@@ -1,12 +1,27 @@
 import React, { useState } from 'react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
 import { 
   Type, Image, CheckCircle2, ListChecks, ToggleLeft, PenLine,
-  Sparkles, ArrowDown, ArrowUp, Trash2, Plus, GripVertical,
+  Sparkles, ArrowDown, ArrowUp, Plus,
   Wand2, Lightbulb, ChevronDown
 } from 'lucide-react';
 import { Slide, SlideType } from '@/types/course';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { SortableSlideItem } from './SortableSlideItem';
 
 interface SlideEditorProps {
   slides: Slide[];
@@ -16,6 +31,7 @@ interface SlideEditorProps {
   onAddSlide: (type: SlideType) => void;
   onDeleteSlide: (slideId: string) => void;
   onImproveSlide: (slideId: string, action: 'improve' | 'simplify' | 'harder') => void;
+  onReorderSlides: (activeId: string, overId: string) => void;
 }
 
 const slideTypeConfig: Record<SlideType, { icon: React.ElementType; label: string; color: string }> = {
@@ -35,9 +51,28 @@ export const SlideEditor: React.FC<SlideEditorProps> = ({
   onAddSlide,
   onDeleteSlide,
   onImproveSlide,
+  onReorderSlides,
 }) => {
   const [showAddMenu, setShowAddMenu] = useState(false);
   const selectedSlide = slides.find(s => s.id === selectedSlideId);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      onReorderSlides(active.id as string, over.id as string);
+    }
+  };
 
   return (
     <div className="h-full flex flex-col bg-card rounded-2xl shadow-soft overflow-hidden">
@@ -83,59 +118,31 @@ export const SlideEditor: React.FC<SlideEditorProps> = ({
 
       {/* Slides List */}
       <div className="flex-1 overflow-y-auto p-3">
-        <div className="grid grid-cols-2 gap-3">
-          {slides.map((slide, index) => {
-            const config = slideTypeConfig[slide.type];
-            const Icon = config.icon;
-            
-            return (
-              <div
-                key={slide.id}
-                onClick={() => onSelectSlide(slide.id)}
-                className={cn(
-                  'group relative aspect-[4/3] rounded-xl border-2 cursor-pointer transition-all duration-200 p-3 flex flex-col',
-                  selectedSlideId === slide.id
-                    ? 'border-primary bg-primary-light shadow-primary'
-                    : 'border-border hover:border-primary/50 bg-background'
-                )}
-              >
-                {/* Slide number */}
-                <div className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-foreground text-background text-xs font-bold flex items-center justify-center">
-                  {index + 1}
-                </div>
-
-                {/* Type badge */}
-                <div className={cn('self-start px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1', config.color)}>
-                  <Icon className="w-3 h-3" />
-                  {config.label}
-                </div>
-
-                {/* Content preview */}
-                <div className="flex-1 mt-2 overflow-hidden">
-                  <p className="text-xs text-muted-foreground line-clamp-3">
-                    {slide.content || 'Пустой слайд...'}
-                  </p>
-                </div>
-
-                {/* Actions on hover */}
-                <div className="absolute inset-0 bg-foreground/80 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                  <Button
-                    variant="secondary"
-                    size="icon-sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDeleteSlide(slide.id);
-                    }}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
+        {slides.length > 0 ? (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={slides.map(s => s.id)}
+              strategy={rectSortingStrategy}
+            >
+              <div className="grid grid-cols-2 gap-3">
+                {slides.map((slide, index) => (
+                  <SortableSlideItem
+                    key={slide.id}
+                    slide={slide}
+                    index={index}
+                    isSelected={selectedSlideId === slide.id}
+                    onSelect={() => onSelectSlide(slide.id)}
+                    onDelete={() => onDeleteSlide(slide.id)}
+                  />
+                ))}
               </div>
-            );
-          })}
-        </div>
-
-        {slides.length === 0 && (
+            </SortableContext>
+          </DndContext>
+        ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mb-4">
               <Type className="w-8 h-8 text-muted-foreground" />
