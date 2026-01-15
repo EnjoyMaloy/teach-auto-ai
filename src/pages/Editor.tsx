@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { arrayMove } from '@dnd-kit/sortable';
 import { Course, Lesson, Slide, SlideType } from '@/types/course';
 import { generateMockLessons, mockCourse } from '@/lib/mockData';
 import { EditorHeader } from '@/components/editor/EditorHeader';
@@ -215,6 +216,48 @@ const Editor: React.FC = () => {
     }, 1500);
   };
 
+  // Reorder lessons via drag-and-drop
+  const handleReorderLessons = (activeId: string, overId: string) => {
+    pushToUndo();
+    setCourse(prev => {
+      const oldIndex = prev.lessons.findIndex(l => l.id === activeId);
+      const newIndex = prev.lessons.findIndex(l => l.id === overId);
+      return {
+        ...prev,
+        lessons: arrayMove(prev.lessons, oldIndex, newIndex).map((l, i) => ({
+          ...l,
+          order: i + 1,
+        })),
+        updatedAt: new Date(),
+      };
+    });
+    toast.success('Порядок уроков обновлён');
+  };
+
+  // Reorder slides via drag-and-drop
+  const handleReorderSlides = (activeId: string, overId: string) => {
+    if (!selectedLessonId) return;
+    pushToUndo();
+    setCourse(prev => ({
+      ...prev,
+      lessons: prev.lessons.map(lesson => {
+        if (lesson.id !== selectedLessonId) return lesson;
+        const oldIndex = lesson.slides.findIndex(s => s.id === activeId);
+        const newIndex = lesson.slides.findIndex(s => s.id === overId);
+        return {
+          ...lesson,
+          slides: arrayMove(lesson.slides, oldIndex, newIndex).map((s, i) => ({
+            ...s,
+            order: i + 1,
+          })),
+          updatedAt: new Date(),
+        };
+      }),
+      updatedAt: new Date(),
+    }));
+    toast.success('Порядок слайдов обновлён');
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     // Simulate save
@@ -263,6 +306,7 @@ const Editor: React.FC = () => {
             onAddLesson={handleAddLesson}
             onDeleteLesson={handleDeleteLesson}
             onDuplicateLesson={handleDuplicateLesson}
+            onReorderLessons={handleReorderLessons}
           />
         </div>
 
@@ -276,6 +320,7 @@ const Editor: React.FC = () => {
             onAddSlide={handleAddSlide}
             onDeleteSlide={handleDeleteSlide}
             onImproveSlide={handleImproveSlide}
+            onReorderSlides={handleReorderSlides}
           />
         </div>
       </div>

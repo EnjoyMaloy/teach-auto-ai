@@ -1,8 +1,22 @@
 import React from 'react';
-import { GripVertical, Plus, BookOpen, MoreHorizontal, Trash2, Copy } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { Plus, BookOpen } from 'lucide-react';
 import { Lesson } from '@/types/course';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { SortableLessonItem } from './SortableLessonItem';
 
 interface LessonsListProps {
   lessons: Lesson[];
@@ -11,6 +25,7 @@ interface LessonsListProps {
   onAddLesson: () => void;
   onDeleteLesson: (lessonId: string) => void;
   onDuplicateLesson: (lessonId: string) => void;
+  onReorderLessons: (activeId: string, overId: string) => void;
 }
 
 export const LessonsList: React.FC<LessonsListProps> = ({
@@ -20,7 +35,26 @@ export const LessonsList: React.FC<LessonsListProps> = ({
   onAddLesson,
   onDeleteLesson,
   onDuplicateLesson,
+  onReorderLessons,
 }) => {
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      onReorderLessons(active.id as string, over.id as string);
+    }
+  };
+
   return (
     <div className="h-full flex flex-col bg-card rounded-2xl shadow-soft overflow-hidden">
       {/* Header */}
@@ -35,56 +69,30 @@ export const LessonsList: React.FC<LessonsListProps> = ({
 
       {/* Lessons List */}
       <div className="flex-1 overflow-y-auto p-2 space-y-1">
-        {lessons.map((lesson, index) => (
-          <div
-            key={lesson.id}
-            className={cn(
-              'group flex items-center gap-2 p-3 rounded-xl cursor-pointer transition-all duration-200',
-              selectedLessonId === lesson.id
-                ? 'bg-primary-light border-2 border-primary'
-                : 'hover:bg-muted border-2 border-transparent'
-            )}
-            onClick={() => onSelectLesson(lesson.id)}
+        {lessons.length > 0 ? (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            <div className="cursor-grab opacity-0 group-hover:opacity-50 transition-opacity">
-              <GripVertical className="w-4 h-4 text-muted-foreground" />
-            </div>
-            
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <span className="text-sm font-bold text-primary">{index + 1}</span>
-            </div>
-            
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm text-foreground truncate">{lesson.title}</p>
-              <p className="text-xs text-muted-foreground">
-                {lesson.slides.length} слайдов • {lesson.estimatedMinutes} мин
-              </p>
-            </div>
-
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDuplicateLesson(lesson.id);
-                }}
-                className="p-1.5 rounded-lg hover:bg-muted-foreground/10 transition-colors"
-              >
-                <Copy className="w-3.5 h-3.5 text-muted-foreground" />
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDeleteLesson(lesson.id);
-                }}
-                className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors"
-              >
-                <Trash2 className="w-3.5 h-3.5 text-destructive" />
-              </button>
-            </div>
-          </div>
-        ))}
-
-        {lessons.length === 0 && (
+            <SortableContext
+              items={lessons.map(l => l.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {lessons.map((lesson, index) => (
+                <SortableLessonItem
+                  key={lesson.id}
+                  lesson={lesson}
+                  index={index}
+                  isSelected={selectedLessonId === lesson.id}
+                  onSelect={() => onSelectLesson(lesson.id)}
+                  onDelete={() => onDeleteLesson(lesson.id)}
+                  onDuplicate={() => onDuplicateLesson(lesson.id)}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
+        ) : (
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center mb-3">
               <BookOpen className="w-6 h-6 text-muted-foreground" />
