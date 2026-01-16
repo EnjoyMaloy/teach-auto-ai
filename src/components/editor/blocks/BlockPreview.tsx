@@ -4,13 +4,13 @@ import { cn } from '@/lib/utils';
 import {
   Heading, Type, Image, Play, Volume2, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
-  Link2, ListOrdered, SlidersHorizontal, MousePointer2
+  Link2, ListOrdered, SlidersHorizontal, MousePointer2, Layers
 } from 'lucide-react';
 
 const iconMap = {
   Heading, Type, Image, Play, Volume2, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
-  Link2, ListOrdered, SlidersHorizontal, MousePointer2
+  Link2, ListOrdered, SlidersHorizontal, MousePointer2, Layers
 };
 
 interface BlockPreviewProps {

@@ -6,7 +6,8 @@ export type SlideType =
   | 'image'
   | 'video'
   | 'audio'
-  | 'image_text' 
+  | 'image_text'
+  | 'design' // Composable design block
   | 'single_choice' 
   | 'multiple_choice' 
   | 'true_false' 

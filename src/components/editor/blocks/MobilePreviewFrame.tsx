@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AudioPlayer } from './AudioPlayer';
+import { DesignBlockEditor } from './DesignBlockEditor';
 import { playSound, SoundConfig } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
 

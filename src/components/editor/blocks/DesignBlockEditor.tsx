@@ -1,0 +1,547 @@
+import React, { useState } from 'react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { arrayMove } from '@dnd-kit/sortable';
+import { 
+  SubBlock, 
+  SubBlockType, 
+  SUB_BLOCK_CONFIGS, 
+  DESIGN_TEMPLATES, 
+  createSubBlock,
+  createSubBlocksFromTemplate,
+  DesignTemplateId
+} from '@/types/designBlock';
+import { CourseDesignSystem } from '@/types/course';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Plus, Trash2, GripVertical, Upload,
+  Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Layers
+} from 'lucide-react';
+
+const iconMap = {
+  Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Layers
+};
+
+interface DesignBlockEditorProps {
+  subBlocks: SubBlock[];
+  onUpdateSubBlocks: (subBlocks: SubBlock[]) => void;
+  designSystem?: CourseDesignSystem;
+  isEditing?: boolean;
+}
+
+// Sortable sub-block item for the preview
+const SortableSubBlockItem: React.FC<{
+  subBlock: SubBlock;
+  isEditing: boolean;
+  onUpdate: (updates: Partial<SubBlock>) => void;
+  onDelete: () => void;
+  designSystem?: CourseDesignSystem;
+}> = ({ subBlock, isEditing, onUpdate, onDelete, designSystem }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: subBlock.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  const ds = {
+    primaryColor: designSystem?.primaryColor || '262 83% 58%',
+    foregroundColor: designSystem?.foregroundColor || '240 10% 4%',
+    mutedColor: designSystem?.mutedColor || '240 5% 96%',
+    successColor: designSystem?.successColor || '142 71% 45%',
+    borderRadius: designSystem?.borderRadius || '0.75rem',
+  };
+
+  const textAlignClass = {
+    left: 'text-left',
+    center: 'text-center',
+    right: 'text-right',
+  }[subBlock.textAlign || 'center'];
+
+  const paddingClass = {
+    none: 'p-0',
+    small: 'px-2 py-1',
+    medium: 'px-4 py-2',
+    large: 'px-6 py-4',
+  }[subBlock.padding || 'medium'];
+
+  const renderSubBlockContent = () => {
+    switch (subBlock.type) {
+      case 'heading':
+        const headingSizeClass = {
+          small: 'text-lg',
+          medium: 'text-xl',
+          large: 'text-2xl',
+          xlarge: 'text-3xl',
+        }[subBlock.textSize || 'large'];
+        
+        const fontWeightClass = {
+          normal: 'font-normal',
+          medium: 'font-medium',
+          semibold: 'font-semibold',
+          bold: 'font-bold',
+        }[subBlock.fontWeight || 'bold'];
+
+        return isEditing ? (
+          <input
+            type="text"
+            value={subBlock.content || ''}
+            onChange={(e) => onUpdate({ content: e.target.value })}
+            placeholder="Заголовок..."
+            className={cn(
+              'w-full bg-transparent outline-none',
+              headingSizeClass, fontWeightClass, textAlignClass
+            )}
+            style={{ color: `hsl(${ds.foregroundColor})` }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          <h2 
+            className={cn(headingSizeClass, fontWeightClass, textAlignClass)}
+            style={{ color: `hsl(${ds.foregroundColor})` }}
+          >
+            {subBlock.content || 'Заголовок'}
+          </h2>
+        );
+
+      case 'text':
+        const textSizeClass = {
+          small: 'text-sm',
+          medium: 'text-base',
+          large: 'text-lg',
+          xlarge: 'text-xl',
+        }[subBlock.textSize || 'medium'];
+
+        return isEditing ? (
+          <textarea
+            value={subBlock.content || ''}
+            onChange={(e) => onUpdate({ content: e.target.value })}
+            placeholder="Текст абзаца..."
+            rows={3}
+            className={cn(
+              'w-full bg-transparent outline-none resize-none',
+              textSizeClass, textAlignClass
+            )}
+            style={{ color: `hsl(${ds.foregroundColor} / 0.8)` }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          <p 
+            className={cn(textSizeClass, textAlignClass)}
+            style={{ color: `hsl(${ds.foregroundColor} / 0.8)` }}
+          >
+            {subBlock.content || 'Текст абзаца'}
+          </p>
+        );
+
+      case 'image':
+        const imageSizeClass = {
+          small: 'max-w-[100px] max-h-[100px]',
+          medium: 'max-w-[200px] max-h-[200px]',
+          large: 'max-w-[300px] max-h-[300px]',
+          full: 'w-full',
+        }[subBlock.imageSize || 'medium'];
+
+        return (
+          <div className={cn('flex', textAlignClass === 'text-center' ? 'justify-center' : textAlignClass === 'text-right' ? 'justify-end' : 'justify-start')}>
+            {subBlock.imageUrl ? (
+              <img 
+                src={subBlock.imageUrl} 
+                alt="" 
+                className={cn('rounded-lg object-cover', imageSizeClass)}
+              />
+            ) : isEditing ? (
+              <label className={cn('flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer', imageSizeClass, 'min-h-[100px]')}
+                style={{ borderColor: `hsl(${ds.mutedColor})` }}
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        onUpdate({ imageUrl: event.target?.result as string });
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+                <Upload className="w-6 h-6 mb-2" style={{ color: `hsl(${ds.foregroundColor} / 0.3)` }} />
+                <span className="text-xs" style={{ color: `hsl(${ds.foregroundColor} / 0.3)` }}>Загрузить</span>
+              </label>
+            ) : (
+              <div 
+                className={cn('flex items-center justify-center rounded-lg', imageSizeClass, 'min-h-[100px]')}
+                style={{ backgroundColor: `hsl(${ds.mutedColor})` }}
+              >
+                <Image className="w-8 h-8" style={{ color: `hsl(${ds.foregroundColor} / 0.3)` }} />
+              </div>
+            )}
+          </div>
+        );
+
+      case 'button':
+        const buttonVariantStyles = {
+          primary: {
+            backgroundColor: `hsl(${ds.primaryColor})`,
+            color: 'white',
+          },
+          secondary: {
+            backgroundColor: `hsl(${ds.mutedColor})`,
+            color: `hsl(${ds.foregroundColor})`,
+          },
+          outline: {
+            backgroundColor: 'transparent',
+            border: `2px solid hsl(${ds.primaryColor})`,
+            color: `hsl(${ds.primaryColor})`,
+          },
+          ghost: {
+            backgroundColor: 'transparent',
+            color: `hsl(${ds.primaryColor})`,
+          },
+        }[subBlock.buttonVariant || 'primary'];
+
+        return (
+          <div className={cn('flex', textAlignClass === 'text-center' ? 'justify-center' : textAlignClass === 'text-right' ? 'justify-end' : 'justify-start')}>
+            {isEditing ? (
+              <input
+                type="text"
+                value={subBlock.buttonLabel || ''}
+                onChange={(e) => onUpdate({ buttonLabel: e.target.value })}
+                placeholder="Текст кнопки..."
+                className="px-4 py-2 rounded-lg text-center font-medium outline-none"
+                style={{ ...buttonVariantStyles, borderRadius: ds.borderRadius }}
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : (
+              <button
+                className="px-4 py-2 rounded-lg font-medium"
+                style={{ ...buttonVariantStyles, borderRadius: ds.borderRadius }}
+              >
+                {subBlock.buttonLabel || 'Кнопка'}
+              </button>
+            )}
+          </div>
+        );
+
+      case 'divider':
+        return (
+          <div className="w-full py-2">
+            <hr style={{ borderColor: `hsl(${ds.mutedColor})` }} />
+          </div>
+        );
+
+      case 'icon':
+        const iconSizeClass = {
+          small: 'w-6 h-6',
+          medium: 'w-10 h-10',
+          large: 'w-16 h-16',
+        }[subBlock.iconSize || 'medium'];
+
+        return (
+          <div className={cn('flex', textAlignClass === 'text-center' ? 'justify-center' : textAlignClass === 'text-right' ? 'justify-end' : 'justify-start')}>
+            <div 
+              className={cn('rounded-full flex items-center justify-center', iconSizeClass)}
+              style={{ 
+                backgroundColor: `hsl(${ds.primaryColor} / 0.1)`,
+                padding: '0.75rem'
+              }}
+            >
+              <Sparkles className={iconSizeClass} style={{ color: `hsl(${ds.primaryColor})` }} />
+            </div>
+          </div>
+        );
+
+      case 'badge':
+        const badgeVariantStyles = {
+          default: {
+            backgroundColor: `hsl(${ds.primaryColor} / 0.1)`,
+            color: `hsl(${ds.primaryColor})`,
+          },
+          success: {
+            backgroundColor: `hsl(${ds.successColor} / 0.1)`,
+            color: `hsl(${ds.successColor})`,
+          },
+          warning: {
+            backgroundColor: 'hsl(45 93% 47% / 0.1)',
+            color: 'hsl(45 93% 47%)',
+          },
+          destructive: {
+            backgroundColor: 'hsl(0 84% 60% / 0.1)',
+            color: 'hsl(0 84% 60%)',
+          },
+        }[subBlock.badgeVariant || 'default'];
+
+        return (
+          <div className={cn('flex', textAlignClass === 'text-center' ? 'justify-center' : textAlignClass === 'text-right' ? 'justify-end' : 'justify-start')}>
+            {isEditing ? (
+              <input
+                type="text"
+                value={subBlock.badgeText || ''}
+                onChange={(e) => onUpdate({ badgeText: e.target.value })}
+                placeholder="Текст бейджа..."
+                className="px-3 py-1 rounded-full text-xs font-medium outline-none"
+                style={badgeVariantStyles}
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : (
+              <span
+                className="px-3 py-1 rounded-full text-xs font-medium"
+                style={badgeVariantStyles}
+              >
+                {subBlock.badgeText || 'Бейдж'}
+              </span>
+            )}
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        'relative group',
+        paddingClass,
+        isDragging && 'opacity-50 z-50',
+        isEditing && 'hover:bg-primary/5 rounded-lg transition-colors'
+      )}
+    >
+      {isEditing && (
+        <>
+          {/* Drag handle */}
+          <div
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full opacity-0 group-hover:opacity-100 transition-opacity cursor-grab pr-1"
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical className="w-4 h-4 text-muted-foreground" />
+          </div>
+          
+          {/* Delete button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full opacity-0 group-hover:opacity-100 transition-opacity pl-1"
+          >
+            <Trash2 className="w-4 h-4 text-destructive" />
+          </button>
+        </>
+      )}
+      
+      {renderSubBlockContent()}
+    </div>
+  );
+};
+
+// Template selector component
+const TemplateSelector: React.FC<{
+  onSelectTemplate: (templateId: DesignTemplateId) => void;
+}> = ({ onSelectTemplate }) => {
+  return (
+    <div className="space-y-3">
+      <p className="text-sm font-medium text-foreground text-center">Выберите шаблон</p>
+      <div className="grid grid-cols-2 gap-2">
+        {DESIGN_TEMPLATES.map((template) => (
+          <button
+            key={template.id}
+            onClick={() => onSelectTemplate(template.id)}
+            className="p-3 rounded-xl border-2 border-border hover:border-primary transition-colors text-left"
+          >
+            <p className="font-medium text-sm">{template.nameRu}</p>
+            <p className="text-xs text-muted-foreground">{template.description}</p>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Sub-block type selector
+const SubBlockSelector: React.FC<{
+  onSelectType: (type: SubBlockType) => void;
+  onClose: () => void;
+}> = ({ onSelectType, onClose }) => {
+  const types = Object.values(SUB_BLOCK_CONFIGS);
+  
+  return (
+    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card border border-border rounded-xl shadow-lg p-2 z-50 min-w-[200px]">
+      <div className="grid grid-cols-2 gap-1">
+        {types.map((config) => {
+          const IconComponent = iconMap[config.icon as keyof typeof iconMap];
+          return (
+            <button
+              key={config.type}
+              onClick={() => {
+                onSelectType(config.type);
+                onClose();
+              }}
+              className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted transition-colors text-left"
+            >
+              {IconComponent && <IconComponent className="w-4 h-4 text-primary" />}
+              <span className="text-xs font-medium">{config.labelRu}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
+  subBlocks,
+  onUpdateSubBlocks,
+  designSystem,
+  isEditing = true,
+}) => {
+  const [showAddMenu, setShowAddMenu] = useState(false);
+  const [showTemplateSelector, setShowTemplateSelector] = useState(subBlocks.length === 0);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = subBlocks.findIndex((sb) => sb.id === active.id);
+    const newIndex = subBlocks.findIndex((sb) => sb.id === over.id);
+    
+    const reordered = arrayMove(subBlocks, oldIndex, newIndex).map((sb, i) => ({
+      ...sb,
+      order: i + 1,
+    }));
+    
+    onUpdateSubBlocks(reordered);
+  };
+
+  const handleAddSubBlock = (type: SubBlockType) => {
+    const newSubBlock = createSubBlock(type, subBlocks.length + 1);
+    onUpdateSubBlocks([...subBlocks, newSubBlock]);
+    setShowTemplateSelector(false);
+  };
+
+  const handleSelectTemplate = (templateId: DesignTemplateId) => {
+    const newSubBlocks = createSubBlocksFromTemplate(templateId);
+    onUpdateSubBlocks(newSubBlocks);
+    setShowTemplateSelector(false);
+  };
+
+  const handleUpdateSubBlock = (id: string, updates: Partial<SubBlock>) => {
+    onUpdateSubBlocks(
+      subBlocks.map((sb) => (sb.id === id ? { ...sb, ...updates } : sb))
+    );
+  };
+
+  const handleDeleteSubBlock = (id: string) => {
+    onUpdateSubBlocks(
+      subBlocks.filter((sb) => sb.id !== id).map((sb, i) => ({ ...sb, order: i + 1 }))
+    );
+  };
+
+  const ds = {
+    backgroundColor: designSystem?.backgroundColor || '0 0% 100%',
+    foregroundColor: designSystem?.foregroundColor || '240 10% 4%',
+  };
+
+  if (showTemplateSelector && subBlocks.length === 0) {
+    return (
+      <div 
+        className="h-full flex flex-col items-center justify-center p-6"
+        style={{ backgroundColor: `hsl(${ds.backgroundColor})` }}
+      >
+        <div className="w-14 h-14 rounded-2xl bg-primary/10 mb-4 flex items-center justify-center">
+          <Layers className="w-7 h-7 text-primary" />
+        </div>
+        <TemplateSelector onSelectTemplate={handleSelectTemplate} />
+      </div>
+    );
+  }
+
+  return (
+    <div 
+      className="h-full flex flex-col p-4 overflow-auto"
+      style={{ backgroundColor: `hsl(${ds.backgroundColor})` }}
+    >
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={subBlocks.map((sb) => sb.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="flex-1 space-y-1">
+            {subBlocks.map((subBlock) => (
+              <SortableSubBlockItem
+                key={subBlock.id}
+                subBlock={subBlock}
+                isEditing={isEditing}
+                onUpdate={(updates) => handleUpdateSubBlock(subBlock.id, updates)}
+                onDelete={() => handleDeleteSubBlock(subBlock.id)}
+                designSystem={designSystem}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
+
+      {/* Add sub-block button */}
+      {isEditing && (
+        <div className="relative flex justify-center mt-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowAddMenu(!showAddMenu)}
+            className="rounded-full"
+          >
+            <Plus className="w-4 h-4 mr-1" />
+            Добавить
+          </Button>
+          
+          {showAddMenu && (
+            <SubBlockSelector
+              onSelectType={handleAddSubBlock}
+              onClose={() => setShowAddMenu(false)}
+            />
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
