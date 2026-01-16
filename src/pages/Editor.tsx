@@ -1,16 +1,70 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { arrayMove } from '@dnd-kit/sortable';
-import { Course, Lesson, Slide, SlideType } from '@/types/course';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { Course, Lesson, Slide } from '@/types/course';
+import { Block, BlockType, createEmptyBlock } from '@/types/blocks';
 import { useAuth } from '@/hooks/useAuth';
 import { useCourses } from '@/hooks/useCourses';
 import { EditorHeader } from '@/components/editor/EditorHeader';
 import { LessonsList } from '@/components/editor/LessonsList';
-import { SlideEditor } from '@/components/editor/SlideEditor';
 import { CoursePlayer } from '@/components/runtime/CoursePlayer';
 import { EditorAIChat } from '@/components/editor/EditorAIChat';
+import { 
+  BlockPreview, 
+  BlockTypeSelector, 
+  MobilePreviewFrame, 
+  BlockEditor 
+} from '@/components/editor/blocks';
+import { SortableBlockItem } from '@/components/editor/SortableBlockItem';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Plus, Smartphone } from 'lucide-react';
+
+// Adapter: Convert Slide to Block for the new editor
+const slideToBlock = (slide: Slide): Block => ({
+  id: slide.id,
+  lessonId: slide.lessonId,
+  type: slide.type as BlockType,
+  order: slide.order,
+  content: slide.content,
+  imageUrl: slide.imageUrl,
+  options: slide.options,
+  correctAnswer: slide.correctAnswer,
+  explanation: slide.explanation,
+  blankWord: slide.blankWord,
+  createdAt: slide.createdAt,
+  updatedAt: slide.updatedAt,
+});
+
+// Adapter: Convert Block back to Slide for storage
+const blockToSlide = (block: Block): Slide => ({
+  id: block.id,
+  lessonId: block.lessonId,
+  type: block.type as any,
+  order: block.order,
+  content: block.content,
+  imageUrl: block.imageUrl,
+  options: block.options,
+  correctAnswer: block.correctAnswer,
+  explanation: block.explanation,
+  blankWord: block.blankWord,
+  createdAt: block.createdAt,
+  updatedAt: block.updatedAt,
+});
 
 const Editor: React.FC = () => {
   const { courseId } = useParams();
@@ -21,11 +75,17 @@ const Editor: React.FC = () => {
   const [course, setCourse] = useState<Course | null>(null);
   const [isLoadingCourse, setIsLoadingCourse] = useState(true);
   const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
-  const [selectedSlideId, setSelectedSlideId] = useState<string | null>(null);
+  const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [showBlockSelector, setShowBlockSelector] = useState(false);
   const [undoStack, setUndoStack] = useState<Course[]>([]);
   const [redoStack, setRedoStack] = useState<Course[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   // Load or create course
   useEffect(() => {
@@ -35,7 +95,6 @@ const Editor: React.FC = () => {
       setIsLoadingCourse(true);
       
       if (courseId === 'new') {
-        // Create new course
         const newCourse = await createCourse('Новый курс');
         if (newCourse) {
           navigate(`/editor/${newCourse.id}`, { replace: true });
@@ -43,14 +102,13 @@ const Editor: React.FC = () => {
           navigate('/');
         }
       } else if (courseId) {
-        // Load existing course
         const loadedCourse = await fetchCourse(courseId);
         if (loadedCourse) {
           setCourse(loadedCourse);
           if (loadedCourse.lessons.length > 0) {
             setSelectedLessonId(loadedCourse.lessons[0].id);
             if (loadedCourse.lessons[0].slides.length > 0) {
-              setSelectedSlideId(loadedCourse.lessons[0].slides[0].id);
+              setSelectedBlockId(loadedCourse.lessons[0].slides[0].id);
             }
           }
         } else {
@@ -66,6 +124,8 @@ const Editor: React.FC = () => {
   }, [courseId, user, fetchCourse, createCourse, navigate]);
 
   const selectedLesson = course?.lessons.find(l => l.id === selectedLessonId);
+  const blocks: Block[] = selectedLesson?.slides.map(slideToBlock) || [];
+  const selectedBlock = blocks.find(b => b.id === selectedBlockId) || null;
 
   // History management
   const pushToUndo = useCallback(() => {
@@ -94,11 +154,7 @@ const Editor: React.FC = () => {
   const handleUpdateTitle = (title: string) => {
     if (!course) return;
     pushToUndo();
-    setCourse(prev => prev ? ({
-      ...prev,
-      title,
-      updatedAt: new Date(),
-    }) : null);
+    setCourse(prev => prev ? ({ ...prev, title, updatedAt: new Date() }) : null);
     toast.success('Название курса обновлено');
   };
 
@@ -107,9 +163,9 @@ const Editor: React.FC = () => {
     setSelectedLessonId(lessonId);
     const lesson = course?.lessons.find(l => l.id === lessonId);
     if (lesson?.slides[0]) {
-      setSelectedSlideId(lesson.slides[0].id);
+      setSelectedBlockId(lesson.slides[0].id);
     } else {
-      setSelectedSlideId(null);
+      setSelectedBlockId(null);
     }
   };
 
@@ -119,7 +175,7 @@ const Editor: React.FC = () => {
     const newLesson: Lesson = {
       id: `lesson-${Date.now()}`,
       courseId: course.id,
-      title: `Новый урок ${course.lessons.length + 1}`,
+      title: `Урок ${course.lessons.length + 1}`,
       description: '',
       order: course.lessons.length + 1,
       slides: [],
@@ -133,7 +189,7 @@ const Editor: React.FC = () => {
       updatedAt: new Date(),
     }) : null);
     setSelectedLessonId(newLesson.id);
-    setSelectedSlideId(null);
+    setSelectedBlockId(null);
     toast.success('Урок добавлен');
   };
 
@@ -182,36 +238,16 @@ const Editor: React.FC = () => {
     toast.success('Урок скопирован');
   };
 
-  // Slide operations
-  const handleSelectSlide = (slideId: string) => {
-    setSelectedSlideId(slideId);
-  };
-
-  const handleAddSlide = (type: SlideType) => {
+  // Block operations
+  const handleAddBlock = (type: BlockType) => {
     if (!selectedLessonId || !course) {
       toast.error('Сначала выберите урок');
       return;
     }
     pushToUndo();
     
-    const newSlide: Slide = {
-      id: `slide-${Date.now()}`,
-      lessonId: selectedLessonId,
-      type,
-      order: selectedLesson?.slides.length || 0 + 1,
-      content: '',
-      options: ['single_choice', 'multiple_choice'].includes(type) ? [
-        { id: 'opt-1', text: 'Вариант 1', isCorrect: true },
-        { id: 'opt-2', text: 'Вариант 2', isCorrect: false },
-        { id: 'opt-3', text: 'Вариант 3', isCorrect: false },
-      ] : undefined,
-      correctAnswer: type === 'true_false' ? true : undefined,
-      explanation: ['single_choice', 'multiple_choice', 'true_false', 'fill_blank'].includes(type) 
-        ? '' 
-        : undefined,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const newBlock = createEmptyBlock(type, selectedLessonId, blocks.length + 1);
+    const newSlide = blockToSlide(newBlock);
 
     setCourse(prev => prev ? ({
       ...prev,
@@ -222,19 +258,20 @@ const Editor: React.FC = () => {
       ),
       updatedAt: new Date(),
     }) : null);
-    setSelectedSlideId(newSlide.id);
-    toast.success('Слайд добавлен');
+    setSelectedBlockId(newBlock.id);
+    setShowBlockSelector(false);
+    toast.success('Блок добавлен');
   };
 
-  const handleUpdateSlide = (slideId: string, updates: Partial<Slide>) => {
-    if (!course) return;
+  const handleUpdateBlock = (updates: Partial<Block>) => {
+    if (!course || !selectedBlockId) return;
     pushToUndo();
     setCourse(prev => prev ? ({
       ...prev,
       lessons: prev.lessons.map(lesson => ({
         ...lesson,
         slides: lesson.slides.map(slide =>
-          slide.id === slideId
+          slide.id === selectedBlockId
             ? { ...slide, ...updates, updatedAt: new Date() }
             : slide
         ),
@@ -243,31 +280,22 @@ const Editor: React.FC = () => {
     }) : null);
   };
 
-  const handleDeleteSlide = (slideId: string) => {
-    if (!course) return;
+  const handleDeleteBlock = () => {
+    if (!course || !selectedBlockId) return;
     pushToUndo();
     setCourse(prev => prev ? ({
       ...prev,
       lessons: prev.lessons.map(lesson => ({
         ...lesson,
-        slides: lesson.slides.filter(s => s.id !== slideId),
+        slides: lesson.slides.filter(s => s.id !== selectedBlockId),
       })),
       updatedAt: new Date(),
     }) : null);
-    if (selectedSlideId === slideId) {
-      setSelectedSlideId(null);
-    }
-    toast.success('Слайд удалён');
+    setSelectedBlockId(null);
+    toast.success('Блок удалён');
   };
 
-  const handleImproveSlide = (slideId: string, action: 'improve' | 'simplify' | 'harder') => {
-    toast.info(`AI ${action === 'improve' ? 'улучшает' : action === 'simplify' ? 'упрощает' : 'усложняет'} слайд...`);
-    setTimeout(() => {
-      toast.success('Слайд обновлён!');
-    }, 1500);
-  };
-
-  // Reorder lessons via drag-and-drop
+  // Reorder
   const handleReorderLessons = (activeId: string, overId: string) => {
     if (!course) return;
     pushToUndo();
@@ -284,19 +312,19 @@ const Editor: React.FC = () => {
         updatedAt: new Date(),
       };
     });
-    toast.success('Порядок уроков обновлён');
   };
 
-  // Reorder slides via drag-and-drop
-  const handleReorderSlides = (activeId: string, overId: string) => {
-    if (!selectedLessonId || !course) return;
+  const handleReorderBlocks = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id || !selectedLessonId || !course) return;
+    
     pushToUndo();
     setCourse(prev => prev ? ({
       ...prev,
       lessons: prev.lessons.map(lesson => {
         if (lesson.id !== selectedLessonId) return lesson;
-        const oldIndex = lesson.slides.findIndex(s => s.id === activeId);
-        const newIndex = lesson.slides.findIndex(s => s.id === overId);
+        const oldIndex = lesson.slides.findIndex(s => s.id === active.id);
+        const newIndex = lesson.slides.findIndex(s => s.id === over.id);
         return {
           ...lesson,
           slides: arrayMove(lesson.slides, oldIndex, newIndex).map((s, i) => ({
@@ -308,7 +336,6 @@ const Editor: React.FC = () => {
       }),
       updatedAt: new Date(),
     }) : null);
-    toast.success('Порядок слайдов обновлён');
   };
 
   const handleSave = async () => {
@@ -343,8 +370,10 @@ const Editor: React.FC = () => {
     return <CoursePlayer course={course} onClose={() => setIsPreviewMode(false)} />;
   }
 
+  const selectedBlockIndex = blocks.findIndex(b => b.id === selectedBlockId);
+
   return (
-    <div className="h-screen flex flex-col bg-background">
+    <div className="h-screen flex flex-col bg-muted/30">
       <EditorHeader
         course={course}
         canUndo={undoStack.length > 0}
@@ -359,9 +388,9 @@ const Editor: React.FC = () => {
         onBack={() => navigate('/')}
       />
 
-      <div className="flex-1 flex overflow-hidden p-4 gap-4">
-        {/* Lessons sidebar */}
-        <div className="w-72 flex-shrink-0">
+      <div className="flex-1 flex overflow-hidden">
+        {/* Left: Lessons sidebar */}
+        <div className="w-64 flex-shrink-0 p-4 border-r border-border bg-background">
           <LessonsList
             lessons={course.lessons}
             selectedLessonId={selectedLessonId}
@@ -373,28 +402,121 @@ const Editor: React.FC = () => {
           />
         </div>
 
-        {/* Slides editor */}
-        <div className="flex-1">
-          <SlideEditor
-            slides={selectedLesson?.slides || []}
-            selectedSlideId={selectedSlideId}
-            onSelectSlide={handleSelectSlide}
-            onUpdateSlide={handleUpdateSlide}
-            onAddSlide={handleAddSlide}
-            onDeleteSlide={handleDeleteSlide}
-            onImproveSlide={handleImproveSlide}
-            onReorderSlides={handleReorderSlides}
-          />
+        {/* Center: Block list + Mobile Preview */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Block list */}
+          <div className="w-80 flex-shrink-0 p-4 overflow-y-auto border-r border-border bg-background">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-foreground">Блоки</h3>
+              <Button 
+                variant="soft" 
+                size="sm"
+                onClick={() => setShowBlockSelector(true)}
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Добавить
+              </Button>
+            </div>
+
+            {blocks.length > 0 ? (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleReorderBlocks}
+              >
+                <SortableContext
+                  items={blocks.map(b => b.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-2">
+                    {blocks.map((block, index) => (
+                      <SortableBlockItem
+                        key={block.id}
+                        block={block}
+                        index={index}
+                        isSelected={selectedBlockId === block.id}
+                        onSelect={() => setSelectedBlockId(block.id)}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
+            ) : (
+              <div className="text-center py-12">
+                <Smartphone className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+                <p className="text-sm text-muted-foreground mb-4">
+                  Добавьте первый блок
+                </p>
+                <Button 
+                  variant="soft" 
+                  size="sm"
+                  onClick={() => setShowBlockSelector(true)}
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Добавить блок
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Preview */}
+          <div className="flex-1 flex items-center justify-center p-8 bg-muted/50 overflow-auto">
+            <MobilePreviewFrame
+              block={selectedBlock}
+              lessonTitle={selectedLesson?.title}
+              blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
+              totalBlocks={blocks.length}
+            />
+          </div>
+        </div>
+
+        {/* Right: Block Editor */}
+        <div className="w-96 flex-shrink-0 border-l border-border bg-background overflow-hidden">
+          {selectedBlock ? (
+            <BlockEditor
+              block={selectedBlock}
+              onUpdate={handleUpdateBlock}
+              onDelete={handleDeleteBlock}
+            />
+          ) : (
+            <div className="h-full flex items-center justify-center p-8 text-center">
+              <div>
+                <Smartphone className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">
+                  Выберите блок для редактирования
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Block Type Selector Modal */}
+      {showBlockSelector && (
+        <BlockTypeSelector
+          onSelect={handleAddBlock}
+          onClose={() => setShowBlockSelector(false)}
+        />
+      )}
 
       {/* AI Chat */}
       <EditorAIChat
         course={course}
         selectedLesson={selectedLesson || null}
-        selectedSlide={selectedLesson?.slides.find(s => s.id === selectedSlideId) || null}
+        selectedSlide={selectedLesson?.slides.find(s => s.id === selectedBlockId) || null}
         onUpdateCourse={(updates) => setCourse(prev => prev ? ({ ...prev, ...updates }) : null)}
-        onUpdateSlide={handleUpdateSlide}
+        onUpdateSlide={(slideId, updates) => {
+          pushToUndo();
+          setCourse(prev => prev ? ({
+            ...prev,
+            lessons: prev.lessons.map(lesson => ({
+              ...lesson,
+              slides: lesson.slides.map(slide =>
+                slide.id === slideId ? { ...slide, ...updates } : slide
+              ),
+            })),
+          }) : null);
+        }}
         onAddLesson={(lesson) => {
           if (!course) return;
           const newLesson: Lesson = {
