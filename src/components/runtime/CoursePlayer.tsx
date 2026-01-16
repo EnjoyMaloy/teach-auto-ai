@@ -58,102 +58,116 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
     const accuracy = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 100;
     
     return (
-      <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full text-center animate-scale-in">
-          <div className="w-24 h-24 rounded-full bg-success-light flex items-center justify-center mx-auto mb-6">
-            <Trophy className="w-12 h-12 text-success" />
-          </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Курс пройден! 🎉</h1>
-          <p className="text-muted-foreground mb-8">{course.title}</p>
-          
-          <div className="grid grid-cols-2 gap-4 mb-8">
-            <div className="p-4 rounded-2xl bg-card border border-border">
-              <Star className="w-6 h-6 text-warning mx-auto mb-2" />
-              <p className="text-2xl font-bold text-foreground">{accuracy}%</p>
-              <p className="text-sm text-muted-foreground">Точность</p>
+      <div className="fixed inset-0 bg-muted/50 z-50 flex items-center justify-center p-4">
+        <div className="h-full max-h-[calc(100vh-80px)] w-full max-w-[420px] aspect-[9/16] bg-card rounded-3xl overflow-hidden flex flex-col items-center justify-center border border-border shadow-2xl p-6">
+          <div className="text-center animate-scale-in">
+            <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-6">
+              <Trophy className="w-10 h-10 text-success" />
             </div>
-            <div className="p-4 rounded-2xl bg-card border border-border">
-              <Clock className="w-6 h-6 text-ai mx-auto mb-2" />
-              <p className="text-2xl font-bold text-foreground">{course.estimatedMinutes}</p>
-              <p className="text-sm text-muted-foreground">Минут</p>
+            <h1 className="text-2xl font-bold text-foreground mb-2">Курс пройден! 🎉</h1>
+            <p className="text-muted-foreground text-sm mb-6">{course.title}</p>
+            
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="p-3 rounded-xl bg-muted/50 border border-border">
+                <Star className="w-5 h-5 text-warning mx-auto mb-1" />
+                <p className="text-xl font-bold text-foreground">{accuracy}%</p>
+                <p className="text-xs text-muted-foreground">Точность</p>
+              </div>
+              <div className="p-3 rounded-xl bg-muted/50 border border-border">
+                <Clock className="w-5 h-5 text-primary mx-auto mb-1" />
+                <p className="text-xl font-bold text-foreground">{course.estimatedMinutes}</p>
+                <p className="text-xs text-muted-foreground">Минут</p>
+              </div>
             </div>
-          </div>
 
-          <Button size="xl" onClick={onClose}>
-            Завершить
-          </Button>
+            <Button size="lg" onClick={onClose} className="w-full">
+              Завершить
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col">
-      {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-border bg-card">
-        <button 
-          onClick={onClose}
-          className="p-2 rounded-lg hover:bg-muted transition-colors"
-        >
-          <X className="w-5 h-5 text-muted-foreground" />
-        </button>
+    <div className="fixed inset-0 bg-muted/50 z-50 flex items-center justify-center p-4">
+      {/* Close button outside phone */}
+      <button 
+        onClick={onClose}
+        className="absolute top-4 right-4 p-3 rounded-xl bg-card border border-border hover:bg-muted transition-colors shadow-lg"
+      >
+        <X className="w-5 h-5 text-muted-foreground" />
+      </button>
 
-        <div className="flex-1 max-w-md mx-4">
-          <div className="h-2 bg-muted rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-gradient-to-r from-primary to-success transition-all duration-300 rounded-full"
-              style={{ width: `${progress}%` }}
-            />
+      {/* Mobile phone frame */}
+      <div className="h-full max-h-[calc(100vh-80px)] w-full max-w-[420px] aspect-[9/16] bg-card rounded-3xl overflow-hidden flex flex-col border border-border shadow-2xl">
+        {/* Header */}
+        <header className="flex items-center justify-between px-4 py-3 border-b border-border bg-card shrink-0">
+          <div className="text-sm font-medium text-muted-foreground">
+            {completedSlides + 1} / {totalSlides}
           </div>
-        </div>
 
-        <div className="text-sm font-medium text-muted-foreground">
-          {completedSlides + 1} / {totalSlides}
-        </div>
-      </header>
-
-      {/* Lesson indicator */}
-      <div className="px-4 py-2 bg-muted/50 border-b border-border">
-        <p className="text-sm text-center">
-          <span className="text-muted-foreground">Урок {currentLessonIndex + 1}:</span>
-          <span className="font-medium text-foreground ml-1">{currentLesson?.title}</span>
-        </p>
-      </div>
-
-      {/* Content */}
-      <main className="flex-1 overflow-y-auto p-4 md:p-8">
-        {currentSlide && (
-          <SlideRenderer
-            key={currentSlide.id}
-            slide={currentSlide}
-            onAnswer={handleAnswer}
-            onNext={handleNext}
-          />
-        )}
-      </main>
-
-      {/* Navigation */}
-      <footer className="px-4 py-3 border-t border-border bg-card flex items-center justify-between">
-        <Button
-          variant="ghost"
-          onClick={handlePrevious}
-          disabled={currentLessonIndex === 0 && currentSlideIndex === 0}
-        >
-          <ChevronLeft className="w-5 h-5 mr-1" />
-          Назад
-        </Button>
-
-        <div className="flex items-center gap-2">
-          {correctAnswers > 0 && (
-            <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-success-light text-success text-sm font-medium">
-              <Star className="w-4 h-4" />
-              {correctAnswers}
+          <div className="flex-1 max-w-[200px] mx-4">
+            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-primary to-success transition-all duration-300 rounded-full"
+                style={{ width: `${progress}%` }}
+              />
             </div>
-          )}
+          </div>
+
+          <div className="flex items-center gap-1">
+            {correctAnswers > 0 && (
+              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-success/10 text-success text-xs font-medium">
+                <Star className="w-3 h-3" />
+                {correctAnswers}
+              </div>
+            )}
+          </div>
+        </header>
+
+        {/* Lesson indicator */}
+        <div className="px-4 py-2 bg-muted/30 border-b border-border shrink-0">
+          <p className="text-xs text-center">
+            <span className="text-muted-foreground">Урок {currentLessonIndex + 1}:</span>
+            <span className="font-medium text-foreground ml-1">{currentLesson?.title}</span>
+          </p>
         </div>
 
-        <div className="w-24" /> {/* Spacer */}
-      </footer>
+        {/* Content */}
+        <main className="flex-1 overflow-y-auto p-4">
+          {currentSlide && (
+            <SlideRenderer
+              key={currentSlide.id}
+              slide={currentSlide}
+              onAnswer={handleAnswer}
+              onNext={handleNext}
+            />
+          )}
+        </main>
+
+        {/* Navigation */}
+        <footer className="px-4 py-3 border-t border-border bg-card flex items-center justify-between shrink-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handlePrevious}
+            disabled={currentLessonIndex === 0 && currentSlideIndex === 0}
+          >
+            <ChevronLeft className="w-4 h-4 mr-1" />
+            Назад
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleNext}
+          >
+            Далее
+            <ChevronRight className="w-4 h-4 ml-1" />
+          </Button>
+        </footer>
+      </div>
     </div>
   );
 };
