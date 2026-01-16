@@ -101,6 +101,12 @@ export interface CourseDesignSystem {
     theme: 'duolingo' | 'minimal' | 'playful' | 'none';
     volume: number;
   };
+  designBlock?: {
+    backdropLightColor: string;
+    backdropDarkColor: string;
+    backdropPrimaryColor: string;
+    backdropBlurColor: string;
+  };
 }
 
 export interface Course {
