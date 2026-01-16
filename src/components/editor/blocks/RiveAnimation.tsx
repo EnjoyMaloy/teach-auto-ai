@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { useRive, Layout, Fit, Alignment } from '@rive-app/react-canvas';
+import React, { useState, useEffect, useRef } from 'react';
+import { Rive, Layout, Fit, Alignment } from '@rive-app/react-canvas';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Upload, Link, Play, AlertCircle } from 'lucide-react';
+import { Upload, Link, Play, AlertCircle, Loader2 } from 'lucide-react';
 
 interface RiveAnimationProps {
   src?: string;
@@ -31,6 +31,9 @@ export const RiveAnimation: React.FC<RiveAnimationProps> = ({
   const [urlInput, setUrlInput] = useState('');
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [riveInstance, setRiveInstance] = useState<Rive | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const ds = {
     primaryColor: designSystem?.primaryColor || '262 83% 58%',
@@ -45,22 +48,88 @@ export const RiveAnimation: React.FC<RiveAnimationProps> = ({
     full: 'w-full aspect-square max-w-md',
   };
 
-  const { rive, RiveComponent } = useRive({
-    src: src || '',
-    stateMachines: stateMachine ? [stateMachine] : undefined,
-    autoplay: autoplay,
-    layout: new Layout({
-      fit: Fit.Contain,
-      alignment: Alignment.Center,
-    }),
-    onLoadError: (err) => {
-      console.error('Rive load error:', err);
-      setError('Не удалось загрузить анимацию');
-    },
-    onLoad: () => {
-      setError(null);
-    },
-  });
+  // Initialize Rive when src changes
+  useEffect(() => {
+    if (!src || !canvasRef.current) return;
+
+    setLoading(true);
+    setError(null);
+
+    // Cleanup previous instance
+    if (riveInstance) {
+      riveInstance.cleanup();
+      setRiveInstance(null);
+    }
+
+    const initRive = async () => {
+      try {
+        let buffer: ArrayBuffer;
+
+        // Check if src is a data URL (base64)
+        if (src.startsWith('data:')) {
+          // Convert base64 to ArrayBuffer
+          const base64 = src.split(',')[1];
+          const binaryString = atob(base64);
+          const bytes = new Uint8Array(binaryString.length);
+          for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+          }
+          buffer = bytes.buffer;
+        } else {
+          // Fetch from URL
+          const response = await fetch(src);
+          if (!response.ok) throw new Error('Failed to fetch');
+          buffer = await response.arrayBuffer();
+        }
+
+        const rive = new Rive({
+          buffer,
+          canvas: canvasRef.current!,
+          autoplay: autoplay,
+          layout: new Layout({
+            fit: Fit.Contain,
+            alignment: Alignment.Center,
+          }),
+          onLoad: () => {
+            setLoading(false);
+            setError(null);
+            // Play first animation or state machine
+            if (stateMachine) {
+              rive.play(stateMachine);
+            } else {
+              rive.play();
+            }
+          },
+          onLoadError: (err) => {
+            console.error('Rive load error:', err);
+            setLoading(false);
+            setError('Не удалось загрузить анимацию');
+          },
+        });
+
+        setRiveInstance(rive);
+      } catch (err) {
+        console.error('Rive init error:', err);
+        setLoading(false);
+        setError('Ошибка загрузки анимации');
+      }
+    };
+
+    initRive();
+
+    return () => {
+      if (riveInstance) {
+        riveInstance.cleanup();
+      }
+    };
+  }, [src, autoplay, stateMachine]);
+
+  // Resize handler
+  useEffect(() => {
+    if (riveInstance) {
+      riveInstance.resizeDrawingSurfaceToCanvas();
+    }
+  }, [riveInstance, size]);
 
   const handleFileUpload = (file: File) => {
     if (!file.name.endsWith('.riv')) {
@@ -82,12 +151,6 @@ export const RiveAnimation: React.FC<RiveAnimationProps> = ({
 
   const handleUrlSubmit = () => {
     if (!urlInput.trim()) return;
-    
-    // Basic URL validation
-    if (!urlInput.endsWith('.riv') && !urlInput.includes('rive')) {
-      setError('URL должен указывать на .riv файл');
-      return;
-    }
     
     onUpdate?.({ animationUrl: urlInput.trim() });
     setShowUrlInput(false);
@@ -196,13 +259,22 @@ export const RiveAnimation: React.FC<RiveAnimationProps> = ({
   // Show animation
   return (
     <div className={cn('relative', sizeClasses[size])}>
+      {loading && (
+        <div 
+          className={cn('absolute inset-0 flex items-center justify-center rounded-xl', sizeClasses[size])}
+          style={{ backgroundColor: `hsl(${ds.mutedColor})` }}
+        >
+          <Loader2 className="w-6 h-6 animate-spin" style={{ color: `hsl(${ds.primaryColor})` }} />
+        </div>
+      )}
+      
       {error ? (
         <div 
           className={cn('flex flex-col items-center justify-center gap-2 rounded-xl', sizeClasses[size])}
           style={{ backgroundColor: `hsl(${ds.mutedColor})` }}
         >
           <AlertCircle className="w-6 h-6 text-destructive" />
-          <span className="text-xs text-destructive">{error}</span>
+          <span className="text-xs text-destructive text-center px-2">{error}</span>
           {isEditing && (
             <Button 
               size="sm" 
@@ -218,16 +290,24 @@ export const RiveAnimation: React.FC<RiveAnimationProps> = ({
           )}
         </div>
       ) : (
-        <RiveComponent className="w-full h-full" />
+        <canvas 
+          ref={canvasRef} 
+          className="w-full h-full"
+          style={{ background: 'transparent' }}
+        />
       )}
       
-      {isEditing && !error && (
+      {isEditing && !error && !loading && (
         <Button
           size="sm"
           variant="destructive"
           className="absolute top-1 right-1 w-6 h-6 p-0 opacity-0 hover:opacity-100 transition-opacity"
           onClick={(e) => {
             e.stopPropagation();
+            if (riveInstance) {
+              riveInstance.cleanup();
+              setRiveInstance(null);
+            }
             onUpdate?.({ animationUrl: '' });
           }}
         >
