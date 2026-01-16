@@ -3,6 +3,7 @@ import {
   DesignSystemConfig, 
   DEFAULT_DESIGN_SYSTEM,
   DEFAULT_SOUND_SETTINGS,
+  DEFAULT_DESIGN_BLOCK_SETTINGS,
   PRESET_THEMES,
   FONT_OPTIONS,
   BORDER_RADIUS_OPTIONS,
@@ -32,7 +33,8 @@ import {
   RotateCcw,
   Check,
   Volume2,
-  VolumeX
+  VolumeX,
+  Layers
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -312,7 +314,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="colors">
-            <TabsList className="mb-4">
+            <TabsList className="mb-4 flex-wrap">
               <TabsTrigger value="colors">
                 <Palette className="w-4 h-4 mr-2" />
                 Цвета
@@ -324,6 +326,10 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
               <TabsTrigger value="shape">
                 <Square className="w-4 h-4 mr-2" />
                 Форма
+              </TabsTrigger>
+              <TabsTrigger value="designblock">
+                <Layers className="w-4 h-4 mr-2" />
+                Дизайн-блок
               </TabsTrigger>
               <TabsTrigger value="sound">
                 <Volume2 className="w-4 h-4 mr-2" />
@@ -494,6 +500,102 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                         <p className="text-xs text-muted-foreground">{depth.description}</p>
                       </button>
                     ))}
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="designblock" className="space-y-4">
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label className="text-base font-semibold">Подложки для текста</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Настройте цвета подложек для текстовых саб-блоков
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <ColorInput
+                    label="Светлая подложка"
+                    value={config.designBlock?.backdropLightColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropLightColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        backdropLightColor: v 
+                      } 
+                    })}
+                    description="Лёгкий полупрозрачный фон"
+                  />
+                  <ColorInput
+                    label="Тёмная подложка"
+                    value={config.designBlock?.backdropDarkColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        backdropDarkColor: v 
+                      } 
+                    })}
+                    description="Тёмный фон с белым текстом"
+                  />
+                  <ColorInput
+                    label="Акцентная подложка"
+                    value={config.designBlock?.backdropPrimaryColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        backdropPrimaryColor: v 
+                      } 
+                    })}
+                    description="Фон основного цвета"
+                  />
+                  <ColorInput
+                    label="Blur-подложка"
+                    value={config.designBlock?.backdropBlurColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        backdropBlurColor: v 
+                      } 
+                    })}
+                    description="Полупрозрачный фон с размытием"
+                  />
+                </div>
+
+                {/* Preview of backdrops */}
+                <div className="space-y-2">
+                  <Label>Предпросмотр подложек</Label>
+                  <div 
+                    className="p-4 rounded-xl space-y-3"
+                    style={{ backgroundColor: `hsl(${config.backgroundColor})` }}
+                  >
+                    <div 
+                      className="p-3 rounded-xl text-center text-sm"
+                      style={{ backgroundColor: `hsl(${config.designBlock?.backdropLightColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropLightColor})` }}
+                    >
+                      <span style={{ color: `hsl(${config.foregroundColor})` }}>Светлая подложка</span>
+                    </div>
+                    <div 
+                      className="p-3 rounded-xl text-center text-sm"
+                      style={{ backgroundColor: `hsl(${config.designBlock?.backdropDarkColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkColor})` }}
+                    >
+                      <span className="text-white">Тёмная подложка</span>
+                    </div>
+                    <div 
+                      className="p-3 rounded-xl text-center text-sm"
+                      style={{ backgroundColor: `hsl(${config.designBlock?.backdropPrimaryColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryColor})` }}
+                    >
+                      <span style={{ color: `hsl(${config.primaryColor})` }}>Акцентная подложка</span>
+                    </div>
+                    <div 
+                      className="p-3 rounded-xl text-center text-sm backdrop-blur-sm"
+                      style={{ backgroundColor: `hsl(${config.designBlock?.backdropBlurColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurColor})` }}
+                    >
+                      <span style={{ color: `hsl(${config.foregroundColor})` }}>Blur-подложка</span>
+                    </div>
                   </div>
                 </div>
               </div>

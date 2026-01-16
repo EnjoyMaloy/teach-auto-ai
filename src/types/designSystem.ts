@@ -10,6 +10,22 @@ export interface SoundSettings {
 
 export type ButtonDepth = 'flat' | 'raised';
 
+// Design block backdrop options
+export interface DesignBlockSettings {
+  // Text sub-block backdrop colors (HSL values)
+  backdropLightColor: string;
+  backdropDarkColor: string;
+  backdropPrimaryColor: string;
+  backdropBlurColor: string;
+}
+
+export const DEFAULT_DESIGN_BLOCK_SETTINGS: DesignBlockSettings = {
+  backdropLightColor: '0 0% 0% / 0.05',
+  backdropDarkColor: '0 0% 0% / 0.9',
+  backdropPrimaryColor: '262 83% 58% / 0.1',
+  backdropBlurColor: '0 0% 0% / 0.03',
+};
+
 export interface DesignSystemConfig {
   // Colors (HSL values as strings, e.g., "262 83% 58%")
   primaryColor: string;
@@ -37,6 +53,9 @@ export interface DesignSystemConfig {
   
   // Sound settings
   sound?: SoundSettings;
+  
+  // Design block settings
+  designBlock?: DesignBlockSettings;
 }
 
 export const DEFAULT_SOUND_SETTINGS: SoundSettings = {

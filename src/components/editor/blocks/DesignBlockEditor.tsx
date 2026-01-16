@@ -25,6 +25,7 @@ import {
   createSubBlocksFromTemplate,
   DesignTemplateId
 } from '@/types/designBlock';
+import { DEFAULT_DESIGN_BLOCK_SETTINGS } from '@/types/designSystem';
 import { CourseDesignSystem } from '@/types/course';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -73,6 +74,11 @@ const SortableSubBlockItem: React.FC<{
     mutedColor: designSystem?.mutedColor || '240 5% 96%',
     successColor: designSystem?.successColor || '142 71% 45%',
     borderRadius: designSystem?.borderRadius || '0.75rem',
+    // Design block backdrop colors from design system
+    backdropLightColor: (designSystem as any)?.designBlock?.backdropLightColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropLightColor,
+    backdropDarkColor: (designSystem as any)?.designBlock?.backdropDarkColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkColor,
+    backdropPrimaryColor: (designSystem as any)?.designBlock?.backdropPrimaryColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryColor,
+    backdropBlurColor: (designSystem as any)?.designBlock?.backdropBlurColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurColor,
   };
 
   const textAlignClass = {
@@ -135,27 +141,26 @@ const SortableSubBlockItem: React.FC<{
           xlarge: 'text-xl',
         }[subBlock.textSize || 'medium'];
 
-        // Backdrop styles
+        // Backdrop styles from design system
         const backdropStyles = {
           none: {},
           light: { 
-            backgroundColor: `hsl(${ds.foregroundColor} / 0.05)`,
+            backgroundColor: `hsl(${ds.backdropLightColor})`,
             padding: '12px 16px',
             borderRadius: subBlock.backdropRounded !== false ? '12px' : '0',
           },
           dark: { 
-            backgroundColor: `hsl(${ds.foregroundColor} / 0.9)`,
-            color: `hsl(${ds.primaryColor === ds.foregroundColor ? '0 0% 100%' : ds.foregroundColor} / 0.1)`,
+            backgroundColor: `hsl(${ds.backdropDarkColor})`,
             padding: '12px 16px',
             borderRadius: subBlock.backdropRounded !== false ? '12px' : '0',
           },
           primary: { 
-            backgroundColor: `hsl(${ds.primaryColor} / 0.1)`,
+            backgroundColor: `hsl(${ds.backdropPrimaryColor})`,
             padding: '12px 16px',
             borderRadius: subBlock.backdropRounded !== false ? '12px' : '0',
           },
           blur: { 
-            backgroundColor: `hsl(${ds.foregroundColor} / 0.03)`,
+            backgroundColor: `hsl(${ds.backdropBlurColor})`,
             backdropFilter: 'blur(8px)',
             padding: '12px 16px',
             borderRadius: subBlock.backdropRounded !== false ? '12px' : '0',
@@ -208,10 +213,10 @@ const SortableSubBlockItem: React.FC<{
                     )}
                     style={{
                       backgroundColor: backdrop === 'none' ? 'transparent' 
-                        : backdrop === 'light' ? `hsl(${ds.foregroundColor} / 0.1)`
-                        : backdrop === 'dark' ? `hsl(${ds.foregroundColor} / 0.9)`
-                        : backdrop === 'primary' ? `hsl(${ds.primaryColor} / 0.2)`
-                        : `hsl(${ds.foregroundColor} / 0.05)`,
+                        : backdrop === 'light' ? `hsl(${ds.backdropLightColor})`
+                        : backdrop === 'dark' ? `hsl(${ds.backdropDarkColor})`
+                        : backdrop === 'primary' ? `hsl(${ds.backdropPrimaryColor})`
+                        : `hsl(${ds.backdropBlurColor})`,
                     }}
                     title={backdrop === 'none' ? 'Без подложки' 
                       : backdrop === 'light' ? 'Светлая'
