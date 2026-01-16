@@ -12,6 +12,7 @@ interface MobilePreviewFrameProps {
   lessonTitle?: string;
   blockIndex?: number;
   totalBlocks?: number;
+  onContinue?: () => void;
 }
 
 type AnswerState = 'idle' | 'correct' | 'incorrect';
@@ -21,6 +22,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   lessonTitle = 'Урок',
   blockIndex = 0,
   totalBlocks = 1,
+  onContinue,
 }) => {
   // Interactive state
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -656,7 +658,13 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             </Button>
           )}
           <Button
-            onClick={isInteractive && answerState === 'idle' ? checkAnswer : undefined}
+            onClick={() => {
+              if (isInteractive && answerState === 'idle') {
+                checkAnswer();
+              } else {
+                onContinue?.();
+              }
+            }}
             className="flex-1 h-10"
             disabled={isInteractive && answerState === 'idle' && selectedOptions.length === 0 && trueFalseAnswer === null && !fillBlankInput && Object.keys(matchingSelected.pairs).length === 0}
           >
