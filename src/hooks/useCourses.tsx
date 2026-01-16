@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Course, Lesson, Slide, SlideOption, SlideHint } from '@/types/course';
+import { Course, Lesson, Slide, SlideOption, SlideHint, CourseDesignSystem } from '@/types/course';
 import { useAuth } from './useAuth';
+import { DesignSystemConfig } from '@/types/designSystem';
 import { toast } from 'sonner';
 
 // Convert database row to Slide type
@@ -51,6 +52,7 @@ const dbCourseToCourse = (row: any, lessons: Lesson[]): Course => ({
   createdAt: new Date(row.created_at),
   updatedAt: new Date(row.updated_at),
   tags: row.tags || [],
+  designSystem: row.design_system as CourseDesignSystem | undefined,
 });
 
 export const useCourses = () => {
@@ -213,6 +215,7 @@ export const useCourses = () => {
           is_published: course.isPublished,
           published_at: course.publishedAt?.toISOString(),
           tags: course.tags,
+          design_system: course.designSystem as any,
           updated_at: new Date().toISOString(),
         })
         .eq('id', course.id);
