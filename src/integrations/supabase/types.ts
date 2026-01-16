@@ -242,49 +242,85 @@ export type Database = {
       }
       slides: {
         Row: {
+          audio_url: string | null
+          background_color: string | null
           blank_word: string | null
           content: string
           correct_answer: Json | null
+          correct_order: Json | null
           created_at: string
           explanation: string | null
           hints: Json | null
+          hotspot_areas: Json | null
           id: string
           image_url: string | null
           lesson_id: string
+          matching_pairs: Json | null
           options: Json | null
           order: number
+          ordering_items: Json | null
+          slider_correct: number | null
+          slider_max: number | null
+          slider_min: number | null
+          slider_step: number | null
+          text_color: string | null
           type: string
           updated_at: string
+          video_url: string | null
         }
         Insert: {
+          audio_url?: string | null
+          background_color?: string | null
           blank_word?: string | null
           content?: string
           correct_answer?: Json | null
+          correct_order?: Json | null
           created_at?: string
           explanation?: string | null
           hints?: Json | null
+          hotspot_areas?: Json | null
           id?: string
           image_url?: string | null
           lesson_id: string
+          matching_pairs?: Json | null
           options?: Json | null
           order?: number
+          ordering_items?: Json | null
+          slider_correct?: number | null
+          slider_max?: number | null
+          slider_min?: number | null
+          slider_step?: number | null
+          text_color?: string | null
           type: string
           updated_at?: string
+          video_url?: string | null
         }
         Update: {
+          audio_url?: string | null
+          background_color?: string | null
           blank_word?: string | null
           content?: string
           correct_answer?: Json | null
+          correct_order?: Json | null
           created_at?: string
           explanation?: string | null
           hints?: Json | null
+          hotspot_areas?: Json | null
           id?: string
           image_url?: string | null
           lesson_id?: string
+          matching_pairs?: Json | null
           options?: Json | null
           order?: number
+          ordering_items?: Json | null
+          slider_correct?: number | null
+          slider_max?: number | null
+          slider_min?: number | null
+          slider_step?: number | null
+          text_color?: string | null
           type?: string
           updated_at?: string
+          video_url?: string | null
         }
         Relationships: [
           {
