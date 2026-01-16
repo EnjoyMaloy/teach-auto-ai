@@ -42,6 +42,10 @@ export interface SubBlock {
   textSize?: 'small' | 'medium' | 'large' | 'xlarge';
   fontWeight?: 'normal' | 'medium' | 'semibold' | 'bold';
   padding?: 'none' | 'small' | 'medium' | 'large';
+  
+  // Background/backdrop for text blocks
+  backdrop?: 'none' | 'light' | 'dark' | 'primary' | 'blur';
+  backdropRounded?: boolean;
 }
 
 // Sub-block configuration for the selector
