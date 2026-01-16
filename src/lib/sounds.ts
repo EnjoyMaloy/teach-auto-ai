@@ -12,7 +12,7 @@ export type SoundType =
 
 export type SoundTheme = 'duolingo' | 'minimal' | 'playful' | 'none';
 
-interface SoundConfig {
+export interface SoundConfig {
   enabled: boolean;
   theme: SoundTheme;
   volume: number; // 0 to 1

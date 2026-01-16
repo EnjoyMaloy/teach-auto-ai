@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AudioPlayer } from './AudioPlayer';
+import { playSound, SoundConfig } from '@/lib/sounds';
+import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
 
 interface MobilePreviewFrameProps {
   block: Block | null;
@@ -16,6 +18,7 @@ interface MobilePreviewFrameProps {
   totalBlocks?: number;
   onContinue?: () => void;
   designSystem?: CourseDesignSystem;
+  isMuted?: boolean;
 }
 
 type AnswerState = 'idle' | 'correct' | 'incorrect';
@@ -43,9 +46,17 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   totalBlocks = 1,
   onContinue,
   designSystem,
+  isMuted = false,
 }) => {
   // Merge design system with defaults
   const ds = { ...DEFAULT_DS, ...designSystem };
+  
+  // Sound configuration
+  const soundConfig: SoundConfig = {
+    enabled: !isMuted && (designSystem?.sound?.enabled !== false),
+    theme: designSystem?.sound?.theme ?? DEFAULT_SOUND_SETTINGS.theme,
+    volume: designSystem?.sound?.volume ?? DEFAULT_SOUND_SETTINGS.volume,
+  };
   
   // Interactive state
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -115,6 +126,18 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     }
 
     setAnswerState(isCorrect ? 'correct' : 'incorrect');
+    
+    // Play sound effect
+    if (isCorrect) {
+      playSound('correct', soundConfig);
+    } else {
+      playSound('incorrect', soundConfig);
+    }
+  };
+
+  const handleContinue = () => {
+    playSound('swipe', soundConfig);
+    onContinue?.();
   };
 
   if (!block) {
@@ -850,7 +873,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             if (isInteractive && answerState === 'idle') {
               checkAnswer();
             } else {
-              onContinue?.();
+              handleContinue();
             }
           }}
           className="flex-1 h-11 max-w-md font-semibold transition-all disabled:opacity-50"
