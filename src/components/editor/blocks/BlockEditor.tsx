@@ -157,7 +157,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
             <div className="border-2 border-dashed border-border rounded-2xl p-4 text-center bg-muted/30 hover:bg-muted/50 transition-colors">
               {block.imageUrl ? (
                 <div className="relative">
-                  <img src={block.imageUrl} alt="" className="w-full rounded-xl" />
+                  <img src={block.imageUrl} alt="" className="w-full rounded-xl object-cover aspect-[9/16]" />
                   <Button
                     variant="secondary"
                     size="sm"
@@ -168,20 +168,38 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                   </Button>
                 </div>
               ) : (
-                <div className="py-8">
+                <label className="block py-8 cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          const result = event.target?.result as string;
+                          onUpdate({ imageUrl: result });
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
                   <div className="w-12 h-12 rounded-xl bg-muted mx-auto mb-3 flex items-center justify-center">
                     <Upload className="w-6 h-6 text-muted-foreground" />
                   </div>
                   <p className="text-sm text-muted-foreground mb-3">
-                    Перетащите или нажмите для загрузки
+                    Нажмите для загрузки изображения
                   </p>
+                  <p className="text-xs text-muted-foreground">или</p>
                   <Input
                     type="text"
-                    placeholder="Или вставьте URL изображения..."
-                    className="max-w-xs mx-auto rounded-xl"
+                    placeholder="Вставьте URL изображения..."
+                    className="max-w-xs mx-auto rounded-xl mt-2"
+                    onClick={(e) => e.stopPropagation()}
                     onChange={(e) => onUpdate({ imageUrl: e.target.value })}
                   />
-                </div>
+                </label>
               )}
             </div>
           </div>

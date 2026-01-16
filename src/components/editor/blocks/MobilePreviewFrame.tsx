@@ -187,15 +187,15 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
       case 'image':
         return (
-          <div className="flex-1 flex items-center justify-center p-4">
+          <div className="h-full w-full flex items-center justify-center overflow-hidden">
             {block.imageUrl ? (
               <img 
                 src={block.imageUrl} 
                 alt="" 
-                className="w-full h-full object-contain rounded-2xl"
+                className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full aspect-square bg-muted rounded-2xl flex items-center justify-center border-2 border-dashed border-border">
+              <div className="w-full h-full bg-muted flex items-center justify-center border-2 border-dashed border-border">
                 <span className="text-muted-foreground text-sm">Нет изображения</span>
               </div>
             )}
