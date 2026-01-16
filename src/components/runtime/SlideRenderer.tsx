@@ -59,10 +59,57 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
   const renderContent = () => {
     switch (slide.type) {
+      case 'heading':
+        return (
+          <div className="text-center py-8">
+            <h1 className="text-3xl font-bold text-foreground">{slide.content || 'Заголовок'}</h1>
+          </div>
+        );
+
       case 'text':
         return (
           <div className="text-center py-8">
             <p className="text-xl leading-relaxed text-foreground">{slide.content}</p>
+          </div>
+        );
+
+      case 'image':
+        return (
+          <div className="py-4">
+            {slide.imageUrl ? (
+              <img src={slide.imageUrl} alt="" className="w-full rounded-2xl object-contain max-h-[60vh]" />
+            ) : (
+              <div className="aspect-video bg-muted rounded-2xl flex items-center justify-center">
+                <span className="text-muted-foreground">Нет изображения</span>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'video':
+        return (
+          <div className="py-4">
+            {slide.videoUrl ? (
+              <video src={slide.videoUrl} controls className="w-full rounded-2xl max-h-[60vh]" />
+            ) : (
+              <div className="aspect-video bg-muted rounded-2xl flex items-center justify-center">
+                <span className="text-muted-foreground">Нет видео</span>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'audio':
+        return (
+          <div className="py-8 text-center space-y-4">
+            <p className="text-xl font-medium text-foreground">{slide.content || 'Аудио'}</p>
+            {slide.audioUrl ? (
+              <audio src={slide.audioUrl} controls className="w-full max-w-md mx-auto" />
+            ) : (
+              <div className="p-8 bg-muted rounded-2xl flex items-center justify-center">
+                <span className="text-muted-foreground">Нет аудио</span>
+              </div>
+            )}
           </div>
         );
 
@@ -98,10 +145,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                     disabled={answered}
                     className={cn(
                       'w-full p-4 rounded-xl border-2 text-left transition-all duration-200 flex items-center justify-between',
-                      !answered && isSelected && 'border-primary bg-primary-light',
+                      !answered && isSelected && 'border-primary bg-primary/10',
                       !answered && !isSelected && 'border-border hover:border-primary/50',
-                      showCorrect && 'border-success bg-success-light',
-                      showIncorrect && 'border-destructive bg-destructive-light'
+                      showCorrect && 'border-success bg-success/10',
+                      showIncorrect && 'border-destructive bg-destructive/10'
                     )}
                   >
                     <span className="font-medium">{option.text}</span>
@@ -135,10 +182,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                     disabled={answered}
                     className={cn(
                       'flex-1 max-w-[200px] p-4 rounded-xl border-2 font-medium transition-all duration-200',
-                      !answered && isSelected && 'border-primary bg-primary-light',
+                      !answered && isSelected && 'border-primary bg-primary/10',
                       !answered && !isSelected && 'border-border hover:border-primary/50',
-                      showCorrect && 'border-success bg-success-light',
-                      showIncorrect && 'border-destructive bg-destructive-light'
+                      showCorrect && 'border-success bg-success/10',
+                      showIncorrect && 'border-destructive bg-destructive/10'
                     )}
                   >
                     {option.label}
@@ -174,19 +221,112 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
             </p>
             {answered && !isCorrect && (
               <p className="text-center text-sm text-muted-foreground">
-                Правильный ответ: <strong className="text-success">{slide.correctAnswer as string}</strong>
+                Правильный ответ: <strong className="text-success">{slide.blankWord || slide.correctAnswer as string}</strong>
               </p>
             )}
           </div>
         );
 
+      case 'slider':
+        return (
+          <div className="space-y-6 py-8">
+            <p className="text-xl font-medium text-center text-foreground">{slide.content || 'Выберите значение'}</p>
+            <div className="max-w-md mx-auto">
+              <input
+                type="range"
+                min={slide.sliderMin || 0}
+                max={slide.sliderMax || 100}
+                step={slide.sliderStep || 1}
+                value={textAnswer || slide.sliderMin || 0}
+                onChange={(e) => setTextAnswer(e.target.value)}
+                disabled={answered}
+                className="w-full accent-primary"
+              />
+              <div className="flex justify-between text-sm text-muted-foreground mt-2">
+                <span>{slide.sliderMin || 0}</span>
+                <span className="font-bold text-primary">{textAnswer || slide.sliderMin || 0}</span>
+                <span>{slide.sliderMax || 100}</span>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'matching':
+        return (
+          <div className="space-y-6">
+            <p className="text-xl font-medium text-center text-foreground">{slide.content || 'Соедините пары'}</p>
+            <div className="space-y-3 max-w-md mx-auto">
+              {slide.matchingPairs?.map((pair) => (
+                <div key={pair.id} className="flex items-center gap-3">
+                  <div className="flex-1 p-3 bg-muted rounded-xl text-sm font-medium">
+                    {pair.left}
+                  </div>
+                  <span className="text-primary">→</span>
+                  <div className="flex-1 p-3 bg-primary/10 rounded-xl text-sm font-medium text-primary">
+                    {pair.right}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'ordering':
+        return (
+          <div className="space-y-6">
+            <p className="text-xl font-medium text-center text-foreground">{slide.content || 'Расположите в порядке'}</p>
+            <div className="space-y-2 max-w-md mx-auto">
+              {slide.orderingItems?.map((item, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-3 bg-card border border-border rounded-xl">
+                  <span className="w-6 h-6 rounded-lg bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold">
+                    {idx + 1}
+                  </span>
+                  <span className="text-sm">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'hotspot':
+        return (
+          <div className="space-y-6">
+            <p className="text-xl font-medium text-center text-foreground">{slide.content || 'Нажмите на области'}</p>
+            <div className="relative bg-muted rounded-xl overflow-hidden max-h-[50vh] aspect-video mx-auto">
+              {slide.imageUrl ? (
+                <img src={slide.imageUrl} alt="" className="w-full h-full object-contain" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="text-muted-foreground">Нет изображения</span>
+                </div>
+              )}
+              {slide.hotspotAreas?.map((area) => (
+                <div
+                  key={area.id}
+                  className="absolute border-2 border-primary bg-primary/20 rounded-lg cursor-pointer hover:bg-primary/40 transition-colors"
+                  style={{
+                    left: `${area.x}%`,
+                    top: `${area.y}%`,
+                    width: `${area.width}%`,
+                    height: `${area.height}%`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        );
+
       default:
-        return null;
+        return (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">Тип блока не поддерживается</p>
+          </div>
+        );
     }
   };
 
-  const needsCheck = ['single_choice', 'multiple_choice', 'true_false', 'fill_blank'].includes(slide.type);
-  const canCheck = (selectedOptions.length > 0 || textAnswer.trim()) && !answered;
+  const needsCheck = ['single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'slider'].includes(slide.type);
+  const canCheck = (selectedOptions.length > 0 || textAnswer.trim() !== '') && !answered;
 
   return (
     <div className="max-w-2xl mx-auto">
