@@ -14,6 +14,105 @@ export type Database = {
   }
   public: {
     Tables: {
+      course_analytics: {
+        Row: {
+          course_id: string
+          created_at: string
+          event_type: string
+          id: string
+          lesson_id: string | null
+          slide_id: string | null
+          time_spent_seconds: number | null
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          lesson_id?: string | null
+          slide_id?: string | null
+          time_spent_seconds?: number | null
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          lesson_id?: string | null
+          slide_id?: string | null
+          time_spent_seconds?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_analytics_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_analytics_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_analytics_slide_id_fkey"
+            columns: ["slide_id"]
+            isOneToOne: false
+            referencedRelation: "slides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      course_reviews: {
+        Row: {
+          ai_recommendation: string | null
+          comment: string | null
+          course_id: string
+          created_at: string
+          id: string
+          rating: number
+          updated_at: string
+          user_id: string
+          user_name: string | null
+        }
+        Insert: {
+          ai_recommendation?: string | null
+          comment?: string | null
+          course_id: string
+          created_at?: string
+          id?: string
+          rating: number
+          updated_at?: string
+          user_id: string
+          user_name?: string | null
+        }
+        Update: {
+          ai_recommendation?: string | null
+          comment?: string | null
+          course_id?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+          user_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_reviews_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           author_id: string
@@ -25,6 +124,7 @@ export type Database = {
           id: string
           is_published: boolean | null
           published_at: string | null
+          short_description: string | null
           tags: string[] | null
           target_audience: string | null
           title: string
@@ -40,6 +140,7 @@ export type Database = {
           id?: string
           is_published?: boolean | null
           published_at?: string | null
+          short_description?: string | null
           tags?: string[] | null
           target_audience?: string | null
           title: string
@@ -55,6 +156,7 @@ export type Database = {
           id?: string
           is_published?: boolean | null
           published_at?: string | null
+          short_description?: string | null
           tags?: string[] | null
           target_audience?: string | null
           title?: string
