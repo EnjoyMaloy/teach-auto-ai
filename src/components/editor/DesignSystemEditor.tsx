@@ -485,7 +485,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     </p>
                   </div>
                   <Switch
-                    checked={config.sound?.enabled ?? true}
+                    checked={config.sound?.enabled !== false}
                     onCheckedChange={(enabled) => 
                       updateConfig({ 
                         sound: { ...DEFAULT_SOUND_SETTINGS, ...config.sound, enabled } 
@@ -498,44 +498,51 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 <div className="space-y-3">
                   <Label>Тема звуков</Label>
                   <div className="grid grid-cols-2 gap-3">
-                    {SOUND_THEME_OPTIONS.map((theme) => (
-                      <button
-                        key={theme.value}
-                        onClick={() => {
-                          updateConfig({ 
-                            sound: { 
-                              ...DEFAULT_SOUND_SETTINGS, 
-                              ...config.sound, 
-                              theme: theme.value as SoundTheme 
-                            } 
-                          });
-                          // Play preview sound
-                          playSound('tap', { 
-                            enabled: true, 
-                            theme: theme.value as SoundTheme, 
-                            volume: config.sound?.volume ?? 0.5 
-                          });
-                        }}
-                        disabled={!config.sound?.enabled}
-                        className={cn(
-                          "p-4 rounded-xl border-2 text-left transition-all",
-                          (config.sound?.theme ?? 'duolingo') === theme.value
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:border-primary/50",
-                          !config.sound?.enabled && "opacity-50 cursor-not-allowed"
-                        )}
-                      >
-                        <div className="flex items-center gap-2 mb-1">
-                          {theme.value === 'none' ? (
-                            <VolumeX className="w-4 h-4 text-muted-foreground" />
-                          ) : (
-                            <Volume2 className="w-4 h-4 text-primary" />
+                    {SOUND_THEME_OPTIONS.map((theme) => {
+                      const isEnabled = config.sound?.enabled !== false;
+                      const currentTheme = config.sound?.theme ?? 'duolingo';
+                      
+                      return (
+                        <button
+                          key={theme.value}
+                          onClick={() => {
+                            updateConfig({ 
+                              sound: { 
+                                ...DEFAULT_SOUND_SETTINGS, 
+                                ...config.sound, 
+                                theme: theme.value as SoundTheme 
+                              } 
+                            });
+                            // Play preview sound
+                            if (theme.value !== 'none') {
+                              playSound('tap', { 
+                                enabled: true, 
+                                theme: theme.value as SoundTheme, 
+                                volume: config.sound?.volume ?? 0.5 
+                              });
+                            }
+                          }}
+                          disabled={!isEnabled}
+                          className={cn(
+                            "p-4 rounded-xl border-2 text-left transition-all",
+                            currentTheme === theme.value
+                              ? "border-primary bg-primary/5"
+                              : "border-border hover:border-primary/50",
+                            !isEnabled && "opacity-50 cursor-not-allowed"
                           )}
-                          <span className="font-medium">{theme.label}</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground">{theme.description}</p>
-                      </button>
-                    ))}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            {theme.value === 'none' ? (
+                              <VolumeX className="w-4 h-4 text-muted-foreground" />
+                            ) : (
+                              <Volume2 className="w-4 h-4 text-primary" />
+                            )}
+                            <span className="font-medium">{theme.label}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">{theme.description}</p>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -552,7 +559,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     min={0}
                     max={100}
                     step={10}
-                    disabled={!config.sound?.enabled || config.sound?.theme === 'none'}
+                    disabled={config.sound?.enabled === false || config.sound?.theme === 'none'}
                     onValueChange={([value]) => {
                       updateConfig({ 
                         sound: { 
@@ -565,7 +572,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     onValueCommit={() => {
                       // Play preview sound when done sliding
                       playSound('pop', { 
-                        enabled: config.sound?.enabled ?? true, 
+                        enabled: true, 
                         theme: config.sound?.theme ?? 'duolingo', 
                         volume: config.sound?.volume ?? 0.5 
                       });
@@ -588,7 +595,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                         key={sound.type}
                         variant="outline"
                         size="sm"
-                        disabled={!config.sound?.enabled || config.sound?.theme === 'none'}
+                        disabled={config.sound?.enabled === false || config.sound?.theme === 'none'}
                         onClick={() => playSound(sound.type as any, {
                           enabled: true,
                           theme: config.sound?.theme ?? 'duolingo',
