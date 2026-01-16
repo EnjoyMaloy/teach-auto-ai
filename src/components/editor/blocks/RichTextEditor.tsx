@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Highlight from '@tiptap/extension-highlight';
@@ -132,6 +132,7 @@ interface RichTextEditorProps {
   wavyColor?: string;
   isEditing?: boolean;
   className?: string;
+  onFocusChange?: (focused: boolean) => void;
 }
 
 export const RichTextEditor: React.FC<RichTextEditorProps> = ({
@@ -146,7 +147,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   wavyColor = '0 84% 60%',
   isEditing = true,
   className,
+  onFocusChange,
 }) => {
+  const [isFocused, setIsFocused] = useState(false);
   const textSizeClass = {
     small: 'text-sm',
     medium: 'text-base',
@@ -256,14 +259,30 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   }
 
   return (
-    <div className={cn('rounded-lg border border-border/50', className)} onClick={(e) => e.stopPropagation()}>
+    <div 
+      className={cn('rounded-lg transition-all', isFocused ? 'border border-border/50' : '', className)} 
+      onClick={(e) => e.stopPropagation()}
+      onFocus={() => {
+        setIsFocused(true);
+        onFocusChange?.(true);
+      }}
+      onBlur={(e) => {
+        // Only blur if focus moves outside this component
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+          setIsFocused(false);
+          onFocusChange?.(false);
+        }
+      }}
+    >
       <style>{dynamicStyles}</style>
-      <Toolbar 
-        editor={editor} 
-        highlightColor={highlightColor}
-        underlineColor={underlineColor}
-        wavyColor={wavyColor}
-      />
+      {isFocused && (
+        <Toolbar 
+          editor={editor} 
+          highlightColor={highlightColor}
+          underlineColor={underlineColor}
+          wavyColor={wavyColor}
+        />
+      )}
       <EditorContent editor={editor} />
     </div>
   );
