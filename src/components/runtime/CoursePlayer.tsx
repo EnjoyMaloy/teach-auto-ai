@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { X, ChevronLeft, Trophy, Star, Clock } from 'lucide-react';
-import { Course, Lesson, Slide, CourseProgress } from '@/types/course';
+import { X, Trophy, Star, Clock } from 'lucide-react';
+import { Course } from '@/types/course';
 import { SlideRenderer, slideNeedsCheck } from './SlideRenderer';
+import { DesignSystemProvider } from './DesignSystemProvider';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -67,32 +68,75 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
     
     return (
       <div className="fixed inset-0 bg-muted/50 z-50 flex items-center justify-center p-4">
-        <div className="h-full max-h-[calc(100vh-80px)] w-full max-w-[420px] aspect-[9/16] bg-card rounded-3xl overflow-hidden flex flex-col items-center justify-center border border-border shadow-2xl p-6">
-          <div className="text-center animate-scale-in">
-            <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-6">
-              <Trophy className="w-10 h-10 text-success" />
-            </div>
-            <h1 className="text-2xl font-bold text-foreground mb-2">Курс пройден! 🎉</h1>
-            <p className="text-muted-foreground text-sm mb-6">{course.title}</p>
-            
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              <div className="p-3 rounded-xl bg-muted/50 border border-border">
-                <Star className="w-5 h-5 text-warning mx-auto mb-1" />
-                <p className="text-xl font-bold text-foreground">{accuracy}%</p>
-                <p className="text-xs text-muted-foreground">Точность</p>
+        <DesignSystemProvider config={course.designSystem}>
+          <div 
+            className="h-full max-h-[calc(100vh-80px)] w-full max-w-[420px] aspect-[9/16] rounded-3xl overflow-hidden flex flex-col items-center justify-center border shadow-2xl p-6"
+            style={{
+              backgroundColor: `hsl(var(--ds-card, var(--card)))`,
+              borderColor: `hsl(var(--ds-muted, var(--border)))`,
+              fontFamily: `var(--ds-font-family, inherit)`,
+            }}
+          >
+            <div className="text-center animate-scale-in">
+              <div 
+                className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+                style={{ backgroundColor: `hsl(var(--ds-success, var(--success)) / 0.1)` }}
+              >
+                <Trophy className="w-10 h-10" style={{ color: `hsl(var(--ds-success, var(--success)))` }} />
               </div>
-              <div className="p-3 rounded-xl bg-muted/50 border border-border">
-                <Clock className="w-5 h-5 text-primary mx-auto mb-1" />
-                <p className="text-xl font-bold text-foreground">{course.estimatedMinutes}</p>
-                <p className="text-xs text-muted-foreground">Минут</p>
+              <h1 
+                className="text-2xl font-bold mb-2"
+                style={{ 
+                  color: `hsl(var(--ds-foreground, var(--foreground)))`,
+                  fontFamily: `var(--ds-heading-font-family, inherit)`,
+                }}
+              >
+                Курс пройден! 🎉
+              </h1>
+              <p className="text-sm mb-6" style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}>
+                {course.title}
+              </p>
+              
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div 
+                  className="p-3 rounded-xl border"
+                  style={{ 
+                    backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.5)`,
+                    borderColor: `hsl(var(--ds-muted, var(--border)))`,
+                  }}
+                >
+                  <Star className="w-5 h-5 mx-auto mb-1" style={{ color: `hsl(var(--ds-primary, var(--primary)))` }} />
+                  <p className="text-xl font-bold" style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}>{accuracy}%</p>
+                  <p className="text-xs" style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}>Точность</p>
+                </div>
+                <div 
+                  className="p-3 rounded-xl border"
+                  style={{ 
+                    backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.5)`,
+                    borderColor: `hsl(var(--ds-muted, var(--border)))`,
+                  }}
+                >
+                  <Clock className="w-5 h-5 mx-auto mb-1" style={{ color: `hsl(var(--ds-primary, var(--primary)))` }} />
+                  <p className="text-xl font-bold" style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}>{course.estimatedMinutes}</p>
+                  <p className="text-xs" style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}>Минут</p>
+                </div>
               </div>
-            </div>
 
-            <Button size="lg" onClick={onClose} className="w-full">
-              Завершить
-            </Button>
+              <Button 
+                size="lg" 
+                onClick={onClose} 
+                className="w-full"
+                style={{
+                  backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
+                  color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
+                  borderRadius: `var(--ds-button-radius, var(--radius))`,
+                }}
+              >
+                Завершить
+              </Button>
+            </div>
           </div>
-        </div>
+        </DesignSystemProvider>
       </div>
     );
   }
@@ -102,70 +146,127 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
       {/* Close button outside phone */}
       <button 
         onClick={onClose}
-        className="absolute top-4 right-4 p-3 rounded-xl bg-card border border-border hover:bg-muted transition-colors shadow-lg"
+        className="absolute top-4 right-4 p-3 rounded-xl bg-card border border-border hover:bg-muted transition-colors shadow-lg z-10"
       >
         <X className="w-5 h-5 text-muted-foreground" />
       </button>
 
-      {/* Mobile phone frame */}
-      <div className="h-full max-h-[calc(100vh-80px)] w-full max-w-[420px] aspect-[9/16] bg-card rounded-3xl overflow-hidden flex flex-col border border-border shadow-2xl">
-        {/* Header */}
-        <header className="flex items-center justify-between px-4 py-3 border-b border-border bg-card shrink-0">
-          <div className="text-sm font-medium text-muted-foreground">
-            {completedSlides + 1} / {totalSlides}
-          </div>
-
-          <div className="flex-1 max-w-[200px] mx-4">
-            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-primary to-success transition-all duration-300 rounded-full"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1">
-            {correctAnswers > 0 && (
-              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-success/10 text-success text-xs font-medium">
-                <Star className="w-3 h-3" />
-                {correctAnswers}
-              </div>
-            )}
-          </div>
-        </header>
-
-        {/* Lesson indicator */}
-        <div className="px-4 py-2 bg-muted/30 border-b border-border shrink-0">
-          <p className="text-xs text-center">
-            <span className="text-muted-foreground">Урок {currentLessonIndex + 1}:</span>
-            <span className="font-medium text-foreground ml-1">{currentLesson?.title}</span>
-          </p>
-        </div>
-
-        {/* Content */}
-        <main className="flex-1 overflow-y-auto p-4">
-          {currentSlide && (
-            <SlideRenderer
-              key={currentSlide.id}
-              slide={currentSlide}
-              onAnswer={handleAnswer}
-              onNext={handleNext}
-              hideActions={true}
-            />
-          )}
-        </main>
-
-        {/* Bottom action button - Duolingo style */}
-        <footer className="px-4 py-4 border-t border-border bg-card shrink-0">
-          <Button
-            onClick={handleNext}
-            disabled={needsCheck && !answered}
-            className="w-full h-12 text-base font-semibold rounded-xl"
+      {/* Mobile phone frame with design system */}
+      <DesignSystemProvider config={course.designSystem}>
+        <div 
+          className="h-full max-h-[calc(100vh-80px)] w-full max-w-[420px] aspect-[9/16] rounded-3xl overflow-hidden flex flex-col border shadow-2xl"
+          style={{
+            backgroundColor: `hsl(var(--ds-background, var(--background)))`,
+            borderColor: `hsl(var(--ds-muted, var(--border)))`,
+            fontFamily: `var(--ds-font-family, inherit)`,
+          }}
+        >
+          {/* Header */}
+          <header 
+            className="flex items-center justify-between px-4 py-3 border-b shrink-0"
+            style={{
+              backgroundColor: `hsl(var(--ds-card, var(--card)))`,
+              borderColor: `hsl(var(--ds-muted, var(--border)))`,
+            }}
           >
-            {showContinue ? 'Продолжить' : 'Проверить'}
-          </Button>
-        </footer>
-      </div>
+            <div 
+              className="text-sm font-medium"
+              style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
+            >
+              {completedSlides + 1} / {totalSlides}
+            </div>
+
+            <div className="flex-1 max-w-[200px] mx-4">
+              <div 
+                className="h-1.5 rounded-full overflow-hidden"
+                style={{ backgroundColor: `hsl(var(--ds-muted, var(--muted)))` }}
+              >
+                <div 
+                  className="h-full transition-all duration-300 rounded-full"
+                  style={{ 
+                    width: `${progress}%`,
+                    background: `linear-gradient(to right, hsl(var(--ds-primary, var(--primary))), hsl(var(--ds-success, var(--success))))`,
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1">
+              {correctAnswers > 0 && (
+                <div 
+                  className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+                  style={{
+                    backgroundColor: `hsl(var(--ds-success, var(--success)) / 0.1)`,
+                    color: `hsl(var(--ds-success, var(--success)))`,
+                  }}
+                >
+                  <Star className="w-3 h-3" />
+                  {correctAnswers}
+                </div>
+              )}
+            </div>
+          </header>
+
+          {/* Lesson indicator */}
+          <div 
+            className="px-4 py-2 border-b shrink-0"
+            style={{
+              backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.3)`,
+              borderColor: `hsl(var(--ds-muted, var(--border)))`,
+            }}
+          >
+            <p className="text-xs text-center">
+              <span style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}>
+                Урок {currentLessonIndex + 1}:
+              </span>
+              <span 
+                className="font-medium ml-1"
+                style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
+              >
+                {currentLesson?.title}
+              </span>
+            </p>
+          </div>
+
+          {/* Content */}
+          <main 
+            className="flex-1 overflow-y-auto p-4"
+            style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
+          >
+            {currentSlide && (
+              <SlideRenderer
+                key={currentSlide.id}
+                slide={currentSlide}
+                onAnswer={handleAnswer}
+                onNext={handleNext}
+                hideActions={true}
+              />
+            )}
+          </main>
+
+          {/* Bottom action button - Duolingo style */}
+          <footer 
+            className="px-4 py-4 border-t shrink-0"
+            style={{
+              backgroundColor: `hsl(var(--ds-card, var(--card)))`,
+              borderColor: `hsl(var(--ds-muted, var(--border)))`,
+            }}
+          >
+            <Button
+              onClick={handleNext}
+              disabled={needsCheck && !answered}
+              className="w-full h-12 text-base font-semibold"
+              style={{
+                backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
+                color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
+                borderRadius: `var(--ds-button-radius, var(--radius))`,
+              }}
+            >
+              {showContinue ? 'Продолжить' : 'Проверить'}
+            </Button>
+          </footer>
+        </div>
+      </DesignSystemProvider>
     </div>
   );
 };

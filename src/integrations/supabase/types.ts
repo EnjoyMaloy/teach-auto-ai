@@ -120,6 +120,7 @@ export type Database = {
           created_at: string
           current_version: number | null
           description: string | null
+          design_system: Json | null
           estimated_minutes: number | null
           id: string
           is_published: boolean | null
@@ -136,6 +137,7 @@ export type Database = {
           created_at?: string
           current_version?: number | null
           description?: string | null
+          design_system?: Json | null
           estimated_minutes?: number | null
           id?: string
           is_published?: boolean | null
@@ -152,6 +154,7 @@ export type Database = {
           created_at?: string
           current_version?: number | null
           description?: string | null
+          design_system?: Json | null
           estimated_minutes?: number | null
           id?: string
           is_published?: boolean | null
