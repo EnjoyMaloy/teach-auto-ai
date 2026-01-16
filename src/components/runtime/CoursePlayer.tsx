@@ -70,7 +70,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
       <div className="fixed inset-0 bg-muted/50 z-50 flex items-center justify-center p-4">
         <DesignSystemProvider config={course.designSystem}>
           <div 
-            className="h-[calc(100vh-32px)] w-full max-w-[420px] rounded-3xl overflow-hidden flex flex-col items-center justify-center border shadow-2xl p-6"
+            className="h-[calc(100vh-32px)] w-auto aspect-[9/16] rounded-3xl overflow-hidden flex flex-col items-center justify-center border shadow-2xl p-6"
             style={{
               backgroundColor: `hsl(var(--ds-card, var(--card)))`,
               borderColor: `hsl(var(--ds-muted, var(--border)))`,
@@ -154,7 +154,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
       {/* Mobile phone frame with design system */}
       <DesignSystemProvider config={course.designSystem}>
         <div 
-          className="h-[calc(100vh-32px)] w-full max-w-[420px] rounded-3xl overflow-hidden flex flex-col border shadow-2xl"
+          className="h-[calc(100vh-32px)] w-auto aspect-[9/16] rounded-3xl overflow-hidden flex flex-col border shadow-2xl"
           style={{
             backgroundColor: `hsl(var(--ds-background, var(--background)))`,
             borderColor: `hsl(var(--ds-muted, var(--border)))`,
