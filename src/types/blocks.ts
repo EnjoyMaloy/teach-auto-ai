@@ -1,5 +1,7 @@
 // Block types for mobile-first vertical course format
 
+import { SubBlock } from './designBlock';
+
 export type BlockType = 
   // Content blocks
   | 'text'
@@ -8,6 +10,7 @@ export type BlockType =
   | 'video'
   | 'audio'
   | 'image_text'
+  | 'design' // Composable design block with sub-blocks
   // Interactive/Quiz blocks
   | 'single_choice'
   | 'multiple_choice'
@@ -78,6 +81,9 @@ export interface Block {
   // Ordering
   orderingItems?: string[];
   correctOrder?: string[];
+  
+  // Design block sub-blocks
+  subBlocks?: SubBlock[];
   
   // Styling
   backgroundColor?: string;
@@ -163,6 +169,16 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     colorClass: 'text-primary',
     bgClass: 'bg-primary/10',
     description: 'Картинка с текстом снизу'
+  },
+  design: {
+    type: 'design',
+    icon: 'Layers',
+    label: 'Design',
+    labelRu: 'Дизайн',
+    category: 'content',
+    colorClass: 'text-ai',
+    bgClass: 'bg-ai/10',
+    description: 'Составной блок с суб-элементами'
   },
   
   // Interactive blocks - using quiz semantic colors
@@ -282,4 +298,5 @@ export const createEmptyBlock = (type: BlockType, lessonId: string, order: numbe
     orderingItems: ['Пункт 1', 'Пункт 2', 'Пункт 3'],
     correctOrder: ['Пункт 1', 'Пункт 2', 'Пункт 3']
   } : {}),
+  ...(type === 'design' ? { subBlocks: [] } : {}),
 });

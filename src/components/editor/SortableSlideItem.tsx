@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Trash2, Type, Image, CheckCircle2, ListChecks, ToggleLeft, PenLine } from 'lucide-react';
+import { Trash2, Type, Image, CheckCircle2, ListChecks, ToggleLeft, PenLine, Layers } from 'lucide-react';
 import { Slide, SlideType } from '@/types/course';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -13,6 +13,7 @@ const slideTypeConfig: Record<SlideType, { icon: React.ElementType; label: strin
   video: { icon: Image, label: 'Видео', color: 'bg-red-100 text-red-600' },
   audio: { icon: Type, label: 'Аудио', color: 'bg-amber-100 text-amber-600' },
   image_text: { icon: Image, label: 'Картинка+Текст', color: 'bg-indigo-100 text-indigo-600' },
+  design: { icon: Layers, label: 'Дизайн', color: 'bg-fuchsia-100 text-fuchsia-600' },
   single_choice: { icon: CheckCircle2, label: 'Один ответ', color: 'bg-green-100 text-green-600' },
   multiple_choice: { icon: ListChecks, label: 'Несколько', color: 'bg-orange-100 text-orange-600' },
   true_false: { icon: ToggleLeft, label: 'Да/Нет', color: 'bg-yellow-100 text-yellow-600' },
