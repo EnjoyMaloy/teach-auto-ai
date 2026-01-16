@@ -178,34 +178,36 @@ const SortableSubBlockItem: React.FC<{
         return (
           <div>
             {isEditing ? (
-              <input
-                type="text"
-                value={subBlock.content || ''}
-                onChange={(e) => onUpdate({ content: e.target.value })}
-                placeholder="Заголовок..."
-                className={cn(
-                  'w-full bg-transparent outline-none',
-                  headingSizeClass, fontWeightClass, textAlignClass
-                )}
-                style={{ 
-                  color: `hsl(${ds.foregroundColor})`,
-                  ...headingHighlightStyles 
-                }}
-                onClick={(e) => e.stopPropagation()}
-              />
+              <>
+                <div 
+                  className={cn('inline-block w-full', textAlignClass)}
+                  style={headingHighlightStyles}
+                >
+                  <input
+                    type="text"
+                    value={subBlock.content || ''}
+                    onChange={(e) => onUpdate({ content: e.target.value })}
+                    placeholder="Заголовок..."
+                    className={cn(
+                      'w-full bg-transparent outline-none',
+                      headingSizeClass, fontWeightClass, textAlignClass
+                    )}
+                    style={{ color: `hsl(${ds.foregroundColor})` }}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
+                <HighlightSelector currentHighlight={subBlock.highlight} />
+              </>
             ) : (
               <h2 
                 className={cn(headingSizeClass, fontWeightClass, textAlignClass)}
-                style={{ 
-                  color: `hsl(${ds.foregroundColor})`,
-                }}
+                style={{ color: `hsl(${ds.foregroundColor})` }}
               >
                 <span style={headingHighlightStyles}>
                   {subBlock.content || 'Заголовок'}
                 </span>
               </h2>
             )}
-            {isEditing && <HighlightSelector currentHighlight={subBlock.highlight} />}
           </div>
         );
 
@@ -252,18 +254,59 @@ const SortableSubBlockItem: React.FC<{
         return (
           <div style={backdropStyles as React.CSSProperties}>
             {isEditing ? (
-              <textarea
-                value={subBlock.content || ''}
-                onChange={(e) => onUpdate({ content: e.target.value })}
-                placeholder="Текст абзаца..."
-                rows={3}
-                className={cn(
-                  'w-full bg-transparent outline-none resize-none',
-                  textSizeClass, textAlignClass
-                )}
-                style={{ color: textColor }}
-                onClick={(e) => e.stopPropagation()}
-              />
+              <>
+                <div style={textHighlightStyles}>
+                  <textarea
+                    value={subBlock.content || ''}
+                    onChange={(e) => onUpdate({ content: e.target.value })}
+                    placeholder="Текст абзаца..."
+                    rows={3}
+                    className={cn(
+                      'w-full bg-transparent outline-none resize-none',
+                      textSizeClass, textAlignClass
+                    )}
+                    style={{ color: textColor }}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
+                
+                {/* Backdrop selector */}
+                <div className="flex justify-center gap-1 mt-2">
+                  <span className="text-[10px] text-muted-foreground mr-1 self-center">Подложка:</span>
+                  {(['none', 'light', 'dark', 'primary', 'blur'] as const).map((backdrop) => (
+                    <button
+                      key={backdrop}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onUpdate({ backdrop });
+                      }}
+                      className={cn(
+                        'w-6 h-6 rounded-md border-2 transition-all text-[8px] font-medium',
+                        subBlock.backdrop === backdrop || (!subBlock.backdrop && backdrop === 'none')
+                          ? 'border-primary scale-110'
+                          : 'border-transparent hover:border-primary/50'
+                      )}
+                      style={{
+                        backgroundColor: backdrop === 'none' ? 'transparent' 
+                          : backdrop === 'light' ? `hsl(${ds.backdropLightColor})`
+                          : backdrop === 'dark' ? `hsl(${ds.backdropDarkColor})`
+                          : backdrop === 'primary' ? `hsl(${ds.backdropPrimaryColor})`
+                          : `hsl(${ds.backdropBlurColor})`,
+                      }}
+                      title={backdrop === 'none' ? 'Без подложки' 
+                        : backdrop === 'light' ? 'Светлая'
+                        : backdrop === 'dark' ? 'Тёмная'
+                        : backdrop === 'primary' ? 'Акцент'
+                        : 'Размытие'}
+                    >
+                      {backdrop === 'blur' && '⚪'}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Highlight selector */}
+                <HighlightSelector currentHighlight={subBlock.highlight} />
+              </>
             ) : (
               <p 
                 className={cn(textSizeClass, textAlignClass)}
@@ -274,44 +317,6 @@ const SortableSubBlockItem: React.FC<{
                 </span>
               </p>
             )}
-            
-            {/* Backdrop selector when editing */}
-            {isEditing && (
-              <div className="flex justify-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                {(['none', 'light', 'dark', 'primary', 'blur'] as const).map((backdrop) => (
-                  <button
-                    key={backdrop}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onUpdate({ backdrop });
-                    }}
-                    className={cn(
-                      'w-6 h-6 rounded-md border-2 transition-all text-[8px] font-medium',
-                      subBlock.backdrop === backdrop || (!subBlock.backdrop && backdrop === 'none')
-                        ? 'border-primary scale-110'
-                        : 'border-transparent hover:border-primary/50'
-                    )}
-                    style={{
-                      backgroundColor: backdrop === 'none' ? 'transparent' 
-                        : backdrop === 'light' ? `hsl(${ds.backdropLightColor})`
-                        : backdrop === 'dark' ? `hsl(${ds.backdropDarkColor})`
-                        : backdrop === 'primary' ? `hsl(${ds.backdropPrimaryColor})`
-                        : `hsl(${ds.backdropBlurColor})`,
-                    }}
-                    title={backdrop === 'none' ? 'Без подложки' 
-                      : backdrop === 'light' ? 'Светлая'
-                      : backdrop === 'dark' ? 'Тёмная'
-                      : backdrop === 'primary' ? 'Акцент'
-                      : 'Размытие'}
-                  >
-                    {backdrop === 'blur' && '⚪'}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Highlight selector when editing */}
-            {isEditing && <HighlightSelector currentHighlight={subBlock.highlight} />}
           </div>
         );
 
