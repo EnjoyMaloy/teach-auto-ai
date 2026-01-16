@@ -31,6 +31,7 @@ import { CourseDesignSystem } from '@/types/course';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { RichTextEditor } from './RichTextEditor';
 import {
   Plus, Trash2, GripVertical, Upload,
   Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Layers,
@@ -249,26 +250,22 @@ const SortableSubBlockItem: React.FC<{
           ? 'hsl(0 0% 100%)' 
           : `hsl(${ds.foregroundColor} / 0.8)`;
 
-        const textHighlightStyles = getHighlightStyles(subBlock.highlight);
-
         return (
           <div style={backdropStyles as React.CSSProperties}>
             {isEditing ? (
               <>
-                <div style={textHighlightStyles}>
-                  <textarea
-                    value={subBlock.content || ''}
-                    onChange={(e) => onUpdate({ content: e.target.value })}
-                    placeholder="Текст абзаца..."
-                    rows={3}
-                    className={cn(
-                      'w-full bg-transparent outline-none resize-none',
-                      textSizeClass, textAlignClass
-                    )}
-                    style={{ color: textColor }}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                </div>
+                <RichTextEditor
+                  content={subBlock.content || ''}
+                  onChange={(content) => onUpdate({ content })}
+                  placeholder="Текст абзаца..."
+                  textSize={subBlock.textSize || 'medium'}
+                  textAlign={subBlock.textAlign || 'center'}
+                  textColor={textColor}
+                  highlightColor={ds.highlightMarkerColor}
+                  underlineColor={ds.highlightUnderlineColor}
+                  wavyColor={ds.highlightWavyColor}
+                  isEditing={true}
+                />
                 
                 {/* Backdrop selector */}
                 <div className="flex justify-center gap-1 mt-2">
@@ -303,19 +300,19 @@ const SortableSubBlockItem: React.FC<{
                     </button>
                   ))}
                 </div>
-
-                {/* Highlight selector */}
-                <HighlightSelector currentHighlight={subBlock.highlight} />
               </>
             ) : (
-              <p 
-                className={cn(textSizeClass, textAlignClass)}
-                style={{ color: textColor }}
-              >
-                <span style={textHighlightStyles}>
-                  {subBlock.content || 'Текст абзаца'}
-                </span>
-              </p>
+              <RichTextEditor
+                content={subBlock.content || 'Текст абзаца'}
+                onChange={() => {}}
+                textSize={subBlock.textSize || 'medium'}
+                textAlign={subBlock.textAlign || 'center'}
+                textColor={textColor}
+                highlightColor={ds.highlightMarkerColor}
+                underlineColor={ds.highlightUnderlineColor}
+                wavyColor={ds.highlightWavyColor}
+                isEditing={false}
+              />
             )}
           </div>
         );
