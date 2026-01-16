@@ -8,7 +8,9 @@ interface SlideRendererProps {
   slide: Slide;
   onAnswer?: (isCorrect: boolean) => void;
   onNext?: () => void;
+  onCheck?: () => void;
   showResult?: boolean;
+  hideActions?: boolean;
 }
 
 export const SlideRenderer: React.FC<SlideRendererProps> = ({
@@ -16,6 +18,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
   onAnswer,
   onNext,
   showResult = false,
+  hideActions = false,
 }) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [textAnswer, setTextAnswer] = useState('');
@@ -329,36 +332,42 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
   const canCheck = (selectedOptions.length > 0 || textAnswer.trim() !== '') && !answered;
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="slide-card">
+    <div className="max-w-2xl mx-auto h-full flex flex-col">
+      <div className="slide-card flex-1">
         {renderContent()}
 
         {/* Explanation */}
         {answered && slide.explanation && (
-          <div className="mt-6 p-4 rounded-xl bg-ai-light flex items-start gap-3 animate-fade-up">
-            <Lightbulb className="w-5 h-5 text-ai flex-shrink-0 mt-0.5" />
+          <div className="mt-6 p-4 rounded-xl bg-primary/5 flex items-start gap-3 animate-fade-up">
+            <Lightbulb className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-medium text-ai text-sm mb-1">Объяснение</p>
+              <p className="font-medium text-primary text-sm mb-1">Объяснение</p>
               <p className="text-sm text-foreground">{slide.explanation}</p>
             </div>
           </div>
         )}
       </div>
 
-      {/* Actions */}
-      <div className="mt-6 flex justify-center gap-4">
-        {needsCheck && !answered && (
-          <Button onClick={checkAnswer} disabled={!canCheck} size="lg">
-            Проверить
-          </Button>
-        )}
-        {(answered || !needsCheck) && (
-          <Button onClick={onNext} size="lg" className="animate-bounce-subtle">
-            Далее
-            <ArrowRight className="w-5 h-5 ml-2" />
-          </Button>
-        )}
-      </div>
+      {/* Actions - only show if not hidden */}
+      {!hideActions && (
+        <div className="mt-6 flex justify-center gap-4">
+          {needsCheck && !answered && (
+            <Button onClick={checkAnswer} disabled={!canCheck} size="lg">
+              Проверить
+            </Button>
+          )}
+          {(answered || !needsCheck) && (
+            <Button onClick={onNext} size="lg" className="animate-bounce-subtle">
+              Далее
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
-};
+}
+
+// Export helper to check if slide needs checking
+export const slideNeedsCheck = (slideType: string) => 
+  ['single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'slider'].includes(slideType);
