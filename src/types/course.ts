@@ -78,6 +78,22 @@ export interface CourseVersion {
   createdBy: string;
 }
 
+export interface CourseDesignSystem {
+  primaryColor?: string;
+  primaryForeground?: string;
+  backgroundColor?: string;
+  foregroundColor?: string;
+  cardColor?: string;
+  mutedColor?: string;
+  accentColor?: string;
+  successColor?: string;
+  destructiveColor?: string;
+  fontFamily?: string;
+  headingFontFamily?: string;
+  borderRadius?: string;
+  buttonStyle?: 'rounded' | 'pill' | 'square';
+}
+
 export interface Course {
   id: string;
   title: string;
@@ -94,6 +110,7 @@ export interface Course {
   createdAt: Date;
   updatedAt: Date;
   tags: string[];
+  designSystem?: CourseDesignSystem;
 }
 
 export interface User {

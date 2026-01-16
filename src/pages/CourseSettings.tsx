@@ -17,10 +17,14 @@ import {
   Trash2,
   Settings,
   BarChart3,
-  Edit3
+  Edit3,
+  Palette
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DesignSystemEditor } from '@/components/editor/DesignSystemEditor';
+import { DesignSystemConfig, DEFAULT_DESIGN_SYSTEM } from '@/types/designSystem';
+import { CourseDesignSystem } from '@/types/course';
 
 const CourseSettings: React.FC = () => {
   const { courseId } = useParams();
@@ -41,6 +45,8 @@ const CourseSettings: React.FC = () => {
   const [coverImage, setCoverImage] = useState<string | undefined>();
   const [tags, setTags] = useState<string[]>([]);
   const [tagsInput, setTagsInput] = useState('');
+  const [designSystem, setDesignSystem] = useState<DesignSystemConfig>(DEFAULT_DESIGN_SYSTEM);
+  const [activeTab, setActiveTab] = useState('general');
 
   useEffect(() => {
     const loadCourse = async () => {
@@ -57,6 +63,11 @@ const CourseSettings: React.FC = () => {
         setCoverImage(course.coverImage);
         setTags(course.tags || []);
         setTagsInput((course.tags || []).join(', '));
+        
+        // Load design system
+        if (course.designSystem) {
+          setDesignSystem({ ...DEFAULT_DESIGN_SYSTEM, ...course.designSystem });
+        }
       } else {
         toast.error('Курс не найден');
         navigate('/');
@@ -155,6 +166,7 @@ const CourseSettings: React.FC = () => {
       targetAudience,
       coverImage,
       tags: parsedTags,
+      designSystem: designSystem as CourseDesignSystem,
     });
 
     // Update short_description directly
@@ -215,144 +227,166 @@ const CourseSettings: React.FC = () => {
       </header>
 
       {/* Content */}
-      <main className="container mx-auto px-4 py-8 max-w-3xl">
-        <div className="space-y-6">
-          {/* Banner Upload */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ImageIcon className="w-5 h-5" />
-                Баннер курса
-              </CardTitle>
-              <CardDescription>
-                Рекомендуемый размер: 1200×630 пикселей (16:9)
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-              
-              {coverImage ? (
-                <div className="relative">
-                  <img 
-                    src={coverImage} 
-                    alt="Course banner" 
-                    className="w-full h-48 object-cover rounded-lg"
+      <main className="container mx-auto px-4 py-8 max-w-4xl">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="mb-6">
+            <TabsTrigger value="general" className="gap-2">
+              <Settings className="w-4 h-4" />
+              Основные
+            </TabsTrigger>
+            <TabsTrigger value="design" className="gap-2">
+              <Palette className="w-4 h-4" />
+              Дизайн
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="general">
+            <div className="space-y-6">
+              {/* Banner Upload */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ImageIcon className="w-5 h-5" />
+                    Баннер курса
+                  </CardTitle>
+                  <CardDescription>
+                    Рекомендуемый размер: 1200×630 пикселей (16:9)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
                   />
-                  <div className="absolute top-2 right-2 flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="secondary"
+                  
+                  {coverImage ? (
+                    <div className="relative">
+                      <img 
+                        src={coverImage} 
+                        alt="Course banner" 
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                      <div className="absolute top-2 right-2 flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={isUploading}
+                        >
+                          {isUploading ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Upload className="w-4 h-4" />
+                          )}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={handleRemoveImage}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isUploading}
+                      className="w-full h-48 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center gap-2 hover:border-primary/50 transition-colors"
                     >
                       {isUploading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
                       ) : (
-                        <Upload className="w-4 h-4" />
+                        <>
+                          <Upload className="w-8 h-8 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">
+                            Нажмите для загрузки баннера
+                          </span>
+                        </>
                       )}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={handleRemoveImage}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                  className="w-full h-48 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center gap-2 hover:border-primary/50 transition-colors"
-                >
-                  {isUploading ? (
-                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-                  ) : (
-                    <>
-                      <Upload className="w-8 h-8 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">
-                        Нажмите для загрузки баннера
-                      </span>
-                    </>
+                    </button>
                   )}
-                </button>
-              )}
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
 
-          {/* Basic Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="w-5 h-5" />
-                Основная информация
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Название курса</Label>
-                <Input
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Введите название курса"
-                />
-              </div>
+              {/* Basic Info */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Settings className="w-5 h-5" />
+                    Основная информация
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Название курса</Label>
+                    <Input
+                      id="title"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder="Введите название курса"
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="shortDescription">Короткое описание</Label>
-                <Input
-                  id="shortDescription"
-                  value={shortDescription}
-                  onChange={(e) => setShortDescription(e.target.value)}
-                  placeholder="Краткое описание для превью (до 100 символов)"
-                  maxLength={100}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {shortDescription.length}/100 символов
-                </p>
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="shortDescription">Короткое описание</Label>
+                    <Input
+                      id="shortDescription"
+                      value={shortDescription}
+                      onChange={(e) => setShortDescription(e.target.value)}
+                      placeholder="Краткое описание для превью (до 100 символов)"
+                      maxLength={100}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {shortDescription.length}/100 символов
+                    </p>
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="description">Полное описание</Label>
-                <Textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Подробное описание курса"
-                  rows={4}
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Полное описание</Label>
+                    <Textarea
+                      id="description"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Подробное описание курса"
+                      rows={4}
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="targetAudience">Целевая аудитория</Label>
-                <Input
-                  id="targetAudience"
-                  value={targetAudience}
-                  onChange={(e) => setTargetAudience(e.target.value)}
-                  placeholder="Например: Начинающие разработчики"
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="targetAudience">Целевая аудитория</Label>
+                    <Input
+                      id="targetAudience"
+                      value={targetAudience}
+                      onChange={(e) => setTargetAudience(e.target.value)}
+                      placeholder="Например: Начинающие разработчики"
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="tags">Теги (через запятую)</Label>
-                <Input
-                  id="tags"
-                  value={tagsInput}
-                  onChange={(e) => setTagsInput(e.target.value)}
-                  placeholder="React, TypeScript, Frontend"
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="tags">Теги (через запятую)</Label>
+                    <Input
+                      id="tags"
+                      value={tagsInput}
+                      onChange={(e) => setTagsInput(e.target.value)}
+                      placeholder="React, TypeScript, Frontend"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="design">
+            <DesignSystemEditor
+              config={designSystem}
+              onChange={setDesignSystem}
+            />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
