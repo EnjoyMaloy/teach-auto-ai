@@ -128,7 +128,8 @@ const SortableSubBlockItem: React.FC<{
 
   // Highlight selector component
   const HighlightSelector: React.FC<{ currentHighlight?: TextHighlightType }> = ({ currentHighlight }) => (
-    <div className="flex justify-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+    <div className="flex justify-center gap-1 mt-3 pt-2 border-t border-border/30">
+      <span className="text-[10px] text-muted-foreground mr-1 self-center">Выделение:</span>
       {([
         { type: 'none' as const, icon: null, title: 'Без выделения' },
         { type: 'marker' as const, icon: Highlighter, title: 'Маркер' },
