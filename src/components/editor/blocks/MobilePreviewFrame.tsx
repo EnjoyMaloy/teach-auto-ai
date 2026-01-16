@@ -166,12 +166,29 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
   const isInteractive = ['single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'slider', 'matching', 'ordering', 'hotspot'].includes(block.type);
 
+  // Button depth and style
+  const isRaised = designSystem?.buttonDepth !== 'flat';
+  
   // Get button border radius based on style
   const getButtonRadius = () => {
     if (ds.buttonStyle === 'pill') return '9999px';
     if (ds.buttonStyle === 'square') return '0';
     return ds.borderRadius;
   };
+
+  // Get raised button styles
+  const getRaisedButtonStyle = (baseColor: string) => {
+    if (!isRaised) return {};
+    return {
+      boxShadow: `0 4px 0 0 hsl(${baseColor} / 0.4), 0 6px 12px -2px hsl(${baseColor} / 0.25)`,
+      transform: 'translateY(0)',
+    };
+  };
+
+  // CSS class for press animation
+  const pressAnimationClass = isRaised 
+    ? 'active:translate-y-1 active:shadow-none transition-all duration-75' 
+    : 'active:scale-95 transition-transform duration-75';
 
   const renderContent = () => {
     switch (block.type) {
@@ -857,7 +874,10 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         {isInteractive && answerState !== 'idle' && (
           <button
             onClick={resetState}
-            className="h-11 px-4 flex items-center gap-2 border-2 font-bold uppercase tracking-wide transition-all"
+            className={cn(
+              "h-11 px-4 flex items-center gap-2 border-2 font-bold uppercase tracking-wide",
+              pressAnimationClass
+            )}
             style={{
               borderColor: `hsl(${ds.mutedColor})`,
               color: `hsl(${ds.foregroundColor})`,
@@ -876,12 +896,16 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
               handleContinue();
             }
           }}
-          className="flex-1 h-11 max-w-md font-bold uppercase tracking-wide transition-all disabled:opacity-50"
+          className={cn(
+            "flex-1 h-11 max-w-md font-bold uppercase tracking-wide disabled:opacity-50",
+            pressAnimationClass
+          )}
           disabled={isInteractive && answerState === 'idle' && selectedOptions.length === 0 && trueFalseAnswer === null && !fillBlankInput && Object.keys(matchingSelected.pairs).length === 0}
           style={{
             backgroundColor: `hsl(${ds.primaryColor})`,
             color: `hsl(${ds.primaryForeground})`,
             borderRadius: getButtonRadius(),
+            ...getRaisedButtonStyle(ds.primaryColor),
           }}
         >
           {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ПРОДОЛЖИТЬ'}
