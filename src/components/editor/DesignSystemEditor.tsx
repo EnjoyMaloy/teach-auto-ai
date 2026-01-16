@@ -6,7 +6,8 @@ import {
   PRESET_THEMES,
   FONT_OPTIONS,
   BORDER_RADIUS_OPTIONS,
-  SoundTheme
+  SoundTheme,
+  ButtonDepth
 } from '@/types/designSystem';
 import { playSound, SOUND_THEME_OPTIONS } from '@/lib/sounds';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -467,6 +468,30 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                         )}
                       >
                         {style.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Объём кнопок</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { value: 'flat', label: 'Плоские', description: 'Минималистичный стиль' },
+                      { value: 'raised', label: 'Объёмные', description: 'С тенью и эффектом 3D' },
+                    ].map((depth) => (
+                      <button
+                        key={depth.value}
+                        onClick={() => updateConfig({ buttonDepth: depth.value as ButtonDepth })}
+                        className={cn(
+                          "p-4 rounded-lg border-2 text-left transition-all",
+                          (config.buttonDepth ?? 'raised') === depth.value
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:border-primary/50"
+                        )}
+                      >
+                        <div className="font-medium text-sm mb-1">{depth.label}</div>
+                        <p className="text-xs text-muted-foreground">{depth.description}</p>
                       </button>
                     ))}
                   </div>

@@ -35,6 +35,20 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
     volume: course.designSystem?.sound?.volume ?? DEFAULT_SOUND_SETTINGS.volume,
   };
 
+  // Button depth and animation
+  const isRaised = course.designSystem?.buttonDepth !== 'flat';
+  const pressAnimationClass = isRaised 
+    ? 'active:translate-y-1 active:shadow-none transition-all duration-75' 
+    : 'active:scale-95 transition-transform duration-75';
+  
+  const getRaisedButtonStyle = () => {
+    if (!isRaised) return {};
+    const primaryColor = course.designSystem?.primaryColor || '262 83% 58%';
+    return {
+      boxShadow: `0 4px 0 0 hsl(${primaryColor} / 0.4), 0 6px 12px -2px hsl(${primaryColor} / 0.25)`,
+    };
+  };
+
   // Calculate progress
   const completedSlides = course.lessons
     .slice(0, currentLessonIndex)
@@ -147,11 +161,12 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
               <Button 
                 size="lg" 
                 onClick={onClose} 
-                className="w-full font-bold uppercase tracking-wide"
+                className={cn("w-full font-bold uppercase tracking-wide", pressAnimationClass)}
                 style={{
                   backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
                   color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
                   borderRadius: `var(--ds-button-radius, var(--radius))`,
+                  ...getRaisedButtonStyle(),
                 }}
               >
                 ЗАВЕРШИТЬ
@@ -277,11 +292,12 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
             <Button
               onClick={handleNext}
               disabled={needsCheck && !answered}
-              className="w-full h-12 text-base font-bold uppercase tracking-wide"
+              className={cn("w-full h-12 text-base font-bold uppercase tracking-wide", pressAnimationClass)}
               style={{
                 backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
                 color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
                 borderRadius: `var(--ds-button-radius, var(--radius))`,
+                ...getRaisedButtonStyle(),
               }}
             >
               {showContinue ? 'ПРОДОЛЖИТЬ' : 'ПРОВЕРИТЬ'}

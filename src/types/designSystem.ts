@@ -8,6 +8,8 @@ export interface SoundSettings {
   volume: number;
 }
 
+export type ButtonDepth = 'flat' | 'raised';
+
 export interface DesignSystemConfig {
   // Colors (HSL values as strings, e.g., "262 83% 58%")
   primaryColor: string;
@@ -29,6 +31,9 @@ export interface DesignSystemConfig {
   
   // Button style
   buttonStyle: 'rounded' | 'pill' | 'square';
+  
+  // Button depth (flat or 3D raised)
+  buttonDepth?: ButtonDepth;
   
   // Sound settings
   sound?: SoundSettings;
@@ -54,6 +59,7 @@ export const DEFAULT_DESIGN_SYSTEM: DesignSystemConfig = {
   headingFontFamily: 'Inter, system-ui, sans-serif',
   borderRadius: '0.75rem',
   buttonStyle: 'rounded',
+  buttonDepth: 'raised',
   sound: DEFAULT_SOUND_SETTINGS,
 };
 
