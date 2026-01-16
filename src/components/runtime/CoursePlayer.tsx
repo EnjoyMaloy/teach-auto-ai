@@ -147,14 +147,14 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
               <Button 
                 size="lg" 
                 onClick={onClose} 
-                className="w-full"
+                className="w-full font-bold uppercase tracking-wide"
                 style={{
                   backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
                   color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
                   borderRadius: `var(--ds-button-radius, var(--radius))`,
                 }}
               >
-                Завершить
+                ЗАВЕРШИТЬ
               </Button>
             </div>
           </div>
@@ -277,14 +277,14 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
             <Button
               onClick={handleNext}
               disabled={needsCheck && !answered}
-              className="w-full h-12 text-base font-semibold"
+              className="w-full h-12 text-base font-bold uppercase tracking-wide"
               style={{
                 backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
                 color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
                 borderRadius: `var(--ds-button-radius, var(--radius))`,
               }}
             >
-              {showContinue ? 'Продолжить' : 'Проверить'}
+              {showContinue ? 'ПРОДОЛЖИТЬ' : 'ПРОВЕРИТЬ'}
             </Button>
           </footer>
         </div>

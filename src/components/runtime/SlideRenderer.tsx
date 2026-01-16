@@ -352,13 +352,13 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
       {!hideActions && (
         <div className="mt-4 flex justify-center gap-3">
           {needsCheck && !answered && (
-            <Button onClick={checkAnswer} disabled={!canCheck} size="sm">
-              Проверить
+            <Button onClick={checkAnswer} disabled={!canCheck} size="sm" className="font-bold uppercase tracking-wide">
+              ПРОВЕРИТЬ
             </Button>
           )}
           {(answered || !needsCheck) && (
-            <Button onClick={onNext} size="sm" className="animate-bounce-subtle">
-              Далее
+            <Button onClick={onNext} size="sm" className="animate-bounce-subtle font-bold uppercase tracking-wide">
+              ДАЛЕЕ
               <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
           )}

@@ -857,7 +857,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         {isInteractive && answerState !== 'idle' && (
           <button
             onClick={resetState}
-            className="h-11 px-4 flex items-center gap-2 border-2 font-medium transition-all"
+            className="h-11 px-4 flex items-center gap-2 border-2 font-bold uppercase tracking-wide transition-all"
             style={{
               borderColor: `hsl(${ds.mutedColor})`,
               color: `hsl(${ds.foregroundColor})`,
@@ -865,7 +865,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             }}
           >
             <RotateCcw className="w-4 h-4" />
-            Заново
+            ЗАНОВО
           </button>
         )}
         <button
@@ -876,7 +876,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
               handleContinue();
             }
           }}
-          className="flex-1 h-11 max-w-md font-semibold transition-all disabled:opacity-50"
+          className="flex-1 h-11 max-w-md font-bold uppercase tracking-wide transition-all disabled:opacity-50"
           disabled={isInteractive && answerState === 'idle' && selectedOptions.length === 0 && trueFalseAnswer === null && !fillBlankInput && Object.keys(matchingSelected.pairs).length === 0}
           style={{
             backgroundColor: `hsl(${ds.primaryColor})`,
@@ -884,7 +884,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             borderRadius: getButtonRadius(),
           }}
         >
-          {isInteractive && answerState === 'idle' ? 'Проверить' : 'Продолжить'}
+          {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ПРОДОЛЖИТЬ'}
         </button>
       </div>
     </div>
