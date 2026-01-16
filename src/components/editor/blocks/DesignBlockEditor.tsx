@@ -271,11 +271,16 @@ const SortableSubBlockItem: React.FC<{
                 
                 {/* Backdrop selector - only show when focused */}
                 {isTextFocused && (
-                  <div className="flex justify-center gap-1 mt-2 animate-in fade-in duration-200">
+                  <div 
+                    className="flex justify-center gap-1 mt-2 animate-in fade-in duration-200"
+                    onMouseDown={(e) => e.preventDefault()} // Prevent blur
+                  >
                     <span className="text-[10px] text-muted-foreground mr-1 self-center">Подложка:</span>
                     {(['none', 'light', 'dark', 'primary', 'blur'] as const).map((backdrop) => (
                       <button
                         key={backdrop}
+                        type="button"
+                        onMouseDown={(e) => e.preventDefault()} // Prevent blur
                         onClick={(e) => {
                           e.stopPropagation();
                           onUpdate({ backdrop });

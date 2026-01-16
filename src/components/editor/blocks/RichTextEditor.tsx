@@ -59,11 +59,15 @@ const Toolbar: React.FC<ToolbarProps> = ({ editor, highlightColor, underlineColo
   if (!editor) return null;
 
   return (
-    <div className="flex items-center gap-1 p-1 border-b border-border/50 bg-muted/30 rounded-t-lg">
+    <div 
+      className="flex items-center gap-1 p-1 border-b border-border/50 bg-muted/30 rounded-t-lg"
+      onMouseDown={(e) => e.preventDefault()} // Prevent blur when clicking toolbar
+    >
       <span className="text-[10px] text-muted-foreground px-1">Выделить:</span>
       
       {/* Marker/Highlight */}
       <button
+        onMouseDown={(e) => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleHighlight().run()}
         className={cn(
           'w-7 h-7 rounded-md border transition-all flex items-center justify-center',
@@ -79,6 +83,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ editor, highlightColor, underlineColo
       
       {/* Underline */}
       <button
+        onMouseDown={(e) => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleUnderline().run()}
         className={cn(
           'w-7 h-7 rounded-md border transition-all flex items-center justify-center',
@@ -94,6 +99,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ editor, highlightColor, underlineColo
       
       {/* Wavy underline */}
       <button
+        onMouseDown={(e) => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleWavyUnderline().run()}
         className={cn(
           'w-7 h-7 rounded-md border transition-all flex items-center justify-center',
@@ -109,6 +115,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ editor, highlightColor, underlineColo
 
       {/* Clear formatting */}
       <button
+        onMouseDown={(e) => e.preventDefault()}
         onClick={() => editor.chain().focus().unsetAllMarks().run()}
         className="w-7 h-7 rounded-md border border-border hover:border-destructive/50 bg-background transition-all flex items-center justify-center ml-1"
         title="Убрать форматирование"
