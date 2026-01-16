@@ -82,6 +82,7 @@ export interface Block {
   // Styling
   backgroundColor?: string;
   textColor?: string;
+  textSize?: 'small' | 'medium' | 'large' | 'xlarge';
   
   // Timestamps
   createdAt: Date;
