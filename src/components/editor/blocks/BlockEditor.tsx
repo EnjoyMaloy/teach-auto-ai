@@ -12,13 +12,13 @@ import {
   Heading, Type, Image, Play, Volume2, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
   Link2, ListOrdered, SlidersHorizontal, MousePointer2,
-  Lightbulb
+  Lightbulb, Layers
 } from 'lucide-react';
 
 const iconMap = {
   Heading, Type, Image, Play, Volume2, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
-  Link2, ListOrdered, SlidersHorizontal, MousePointer2
+  Link2, ListOrdered, SlidersHorizontal, MousePointer2, Layers
 };
 
 interface BlockEditorProps {
@@ -491,6 +491,24 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
               rows={2}
               className="rounded-xl resize-none"
             />
+          </div>
+        )}
+
+        {/* Design block inline editing notice */}
+        {block.type === 'design' && (
+          <div className="text-center py-8">
+            <div className="w-16 h-16 rounded-2xl bg-ai/10 mx-auto mb-4 flex items-center justify-center">
+              <Layers className="w-8 h-8 text-ai" />
+            </div>
+            <p className="font-medium text-foreground mb-2">Дизайн-блок</p>
+            <p className="text-sm text-muted-foreground mb-4">
+              Редактируйте содержимое прямо в области предпросмотра слева
+            </p>
+            <p className="text-xs text-muted-foreground">
+              • Кликните по элементу для редактирования<br/>
+              • Перетаскивайте для изменения порядка<br/>
+              • Нажмите «Добавить» для новых элементов
+            </p>
           </div>
         )}
       </div>
