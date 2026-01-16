@@ -186,9 +186,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   };
 
   // CSS class for press animation
-  const pressAnimationClass = isRaised 
-    ? 'active:translate-y-1 active:shadow-none transition-all duration-75' 
-    : 'active:scale-95 transition-transform duration-75';
+  const pressAnimationClass = isRaised ? 'btn-raised' : 'btn-flat';
 
   const renderContent = () => {
     switch (block.type) {
