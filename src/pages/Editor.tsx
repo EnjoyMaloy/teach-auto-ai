@@ -59,6 +59,7 @@ const slideToBlock = (slide: Slide): Block => ({
   correctOrder: slide.correctOrder,
   backgroundColor: slide.backgroundColor,
   textColor: slide.textColor,
+  textSize: (slide as any).textSize,
   createdAt: slide.createdAt,
   updatedAt: slide.updatedAt,
 });
@@ -87,9 +88,10 @@ const blockToSlide = (block: Block): Slide => ({
   correctOrder: block.correctOrder,
   backgroundColor: block.backgroundColor,
   textColor: block.textColor,
+  textSize: block.textSize,
   createdAt: block.createdAt,
   updatedAt: block.updatedAt,
-});
+} as Slide);
 
 const Editor: React.FC = () => {
   const { courseId } = useParams();
