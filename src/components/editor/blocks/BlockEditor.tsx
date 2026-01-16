@@ -121,6 +121,35 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
           </div>
         )}
 
+        {/* Text size selector for text block */}
+        {block.type === 'text' && (
+          <div className="space-y-2">
+            <Label className="text-foreground font-medium">Размер текста</Label>
+            <div className="grid grid-cols-4 gap-2">
+              {[
+                { value: 'small', label: 'S', desc: 'Мелкий' },
+                { value: 'medium', label: 'M', desc: 'Средний' },
+                { value: 'large', label: 'L', desc: 'Крупный' },
+                { value: 'xlarge', label: 'XL', desc: 'Очень крупный' },
+              ].map((size) => (
+                <button
+                  key={size.value}
+                  onClick={() => onUpdate({ textSize: size.value as Block['textSize'] })}
+                  className={cn(
+                    'p-3 rounded-xl border-2 text-center transition-all',
+                    (block.textSize || 'medium') === size.value
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border hover:border-primary/50'
+                  )}
+                >
+                  <span className="text-lg font-bold">{size.label}</span>
+                  <p className="text-xs text-muted-foreground mt-1">{size.desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Image upload */}
         {['image', 'image_text', 'hotspot'].includes(block.type) && (
           <div className="space-y-2">

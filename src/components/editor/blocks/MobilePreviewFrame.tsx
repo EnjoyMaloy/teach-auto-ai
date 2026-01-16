@@ -167,10 +167,17 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         );
 
       case 'text':
+        const textSizeClass = {
+          small: 'text-sm',
+          medium: 'text-base',
+          large: 'text-xl',
+          xlarge: 'text-2xl',
+        }[block.textSize || 'medium'];
+        
         return (
-          <div className="flex-1 flex items-center p-6">
+          <div className="h-full flex items-center justify-center p-8">
             <p 
-              className="text-base leading-relaxed"
+              className={cn('leading-relaxed text-center', textSizeClass)}
               style={{ color: `hsl(${ds.foregroundColor})` }}
             >
               {block.content || 'Текст блока...'}
