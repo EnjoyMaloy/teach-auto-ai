@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 import { 
   DesignSystemConfig, 
-  DEFAULT_DESIGN_SYSTEM, 
+  DEFAULT_DESIGN_SYSTEM,
+  DEFAULT_SOUND_SETTINGS,
   PRESET_THEMES,
   FONT_OPTIONS,
-  BORDER_RADIUS_OPTIONS 
+  BORDER_RADIUS_OPTIONS,
+  SoundTheme
 } from '@/types/designSystem';
+import { playSound, SOUND_THEME_OPTIONS } from '@/lib/sounds';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
 import { 
   Select, 
   SelectContent, 
@@ -24,7 +29,9 @@ import {
   Square, 
   Sparkles,
   RotateCcw,
-  Check
+  Check,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -317,6 +324,10 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 <Square className="w-4 h-4 mr-2" />
                 Форма
               </TabsTrigger>
+              <TabsTrigger value="sound">
+                <Volume2 className="w-4 h-4 mr-2" />
+                Звуки
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="colors" className="space-y-4">
@@ -457,6 +468,135 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                       >
                         {style.label}
                       </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="sound" className="space-y-4">
+              <div className="space-y-6">
+                {/* Sound enabled toggle */}
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Звуковые эффекты</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Звуки при переходах и ответах
+                    </p>
+                  </div>
+                  <Switch
+                    checked={config.sound?.enabled ?? true}
+                    onCheckedChange={(enabled) => 
+                      updateConfig({ 
+                        sound: { ...DEFAULT_SOUND_SETTINGS, ...config.sound, enabled } 
+                      })
+                    }
+                  />
+                </div>
+
+                {/* Sound theme */}
+                <div className="space-y-3">
+                  <Label>Тема звуков</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {SOUND_THEME_OPTIONS.map((theme) => (
+                      <button
+                        key={theme.value}
+                        onClick={() => {
+                          updateConfig({ 
+                            sound: { 
+                              ...DEFAULT_SOUND_SETTINGS, 
+                              ...config.sound, 
+                              theme: theme.value as SoundTheme 
+                            } 
+                          });
+                          // Play preview sound
+                          playSound('tap', { 
+                            enabled: true, 
+                            theme: theme.value as SoundTheme, 
+                            volume: config.sound?.volume ?? 0.5 
+                          });
+                        }}
+                        disabled={!config.sound?.enabled}
+                        className={cn(
+                          "p-4 rounded-xl border-2 text-left transition-all",
+                          (config.sound?.theme ?? 'duolingo') === theme.value
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:border-primary/50",
+                          !config.sound?.enabled && "opacity-50 cursor-not-allowed"
+                        )}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          {theme.value === 'none' ? (
+                            <VolumeX className="w-4 h-4 text-muted-foreground" />
+                          ) : (
+                            <Volume2 className="w-4 h-4 text-primary" />
+                          )}
+                          <span className="font-medium">{theme.label}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{theme.description}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Volume slider */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label>Громкость</Label>
+                    <span className="text-sm text-muted-foreground">
+                      {Math.round((config.sound?.volume ?? 0.5) * 100)}%
+                    </span>
+                  </div>
+                  <Slider
+                    value={[(config.sound?.volume ?? 0.5) * 100]}
+                    min={0}
+                    max={100}
+                    step={10}
+                    disabled={!config.sound?.enabled || config.sound?.theme === 'none'}
+                    onValueChange={([value]) => {
+                      updateConfig({ 
+                        sound: { 
+                          ...DEFAULT_SOUND_SETTINGS, 
+                          ...config.sound, 
+                          volume: value / 100 
+                        } 
+                      });
+                    }}
+                    onValueCommit={() => {
+                      // Play preview sound when done sliding
+                      playSound('pop', { 
+                        enabled: config.sound?.enabled ?? true, 
+                        theme: config.sound?.theme ?? 'duolingo', 
+                        volume: config.sound?.volume ?? 0.5 
+                      });
+                    }}
+                    className="w-full"
+                  />
+                </div>
+
+                {/* Test sounds */}
+                <div className="space-y-3">
+                  <Label>Проверить звуки</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { type: 'swipe', label: 'Переход' },
+                      { type: 'correct', label: 'Верно' },
+                      { type: 'incorrect', label: 'Неверно' },
+                      { type: 'complete', label: 'Завершение' },
+                    ].map((sound) => (
+                      <Button
+                        key={sound.type}
+                        variant="outline"
+                        size="sm"
+                        disabled={!config.sound?.enabled || config.sound?.theme === 'none'}
+                        onClick={() => playSound(sound.type as any, {
+                          enabled: true,
+                          theme: config.sound?.theme ?? 'duolingo',
+                          volume: config.sound?.volume ?? 0.5,
+                        })}
+                      >
+                        {sound.label}
+                      </Button>
                     ))}
                   </div>
                 </div>
