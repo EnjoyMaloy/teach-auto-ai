@@ -23,7 +23,8 @@ import {
   DESIGN_TEMPLATES, 
   createSubBlock,
   createSubBlocksFromTemplate,
-  DesignTemplateId
+  DesignTemplateId,
+  TextHighlightType
 } from '@/types/designBlock';
 import { DEFAULT_DESIGN_BLOCK_SETTINGS } from '@/types/designSystem';
 import { CourseDesignSystem } from '@/types/course';
@@ -32,7 +33,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   Plus, Trash2, GripVertical, Upload,
-  Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Layers
+  Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Layers,
+  Highlighter, Underline, Waves
 } from 'lucide-react';
 
 const iconMap = {
@@ -75,10 +77,14 @@ const SortableSubBlockItem: React.FC<{
     successColor: designSystem?.successColor || '142 71% 45%',
     borderRadius: designSystem?.borderRadius || '0.75rem',
     // Design block backdrop colors from design system
-    backdropLightColor: (designSystem as any)?.designBlock?.backdropLightColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropLightColor,
-    backdropDarkColor: (designSystem as any)?.designBlock?.backdropDarkColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkColor,
-    backdropPrimaryColor: (designSystem as any)?.designBlock?.backdropPrimaryColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryColor,
-    backdropBlurColor: (designSystem as any)?.designBlock?.backdropBlurColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurColor,
+    backdropLightColor: designSystem?.designBlock?.backdropLightColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropLightColor,
+    backdropDarkColor: designSystem?.designBlock?.backdropDarkColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkColor,
+    backdropPrimaryColor: designSystem?.designBlock?.backdropPrimaryColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryColor,
+    backdropBlurColor: designSystem?.designBlock?.backdropBlurColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurColor,
+    // Highlight colors
+    highlightMarkerColor: designSystem?.designBlock?.highlightMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightMarkerColor,
+    highlightUnderlineColor: designSystem?.designBlock?.highlightUnderlineColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightUnderlineColor,
+    highlightWavyColor: designSystem?.designBlock?.highlightWavyColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightWavyColor,
   };
 
   const textAlignClass = {
@@ -93,6 +99,61 @@ const SortableSubBlockItem: React.FC<{
     medium: 'px-4 py-2',
     large: 'px-6 py-4',
   }[subBlock.padding || 'medium'];
+
+  // Get highlight styles for text
+  const getHighlightStyles = (highlight?: TextHighlightType): React.CSSProperties => {
+    switch (highlight) {
+      case 'marker':
+        return {
+          backgroundColor: `hsl(${ds.highlightMarkerColor})`,
+          padding: '0 4px',
+          borderRadius: '2px',
+        };
+      case 'underline':
+        return {
+          borderBottom: `2px solid hsl(${ds.highlightUnderlineColor})`,
+          paddingBottom: '2px',
+        };
+      case 'wavy':
+        return {
+          textDecorationLine: 'underline',
+          textDecorationStyle: 'wavy',
+          textDecorationColor: `hsl(${ds.highlightWavyColor})`,
+          textUnderlineOffset: '4px',
+        };
+      default:
+        return {};
+    }
+  };
+
+  // Highlight selector component
+  const HighlightSelector: React.FC<{ currentHighlight?: TextHighlightType }> = ({ currentHighlight }) => (
+    <div className="flex justify-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+      {([
+        { type: 'none' as const, icon: null, title: 'Без выделения' },
+        { type: 'marker' as const, icon: Highlighter, title: 'Маркер' },
+        { type: 'underline' as const, icon: Underline, title: 'Подчёркивание' },
+        { type: 'wavy' as const, icon: Waves, title: 'Волнистая линия' },
+      ]).map(({ type, icon: Icon, title }) => (
+        <button
+          key={type}
+          onClick={(e) => {
+            e.stopPropagation();
+            onUpdate({ highlight: type });
+          }}
+          className={cn(
+            'w-7 h-7 rounded-md border-2 transition-all flex items-center justify-center',
+            (currentHighlight === type || (!currentHighlight && type === 'none'))
+              ? 'border-primary bg-primary/10'
+              : 'border-border hover:border-primary/50 bg-background'
+          )}
+          title={title}
+        >
+          {Icon ? <Icon className="w-3.5 h-3.5" /> : <span className="text-xs">—</span>}
+        </button>
+      ))}
+    </div>
+  );
 
   const renderSubBlockContent = () => {
     switch (subBlock.type) {
@@ -111,26 +172,40 @@ const SortableSubBlockItem: React.FC<{
           bold: 'font-bold',
         }[subBlock.fontWeight || 'bold'];
 
-        return isEditing ? (
-          <input
-            type="text"
-            value={subBlock.content || ''}
-            onChange={(e) => onUpdate({ content: e.target.value })}
-            placeholder="Заголовок..."
-            className={cn(
-              'w-full bg-transparent outline-none',
-              headingSizeClass, fontWeightClass, textAlignClass
+        const headingHighlightStyles = getHighlightStyles(subBlock.highlight);
+
+        return (
+          <div>
+            {isEditing ? (
+              <input
+                type="text"
+                value={subBlock.content || ''}
+                onChange={(e) => onUpdate({ content: e.target.value })}
+                placeholder="Заголовок..."
+                className={cn(
+                  'w-full bg-transparent outline-none',
+                  headingSizeClass, fontWeightClass, textAlignClass
+                )}
+                style={{ 
+                  color: `hsl(${ds.foregroundColor})`,
+                  ...headingHighlightStyles 
+                }}
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : (
+              <h2 
+                className={cn(headingSizeClass, fontWeightClass, textAlignClass)}
+                style={{ 
+                  color: `hsl(${ds.foregroundColor})`,
+                }}
+              >
+                <span style={headingHighlightStyles}>
+                  {subBlock.content || 'Заголовок'}
+                </span>
+              </h2>
             )}
-            style={{ color: `hsl(${ds.foregroundColor})` }}
-            onClick={(e) => e.stopPropagation()}
-          />
-        ) : (
-          <h2 
-            className={cn(headingSizeClass, fontWeightClass, textAlignClass)}
-            style={{ color: `hsl(${ds.foregroundColor})` }}
-          >
-            {subBlock.content || 'Заголовок'}
-          </h2>
+            {isEditing && <HighlightSelector currentHighlight={subBlock.highlight} />}
+          </div>
         );
 
       case 'text':
@@ -171,6 +246,8 @@ const SortableSubBlockItem: React.FC<{
           ? 'hsl(0 0% 100%)' 
           : `hsl(${ds.foregroundColor} / 0.8)`;
 
+        const textHighlightStyles = getHighlightStyles(subBlock.highlight);
+
         return (
           <div style={backdropStyles as React.CSSProperties}>
             {isEditing ? (
@@ -191,7 +268,9 @@ const SortableSubBlockItem: React.FC<{
                 className={cn(textSizeClass, textAlignClass)}
                 style={{ color: textColor }}
               >
-                {subBlock.content || 'Текст абзаца'}
+                <span style={textHighlightStyles}>
+                  {subBlock.content || 'Текст абзаца'}
+                </span>
               </p>
             )}
             
@@ -229,6 +308,9 @@ const SortableSubBlockItem: React.FC<{
                 ))}
               </div>
             )}
+
+            {/* Highlight selector when editing */}
+            {isEditing && <HighlightSelector currentHighlight={subBlock.highlight} />}
           </div>
         );
 

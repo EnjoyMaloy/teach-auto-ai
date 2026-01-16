@@ -13,17 +13,25 @@ export type ButtonDepth = 'flat' | 'raised';
 // Design block backdrop options
 export interface DesignBlockSettings {
   // Text sub-block backdrop colors (HSL values)
-  backdropLightColor: string;
-  backdropDarkColor: string;
-  backdropPrimaryColor: string;
-  backdropBlurColor: string;
+  backdropLightColor?: string;
+  backdropDarkColor?: string;
+  backdropPrimaryColor?: string;
+  backdropBlurColor?: string;
+  
+  // Text highlighting colors
+  highlightMarkerColor?: string;
+  highlightUnderlineColor?: string;
+  highlightWavyColor?: string;
 }
 
-export const DEFAULT_DESIGN_BLOCK_SETTINGS: DesignBlockSettings = {
+export const DEFAULT_DESIGN_BLOCK_SETTINGS: Required<DesignBlockSettings> = {
   backdropLightColor: '0 0% 0% / 0.05',
   backdropDarkColor: '0 0% 0% / 0.9',
   backdropPrimaryColor: '262 83% 58% / 0.1',
   backdropBlurColor: '0 0% 0% / 0.03',
+  highlightMarkerColor: '50 100% 50% / 0.4',
+  highlightUnderlineColor: '262 83% 58%',
+  highlightWavyColor: '0 84% 60%',
 };
 
 export interface DesignSystemConfig {

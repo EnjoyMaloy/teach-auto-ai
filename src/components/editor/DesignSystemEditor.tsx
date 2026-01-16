@@ -507,6 +507,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
 
             <TabsContent value="designblock" className="space-y-4">
               <div className="space-y-6">
+                {/* Backdrop settings */}
                 <div className="space-y-2">
                   <Label className="text-base font-semibold">Подложки для текста</Label>
                   <p className="text-sm text-muted-foreground">
@@ -595,6 +596,99 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                       style={{ backgroundColor: `hsl(${config.designBlock?.backdropBlurColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurColor})` }}
                     >
                       <span style={{ color: `hsl(${config.foregroundColor})` }}>Blur-подложка</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Highlight settings */}
+                <div className="border-t pt-6 space-y-2">
+                  <Label className="text-base font-semibold">Выделение текста</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Настройте цвета для маркера, подчёркивания и волнистой линии
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <ColorInput
+                    label="Маркер"
+                    value={config.designBlock?.highlightMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightMarkerColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        highlightMarkerColor: v 
+                      } 
+                    })}
+                    description="Как текстовый маркер"
+                  />
+                  <ColorInput
+                    label="Подчёркивание"
+                    value={config.designBlock?.highlightUnderlineColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightUnderlineColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        highlightUnderlineColor: v 
+                      } 
+                    })}
+                    description="Прямая линия снизу"
+                  />
+                  <ColorInput
+                    label="Волнистая линия"
+                    value={config.designBlock?.highlightWavyColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightWavyColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        highlightWavyColor: v 
+                      } 
+                    })}
+                    description="Волнистая линия снизу"
+                  />
+                </div>
+
+                {/* Preview of highlights */}
+                <div className="space-y-2">
+                  <Label>Предпросмотр выделений</Label>
+                  <div 
+                    className="p-4 rounded-xl space-y-4"
+                    style={{ backgroundColor: `hsl(${config.backgroundColor})` }}
+                  >
+                    <div className="text-center">
+                      <span 
+                        className="text-lg px-1"
+                        style={{ 
+                          backgroundColor: `hsl(${config.designBlock?.highlightMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightMarkerColor})`,
+                          color: `hsl(${config.foregroundColor})`
+                        }}
+                      >
+                        Текст с маркером
+                      </span>
+                    </div>
+                    <div className="text-center">
+                      <span 
+                        className="text-lg border-b-2 pb-0.5"
+                        style={{ 
+                          borderColor: `hsl(${config.designBlock?.highlightUnderlineColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightUnderlineColor})`,
+                          color: `hsl(${config.foregroundColor})`
+                        }}
+                      >
+                        Текст с подчёркиванием
+                      </span>
+                    </div>
+                    <div className="text-center">
+                      <span 
+                        className="text-lg"
+                        style={{ 
+                          color: `hsl(${config.foregroundColor})`,
+                          textDecorationLine: 'underline',
+                          textDecorationStyle: 'wavy',
+                          textDecorationColor: `hsl(${config.designBlock?.highlightWavyColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightWavyColor})`,
+                          textUnderlineOffset: '4px',
+                        }}
+                      >
+                        Текст с волнистой линией
+                      </span>
                     </div>
                   </div>
                 </div>
