@@ -2,11 +2,19 @@
 
 export type SlideType = 
   | 'text' 
+  | 'heading'
+  | 'image'
+  | 'video'
+  | 'audio'
   | 'image_text' 
   | 'single_choice' 
   | 'multiple_choice' 
   | 'true_false' 
-  | 'fill_blank';
+  | 'fill_blank'
+  | 'matching'
+  | 'ordering'
+  | 'slider'
+  | 'hotspot';
 
 export interface SlideHint {
   id: string;
@@ -27,11 +35,23 @@ export interface Slide {
   order: number;
   content: string;
   imageUrl?: string;
+  videoUrl?: string;
+  audioUrl?: string;
   options?: SlideOption[];
-  correctAnswer?: string | string[] | boolean;
+  correctAnswer?: string | string[] | boolean | number;
   explanation?: string;
   hints?: SlideHint[];
-  blankWord?: string; // For fill_blank type
+  blankWord?: string;
+  matchingPairs?: { id: string; left: string; right: string }[];
+  hotspotAreas?: { id: string; x: number; y: number; width: number; height: number; label: string; isCorrect: boolean }[];
+  sliderMin?: number;
+  sliderMax?: number;
+  sliderCorrect?: number;
+  sliderStep?: number;
+  orderingItems?: string[];
+  correctOrder?: string[];
+  backgroundColor?: string;
+  textColor?: string;
   createdAt: Date;
   updatedAt: Date;
 }
