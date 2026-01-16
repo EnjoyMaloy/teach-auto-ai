@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import { 
   Undo2, Redo2, Eye, Save, 
-  Share2, Clock, Loader2, Pencil, Check, X, ArrowLeft
+  Share2, Clock, Loader2, Pencil, Check, X, ArrowLeft, Palette
 } from 'lucide-react';
 import { Course } from '@/types/course';
+import { DesignSystemConfig } from '@/types/designSystem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PublishDialog } from './PublishDialog';
+import { DesignSystemEditor } from './DesignSystemEditor';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface EditorHeaderProps {
   course: Course;
@@ -19,6 +27,7 @@ interface EditorHeaderProps {
   onPublish: () => void;
   onSave: () => void;
   onUpdateTitle: (title: string) => void;
+  onUpdateDesignSystem: (config: DesignSystemConfig) => void;
   onBack?: () => void;
 }
 
@@ -33,11 +42,13 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   onPublish,
   onSave,
   onUpdateTitle,
+  onUpdateDesignSystem,
   onBack,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(course.title);
   const [showPublishDialog, setShowPublishDialog] = useState(false);
+  const [showDesignSystem, setShowDesignSystem] = useState(false);
 
   const handleStartEditing = () => {
     setEditedTitle(course.title);
@@ -138,6 +149,45 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
               )}
             </div>
           </div>
+
+          {/* Design System Button */}
+          <Popover open={showDesignSystem} onOpenChange={setShowDesignSystem}>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="ml-4">
+                <Palette className="w-4 h-4 mr-1" />
+                Дизайн
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent 
+              className="w-[500px] p-0" 
+              align="start"
+              side="bottom"
+              sideOffset={8}
+            >
+              <ScrollArea className="h-[70vh]">
+                <div className="p-4">
+                  <DesignSystemEditor
+                    config={{
+                      primaryColor: course.designSystem?.primaryColor || '262 83% 58%',
+                      primaryForeground: course.designSystem?.primaryForeground || '0 0% 100%',
+                      backgroundColor: course.designSystem?.backgroundColor || '0 0% 100%',
+                      foregroundColor: course.designSystem?.foregroundColor || '240 10% 4%',
+                      cardColor: course.designSystem?.cardColor || '0 0% 100%',
+                      mutedColor: course.designSystem?.mutedColor || '240 5% 96%',
+                      accentColor: course.designSystem?.accentColor || '240 5% 96%',
+                      successColor: course.designSystem?.successColor || '142 71% 45%',
+                      destructiveColor: course.designSystem?.destructiveColor || '0 84% 60%',
+                      fontFamily: course.designSystem?.fontFamily || 'Inter, system-ui, sans-serif',
+                      headingFontFamily: course.designSystem?.headingFontFamily || 'Inter, system-ui, sans-serif',
+                      borderRadius: course.designSystem?.borderRadius || '0.75rem',
+                      buttonStyle: course.designSystem?.buttonStyle || 'rounded',
+                    }}
+                    onChange={onUpdateDesignSystem}
+                  />
+                </div>
+              </ScrollArea>
+            </PopoverContent>
+          </Popover>
         </div>
 
         {/* Center section - Undo/Redo */}
