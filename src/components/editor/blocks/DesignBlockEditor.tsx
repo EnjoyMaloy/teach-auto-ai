@@ -57,6 +57,7 @@ const SortableSubBlockItem: React.FC<{
   onDelete: () => void;
   designSystem?: CourseDesignSystem;
 }> = ({ subBlock, isEditing, onUpdate, onDelete, designSystem }) => {
+  const [isTextFocused, setIsTextFocused] = useState(false);
   const {
     attributes,
     listeners,
@@ -265,41 +266,44 @@ const SortableSubBlockItem: React.FC<{
                   underlineColor={ds.highlightUnderlineColor}
                   wavyColor={ds.highlightWavyColor}
                   isEditing={true}
+                  onFocusChange={setIsTextFocused}
                 />
                 
-                {/* Backdrop selector */}
-                <div className="flex justify-center gap-1 mt-2">
-                  <span className="text-[10px] text-muted-foreground mr-1 self-center">Подложка:</span>
-                  {(['none', 'light', 'dark', 'primary', 'blur'] as const).map((backdrop) => (
-                    <button
-                      key={backdrop}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onUpdate({ backdrop });
-                      }}
-                      className={cn(
-                        'w-6 h-6 rounded-md border-2 transition-all text-[8px] font-medium',
-                        subBlock.backdrop === backdrop || (!subBlock.backdrop && backdrop === 'none')
-                          ? 'border-primary scale-110'
-                          : 'border-transparent hover:border-primary/50'
-                      )}
-                      style={{
-                        backgroundColor: backdrop === 'none' ? 'transparent' 
-                          : backdrop === 'light' ? `hsl(${ds.backdropLightColor})`
-                          : backdrop === 'dark' ? `hsl(${ds.backdropDarkColor})`
-                          : backdrop === 'primary' ? `hsl(${ds.backdropPrimaryColor})`
-                          : `hsl(${ds.backdropBlurColor})`,
-                      }}
-                      title={backdrop === 'none' ? 'Без подложки' 
-                        : backdrop === 'light' ? 'Светлая'
-                        : backdrop === 'dark' ? 'Тёмная'
-                        : backdrop === 'primary' ? 'Акцент'
-                        : 'Размытие'}
-                    >
-                      {backdrop === 'blur' && '⚪'}
-                    </button>
-                  ))}
-                </div>
+                {/* Backdrop selector - only show when focused */}
+                {isTextFocused && (
+                  <div className="flex justify-center gap-1 mt-2 animate-in fade-in duration-200">
+                    <span className="text-[10px] text-muted-foreground mr-1 self-center">Подложка:</span>
+                    {(['none', 'light', 'dark', 'primary', 'blur'] as const).map((backdrop) => (
+                      <button
+                        key={backdrop}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onUpdate({ backdrop });
+                        }}
+                        className={cn(
+                          'w-6 h-6 rounded-md border-2 transition-all text-[8px] font-medium',
+                          subBlock.backdrop === backdrop || (!subBlock.backdrop && backdrop === 'none')
+                            ? 'border-primary scale-110'
+                            : 'border-transparent hover:border-primary/50'
+                        )}
+                        style={{
+                          backgroundColor: backdrop === 'none' ? 'transparent' 
+                            : backdrop === 'light' ? `hsl(${ds.backdropLightColor})`
+                            : backdrop === 'dark' ? `hsl(${ds.backdropDarkColor})`
+                            : backdrop === 'primary' ? `hsl(${ds.backdropPrimaryColor})`
+                            : `hsl(${ds.backdropBlurColor})`,
+                        }}
+                        title={backdrop === 'none' ? 'Без подложки' 
+                          : backdrop === 'light' ? 'Светлая'
+                          : backdrop === 'dark' ? 'Тёмная'
+                          : backdrop === 'primary' ? 'Акцент'
+                          : 'Размытие'}
+                      >
+                        {backdrop === 'blur' && '⚪'}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </>
             ) : (
               <RichTextEditor
