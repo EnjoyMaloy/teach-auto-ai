@@ -135,26 +135,96 @@ const SortableSubBlockItem: React.FC<{
           xlarge: 'text-xl',
         }[subBlock.textSize || 'medium'];
 
-        return isEditing ? (
-          <textarea
-            value={subBlock.content || ''}
-            onChange={(e) => onUpdate({ content: e.target.value })}
-            placeholder="Текст абзаца..."
-            rows={3}
-            className={cn(
-              'w-full bg-transparent outline-none resize-none',
-              textSizeClass, textAlignClass
+        // Backdrop styles
+        const backdropStyles = {
+          none: {},
+          light: { 
+            backgroundColor: `hsl(${ds.foregroundColor} / 0.05)`,
+            padding: '12px 16px',
+            borderRadius: subBlock.backdropRounded !== false ? '12px' : '0',
+          },
+          dark: { 
+            backgroundColor: `hsl(${ds.foregroundColor} / 0.9)`,
+            color: `hsl(${ds.primaryColor === ds.foregroundColor ? '0 0% 100%' : ds.foregroundColor} / 0.1)`,
+            padding: '12px 16px',
+            borderRadius: subBlock.backdropRounded !== false ? '12px' : '0',
+          },
+          primary: { 
+            backgroundColor: `hsl(${ds.primaryColor} / 0.1)`,
+            padding: '12px 16px',
+            borderRadius: subBlock.backdropRounded !== false ? '12px' : '0',
+          },
+          blur: { 
+            backgroundColor: `hsl(${ds.foregroundColor} / 0.03)`,
+            backdropFilter: 'blur(8px)',
+            padding: '12px 16px',
+            borderRadius: subBlock.backdropRounded !== false ? '12px' : '0',
+          },
+        }[subBlock.backdrop || 'none'];
+
+        const textColor = subBlock.backdrop === 'dark' 
+          ? 'hsl(0 0% 100%)' 
+          : `hsl(${ds.foregroundColor} / 0.8)`;
+
+        return (
+          <div style={backdropStyles as React.CSSProperties}>
+            {isEditing ? (
+              <textarea
+                value={subBlock.content || ''}
+                onChange={(e) => onUpdate({ content: e.target.value })}
+                placeholder="Текст абзаца..."
+                rows={3}
+                className={cn(
+                  'w-full bg-transparent outline-none resize-none',
+                  textSizeClass, textAlignClass
+                )}
+                style={{ color: textColor }}
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : (
+              <p 
+                className={cn(textSizeClass, textAlignClass)}
+                style={{ color: textColor }}
+              >
+                {subBlock.content || 'Текст абзаца'}
+              </p>
             )}
-            style={{ color: `hsl(${ds.foregroundColor} / 0.8)` }}
-            onClick={(e) => e.stopPropagation()}
-          />
-        ) : (
-          <p 
-            className={cn(textSizeClass, textAlignClass)}
-            style={{ color: `hsl(${ds.foregroundColor} / 0.8)` }}
-          >
-            {subBlock.content || 'Текст абзаца'}
-          </p>
+            
+            {/* Backdrop selector when editing */}
+            {isEditing && (
+              <div className="flex justify-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                {(['none', 'light', 'dark', 'primary', 'blur'] as const).map((backdrop) => (
+                  <button
+                    key={backdrop}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onUpdate({ backdrop });
+                    }}
+                    className={cn(
+                      'w-6 h-6 rounded-md border-2 transition-all text-[8px] font-medium',
+                      subBlock.backdrop === backdrop || (!subBlock.backdrop && backdrop === 'none')
+                        ? 'border-primary scale-110'
+                        : 'border-transparent hover:border-primary/50'
+                    )}
+                    style={{
+                      backgroundColor: backdrop === 'none' ? 'transparent' 
+                        : backdrop === 'light' ? `hsl(${ds.foregroundColor} / 0.1)`
+                        : backdrop === 'dark' ? `hsl(${ds.foregroundColor} / 0.9)`
+                        : backdrop === 'primary' ? `hsl(${ds.primaryColor} / 0.2)`
+                        : `hsl(${ds.foregroundColor} / 0.05)`,
+                    }}
+                    title={backdrop === 'none' ? 'Без подложки' 
+                      : backdrop === 'light' ? 'Светлая'
+                      : backdrop === 'dark' ? 'Тёмная'
+                      : backdrop === 'primary' ? 'Акцент'
+                      : 'Размытие'}
+                  >
+                    {backdrop === 'blur' && '⚪'}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         );
 
       case 'image':
