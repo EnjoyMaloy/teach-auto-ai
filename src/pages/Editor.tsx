@@ -499,22 +499,15 @@ const Editor: React.FC = () => {
             </div>
           </div>
 
-          {/* Mobile Preview */}
-          <div className="flex-1 flex items-center justify-center p-8 bg-muted/30 overflow-auto">
-            <div className="text-center">
-              <MobilePreviewFrame
-                block={selectedBlock}
-                lessonTitle={selectedLesson?.title}
-                blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
-                totalBlocks={blocks.length}
-                onContinue={handleContinueToNextBlock}
-              />
-              {selectedBlock && (
-                <p className="text-xs text-muted-foreground mt-4">
-                  Блок {selectedBlockIndex + 1} из {blocks.length}
-                </p>
-              )}
-            </div>
+          {/* Mobile Preview - Full area */}
+          <div className="flex-1 flex flex-col overflow-hidden bg-card">
+            <MobilePreviewFrame
+              block={selectedBlock}
+              lessonTitle={selectedLesson?.title}
+              blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
+              totalBlocks={blocks.length}
+              onContinue={handleContinueToNextBlock}
+            />
           </div>
         </div>
 
