@@ -17,6 +17,7 @@ import {
 } from '@dnd-kit/sortable';
 import { Course, Lesson, Slide } from '@/types/course';
 import { Block, BlockType, createEmptyBlock } from '@/types/blocks';
+import { DesignSystemConfig } from '@/types/designSystem';
 import { useAuth } from '@/hooks/useAuth';
 import { useCourses } from '@/hooks/useCourses';
 import { EditorHeader } from '@/components/editor/EditorHeader';
@@ -180,6 +181,13 @@ const Editor: React.FC = () => {
     pushToUndo();
     setCourse(prev => prev ? ({ ...prev, title, updatedAt: new Date() }) : null);
     toast.success('Название курса обновлено');
+  };
+
+  // Design system update
+  const handleUpdateDesignSystem = (config: DesignSystemConfig) => {
+    if (!course) return;
+    pushToUndo();
+    setCourse(prev => prev ? ({ ...prev, designSystem: config, updatedAt: new Date() }) : null);
   };
 
   // Lesson operations
@@ -415,6 +423,7 @@ const Editor: React.FC = () => {
         onPublish={handlePublish}
         onSave={handleSave}
         onUpdateTitle={handleUpdateTitle}
+        onUpdateDesignSystem={handleUpdateDesignSystem}
         onBack={() => navigate('/')}
       />
 
@@ -507,6 +516,7 @@ const Editor: React.FC = () => {
               blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
               totalBlocks={blocks.length}
               onContinue={handleContinueToNextBlock}
+              designSystem={course.designSystem}
             />
           </div>
         </div>

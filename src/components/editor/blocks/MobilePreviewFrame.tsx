@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Block, BLOCK_CONFIGS } from '@/types/blocks';
+import { CourseDesignSystem } from '@/types/course';
 import { cn } from '@/lib/utils';
 import { 
   Play, Volume2, Check, X,
@@ -13,9 +14,26 @@ interface MobilePreviewFrameProps {
   blockIndex?: number;
   totalBlocks?: number;
   onContinue?: () => void;
+  designSystem?: CourseDesignSystem;
 }
 
 type AnswerState = 'idle' | 'correct' | 'incorrect';
+
+// Default design system values
+const DEFAULT_DS = {
+  primaryColor: '262 83% 58%',
+  primaryForeground: '0 0% 100%',
+  backgroundColor: '0 0% 100%',
+  foregroundColor: '240 10% 4%',
+  cardColor: '0 0% 100%',
+  mutedColor: '240 5% 96%',
+  successColor: '142 71% 45%',
+  destructiveColor: '0 84% 60%',
+  fontFamily: 'Inter, system-ui, sans-serif',
+  headingFontFamily: 'Inter, system-ui, sans-serif',
+  borderRadius: '0.75rem',
+  buttonStyle: 'rounded' as const,
+};
 
 export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   block,
@@ -23,7 +41,11 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   blockIndex = 0,
   totalBlocks = 1,
   onContinue,
+  designSystem,
 }) => {
+  // Merge design system with defaults
+  const ds = { ...DEFAULT_DS, ...designSystem };
+  
   // Interactive state
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [trueFalseAnswer, setTrueFalseAnswer] = useState<boolean | null>(null);
@@ -96,12 +118,21 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
   if (!block) {
     return (
-      <div className="h-full w-full flex items-center justify-center bg-card">
+      <div 
+        className="h-full w-full flex items-center justify-center"
+        style={{ 
+          backgroundColor: `hsl(${ds.backgroundColor})`,
+          fontFamily: ds.fontFamily,
+        }}
+      >
         <div className="text-center px-8">
-          <div className="w-16 h-16 rounded-2xl bg-muted mx-auto mb-4 flex items-center justify-center">
-            <Play className="w-8 h-8 text-muted-foreground" />
+          <div 
+            className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
+            style={{ backgroundColor: `hsl(${ds.mutedColor})` }}
+          >
+            <Play className="w-8 h-8" style={{ color: `hsl(${ds.foregroundColor} / 0.5)` }} />
           </div>
-          <p className="text-muted-foreground text-sm">
+          <p style={{ color: `hsl(${ds.foregroundColor} / 0.5)` }} className="text-sm">
             Выберите блок для предпросмотра
           </p>
         </div>
@@ -111,12 +142,25 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
   const isInteractive = ['single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'slider', 'matching', 'ordering', 'hotspot'].includes(block.type);
 
+  // Get button border radius based on style
+  const getButtonRadius = () => {
+    if (ds.buttonStyle === 'pill') return '9999px';
+    if (ds.buttonStyle === 'square') return '0';
+    return ds.borderRadius;
+  };
+
   const renderContent = () => {
     switch (block.type) {
       case 'heading':
         return (
           <div className="flex-1 flex items-center justify-center p-6">
-            <h1 className="text-2xl font-bold text-center text-foreground">
+            <h1 
+              className="text-2xl font-bold text-center"
+              style={{ 
+                color: `hsl(${ds.foregroundColor})`,
+                fontFamily: ds.headingFontFamily,
+              }}
+            >
               {block.content || 'Заголовок'}
             </h1>
           </div>
@@ -125,7 +169,10 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       case 'text':
         return (
           <div className="flex-1 flex items-center p-6">
-            <p className="text-base leading-relaxed text-foreground">
+            <p 
+              className="text-base leading-relaxed"
+              style={{ color: `hsl(${ds.foregroundColor})` }}
+            >
               {block.content || 'Текст блока...'}
             </p>
           </div>
@@ -199,13 +246,34 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       case 'single_choice':
         return (
           <div className="flex-1 flex flex-col p-4 overflow-auto">
-            <p className="text-lg font-semibold mb-4 text-center text-foreground">
+            <p 
+              className="text-lg font-semibold mb-4 text-center"
+              style={{ color: `hsl(${ds.foregroundColor})` }}
+            >
               {block.content || 'Вопрос?'}
             </p>
             <div className="space-y-2 flex-1 flex flex-col justify-center">
               {(block.options || []).map((option) => {
                 const isSelected = selectedOptions.includes(option.id);
                 const showResult = answerState !== 'idle';
+                
+                let borderColor = `hsl(${ds.mutedColor})`;
+                let bgColor = `hsl(${ds.cardColor})`;
+                let textColor = `hsl(${ds.foregroundColor})`;
+                
+                if (showResult && option.isCorrect) {
+                  borderColor = `hsl(${ds.successColor})`;
+                  bgColor = `hsl(${ds.successColor} / 0.1)`;
+                  textColor = `hsl(${ds.successColor})`;
+                } else if (showResult && isSelected && !option.isCorrect) {
+                  borderColor = `hsl(${ds.destructiveColor})`;
+                  bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
+                  textColor = `hsl(${ds.destructiveColor})`;
+                } else if (!showResult && isSelected) {
+                  borderColor = `hsl(${ds.primaryColor})`;
+                  bgColor = `hsl(${ds.primaryColor} / 0.1)`;
+                  textColor = `hsl(${ds.primaryColor})`;
+                }
                 
                 return (
                   <button
@@ -214,13 +282,13 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                       if (answerState !== 'idle') return;
                       setSelectedOptions([option.id]);
                     }}
-                    className={cn(
-                      'w-full p-3 rounded-xl text-left transition-all text-sm border-2',
-                      showResult && option.isCorrect && 'border-success bg-success/10 text-success',
-                      showResult && isSelected && !option.isCorrect && 'border-destructive bg-destructive/10 text-destructive',
-                      !showResult && isSelected && 'border-primary bg-primary/10 text-primary',
-                      !showResult && !isSelected && 'border-border bg-card text-foreground hover:border-primary/50'
-                    )}
+                    className="w-full p-3 text-left transition-all text-sm border-2"
+                    style={{
+                      borderColor,
+                      backgroundColor: bgColor,
+                      color: textColor,
+                      borderRadius: ds.borderRadius,
+                    }}
                   >
                     <span className="font-medium">{option.text}</span>
                   </button>
@@ -233,13 +301,34 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       case 'multiple_choice':
         return (
           <div className="flex-1 flex flex-col p-4 overflow-auto">
-            <p className="text-lg font-semibold mb-4 text-center text-foreground">
+            <p 
+              className="text-lg font-semibold mb-4 text-center"
+              style={{ color: `hsl(${ds.foregroundColor})` }}
+            >
               {block.content || 'Вопрос?'}
             </p>
             <div className="space-y-2 flex-1 flex flex-col justify-center">
               {(block.options || []).map((option) => {
                 const isSelected = selectedOptions.includes(option.id);
                 const showResult = answerState !== 'idle';
+                
+                let borderColor = `hsl(${ds.mutedColor})`;
+                let bgColor = `hsl(${ds.cardColor})`;
+                let textColor = `hsl(${ds.foregroundColor})`;
+                
+                if (showResult && option.isCorrect) {
+                  borderColor = `hsl(${ds.successColor})`;
+                  bgColor = `hsl(${ds.successColor} / 0.1)`;
+                  textColor = `hsl(${ds.successColor})`;
+                } else if (showResult && isSelected && !option.isCorrect) {
+                  borderColor = `hsl(${ds.destructiveColor})`;
+                  bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
+                  textColor = `hsl(${ds.destructiveColor})`;
+                } else if (!showResult && isSelected) {
+                  borderColor = `hsl(${ds.primaryColor})`;
+                  bgColor = `hsl(${ds.primaryColor} / 0.1)`;
+                  textColor = `hsl(${ds.primaryColor})`;
+                }
                 
                 return (
                   <button
@@ -252,19 +341,22 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                           : [...prev, option.id]
                       );
                     }}
-                    className={cn(
-                      'w-full p-3 rounded-xl text-left transition-all text-sm border-2 flex items-center gap-2',
-                      showResult && option.isCorrect && 'border-success bg-success/10 text-success',
-                      showResult && isSelected && !option.isCorrect && 'border-destructive bg-destructive/10 text-destructive',
-                      !showResult && isSelected && 'border-primary bg-primary/10 text-primary',
-                      !showResult && !isSelected && 'border-border bg-card text-foreground hover:border-primary/50'
-                    )}
+                    className="w-full p-3 text-left transition-all text-sm border-2 flex items-center gap-2"
+                    style={{
+                      borderColor,
+                      backgroundColor: bgColor,
+                      color: textColor,
+                      borderRadius: ds.borderRadius,
+                    }}
                   >
-                    <div className={cn(
-                      'w-5 h-5 rounded border-2 flex items-center justify-center shrink-0',
-                      isSelected ? 'border-current bg-current' : 'border-current'
-                    )}>
-                      {isSelected && <Check className="w-3 h-3 text-card" />}
+                    <div 
+                      className="w-5 h-5 rounded border-2 flex items-center justify-center shrink-0"
+                      style={{ 
+                        borderColor: 'currentColor',
+                        backgroundColor: isSelected ? 'currentColor' : 'transparent',
+                      }}
+                    >
+                      {isSelected && <Check className="w-3 h-3" style={{ color: `hsl(${ds.cardColor})` }} />}
                     </div>
                     <span className="font-medium">{option.text}</span>
                   </button>
@@ -276,9 +368,38 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
       case 'true_false':
         const showTFResult = answerState !== 'idle';
+        
+        const getTFButtonStyle = (value: boolean) => {
+          const isSelected = trueFalseAnswer === value;
+          const isCorrectAnswer = block.correctAnswer === value;
+          
+          let borderColor = `hsl(${ds.mutedColor})`;
+          let bgColor = `hsl(${ds.cardColor})`;
+          let textColor = `hsl(${ds.foregroundColor})`;
+          
+          if (showTFResult && isCorrectAnswer) {
+            borderColor = `hsl(${ds.successColor})`;
+            bgColor = `hsl(${ds.successColor} / 0.1)`;
+            textColor = `hsl(${ds.successColor})`;
+          } else if (showTFResult && isSelected && !isCorrectAnswer) {
+            borderColor = `hsl(${ds.destructiveColor})`;
+            bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
+            textColor = `hsl(${ds.destructiveColor})`;
+          } else if (!showTFResult && isSelected) {
+            borderColor = `hsl(${ds.primaryColor})`;
+            bgColor = `hsl(${ds.primaryColor} / 0.1)`;
+            textColor = `hsl(${ds.primaryColor})`;
+          }
+          
+          return { borderColor, backgroundColor: bgColor, color: textColor, borderRadius: ds.borderRadius };
+        };
+        
         return (
           <div className="flex-1 flex flex-col p-4">
-            <p className="text-lg font-semibold mb-6 text-center flex-1 flex items-center justify-center text-foreground">
+            <p 
+              className="text-lg font-semibold mb-6 text-center flex-1 flex items-center justify-center"
+              style={{ color: `hsl(${ds.foregroundColor})` }}
+            >
               {block.content || 'Утверждение верно?'}
             </p>
             <div className="grid grid-cols-2 gap-3">
@@ -287,13 +408,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                   if (answerState !== 'idle') return;
                   setTrueFalseAnswer(true);
                 }}
-                className={cn(
-                  'p-4 rounded-xl flex flex-col items-center gap-2 border-2 transition-all',
-                  showTFResult && block.correctAnswer === true && 'bg-success/10 border-success text-success',
-                  showTFResult && trueFalseAnswer === true && block.correctAnswer !== true && 'bg-destructive/10 border-destructive text-destructive',
-                  !showTFResult && trueFalseAnswer === true && 'bg-primary/10 border-primary text-primary',
-                  !showTFResult && trueFalseAnswer !== true && 'bg-card border-border text-foreground hover:border-primary/50'
-                )}
+                className="p-4 flex flex-col items-center gap-2 border-2 transition-all"
+                style={getTFButtonStyle(true)}
               >
                 <Check className="w-8 h-8" />
                 <span className="font-semibold">Да</span>
@@ -303,13 +419,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                   if (answerState !== 'idle') return;
                   setTrueFalseAnswer(false);
                 }}
-                className={cn(
-                  'p-4 rounded-xl flex flex-col items-center gap-2 border-2 transition-all',
-                  showTFResult && block.correctAnswer === false && 'bg-success/10 border-success text-success',
-                  showTFResult && trueFalseAnswer === false && block.correctAnswer !== false && 'bg-destructive/10 border-destructive text-destructive',
-                  !showTFResult && trueFalseAnswer === false && 'bg-primary/10 border-primary text-primary',
-                  !showTFResult && trueFalseAnswer !== false && 'bg-card border-border text-foreground hover:border-primary/50'
-                )}
+                className="p-4 flex flex-col items-center gap-2 border-2 transition-all"
+                style={getTFButtonStyle(false)}
               >
                 <X className="w-8 h-8" />
                 <span className="font-semibold">Нет</span>
@@ -595,31 +706,45 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   };
 
   return (
-    <div className="h-full w-full flex flex-col bg-card overflow-hidden">
+    <div 
+      className="h-full w-full flex flex-col overflow-hidden"
+      style={{ 
+        backgroundColor: `hsl(${ds.backgroundColor})`,
+        fontFamily: ds.fontFamily,
+      }}
+    >
       {/* Progress bar */}
-      <div className="h-10 flex items-center justify-between px-4 bg-muted/30 border-b border-border shrink-0">
-        <span className="text-xs text-muted-foreground">
+      <div 
+        className="h-10 flex items-center justify-between px-4 border-b shrink-0"
+        style={{ 
+          backgroundColor: `hsl(${ds.mutedColor} / 0.3)`,
+          borderColor: `hsl(${ds.mutedColor})`,
+        }}
+      >
+        <span className="text-xs" style={{ color: `hsl(${ds.foregroundColor} / 0.6)` }}>
           {lessonTitle}
         </span>
         <div className="flex items-center gap-1">
           {Array.from({ length: Math.min(totalBlocks, 20) }).map((_, i) => (
             <div
               key={i}
-              className={cn(
-                'h-1.5 rounded-full transition-all',
-                i === blockIndex
-                  ? 'w-6 bg-primary'
-                  : i < blockIndex
-                    ? 'w-2 bg-primary/50'
-                    : 'w-2 bg-border'
-              )}
+              className="rounded-full transition-all"
+              style={{
+                height: '6px',
+                width: i === blockIndex ? '24px' : '8px',
+                backgroundColor: i <= blockIndex 
+                  ? `hsl(${ds.primaryColor}${i < blockIndex ? ' / 0.5' : ''})` 
+                  : `hsl(${ds.mutedColor})`,
+              }}
             />
           ))}
           {totalBlocks > 20 && (
-            <span className="text-xs text-muted-foreground ml-1">+{totalBlocks - 20}</span>
+            <span className="text-xs ml-1" style={{ color: `hsl(${ds.foregroundColor} / 0.6)` }}>
+              +{totalBlocks - 20}
+            </span>
           )}
         </div>
-        <span className="text-xs text-muted-foreground">
+        <span className="text-xs" style={{ color: `hsl(${ds.foregroundColor} / 0.6)` }}>
           {blockIndex + 1} / {totalBlocks}
         </span>
       </div>
@@ -631,11 +756,17 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
       {/* Result feedback */}
       {answerState !== 'idle' && (
-        <div className={cn(
-          "px-4 py-3 text-center text-sm font-medium shrink-0",
-          answerState === 'correct' && "bg-success/10 text-success",
-          answerState === 'incorrect' && "bg-destructive/10 text-destructive"
-        )}>
+        <div 
+          className="px-4 py-3 text-center text-sm font-medium shrink-0"
+          style={{
+            backgroundColor: answerState === 'correct' 
+              ? `hsl(${ds.successColor} / 0.1)` 
+              : `hsl(${ds.destructiveColor} / 0.1)`,
+            color: answerState === 'correct' 
+              ? `hsl(${ds.successColor})` 
+              : `hsl(${ds.destructiveColor})`,
+          }}
+        >
           <div className="flex items-center justify-center gap-2">
             {answerState === 'correct' ? (
               <>
@@ -653,19 +784,28 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       )}
 
       {/* Bottom navigation */}
-      <div className="h-16 border-t border-border flex items-center justify-center gap-3 px-4 bg-card shrink-0">
+      <div 
+        className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0"
+        style={{ 
+          backgroundColor: `hsl(${ds.cardColor})`,
+          borderColor: `hsl(${ds.mutedColor})`,
+        }}
+      >
         {isInteractive && answerState !== 'idle' && (
-          <Button
-            variant="outline"
-            size="default"
+          <button
             onClick={resetState}
-            className="h-11"
+            className="h-11 px-4 flex items-center gap-2 border-2 font-medium transition-all"
+            style={{
+              borderColor: `hsl(${ds.mutedColor})`,
+              color: `hsl(${ds.foregroundColor})`,
+              borderRadius: getButtonRadius(),
+            }}
           >
-            <RotateCcw className="w-4 h-4 mr-2" />
+            <RotateCcw className="w-4 h-4" />
             Заново
-          </Button>
+          </button>
         )}
-        <Button
+        <button
           onClick={() => {
             if (isInteractive && answerState === 'idle') {
               checkAnswer();
@@ -673,11 +813,16 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
               onContinue?.();
             }
           }}
-          className="flex-1 h-11 max-w-md"
+          className="flex-1 h-11 max-w-md font-semibold transition-all disabled:opacity-50"
           disabled={isInteractive && answerState === 'idle' && selectedOptions.length === 0 && trueFalseAnswer === null && !fillBlankInput && Object.keys(matchingSelected.pairs).length === 0}
+          style={{
+            backgroundColor: `hsl(${ds.primaryColor})`,
+            color: `hsl(${ds.primaryForeground})`,
+            borderRadius: getButtonRadius(),
+          }}
         >
           {isInteractive && answerState === 'idle' ? 'Проверить' : 'Продолжить'}
-        </Button>
+        </button>
       </div>
     </div>
   );
