@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Undo2, Redo2, Eye, Save, 
-  Share2, Clock, Loader2, Pencil, Check, X
+  Share2, Clock, Loader2, Pencil, Check, X, ArrowLeft
 } from 'lucide-react';
 import { Course } from '@/types/course';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ interface EditorHeaderProps {
   onPublish: () => void;
   onSave: () => void;
   onUpdateTitle: (title: string) => void;
+  onBack?: () => void;
 }
 
 export const EditorHeader: React.FC<EditorHeaderProps> = ({
@@ -32,6 +33,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   onPublish,
   onSave,
   onUpdateTitle,
+  onBack,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(course.title);
@@ -72,6 +74,11 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
       <header className="h-16 border-b border-border bg-card flex items-center justify-between px-4">
         {/* Left section */}
         <div className="flex items-center gap-3">
+          {onBack && (
+            <Button variant="ghost" size="icon" onClick={onBack} className="mr-1">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          )}
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ai to-primary flex items-center justify-center">
             <span className="text-white font-bold text-lg">T</span>
           </div>
