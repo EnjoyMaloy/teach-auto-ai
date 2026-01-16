@@ -102,10 +102,13 @@ export interface CourseDesignSystem {
     volume: number;
   };
   designBlock?: {
-    backdropLightColor: string;
-    backdropDarkColor: string;
-    backdropPrimaryColor: string;
-    backdropBlurColor: string;
+    backdropLightColor?: string;
+    backdropDarkColor?: string;
+    backdropPrimaryColor?: string;
+    backdropBlurColor?: string;
+    highlightMarkerColor?: string;
+    highlightUnderlineColor?: string;
+    highlightWavyColor?: string;
   };
 }
 

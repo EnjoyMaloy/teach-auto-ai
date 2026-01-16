@@ -10,6 +10,9 @@ export type SubBlockType =
   | 'icon'
   | 'badge';
 
+// Text highlight types
+export type TextHighlightType = 'none' | 'marker' | 'underline' | 'wavy';
+
 // Sub-block interface
 export interface SubBlock {
   id: string;
@@ -46,6 +49,9 @@ export interface SubBlock {
   // Background/backdrop for text blocks
   backdrop?: 'none' | 'light' | 'dark' | 'primary' | 'blur';
   backdropRounded?: boolean;
+  
+  // Text highlighting
+  highlight?: TextHighlightType;
 }
 
 // Sub-block configuration for the selector
