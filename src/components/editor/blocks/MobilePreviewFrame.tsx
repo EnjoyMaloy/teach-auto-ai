@@ -96,16 +96,14 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
   if (!block) {
     return (
-      <div className="h-full flex items-center justify-center p-4">
-        <div className="h-full max-h-[calc(100vh-160px)] w-full max-w-[420px] aspect-[9/16] bg-card rounded-2xl overflow-hidden flex items-center justify-center border border-border shadow-lg">
-          <div className="text-center px-8">
-            <div className="w-16 h-16 rounded-2xl bg-muted mx-auto mb-4 flex items-center justify-center">
-              <Play className="w-8 h-8 text-muted-foreground" />
-            </div>
-            <p className="text-muted-foreground text-sm">
-              Выберите блок для предпросмотра
-            </p>
+      <div className="h-full w-full flex items-center justify-center bg-card">
+        <div className="text-center px-8">
+          <div className="w-16 h-16 rounded-2xl bg-muted mx-auto mb-4 flex items-center justify-center">
+            <Play className="w-8 h-8 text-muted-foreground" />
           </div>
+          <p className="text-muted-foreground text-sm">
+            Выберите блок для предпросмотра
+          </p>
         </div>
       </div>
     );
@@ -597,80 +595,89 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   };
 
   return (
-    <div className="h-full flex items-center justify-center p-4">
-      <div className="h-full max-h-[calc(100vh-160px)] w-full max-w-[420px] aspect-[9/16] bg-card rounded-2xl overflow-hidden flex flex-col border border-border shadow-lg">
-        {/* Progress bar */}
-        <div className="h-8 flex items-center justify-center bg-muted/30">
-          <div className="flex items-center gap-1">
-            {Array.from({ length: totalBlocks }).map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  'h-1 rounded-full transition-all',
-                  i === blockIndex
-                    ? 'w-5 bg-primary'
-                    : i < blockIndex
-                      ? 'w-1.5 bg-primary/50'
-                      : 'w-1.5 bg-border'
-                )}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Content */}
-        {renderContent()}
-
-        {/* Result feedback */}
-        {answerState !== 'idle' && (
-          <div className={cn(
-            "px-4 py-2 text-center text-sm font-medium",
-            answerState === 'correct' && "bg-success/10 text-success",
-            answerState === 'incorrect' && "bg-destructive/10 text-destructive"
-          )}>
-            <div className="flex items-center justify-center gap-2">
-              {answerState === 'correct' ? (
-                <>
-                  <Sparkles className="w-4 h-4" />
-                  <span>Правильно!</span>
-                </>
-              ) : (
-                <>
-                  <X className="w-4 h-4" />
-                  <span>Неправильно</span>
-                </>
+    <div className="h-full w-full flex flex-col bg-card overflow-hidden">
+      {/* Progress bar */}
+      <div className="h-10 flex items-center justify-between px-4 bg-muted/30 border-b border-border shrink-0">
+        <span className="text-xs text-muted-foreground">
+          {lessonTitle}
+        </span>
+        <div className="flex items-center gap-1">
+          {Array.from({ length: Math.min(totalBlocks, 20) }).map((_, i) => (
+            <div
+              key={i}
+              className={cn(
+                'h-1.5 rounded-full transition-all',
+                i === blockIndex
+                  ? 'w-6 bg-primary'
+                  : i < blockIndex
+                    ? 'w-2 bg-primary/50'
+                    : 'w-2 bg-border'
               )}
-            </div>
-          </div>
-        )}
-
-        {/* Bottom navigation */}
-        <div className="h-14 border-t border-border flex items-center justify-center gap-2 px-4 bg-card">
-          {isInteractive && answerState !== 'idle' && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={resetState}
-              className="h-10"
-            >
-              <RotateCcw className="w-4 h-4 mr-1" />
-              Заново
-            </Button>
+            />
+          ))}
+          {totalBlocks > 20 && (
+            <span className="text-xs text-muted-foreground ml-1">+{totalBlocks - 20}</span>
           )}
-          <Button
-            onClick={() => {
-              if (isInteractive && answerState === 'idle') {
-                checkAnswer();
-              } else {
-                onContinue?.();
-              }
-            }}
-            className="flex-1 h-10"
-            disabled={isInteractive && answerState === 'idle' && selectedOptions.length === 0 && trueFalseAnswer === null && !fillBlankInput && Object.keys(matchingSelected.pairs).length === 0}
-          >
-            {isInteractive && answerState === 'idle' ? 'Проверить' : 'Продолжить'}
-          </Button>
         </div>
+        <span className="text-xs text-muted-foreground">
+          {blockIndex + 1} / {totalBlocks}
+        </span>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-auto">
+        {renderContent()}
+      </div>
+
+      {/* Result feedback */}
+      {answerState !== 'idle' && (
+        <div className={cn(
+          "px-4 py-3 text-center text-sm font-medium shrink-0",
+          answerState === 'correct' && "bg-success/10 text-success",
+          answerState === 'incorrect' && "bg-destructive/10 text-destructive"
+        )}>
+          <div className="flex items-center justify-center gap-2">
+            {answerState === 'correct' ? (
+              <>
+                <Sparkles className="w-4 h-4" />
+                <span>Правильно!</span>
+              </>
+            ) : (
+              <>
+                <X className="w-4 h-4" />
+                <span>Неправильно</span>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Bottom navigation */}
+      <div className="h-16 border-t border-border flex items-center justify-center gap-3 px-4 bg-card shrink-0">
+        {isInteractive && answerState !== 'idle' && (
+          <Button
+            variant="outline"
+            size="default"
+            onClick={resetState}
+            className="h-11"
+          >
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Заново
+          </Button>
+        )}
+        <Button
+          onClick={() => {
+            if (isInteractive && answerState === 'idle') {
+              checkAnswer();
+            } else {
+              onContinue?.();
+            }
+          }}
+          className="flex-1 h-11 max-w-md"
+          disabled={isInteractive && answerState === 'idle' && selectedOptions.length === 0 && trueFalseAnswer === null && !fillBlankInput && Object.keys(matchingSelected.pairs).length === 0}
+        >
+          {isInteractive && answerState === 'idle' ? 'Проверить' : 'Продолжить'}
+        </Button>
       </div>
     </div>
   );
