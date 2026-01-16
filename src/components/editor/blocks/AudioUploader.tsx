@@ -25,7 +25,7 @@ export const AudioUploader: React.FC<AudioUploaderProps> = ({
     if (!file) return;
 
     // Check file type
-    const allowedTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/m4a', 'audio/x-m4a'];
+    const allowedTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/m4a', 'audio/x-m4a', 'audio/mp4'];
     if (!allowedTypes.includes(file.type) && !file.name.match(/\.(mp3|wav|ogg|aac|m4a)$/i)) {
       toast.error('Неподдерживаемый формат. Используйте MP3, WAV, OGG, AAC или M4A.');
       return;
