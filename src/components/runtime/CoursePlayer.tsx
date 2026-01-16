@@ -1,10 +1,12 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { X, Trophy, Star, Clock } from 'lucide-react';
 import { Course } from '@/types/course';
 import { SlideRenderer, slideNeedsCheck } from './SlideRenderer';
 import { DesignSystemProvider } from './DesignSystemProvider';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { playSound } from '@/lib/sounds';
+import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
 
 interface CoursePlayerProps {
   course: Course;
@@ -26,39 +28,59 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
   const currentLesson = course.lessons[currentLessonIndex];
   const currentSlide = currentLesson?.slides[currentSlideIndex];
 
+  // Sound settings helper
+  const soundConfig = {
+    enabled: course.designSystem?.sound?.enabled ?? DEFAULT_SOUND_SETTINGS.enabled,
+    theme: course.designSystem?.sound?.theme ?? DEFAULT_SOUND_SETTINGS.theme,
+    volume: course.designSystem?.sound?.volume ?? DEFAULT_SOUND_SETTINGS.volume,
+  };
+
   // Calculate progress
   const completedSlides = course.lessons
     .slice(0, currentLessonIndex)
     .reduce((acc, lesson) => acc + lesson.slides.length, 0) + currentSlideIndex;
   const progress = (completedSlides / totalSlides) * 100;
 
-  const handleAnswer = (isCorrect: boolean) => {
+  const handleAnswer = useCallback((isCorrect: boolean) => {
     setTotalAnswers(prev => prev + 1);
-    if (isCorrect) setCorrectAnswers(prev => prev + 1);
+    if (isCorrect) {
+      setCorrectAnswers(prev => prev + 1);
+      playSound('correct', soundConfig);
+    } else {
+      playSound('incorrect', soundConfig);
+    }
     setAnswered(true);
-  };
+  }, [soundConfig]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     setAnswered(false);
+    playSound('swipe', soundConfig);
+    
     if (currentSlideIndex < currentLesson.slides.length - 1) {
       setCurrentSlideIndex(prev => prev + 1);
     } else if (currentLessonIndex < course.lessons.length - 1) {
+      // Lesson completed, play level up sound
+      playSound('levelUp', soundConfig);
       setCurrentLessonIndex(prev => prev + 1);
       setCurrentSlideIndex(0);
     } else {
+      // Course completed
+      playSound('complete', soundConfig);
       setIsCompleted(true);
     }
-  };
+  }, [currentSlideIndex, currentLesson?.slides.length, currentLessonIndex, course.lessons.length, soundConfig]);
 
-  const handlePrevious = () => {
+  const handlePrevious = useCallback(() => {
     setAnswered(false);
+    playSound('tap', soundConfig);
+    
     if (currentSlideIndex > 0) {
       setCurrentSlideIndex(prev => prev - 1);
     } else if (currentLessonIndex > 0) {
       setCurrentLessonIndex(prev => prev - 1);
       setCurrentSlideIndex(course.lessons[currentLessonIndex - 1].slides.length - 1);
     }
-  };
+  }, [currentSlideIndex, currentLessonIndex, course.lessons, soundConfig]);
 
   const needsCheck = currentSlide ? slideNeedsCheck(currentSlide.type) : false;
   const showContinue = !needsCheck || answered;

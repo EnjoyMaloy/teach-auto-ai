@@ -1,5 +1,13 @@
 // Design System configuration for courses
 
+export type SoundTheme = 'duolingo' | 'minimal' | 'playful' | 'none';
+
+export interface SoundSettings {
+  enabled: boolean;
+  theme: SoundTheme;
+  volume: number;
+}
+
 export interface DesignSystemConfig {
   // Colors (HSL values as strings, e.g., "262 83% 58%")
   primaryColor: string;
@@ -21,7 +29,16 @@ export interface DesignSystemConfig {
   
   // Button style
   buttonStyle: 'rounded' | 'pill' | 'square';
+  
+  // Sound settings
+  sound?: SoundSettings;
 }
+
+export const DEFAULT_SOUND_SETTINGS: SoundSettings = {
+  enabled: true,
+  theme: 'duolingo',
+  volume: 0.5,
+};
 
 export const DEFAULT_DESIGN_SYSTEM: DesignSystemConfig = {
   primaryColor: '262 83% 58%',
@@ -37,6 +54,7 @@ export const DEFAULT_DESIGN_SYSTEM: DesignSystemConfig = {
   headingFontFamily: 'Inter, system-ui, sans-serif',
   borderRadius: '0.75rem',
   buttonStyle: 'rounded',
+  sound: DEFAULT_SOUND_SETTINGS,
 };
 
 export const PRESET_THEMES: { id: string; name: string; config: Partial<DesignSystemConfig> }[] = [

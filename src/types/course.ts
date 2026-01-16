@@ -92,6 +92,11 @@ export interface CourseDesignSystem {
   headingFontFamily?: string;
   borderRadius?: string;
   buttonStyle?: 'rounded' | 'pill' | 'square';
+  sound?: {
+    enabled: boolean;
+    theme: 'duolingo' | 'minimal' | 'playful' | 'none';
+    volume: number;
+  };
 }
 
 export interface Course {
