@@ -8,7 +8,8 @@ export type SubBlockType =
   | 'button'
   | 'divider'
   | 'icon'
-  | 'badge';
+  | 'badge'
+  | 'animation';
 
 // Text highlight types
 export type TextHighlightType = 'none' | 'marker' | 'underline' | 'wavy';
@@ -39,6 +40,12 @@ export interface SubBlock {
   // Badge specific
   badgeText?: string;
   badgeVariant?: 'default' | 'success' | 'warning' | 'destructive';
+  
+  // Animation (Rive) specific
+  animationUrl?: string;
+  animationSize?: 'small' | 'medium' | 'large' | 'full';
+  animationStateMachine?: string;
+  animationAutoplay?: boolean;
   
   // Styling
   textAlign?: 'left' | 'center' | 'right';
@@ -113,6 +120,13 @@ export const SUB_BLOCK_CONFIGS: Record<SubBlockType, SubBlockConfig> = {
     labelRu: 'Бейдж',
     description: 'Метка или тег',
   },
+  animation: {
+    type: 'animation',
+    icon: 'Play',
+    label: 'Animation',
+    labelRu: 'Анимация',
+    description: 'Rive-анимация (.riv)',
+  },
 };
 
 // Design block templates
@@ -183,6 +197,7 @@ export const createSubBlock = (type: SubBlockType, order: number): SubBlock => (
   ...(type === 'button' ? { buttonLabel: 'Кнопка', buttonVariant: 'primary' as const } : {}),
   ...(type === 'badge' ? { badgeText: 'Бейдж', badgeVariant: 'default' as const } : {}),
   ...(type === 'icon' ? { iconName: 'Star', iconSize: 'medium' as const } : {}),
+  ...(type === 'animation' ? { animationSize: 'medium' as const, animationAutoplay: true } : {}),
 });
 
 // Helper to create sub-blocks from template

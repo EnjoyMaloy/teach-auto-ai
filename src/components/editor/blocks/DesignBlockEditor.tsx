@@ -34,12 +34,13 @@ import { Input } from '@/components/ui/input';
 import { RichTextEditor } from './RichTextEditor';
 import {
   Plus, Trash2, GripVertical, Upload,
-  Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Layers,
+  Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Layers, Play,
   Highlighter, Underline, Waves
 } from 'lucide-react';
+import { RiveAnimation } from './RiveAnimation';
 
 const iconMap = {
-  Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Layers
+  Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Layers, Play
 };
 
 interface DesignBlockEditorProps {
@@ -487,6 +488,32 @@ const SortableSubBlockItem: React.FC<{
                 {subBlock.badgeText || 'Бейдж'}
               </span>
             )}
+          </div>
+        );
+
+      case 'animation':
+        const animationSizeClass = {
+          small: 'w-24 h-24',
+          medium: 'w-48 h-48',
+          large: 'w-72 h-72',
+          full: 'w-full aspect-square max-w-md',
+        }[subBlock.animationSize || 'medium'];
+
+        return (
+          <div className={cn('flex', textAlignClass === 'text-center' ? 'justify-center' : textAlignClass === 'text-right' ? 'justify-end' : 'justify-start')}>
+            <RiveAnimation
+              src={subBlock.animationUrl}
+              size={subBlock.animationSize || 'medium'}
+              stateMachine={subBlock.animationStateMachine}
+              autoplay={subBlock.animationAutoplay !== false}
+              isEditing={isEditing}
+              onUpdate={(updates) => onUpdate(updates)}
+              designSystem={{
+                primaryColor: ds.primaryColor,
+                foregroundColor: ds.foregroundColor,
+                mutedColor: ds.mutedColor,
+              }}
+            />
           </div>
         );
 
