@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { X, ChevronLeft, ChevronRight, Trophy, Star, Clock } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { X, ChevronLeft, Trophy, Star, Clock } from 'lucide-react';
 import { Course, Lesson, Slide, CourseProgress } from '@/types/course';
-import { SlideRenderer } from './SlideRenderer';
+import { SlideRenderer, slideNeedsCheck } from './SlideRenderer';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -16,6 +16,8 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [totalAnswers, setTotalAnswers] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [answered, setAnswered] = useState(false);
+  const slideRendererRef = useRef<{ checkAnswer: () => void } | null>(null);
 
   const allSlides = course.lessons.flatMap(lesson => lesson.slides);
   const totalSlides = allSlides.length;
@@ -32,9 +34,11 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
   const handleAnswer = (isCorrect: boolean) => {
     setTotalAnswers(prev => prev + 1);
     if (isCorrect) setCorrectAnswers(prev => prev + 1);
+    setAnswered(true);
   };
 
   const handleNext = () => {
+    setAnswered(false);
     if (currentSlideIndex < currentLesson.slides.length - 1) {
       setCurrentSlideIndex(prev => prev + 1);
     } else if (currentLessonIndex < course.lessons.length - 1) {
@@ -46,6 +50,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
   };
 
   const handlePrevious = () => {
+    setAnswered(false);
     if (currentSlideIndex > 0) {
       setCurrentSlideIndex(prev => prev - 1);
     } else if (currentLessonIndex > 0) {
@@ -53,6 +58,9 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
       setCurrentSlideIndex(course.lessons[currentLessonIndex - 1].slides.length - 1);
     }
   };
+
+  const needsCheck = currentSlide ? slideNeedsCheck(currentSlide.type) : false;
+  const showContinue = !needsCheck || answered;
 
   if (isCompleted) {
     const accuracy = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 100;
@@ -142,29 +150,19 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
               slide={currentSlide}
               onAnswer={handleAnswer}
               onNext={handleNext}
+              hideActions={true}
             />
           )}
         </main>
 
-        {/* Navigation */}
-        <footer className="px-4 py-3 border-t border-border bg-card flex items-center justify-between shrink-0">
+        {/* Bottom action button - Duolingo style */}
+        <footer className="px-4 py-4 border-t border-border bg-card shrink-0">
           <Button
-            variant="ghost"
-            size="sm"
-            onClick={handlePrevious}
-            disabled={currentLessonIndex === 0 && currentSlideIndex === 0}
-          >
-            <ChevronLeft className="w-4 h-4 mr-1" />
-            Назад
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
             onClick={handleNext}
+            disabled={needsCheck && !answered}
+            className="w-full h-12 text-base font-semibold rounded-xl"
           >
-            Далее
-            <ChevronRight className="w-4 h-4 ml-1" />
+            {showContinue ? 'Продолжить' : 'Проверить'}
           </Button>
         </footer>
       </div>
