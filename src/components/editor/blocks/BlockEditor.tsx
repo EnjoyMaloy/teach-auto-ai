@@ -5,12 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import {
   Plus, Trash2, GripVertical, Upload, Sparkles,
   Heading, Type, Image, Play, Volume2, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
-  Link2, ListOrdered, SlidersHorizontal, MousePointer2
+  Link2, ListOrdered, SlidersHorizontal, MousePointer2,
+  Lightbulb
 } from 'lucide-react';
 
 const iconMap = {
@@ -58,7 +58,6 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
 
   const toggleCorrectOption = (optionId: string) => {
     if (block.type === 'single_choice') {
-      // Only one correct answer
       onUpdate({
         options: block.options?.map(opt => ({
           ...opt,
@@ -66,7 +65,6 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
         })),
       });
     } else {
-      // Multiple correct answers allowed
       onUpdate({
         options: block.options?.map(opt =>
           opt.id === optionId ? { ...opt, isCorrect: !opt.isCorrect } : opt
@@ -76,29 +74,29 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col bg-card rounded-2xl shadow-soft overflow-hidden">
+    <div className="h-full flex flex-col bg-card overflow-hidden">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center', config.bgColor)}>
-            {IconComponent && <IconComponent className={cn('w-4 h-4', config.color)} />}
+      <div className="px-5 py-4 border-b border-border flex items-center justify-between bg-gradient-surface">
+        <div className="flex items-center gap-3">
+          <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', config.bgClass)}>
+            {IconComponent && <IconComponent className={cn('w-5 h-5', config.colorClass)} />}
           </div>
           <div>
             <h3 className="font-bold text-foreground">{config.labelRu}</h3>
             <p className="text-xs text-muted-foreground">{config.description}</p>
           </div>
         </div>
-        <Button variant="ghost" size="icon-sm" onClick={onDelete}>
-          <Trash2 className="w-4 h-4 text-destructive" />
+        <Button variant="ghost" size="icon" onClick={onDelete} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl">
+          <Trash2 className="w-4 h-4" />
         </Button>
       </div>
 
       {/* Editor content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {/* Content field - for most blocks */}
+      <div className="flex-1 overflow-y-auto p-5 space-y-5">
+        {/* Content field */}
         {['heading', 'text', 'image_text', 'single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'matching', 'ordering', 'slider', 'hotspot'].includes(block.type) && (
           <div className="space-y-2">
-            <Label>
+            <Label className="text-foreground font-medium">
               {block.type === 'heading' ? 'Заголовок' : 
                ['single_choice', 'multiple_choice', 'true_false'].includes(block.type) ? 'Вопрос' :
                block.type === 'fill_blank' ? 'Текст (используйте ___ для пропуска)' :
@@ -109,7 +107,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                 value={block.content}
                 onChange={(e) => onUpdate({ content: e.target.value })}
                 placeholder="Введите заголовок..."
-                className="text-lg font-bold"
+                className="text-lg font-bold rounded-xl"
               />
             ) : (
               <Textarea
@@ -117,6 +115,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                 onChange={(e) => onUpdate({ content: e.target.value })}
                 placeholder="Введите текст..."
                 rows={block.type === 'text' ? 6 : 3}
+                className="rounded-xl resize-none"
               />
             )}
           </div>
@@ -125,15 +124,15 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
         {/* Image upload */}
         {['image', 'image_text', 'hotspot'].includes(block.type) && (
           <div className="space-y-2">
-            <Label>Изображение</Label>
-            <div className="border-2 border-dashed border-border rounded-xl p-4 text-center">
+            <Label className="text-foreground font-medium">Изображение</Label>
+            <div className="border-2 border-dashed border-border rounded-2xl p-4 text-center bg-muted/30 hover:bg-muted/50 transition-colors">
               {block.imageUrl ? (
                 <div className="relative">
-                  <img src={block.imageUrl} alt="" className="w-full rounded-lg" />
+                  <img src={block.imageUrl} alt="" className="w-full rounded-xl" />
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="absolute top-2 right-2"
+                    className="absolute top-2 right-2 rounded-lg"
                     onClick={() => onUpdate({ imageUrl: undefined })}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -141,14 +140,16 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                 </div>
               ) : (
                 <div className="py-8">
-                  <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">
-                    Перетащите изображение или нажмите для загрузки
+                  <div className="w-12 h-12 rounded-xl bg-muted mx-auto mb-3 flex items-center justify-center">
+                    <Upload className="w-6 h-6 text-muted-foreground" />
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Перетащите или нажмите для загрузки
                   </p>
                   <Input
                     type="text"
                     placeholder="Или вставьте URL изображения..."
-                    className="mt-3 max-w-xs mx-auto"
+                    className="max-w-xs mx-auto rounded-xl"
                     onChange={(e) => onUpdate({ imageUrl: e.target.value })}
                   />
                 </div>
@@ -160,11 +161,12 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
         {/* Video URL */}
         {block.type === 'video' && (
           <div className="space-y-2">
-            <Label>URL видео</Label>
+            <Label className="text-foreground font-medium">URL видео</Label>
             <Input
               value={block.videoUrl || ''}
               onChange={(e) => onUpdate({ videoUrl: e.target.value })}
               placeholder="https://youtube.com/watch?v=..."
+              className="rounded-xl"
             />
           </div>
         )}
@@ -173,19 +175,21 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
         {block.type === 'audio' && (
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Название</Label>
+              <Label className="text-foreground font-medium">Название</Label>
               <Input
                 value={block.content}
                 onChange={(e) => onUpdate({ content: e.target.value })}
                 placeholder="Название трека..."
+                className="rounded-xl"
               />
             </div>
             <div className="space-y-2">
-              <Label>URL аудио</Label>
+              <Label className="text-foreground font-medium">URL аудио</Label>
               <Input
                 value={block.audioUrl || ''}
                 onChange={(e) => onUpdate({ audioUrl: e.target.value })}
                 placeholder="https://..."
+                className="rounded-xl"
               />
             </div>
           </div>
@@ -193,40 +197,41 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
 
         {/* Options for quiz types */}
         {['single_choice', 'multiple_choice'].includes(block.type) && (
-          <div className="space-y-2">
-            <Label>Варианты ответа</Label>
+          <div className="space-y-3">
+            <Label className="text-foreground font-medium">Варианты ответа</Label>
             <div className="space-y-2">
               {(block.options || []).map((option, idx) => (
                 <div key={option.id} className="flex items-center gap-2">
                   <button
                     onClick={() => toggleCorrectOption(option.id)}
                     className={cn(
-                      'w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors',
+                      'w-7 h-7 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all',
                       option.isCorrect
-                        ? 'border-green-500 bg-green-500 text-white'
-                        : 'border-border hover:border-green-500'
+                        ? 'border-success bg-success text-white'
+                        : 'border-border hover:border-success bg-card'
                     )}
                   >
-                    {option.isCorrect && <span className="text-xs">✓</span>}
+                    {option.isCorrect && <span className="text-xs font-bold">✓</span>}
                   </button>
                   <Input
                     value={option.text}
                     onChange={(e) => updateOption(option.id, { text: e.target.value })}
                     placeholder={`Вариант ${idx + 1}`}
-                    className="flex-1"
+                    className="flex-1 rounded-xl"
                   />
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon"
                     onClick={() => deleteOption(option.id)}
+                    className="text-muted-foreground hover:text-destructive rounded-xl"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               ))}
             </div>
-            <Button variant="soft" size="sm" onClick={addOption}>
-              <Plus className="w-4 h-4 mr-1" />
+            <Button variant="soft" size="sm" onClick={addOption} className="rounded-xl">
+              <Plus className="w-4 h-4 mr-1.5" />
               Добавить вариант
             </Button>
           </div>
@@ -235,17 +240,19 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
         {/* True/False toggle */}
         {block.type === 'true_false' && (
           <div className="space-y-2">
-            <Label>Правильный ответ</Label>
-            <div className="flex items-center gap-4">
+            <Label className="text-foreground font-medium">Правильный ответ</Label>
+            <div className="flex items-center gap-3">
               <Button
                 variant={block.correctAnswer === true ? 'default' : 'outline'}
                 onClick={() => onUpdate({ correctAnswer: true })}
+                className="flex-1 rounded-xl"
               >
                 Да
               </Button>
               <Button
                 variant={block.correctAnswer === false ? 'default' : 'outline'}
                 onClick={() => onUpdate({ correctAnswer: false })}
+                className="flex-1 rounded-xl"
               >
                 Нет
               </Button>
@@ -256,11 +263,12 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
         {/* Fill blank word */}
         {block.type === 'fill_blank' && (
           <div className="space-y-2">
-            <Label>Правильное слово</Label>
+            <Label className="text-foreground font-medium">Правильное слово</Label>
             <Input
               value={block.blankWord || ''}
               onChange={(e) => onUpdate({ blankWord: e.target.value })}
               placeholder="Слово для пропуска..."
+              className="rounded-xl"
             />
           </div>
         )}
@@ -270,36 +278,40 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
           <div className="space-y-4">
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-2">
-                <Label>Мин</Label>
+                <Label className="text-foreground font-medium text-xs">Мин</Label>
                 <Input
                   type="number"
                   value={block.sliderMin || 0}
                   onChange={(e) => onUpdate({ sliderMin: Number(e.target.value) })}
+                  className="rounded-xl"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Макс</Label>
+                <Label className="text-foreground font-medium text-xs">Макс</Label>
                 <Input
                   type="number"
                   value={block.sliderMax || 100}
                   onChange={(e) => onUpdate({ sliderMax: Number(e.target.value) })}
+                  className="rounded-xl"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Шаг</Label>
+                <Label className="text-foreground font-medium text-xs">Шаг</Label>
                 <Input
                   type="number"
                   value={block.sliderStep || 1}
                   onChange={(e) => onUpdate({ sliderStep: Number(e.target.value) })}
+                  className="rounded-xl"
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Правильный ответ</Label>
+              <Label className="text-foreground font-medium">Правильный ответ</Label>
               <Input
                 type="number"
                 value={block.sliderCorrect || 50}
                 onChange={(e) => onUpdate({ sliderCorrect: Number(e.target.value) })}
+                className="rounded-xl"
               />
             </div>
           </div>
@@ -307,10 +319,10 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
 
         {/* Matching pairs */}
         {block.type === 'matching' && (
-          <div className="space-y-2">
-            <Label>Пары</Label>
+          <div className="space-y-3">
+            <Label className="text-foreground font-medium">Пары</Label>
             <div className="space-y-2">
-              {(block.matchingPairs || []).map((pair, idx) => (
+              {(block.matchingPairs || []).map((pair) => (
                 <div key={pair.id} className="flex items-center gap-2">
                   <Input
                     value={pair.left}
@@ -320,9 +332,9 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                       ),
                     })}
                     placeholder="Левый"
-                    className="flex-1"
+                    className="flex-1 rounded-xl"
                   />
-                  <span className="text-muted-foreground">→</span>
+                  <span className="text-primary font-bold">→</span>
                   <Input
                     value={pair.right}
                     onChange={(e) => onUpdate({
@@ -331,14 +343,15 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                       ),
                     })}
                     placeholder="Правый"
-                    className="flex-1"
+                    className="flex-1 rounded-xl"
                   />
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon"
                     onClick={() => onUpdate({
                       matchingPairs: block.matchingPairs?.filter(p => p.id !== pair.id),
                     })}
+                    className="text-muted-foreground hover:text-destructive rounded-xl"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -354,8 +367,9 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                   { id: crypto.randomUUID(), left: '', right: '' },
                 ],
               })}
+              className="rounded-xl"
             >
-              <Plus className="w-4 h-4 mr-1" />
+              <Plus className="w-4 h-4 mr-1.5" />
               Добавить пару
             </Button>
           </div>
@@ -363,13 +377,13 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
 
         {/* Ordering items */}
         {block.type === 'ordering' && (
-          <div className="space-y-2">
-            <Label>Пункты (в правильном порядке)</Label>
+          <div className="space-y-3">
+            <Label className="text-foreground font-medium">Пункты (в правильном порядке)</Label>
             <div className="space-y-2">
               {(block.orderingItems || []).map((item, idx) => (
                 <div key={idx} className="flex items-center gap-2">
-                  <GripVertical className="w-4 h-4 text-muted-foreground" />
-                  <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
+                  <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab" />
+                  <span className="w-7 h-7 rounded-lg bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold">
                     {idx + 1}
                   </span>
                   <Input
@@ -380,15 +394,16 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                       onUpdate({ orderingItems: newItems, correctOrder: newItems });
                     }}
                     placeholder={`Пункт ${idx + 1}`}
-                    className="flex-1"
+                    className="flex-1 rounded-xl"
                   />
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon"
                     onClick={() => {
                       const newItems = block.orderingItems?.filter((_, i) => i !== idx);
                       onUpdate({ orderingItems: newItems, correctOrder: newItems });
                     }}
+                    className="text-muted-foreground hover:text-destructive rounded-xl"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -402,30 +417,35 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                 const newItems = [...(block.orderingItems || []), ''];
                 onUpdate({ orderingItems: newItems, correctOrder: newItems });
               }}
+              className="rounded-xl"
             >
-              <Plus className="w-4 h-4 mr-1" />
+              <Plus className="w-4 h-4 mr-1.5" />
               Добавить пункт
             </Button>
           </div>
         )}
 
-        {/* Explanation field - for quiz types */}
+        {/* Explanation field */}
         {['single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'matching', 'ordering', 'slider', 'hotspot'].includes(block.type) && (
           <div className="space-y-2">
-            <Label>Объяснение (показывается после ответа)</Label>
+            <Label className="text-foreground font-medium flex items-center gap-2">
+              <Lightbulb className="w-4 h-4 text-warning-foreground" />
+              Объяснение
+            </Label>
             <Textarea
               value={block.explanation || ''}
               onChange={(e) => onUpdate({ explanation: e.target.value })}
               placeholder="Почему это правильный ответ..."
               rows={2}
+              className="rounded-xl resize-none"
             />
           </div>
         )}
       </div>
 
       {/* AI Actions */}
-      <div className="px-4 py-3 border-t border-border bg-muted/30">
-        <Button variant="soft-ai" size="sm" className="w-full">
+      <div className="px-5 py-4 border-t border-border bg-gradient-surface">
+        <Button variant="soft-ai" size="sm" className="w-full rounded-xl">
           <Sparkles className="w-4 h-4 mr-2" />
           Улучшить с AI
         </Button>

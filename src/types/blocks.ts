@@ -88,29 +88,30 @@ export interface Block {
   updatedAt: Date;
 }
 
-// Block configuration for the editor
+// Block configuration for the editor - using semantic design tokens
 export interface BlockConfig {
   type: BlockType;
   icon: string;
   label: string;
   labelRu: string;
   category: 'content' | 'interactive';
-  color: string;
-  bgColor: string;
+  // Use semantic classes that match the design system
+  colorClass: string;
+  bgClass: string;
   description: string;
 }
 
 export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
-  // Content blocks
+  // Content blocks - using primary/muted tones
   heading: {
     type: 'heading',
     icon: 'Heading',
     label: 'Heading',
     labelRu: 'Заголовок',
     category: 'content',
-    color: 'text-slate-600',
-    bgColor: 'bg-slate-100',
-    description: 'Крупный заголовок для секции'
+    colorClass: 'text-foreground',
+    bgClass: 'bg-muted/50',
+    description: 'Крупный заголовок секции'
   },
   text: {
     type: 'text',
@@ -118,9 +119,9 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     label: 'Text',
     labelRu: 'Текст',
     category: 'content',
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-100',
-    description: 'Текстовый блок с форматированием'
+    colorClass: 'text-primary',
+    bgClass: 'bg-primary/10',
+    description: 'Текстовый блок'
   },
   image: {
     type: 'image',
@@ -128,8 +129,8 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     label: 'Image',
     labelRu: 'Картинка',
     category: 'content',
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-100',
+    colorClass: 'text-accent-foreground',
+    bgClass: 'bg-accent',
     description: 'Изображение на весь экран'
   },
   video: {
@@ -138,8 +139,8 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     label: 'Video',
     labelRu: 'Видео',
     category: 'content',
-    color: 'text-red-600',
-    bgColor: 'bg-red-100',
+    colorClass: 'text-destructive',
+    bgClass: 'bg-destructive/10',
     description: 'Видео контент'
   },
   audio: {
@@ -148,8 +149,8 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     label: 'Audio',
     labelRu: 'Аудио',
     category: 'content',
-    color: 'text-amber-600',
-    bgColor: 'bg-amber-100',
+    colorClass: 'text-warning-foreground',
+    bgClass: 'bg-warning/10',
     description: 'Аудио плеер'
   },
   image_text: {
@@ -158,21 +159,21 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     label: 'Image + Text',
     labelRu: 'Картинка + Текст',
     category: 'content',
-    color: 'text-indigo-600',
-    bgColor: 'bg-indigo-100',
+    colorClass: 'text-primary',
+    bgClass: 'bg-primary/10',
     description: 'Картинка с текстом снизу'
   },
   
-  // Interactive blocks
+  // Interactive blocks - using quiz semantic colors
   single_choice: {
     type: 'single_choice',
     icon: 'CircleDot',
     label: 'Single Choice',
     labelRu: 'Один ответ',
     category: 'interactive',
-    color: 'text-green-600',
-    bgColor: 'bg-green-100',
-    description: 'Выбор одного правильного ответа'
+    colorClass: 'text-success',
+    bgClass: 'bg-success/10',
+    description: 'Выбор одного ответа'
   },
   multiple_choice: {
     type: 'multiple_choice',
@@ -180,9 +181,9 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     label: 'Multiple Choice',
     labelRu: 'Несколько ответов',
     category: 'interactive',
-    color: 'text-emerald-600',
-    bgColor: 'bg-emerald-100',
-    description: 'Выбор нескольких правильных ответов'
+    colorClass: 'text-success',
+    bgClass: 'bg-success/10',
+    description: 'Выбор нескольких ответов'
   },
   true_false: {
     type: 'true_false',
@@ -190,9 +191,9 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     label: 'True/False',
     labelRu: 'Да/Нет',
     category: 'interactive',
-    color: 'text-yellow-600',
-    bgColor: 'bg-yellow-100',
-    description: 'Вопрос с ответом Да или Нет'
+    colorClass: 'text-warning-foreground',
+    bgClass: 'bg-warning/10',
+    description: 'Вопрос Да или Нет'
   },
   fill_blank: {
     type: 'fill_blank',
@@ -200,8 +201,8 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     label: 'Fill Blank',
     labelRu: 'Заполни пропуск',
     category: 'interactive',
-    color: 'text-pink-600',
-    bgColor: 'bg-pink-100',
+    colorClass: 'text-accent-foreground',
+    bgClass: 'bg-accent',
     description: 'Заполнить пропущенное слово'
   },
   matching: {
@@ -210,8 +211,8 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     label: 'Matching',
     labelRu: 'Соответствие',
     category: 'interactive',
-    color: 'text-cyan-600',
-    bgColor: 'bg-cyan-100',
+    colorClass: 'text-ai',
+    bgClass: 'bg-ai/10',
     description: 'Соединить пары'
   },
   ordering: {
@@ -220,9 +221,9 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     label: 'Ordering',
     labelRu: 'Порядок',
     category: 'interactive',
-    color: 'text-orange-600',
-    bgColor: 'bg-orange-100',
-    description: 'Расположить в правильном порядке'
+    colorClass: 'text-warning-foreground',
+    bgClass: 'bg-warning/10',
+    description: 'Расположить в порядке'
   },
   slider: {
     type: 'slider',
@@ -230,8 +231,8 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     label: 'Slider',
     labelRu: 'Ползунок',
     category: 'interactive',
-    color: 'text-violet-600',
-    bgColor: 'bg-violet-100',
+    colorClass: 'text-primary',
+    bgClass: 'bg-primary/10',
     description: 'Выбрать значение на шкале'
   },
   hotspot: {
@@ -240,9 +241,9 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     label: 'Hotspot',
     labelRu: 'Точки на картинке',
     category: 'interactive',
-    color: 'text-rose-600',
-    bgColor: 'bg-rose-100',
-    description: 'Нажать на правильные области картинки'
+    colorClass: 'text-destructive',
+    bgClass: 'bg-destructive/10',
+    description: 'Нажать на правильные области'
   },
 };
 

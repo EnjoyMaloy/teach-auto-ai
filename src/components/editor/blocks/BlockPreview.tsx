@@ -34,18 +34,18 @@ export const BlockPreview: React.FC<BlockPreviewProps> = ({
       <div
         onClick={onClick}
         className={cn(
-          'flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all',
+          'flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200',
           'border-2',
           isSelected
-            ? 'border-primary bg-primary/5'
-            : 'border-transparent hover:bg-muted'
+            ? 'border-primary bg-primary-light shadow-sm'
+            : 'border-transparent hover:bg-muted/50'
         )}
       >
-        <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center', config.bgColor)}>
-          {IconComponent && <IconComponent className={cn('w-4 h-4', config.color)} />}
+        <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center', config.bgClass)}>
+          {IconComponent && <IconComponent className={cn('w-4 h-4', config.colorClass)} />}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate">{config.labelRu}</p>
+          <p className="text-sm font-medium text-foreground truncate">{config.labelRu}</p>
           <p className="text-xs text-muted-foreground truncate">
             {block.content || 'Пустой блок'}
           </p>
@@ -58,19 +58,19 @@ export const BlockPreview: React.FC<BlockPreviewProps> = ({
     <div
       onClick={onClick}
       className={cn(
-        'relative rounded-2xl overflow-hidden cursor-pointer transition-all',
-        'border-2 aspect-[9/16] bg-background',
+        'relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-300',
+        'border-2 aspect-[9/16] bg-card',
         isSelected
-          ? 'border-primary shadow-lg ring-2 ring-primary/20'
-          : 'border-border hover:border-primary/50'
+          ? 'border-primary shadow-primary ring-2 ring-primary/20'
+          : 'border-border hover:border-primary/50 hover:shadow-md'
       )}
     >
       {/* Block type badge */}
       <div className={cn(
-        'absolute top-2 left-2 px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1 z-10',
-        config.bgColor, config.color
+        'absolute top-3 left-3 px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 z-10',
+        config.bgClass, config.colorClass
       )}>
-        {IconComponent && <IconComponent className="w-3 h-3" />}
+        {IconComponent && <IconComponent className="w-3.5 h-3.5" />}
         {config.labelRu}
       </div>
 
@@ -92,8 +92,8 @@ export const BlockPreview: React.FC<BlockPreviewProps> = ({
           </div>
         ) : (
           <div className="text-center px-4">
-            <div className={cn('w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center', config.bgColor)}>
-              {IconComponent && <IconComponent className={cn('w-6 h-6', config.color)} />}
+            <div className={cn('w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center', config.bgClass)}>
+              {IconComponent && <IconComponent className={cn('w-7 h-7', config.colorClass)} />}
             </div>
             <p className="text-sm text-muted-foreground line-clamp-4">
               {block.content || 'Нажмите для редактирования'}
@@ -104,14 +104,14 @@ export const BlockPreview: React.FC<BlockPreviewProps> = ({
 
       {/* Options preview for quiz types */}
       {block.options && block.options.length > 0 && (
-        <div className="absolute bottom-2 left-2 right-2 space-y-1">
-          {block.options.slice(0, 3).map((option, idx) => (
+        <div className="absolute bottom-3 left-3 right-3 space-y-1.5">
+          {block.options.slice(0, 3).map((option) => (
             <div
               key={option.id}
               className={cn(
-                'px-2 py-1 rounded-lg text-xs truncate',
+                'px-2.5 py-1.5 rounded-lg text-xs truncate',
                 option.isCorrect
-                  ? 'bg-green-100 text-green-700'
+                  ? 'bg-success/20 text-success'
                   : 'bg-muted text-muted-foreground'
               )}
             >

@@ -373,7 +373,7 @@ const Editor: React.FC = () => {
   const selectedBlockIndex = blocks.findIndex(b => b.id === selectedBlockId);
 
   return (
-    <div className="h-screen flex flex-col bg-muted/30">
+    <div className="h-screen flex flex-col bg-background">
       <EditorHeader
         course={course}
         canUndo={undoStack.length > 0}
@@ -390,7 +390,7 @@ const Editor: React.FC = () => {
 
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Lessons sidebar */}
-        <div className="w-64 flex-shrink-0 p-4 border-r border-border bg-background">
+        <div className="w-72 flex-shrink-0 p-4 border-r border-border bg-card">
           <LessonsList
             lessons={course.lessons}
             selectedLessonId={selectedLessonId}
@@ -405,73 +405,90 @@ const Editor: React.FC = () => {
         {/* Center: Block list + Mobile Preview */}
         <div className="flex-1 flex overflow-hidden">
           {/* Block list */}
-          <div className="w-80 flex-shrink-0 p-4 overflow-y-auto border-r border-border bg-background">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-foreground">Блоки</h3>
+          <div className="w-80 flex-shrink-0 flex flex-col border-r border-border bg-card">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+              <div>
+                <h3 className="font-bold text-foreground">Блоки</h3>
+                <p className="text-xs text-muted-foreground">{blocks.length} блоков</p>
+              </div>
               <Button 
-                variant="soft" 
+                variant="default" 
                 size="sm"
                 onClick={() => setShowBlockSelector(true)}
+                className="rounded-xl"
               >
-                <Plus className="w-4 h-4 mr-1" />
+                <Plus className="w-4 h-4 mr-1.5" />
                 Добавить
               </Button>
             </div>
 
-            {blocks.length > 0 ? (
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleReorderBlocks}
-              >
-                <SortableContext
-                  items={blocks.map(b => b.id)}
-                  strategy={verticalListSortingStrategy}
+            <div className="flex-1 overflow-y-auto p-3">
+              {blocks.length > 0 ? (
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleReorderBlocks}
                 >
-                  <div className="space-y-2">
-                    {blocks.map((block, index) => (
-                      <SortableBlockItem
-                        key={block.id}
-                        block={block}
-                        index={index}
-                        isSelected={selectedBlockId === block.id}
-                        onSelect={() => setSelectedBlockId(block.id)}
-                      />
-                    ))}
+                  <SortableContext
+                    items={blocks.map(b => b.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-2">
+                      {blocks.map((block, index) => (
+                        <SortableBlockItem
+                          key={block.id}
+                          block={block}
+                          index={index}
+                          isSelected={selectedBlockId === block.id}
+                          onSelect={() => setSelectedBlockId(block.id)}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              ) : (
+                <div className="text-center py-16">
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 mx-auto mb-4 flex items-center justify-center">
+                    <Smartphone className="w-8 h-8 text-primary" />
                   </div>
-                </SortableContext>
-              </DndContext>
-            ) : (
-              <div className="text-center py-12">
-                <Smartphone className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-                <p className="text-sm text-muted-foreground mb-4">
-                  Добавьте первый блок
-                </p>
-                <Button 
-                  variant="soft" 
-                  size="sm"
-                  onClick={() => setShowBlockSelector(true)}
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Добавить блок
-                </Button>
-              </div>
-            )}
+                  <p className="text-foreground font-medium mb-2">Начните создавать</p>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Добавьте первый блок урока
+                  </p>
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    onClick={() => setShowBlockSelector(true)}
+                    className="rounded-xl"
+                  >
+                    <Plus className="w-4 h-4 mr-1.5" />
+                    Добавить блок
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Mobile Preview */}
-          <div className="flex-1 flex items-center justify-center p-8 bg-muted/50 overflow-auto">
-            <MobilePreviewFrame
-              block={selectedBlock}
-              lessonTitle={selectedLesson?.title}
-              blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
-              totalBlocks={blocks.length}
-            />
+          <div className="flex-1 flex items-center justify-center p-8 bg-muted/30 overflow-auto">
+            <div className="text-center">
+              <MobilePreviewFrame
+                block={selectedBlock}
+                lessonTitle={selectedLesson?.title}
+                blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
+                totalBlocks={blocks.length}
+              />
+              {selectedBlock && (
+                <p className="text-xs text-muted-foreground mt-4">
+                  Блок {selectedBlockIndex + 1} из {blocks.length}
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Right: Block Editor */}
-        <div className="w-96 flex-shrink-0 border-l border-border bg-background overflow-hidden">
+        <div className="w-[420px] flex-shrink-0 border-l border-border bg-card overflow-hidden">
           {selectedBlock ? (
             <BlockEditor
               block={selectedBlock}
@@ -481,9 +498,12 @@ const Editor: React.FC = () => {
           ) : (
             <div className="h-full flex items-center justify-center p-8 text-center">
               <div>
-                <Smartphone className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">
-                  Выберите блок для редактирования
+                <div className="w-20 h-20 rounded-3xl bg-muted mx-auto mb-5 flex items-center justify-center">
+                  <Smartphone className="w-10 h-10 text-muted-foreground" />
+                </div>
+                <p className="text-foreground font-medium mb-2">Редактор блока</p>
+                <p className="text-sm text-muted-foreground">
+                  Выберите блок слева для редактирования
                 </p>
               </div>
             </div>
