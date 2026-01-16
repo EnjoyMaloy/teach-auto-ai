@@ -5,7 +5,7 @@ import Highlight from '@tiptap/extension-highlight';
 import Underline from '@tiptap/extension-underline';
 import { Mark, mergeAttributes } from '@tiptap/core';
 import { cn } from '@/lib/utils';
-import { Highlighter, Underline as UnderlineIcon, Waves, X } from 'lucide-react';
+import { Highlighter, Underline as UnderlineIcon, Waves, X, Bold, Italic } from 'lucide-react';
 
 // Extend the Commands interface for TypeScript
 declare module '@tiptap/core' {
@@ -60,10 +60,42 @@ const Toolbar: React.FC<ToolbarProps> = ({ editor, highlightColor, underlineColo
 
   return (
     <div 
-      className="flex items-center gap-1 p-1 border-b border-border/50 bg-muted/30 rounded-t-lg"
+      className="flex items-center gap-1 p-1.5 border-b border-border/50 bg-muted/30 rounded-t-lg flex-wrap"
       onMouseDown={(e) => e.preventDefault()} // Prevent blur when clicking toolbar
     >
-      <span className="text-[10px] text-muted-foreground px-1">Выделить:</span>
+      {/* Bold */}
+      <button
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        className={cn(
+          'w-7 h-7 rounded-md border transition-all flex items-center justify-center',
+          editor.isActive('bold')
+            ? 'border-primary bg-primary/20'
+            : 'border-border hover:border-primary/50 bg-background'
+        )}
+        title="Жирный (Ctrl+B)"
+        type="button"
+      >
+        <Bold className="w-3.5 h-3.5" />
+      </button>
+
+      {/* Italic */}
+      <button
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        className={cn(
+          'w-7 h-7 rounded-md border transition-all flex items-center justify-center',
+          editor.isActive('italic')
+            ? 'border-primary bg-primary/20'
+            : 'border-border hover:border-primary/50 bg-background'
+        )}
+        title="Курсив (Ctrl+I)"
+        type="button"
+      >
+        <Italic className="w-3.5 h-3.5" />
+      </button>
+
+      <div className="w-px h-5 bg-border mx-1" />
       
       {/* Marker/Highlight */}
       <button
@@ -75,7 +107,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ editor, highlightColor, underlineColo
             ? 'border-primary bg-primary/20'
             : 'border-border hover:border-primary/50 bg-background'
         )}
-        title="Маркер (выделите текст)"
+        title="Маркер"
         type="button"
       >
         <Highlighter className="w-3.5 h-3.5" />
@@ -113,11 +145,13 @@ const Toolbar: React.FC<ToolbarProps> = ({ editor, highlightColor, underlineColo
         <Waves className="w-3.5 h-3.5" />
       </button>
 
+      <div className="w-px h-5 bg-border mx-1" />
+
       {/* Clear formatting */}
       <button
         onMouseDown={(e) => e.preventDefault()}
         onClick={() => editor.chain().focus().unsetAllMarks().run()}
-        className="w-7 h-7 rounded-md border border-border hover:border-destructive/50 bg-background transition-all flex items-center justify-center ml-1"
+        className="w-7 h-7 rounded-md border border-border hover:border-destructive/50 bg-background transition-all flex items-center justify-center"
         title="Убрать форматирование"
         type="button"
       >
@@ -173,9 +207,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        // Disable default marks we're replacing
-        bold: false,
-        italic: false,
+        // Keep bold and italic, disable others
         strike: false,
         code: false,
         heading: false,
@@ -241,13 +273,21 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       border-radius: 2px;
     }
     .rich-text-underline {
-      text-decoration: underline;
+      text-decoration-line: underline;
+      text-decoration-style: solid;
       text-decoration-color: hsl(${underlineColor});
       text-decoration-thickness: 2px;
       text-underline-offset: 3px;
     }
     .rich-text-wavy {
-      text-decoration: underline wavy;
+      text-decoration-line: underline;
+      text-decoration-style: wavy;
+      text-decoration-color: hsl(${wavyColor});
+      text-underline-offset: 4px;
+    }
+    [data-wavy="true"] {
+      text-decoration-line: underline;
+      text-decoration-style: wavy;
       text-decoration-color: hsl(${wavyColor});
       text-underline-offset: 4px;
     }
