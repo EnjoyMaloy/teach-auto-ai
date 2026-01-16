@@ -153,9 +153,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     switch (block.type) {
       case 'heading':
         return (
-          <div className="flex-1 flex items-center justify-center p-6">
+          <div className="flex-1 flex items-center justify-center p-8">
             <h1 
-              className="text-2xl font-bold text-center"
+              className="text-4xl font-bold text-center leading-tight"
               style={{ 
                 color: `hsl(${ds.foregroundColor})`,
                 fontFamily: ds.headingFontFamily,
