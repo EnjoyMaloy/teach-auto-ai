@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { AIMessage, CourseStructure } from '@/types/course';
 import { initialAIMessages } from '@/lib/mockData';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface AIChatProps {
   onCourseGenerated: (structure: CourseStructure) => void;
@@ -24,76 +26,106 @@ export const AIChat: React.FC<AIChatProps> = ({ onCourseGenerated }) => {
     scrollToBottom();
   }, [messages]);
 
-  const simulateAIResponse = async (userMessage: string) => {
+  const callAI = async (userMessage: string, agentRole: 'planner' | 'builder' | 'reviewer') => {
+    const { data, error } = await supabase.functions.invoke('generate-course', {
+      body: { userMessage, agentRole }
+    });
+
+    if (error) {
+      console.error('Edge function error:', error);
+      throw new Error(error.message || 'Ошибка генерации');
+    }
+
+    if (data?.error) {
+      throw new Error(data.error);
+    }
+
+    return data.content;
+  };
+
+  const generateCourse = async (userMessage: string) => {
     setIsLoading(true);
     
-    // Simulate Planner response
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    const plannerResponse: AIMessage = {
-      id: `msg-${Date.now()}-planner`,
-      role: 'assistant',
-      agentRole: 'planner',
-      content: `📋 **Анализирую запрос...**\n\nВы хотите курс на тему, связанную с "${userMessage}". Формирую структуру курса.`,
-      timestamp: new Date(),
-    };
-    setMessages(prev => [...prev, plannerResponse]);
-    setCurrentAgent('builder');
+    try {
+      // Step 1: Planner
+      setCurrentAgent('planner');
+      const plannerContent = await callAI(userMessage, 'planner');
+      
+      const plannerResponse: AIMessage = {
+        id: `msg-${Date.now()}-planner`,
+        role: 'assistant',
+        agentRole: 'planner',
+        content: `📋 **Анализ запроса**\n\n${plannerContent}`,
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, plannerResponse]);
 
-    await new Promise(resolve => setTimeout(resolve, 2000));
+      // Step 2: Builder - generate course structure
+      setCurrentAgent('builder');
+      const builderContent = await callAI(
+        `Создай курс по запросу пользователя: "${userMessage}". Время прохождения ~10 минут.`,
+        'builder'
+      );
+      
+      // Parse JSON from builder response
+      let courseStructure: CourseStructure;
+      try {
+        // Clean up the response - remove markdown code blocks if present
+        let jsonStr = builderContent;
+        if (jsonStr.includes('```json')) {
+          jsonStr = jsonStr.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+        } else if (jsonStr.includes('```')) {
+          jsonStr = jsonStr.replace(/```\n?/g, '');
+        }
+        courseStructure = JSON.parse(jsonStr.trim());
+      } catch (parseError) {
+        console.error('Failed to parse course structure:', parseError, builderContent);
+        throw new Error('Не удалось разобрать структуру курса');
+      }
 
-    const courseStructure: CourseStructure = {
-      title: 'DeFi для начинающих',
-      description: 'Изучите основы децентрализованных финансов за 10 минут',
-      targetAudience: 'Новички в криптовалютах',
-      estimatedMinutes: 10,
-      lessons: [
-        {
-          title: 'Что такое DeFi?',
-          description: 'Базовые понятия',
-          slidesCount: 5,
-          slideTypes: ['text', 'image_text', 'single_choice', 'true_false', 'fill_blank'],
-        },
-        {
-          title: 'Основные протоколы',
-          description: 'Uniswap, Aave, Compound',
-          slidesCount: 6,
-          slideTypes: ['text', 'image_text', 'single_choice', 'multiple_choice', 'true_false', 'fill_blank'],
-        },
-        {
-          title: 'Риски и безопасность',
-          description: 'Защита активов',
-          slidesCount: 4,
-          slideTypes: ['text', 'single_choice', 'true_false', 'fill_blank'],
-        },
-      ],
-    };
+      const builderResponse: AIMessage = {
+        id: `msg-${Date.now()}-builder`,
+        role: 'assistant',
+        agentRole: 'builder',
+        content: `🏗️ **Структура готова!**\n\n**${courseStructure.title}**\n${courseStructure.description}\n\n📚 **${courseStructure.lessons.length} урока** • ⏱️ **~${courseStructure.estimatedMinutes} минут**\n\n${courseStructure.lessons.map((l, i) => `${i + 1}. **${l.title}** (${l.slides?.length || l.slidesCount || 0} слайдов)`).join('\n')}`,
+        timestamp: new Date(),
+        metadata: { courseStructure },
+      };
+      setMessages(prev => [...prev, builderResponse]);
 
-    const builderResponse: AIMessage = {
-      id: `msg-${Date.now()}-builder`,
-      role: 'assistant',
-      agentRole: 'builder',
-      content: `🏗️ **Структура готова!**\n\n**${courseStructure.title}**\n${courseStructure.description}\n\n📚 **${courseStructure.lessons.length} урока** • ⏱️ **~${courseStructure.estimatedMinutes} минут**\n\n${courseStructure.lessons.map((l, i) => `${i + 1}. **${l.title}** (${l.slidesCount} слайдов)`).join('\n')}`,
-      timestamp: new Date(),
-      metadata: { courseStructure },
-    };
-    setMessages(prev => [...prev, builderResponse]);
-    setCurrentAgent('reviewer');
-
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    const reviewerResponse: AIMessage = {
-      id: `msg-${Date.now()}-reviewer`,
-      role: 'assistant',
-      agentRole: 'reviewer',
-      content: `✅ **Проверка пройдена!**\n\n• Длина текстов оптимальна\n• Квизы логически корректны\n• Сложность подходит для новичков\n\n🎉 Курс готов к редактированию!`,
-      timestamp: new Date(),
-    };
-    setMessages(prev => [...prev, reviewerResponse]);
-    
-    setIsLoading(false);
-    setCurrentAgent('planner');
-    onCourseGenerated(courseStructure);
+      // Step 3: Reviewer
+      setCurrentAgent('reviewer');
+      const reviewerContent = await callAI(
+        `Проверь курс "${courseStructure.title}" с ${courseStructure.lessons.length} уроками`,
+        'reviewer'
+      );
+      
+      const reviewerResponse: AIMessage = {
+        id: `msg-${Date.now()}-reviewer`,
+        role: 'assistant',
+        agentRole: 'reviewer',
+        content: `✅ **Проверка**\n\n${reviewerContent}\n\n🎉 Курс готов к редактированию!`,
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, reviewerResponse]);
+      
+      onCourseGenerated(courseStructure);
+      
+    } catch (error) {
+      console.error('AI generation error:', error);
+      toast.error(error instanceof Error ? error.message : 'Ошибка генерации курса');
+      
+      const errorResponse: AIMessage = {
+        id: `msg-${Date.now()}-error`,
+        role: 'assistant',
+        content: `❌ ${error instanceof Error ? error.message : 'Произошла ошибка. Попробуйте снова.'}`,
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {
+      setIsLoading(false);
+      setCurrentAgent('planner');
+    }
   };
 
   const handleSend = () => {
@@ -108,7 +140,7 @@ export const AIChat: React.FC<AIChatProps> = ({ onCourseGenerated }) => {
 
     setMessages(prev => [...prev, userMessage]);
     setInput('');
-    simulateAIResponse(input);
+    generateCourse(input);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -143,7 +175,7 @@ export const AIChat: React.FC<AIChatProps> = ({ onCourseGenerated }) => {
           </div>
           <div>
             <h2 className="font-bold text-foreground">AI Course Generator</h2>
-            <p className="text-sm text-muted-foreground">Опишите курс — я создам его</p>
+            <p className="text-sm text-muted-foreground">Опишите курс — AI создаст его</p>
           </div>
         </div>
       </div>
