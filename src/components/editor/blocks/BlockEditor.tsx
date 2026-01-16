@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { VideoUploader } from './VideoUploader';
+import { AudioUploader } from './AudioUploader';
 import {
   Plus, Trash2, GripVertical, Upload, Sparkles,
   Heading, Type, Image, Play, Volume2, LayoutList,
@@ -217,11 +218,11 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
           </div>
         )}
 
-        {/* Audio URL */}
+        {/* Audio upload */}
         {block.type === 'audio' && (
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-foreground font-medium">Название</Label>
+              <Label className="text-foreground font-medium">Название трека</Label>
               <Input
                 value={block.content}
                 onChange={(e) => onUpdate({ content: e.target.value })}
@@ -230,12 +231,17 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-foreground font-medium">URL аудио</Label>
-              <Input
-                value={block.audioUrl || ''}
-                onChange={(e) => onUpdate({ audioUrl: e.target.value })}
-                placeholder="https://..."
-                className="rounded-xl"
+              <Label className="text-foreground font-medium">Аудио файл</Label>
+              <AudioUploader
+                audioUrl={block.audioUrl}
+                audioName={block.content}
+                onUpdate={(url, name) => {
+                  if (name && !block.content) {
+                    onUpdate({ audioUrl: url, content: name });
+                  } else {
+                    onUpdate({ audioUrl: url });
+                  }
+                }}
               />
             </div>
           </div>
