@@ -5,7 +5,7 @@ import {
   Heading, Type, Image, Play, Volume2, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
   Link2, ListOrdered, SlidersHorizontal, MousePointer2,
-  X
+  X, Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -35,21 +35,22 @@ export const BlockTypeSelector: React.FC<BlockTypeSelectorProps> = ({
         key={config.type}
         onClick={() => onSelect(config.type)}
         className={cn(
-          'flex flex-col items-center gap-2 p-4 rounded-xl',
-          'border-2 border-transparent hover:border-primary/50',
-          'bg-muted/50 hover:bg-muted transition-all',
-          'text-center group'
+          'flex flex-col items-center gap-3 p-4 rounded-2xl',
+          'border-2 border-border hover:border-primary',
+          'bg-card hover:bg-primary-light transition-all duration-200',
+          'text-center group hover:shadow-md'
         )}
       >
         <div className={cn(
-          'w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110',
-          config.bgColor
+          'w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-200',
+          'group-hover:scale-110',
+          config.bgClass
         )}>
-          {IconComponent && <IconComponent className={cn('w-6 h-6', config.color)} />}
+          {IconComponent && <IconComponent className={cn('w-6 h-6', config.colorClass)} />}
         </div>
         <div>
-          <p className="text-sm font-medium">{config.labelRu}</p>
-          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+          <p className="text-sm font-semibold text-foreground">{config.labelRu}</p>
+          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
             {config.description}
           </p>
         </div>
@@ -58,25 +59,36 @@ export const BlockTypeSelector: React.FC<BlockTypeSelectorProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
+    <div 
+      className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-up" 
+      onClick={onClose}
+    >
       <div 
-        className="bg-card rounded-2xl shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden"
+        className="bg-card rounded-3xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden border border-border animate-scale-in"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-          <h2 className="text-lg font-bold">Добавить блок</h2>
-          <Button variant="ghost" size="icon-sm" onClick={onClose}>
-            <X className="w-4 h-4" />
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border bg-gradient-surface">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-foreground">Добавить блок</h2>
+              <p className="text-xs text-muted-foreground">Выберите тип контента</p>
+            </div>
+          </div>
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl">
+            <X className="w-5 h-5" />
           </Button>
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(80vh-80px)] space-y-6">
+        <div className="p-6 overflow-y-auto max-h-[calc(85vh-88px)] space-y-8">
           {/* Content blocks */}
           <div>
-            <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
-              <Type className="w-4 h-4" />
+            <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+              <Type className="w-4 h-4 text-primary" />
               Контент
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -86,8 +98,8 @@ export const BlockTypeSelector: React.FC<BlockTypeSelectorProps> = ({
 
           {/* Interactive blocks */}
           <div>
-            <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
-              <CircleDot className="w-4 h-4" />
+            <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+              <CircleDot className="w-4 h-4 text-success" />
               Интерактивные
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

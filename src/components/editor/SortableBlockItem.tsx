@@ -52,17 +52,17 @@ export const SortableBlockItem: React.FC<SortableBlockItemProps> = ({
       style={style}
       onClick={onSelect}
       className={cn(
-        'group relative flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all',
+        'group relative flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all duration-200',
         'border-2',
         isSelected
-          ? 'border-primary bg-primary/5 shadow-sm'
-          : 'border-transparent hover:bg-muted/50',
+          ? 'border-primary bg-primary-light shadow-sm'
+          : 'border-border bg-card hover:border-primary/50 hover:shadow-sm',
         isDragging && 'opacity-50 shadow-lg z-50'
       )}
     >
       {/* Drag handle */}
       <div
-        className="flex-shrink-0 cursor-grab opacity-0 group-hover:opacity-50 hover:!opacity-100 transition-opacity touch-none"
+        className="flex-shrink-0 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity touch-none"
         {...attributes}
         {...listeners}
         onClick={(e) => e.stopPropagation()}
@@ -71,20 +71,20 @@ export const SortableBlockItem: React.FC<SortableBlockItemProps> = ({
       </div>
 
       {/* Block number */}
-      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-foreground text-background text-xs font-bold flex items-center justify-center">
+      <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
         {index + 1}
       </div>
 
       {/* Icon */}
-      <div className={cn('flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center', config.bgColor)}>
-        {IconComponent && <IconComponent className={cn('w-4 h-4', config.color)} />}
+      <div className={cn('flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center', config.bgClass)}>
+        {IconComponent && <IconComponent className={cn('w-5 h-5', config.colorClass)} />}
       </div>
 
       {/* Content preview */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{config.labelRu}</p>
-        <p className="text-xs text-muted-foreground truncate">
-          {block.content || 'Пустой блок'}
+        <p className="text-sm font-semibold text-foreground truncate">{config.labelRu}</p>
+        <p className="text-xs text-muted-foreground truncate mt-0.5">
+          {block.content || 'Пустой блок...'}
         </p>
       </div>
     </div>
