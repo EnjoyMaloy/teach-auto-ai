@@ -7,6 +7,8 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import Editor from "./pages/Editor";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import CourseSettings from "./pages/CourseSettings";
+import CourseStats from "./pages/CourseStats";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 
@@ -55,6 +57,8 @@ const AppRoutes = () => (
     <Route path="/auth" element={<PublicRoute><Auth /></PublicRoute>} />
     <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
     <Route path="/editor/:courseId" element={<ProtectedRoute><Editor /></ProtectedRoute>} />
+    <Route path="/course/:courseId/settings" element={<ProtectedRoute><CourseSettings /></ProtectedRoute>} />
+    <Route path="/course/:courseId/stats" element={<ProtectedRoute><CourseStats /></ProtectedRoute>} />
     <Route path="*" element={<NotFound />} />
   </Routes>
 );
