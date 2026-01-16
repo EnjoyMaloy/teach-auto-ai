@@ -181,6 +181,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                       headingFontFamily: course.designSystem?.headingFontFamily || 'Inter, system-ui, sans-serif',
                       borderRadius: course.designSystem?.borderRadius || '0.75rem',
                       buttonStyle: course.designSystem?.buttonStyle || 'rounded',
+                      sound: course.designSystem?.sound,
                     }}
                     onChange={onUpdateDesignSystem}
                   />
