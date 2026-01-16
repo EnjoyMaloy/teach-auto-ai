@@ -7,6 +7,7 @@ import {
   ChevronRight, RotateCcw, Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { AudioPlayer } from './AudioPlayer';
 
 interface MobilePreviewFrameProps {
   block: Block | null;
@@ -241,23 +242,28 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         );
 
       case 'audio':
-        return (
-          <div className="flex-1 flex flex-col items-center justify-center p-6 gap-4">
-            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-              <Volume2 className="w-10 h-10 text-primary" />
+        return block.audioUrl ? (
+          <AudioPlayer
+            audioUrl={block.audioUrl}
+            audioName={block.content}
+            primaryColor={ds.primaryColor}
+            foregroundColor={ds.foregroundColor}
+            mutedColor={ds.mutedColor}
+          />
+        ) : (
+          <div className="h-full flex flex-col items-center justify-center p-6 gap-4">
+            <div 
+              className="w-20 h-20 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: `hsl(${ds.mutedColor})` }}
+            >
+              <Volume2 className="w-10 h-10" style={{ color: `hsl(${ds.foregroundColor} / 0.4)` }} />
             </div>
-            <p className="text-center text-foreground font-medium">
-              {block.content || 'Аудио файл'}
+            <p 
+              className="text-center font-medium"
+              style={{ color: `hsl(${ds.foregroundColor} / 0.5)` }}
+            >
+              Загрузите аудио файл
             </p>
-            <div className="w-full h-10 flex items-center justify-center gap-0.5">
-              {Array.from({ length: 35 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="w-1 bg-primary/40 rounded-full"
-                  style={{ height: `${20 + Math.random() * 80}%` }}
-                />
-              ))}
-            </div>
           </div>
         );
 
