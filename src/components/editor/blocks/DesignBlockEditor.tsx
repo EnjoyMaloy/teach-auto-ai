@@ -524,22 +524,31 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
       {/* Add sub-block button */}
       {isEditing && (
         <div className="relative flex justify-center mt-4">
+          {showAddMenu && (
+            <>
+              {/* Backdrop to close menu */}
+              <div 
+                className="fixed inset-0 z-40" 
+                onClick={() => setShowAddMenu(false)}
+              />
+              <SubBlockSelector
+                onSelectType={(type) => {
+                  handleAddSubBlock(type);
+                  setShowAddMenu(false);
+                }}
+                onClose={() => setShowAddMenu(false)}
+              />
+            </>
+          )}
           <Button
             variant="outline"
             size="sm"
             onClick={() => setShowAddMenu(!showAddMenu)}
-            className="rounded-full"
+            className="rounded-full relative z-50"
           >
             <Plus className="w-4 h-4 mr-1" />
             Добавить
           </Button>
-          
-          {showAddMenu && (
-            <SubBlockSelector
-              onSelectType={handleAddSubBlock}
-              onClose={() => setShowAddMenu(false)}
-            />
-          )}
         </div>
       )}
     </div>
