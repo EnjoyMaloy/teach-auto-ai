@@ -372,6 +372,12 @@ const Editor: React.FC = () => {
 
   const selectedBlockIndex = blocks.findIndex(b => b.id === selectedBlockId);
 
+  const handleContinueToNextBlock = () => {
+    if (selectedBlockIndex < blocks.length - 1) {
+      setSelectedBlockId(blocks[selectedBlockIndex + 1].id);
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col bg-background">
       <EditorHeader
@@ -477,6 +483,7 @@ const Editor: React.FC = () => {
                 lessonTitle={selectedLesson?.title}
                 blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
                 totalBlocks={blocks.length}
+                onContinue={handleContinueToNextBlock}
               />
               {selectedBlock && (
                 <p className="text-xs text-muted-foreground mt-4">
