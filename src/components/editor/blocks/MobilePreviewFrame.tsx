@@ -21,19 +21,15 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 }) => {
   if (!block) {
     return (
-      <div className="relative w-full max-w-[320px] mx-auto">
-        {/* Phone frame */}
-        <div className="relative bg-foreground rounded-[2.5rem] p-2 shadow-2xl">
-          {/* Screen */}
-          <div className="bg-card rounded-[2rem] overflow-hidden aspect-[9/16] flex items-center justify-center border border-border">
-            <div className="text-center px-8">
-              <div className="w-16 h-16 rounded-2xl bg-muted mx-auto mb-4 flex items-center justify-center">
-                <Play className="w-8 h-8 text-muted-foreground" />
-              </div>
-              <p className="text-muted-foreground text-sm">
-                Выберите блок для предпросмотра
-              </p>
+      <div className="w-full max-w-[320px] mx-auto">
+        <div className="bg-card rounded-2xl overflow-hidden aspect-[9/16] flex items-center justify-center border border-border shadow-lg">
+          <div className="text-center px-8">
+            <div className="w-16 h-16 rounded-2xl bg-muted mx-auto mb-4 flex items-center justify-center">
+              <Play className="w-8 h-8 text-muted-foreground" />
             </div>
+            <p className="text-muted-foreground text-sm">
+              Выберите блок для предпросмотра
+            </p>
           </div>
         </div>
       </div>
@@ -305,42 +301,35 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   };
 
   return (
-    <div className="relative w-full max-w-[320px] mx-auto">
-      {/* Phone frame */}
-      <div className="relative bg-foreground rounded-[2.5rem] p-2 shadow-2xl">
-        {/* Notch */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-6 bg-foreground rounded-b-2xl z-10" />
-        
-        {/* Screen */}
-        <div className="bg-background rounded-[2rem] overflow-hidden aspect-[9/16] flex flex-col border border-border">
-          {/* Status bar */}
-          <div className="h-10 flex items-end justify-center pb-1 bg-card/50">
-            <div className="flex items-center gap-1">
-              {Array.from({ length: totalBlocks }).map((_, i) => (
-                <div
-                  key={i}
-                  className={cn(
-                    'h-1 rounded-full transition-all',
-                    i === blockIndex
-                      ? 'w-5 bg-primary'
-                      : i < blockIndex
-                        ? 'w-1.5 bg-primary/50'
-                        : 'w-1.5 bg-border'
-                  )}
-                />
-              ))}
-            </div>
+    <div className="w-full max-w-[320px] mx-auto">
+      <div className="bg-card rounded-2xl overflow-hidden aspect-[9/16] flex flex-col border border-border shadow-lg">
+        {/* Progress bar */}
+        <div className="h-8 flex items-center justify-center bg-muted/30">
+          <div className="flex items-center gap-1">
+            {Array.from({ length: totalBlocks }).map((_, i) => (
+              <div
+                key={i}
+                className={cn(
+                  'h-1 rounded-full transition-all',
+                  i === blockIndex
+                    ? 'w-5 bg-primary'
+                    : i < blockIndex
+                      ? 'w-1.5 bg-primary/50'
+                      : 'w-1.5 bg-border'
+                )}
+              />
+            ))}
           </div>
+        </div>
 
-          {/* Content */}
-          {renderContent()}
+        {/* Content */}
+        {renderContent()}
 
-          {/* Bottom navigation */}
-          <div className="h-14 border-t border-border flex items-center justify-center px-4 bg-card">
-            <button className="w-full h-10 bg-primary text-primary-foreground rounded-xl font-semibold text-sm shadow-sm">
-              Продолжить
-            </button>
-          </div>
+        {/* Bottom navigation */}
+        <div className="h-14 border-t border-border flex items-center justify-center px-4 bg-card">
+          <button className="w-full h-10 bg-primary text-primary-foreground rounded-xl font-semibold text-sm shadow-sm">
+            Продолжить
+          </button>
         </div>
       </div>
     </div>
