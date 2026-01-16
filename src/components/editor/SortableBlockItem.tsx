@@ -7,13 +7,13 @@ import {
   Heading, Type, Image, Play, Volume2, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
   Link2, ListOrdered, SlidersHorizontal, MousePointer2,
-  GripVertical
+  GripVertical, Layers
 } from 'lucide-react';
 
 const iconMap = {
   Heading, Type, Image, Play, Volume2, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
-  Link2, ListOrdered, SlidersHorizontal, MousePointer2
+  Link2, ListOrdered, SlidersHorizontal, MousePointer2, Layers
 };
 
 interface SortableBlockItemProps {
@@ -84,7 +84,9 @@ export const SortableBlockItem: React.FC<SortableBlockItemProps> = ({
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-foreground truncate">{config.labelRu}</p>
         <p className="text-xs text-muted-foreground truncate mt-0.5">
-          {block.content || 'Пустой блок...'}
+          {block.type === 'design' 
+            ? `${block.subBlocks?.length || 0} элементов`
+            : block.content || 'Пустой блок...'}
         </p>
       </div>
     </div>

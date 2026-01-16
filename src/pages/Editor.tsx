@@ -542,6 +542,7 @@ const Editor: React.FC = () => {
                 blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
                 totalBlocks={blocks.length}
                 onContinue={handleContinueToNextBlock}
+                onUpdateBlock={handleUpdateBlock}
                 designSystem={course.designSystem}
                 isMuted={isPreviewMuted}
               />

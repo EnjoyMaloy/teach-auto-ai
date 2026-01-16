@@ -18,6 +18,7 @@ interface MobilePreviewFrameProps {
   blockIndex?: number;
   totalBlocks?: number;
   onContinue?: () => void;
+  onUpdateBlock?: (updates: Partial<Block>) => void;
   designSystem?: CourseDesignSystem;
   isMuted?: boolean;
 }
@@ -46,6 +47,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   blockIndex = 0,
   totalBlocks = 1,
   onContinue,
+  onUpdateBlock,
   designSystem,
   isMuted = false,
 }) => {
@@ -320,6 +322,16 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
               <p className="text-sm text-foreground">{block.content || 'Описание к картинке...'}</p>
             </div>
           </div>
+        );
+
+      case 'design':
+        return (
+          <DesignBlockEditor
+            subBlocks={block.subBlocks || []}
+            onUpdateSubBlocks={(subBlocks) => onUpdateBlock?.({ subBlocks })}
+            designSystem={designSystem}
+            isEditing={true}
+          />
         );
 
       case 'single_choice':
