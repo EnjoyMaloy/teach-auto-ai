@@ -33,7 +33,7 @@ import {
 import { SortableBlockItem } from '@/components/editor/SortableBlockItem';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Loader2, Plus, Smartphone } from 'lucide-react';
+import { Loader2, Plus, Smartphone, Volume2, VolumeX } from 'lucide-react';
 
 // Adapter: Convert Slide to Block for the new editor
 const slideToBlock = (slide: Slide): Block => ({
@@ -108,6 +108,7 @@ const Editor: React.FC = () => {
   const [undoStack, setUndoStack] = useState<Course[]>([]);
   const [redoStack, setRedoStack] = useState<Course[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [isPreviewMuted, setIsPreviewMuted] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -512,14 +513,39 @@ const Editor: React.FC = () => {
 
           {/* Mobile Preview - Full area */}
           <div className="flex-1 flex flex-col overflow-hidden bg-card">
-            <MobilePreviewFrame
-              block={selectedBlock}
-              lessonTitle={selectedLesson?.title}
-              blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
-              totalBlocks={blocks.length}
-              onContinue={handleContinueToNextBlock}
-              designSystem={course.designSystem}
-            />
+            {/* Preview header with mute button */}
+            <div className="flex items-center justify-between px-4 py-2 border-b border-border">
+              <span className="text-sm font-medium text-muted-foreground">Предпросмотр</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsPreviewMuted(!isPreviewMuted)}
+                className="gap-2"
+              >
+                {isPreviewMuted ? (
+                  <>
+                    <VolumeX className="w-4 h-4" />
+                    <span className="text-xs">Звук выкл</span>
+                  </>
+                ) : (
+                  <>
+                    <Volume2 className="w-4 h-4" />
+                    <span className="text-xs">Звук вкл</span>
+                  </>
+                )}
+              </Button>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <MobilePreviewFrame
+                block={selectedBlock}
+                lessonTitle={selectedLesson?.title}
+                blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
+                totalBlocks={blocks.length}
+                onContinue={handleContinueToNextBlock}
+                designSystem={course.designSystem}
+                isMuted={isPreviewMuted}
+              />
+            </div>
           </div>
         </div>
 
