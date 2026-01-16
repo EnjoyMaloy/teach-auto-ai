@@ -1,5 +1,5 @@
 // Core entities for the course platform
-
+import { SubBlock } from './designBlock';
 export type SlideType = 
   | 'text' 
   | 'heading'
@@ -51,8 +51,10 @@ export interface Slide {
   sliderStep?: number;
   orderingItems?: string[];
   correctOrder?: string[];
+  subBlocks?: SubBlock[];
   backgroundColor?: string;
   textColor?: string;
+  textSize?: 'small' | 'medium' | 'large' | 'xlarge';
   createdAt: Date;
   updatedAt: Date;
 }
