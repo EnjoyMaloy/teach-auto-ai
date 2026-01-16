@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { arrayMove } from '@dnd-kit/sortable';
 import { Course, Lesson, Slide, SlideType } from '@/types/course';
 import { generateMockLessons, mockCourse } from '@/lib/mockData';
@@ -7,10 +7,10 @@ import { EditorHeader } from '@/components/editor/EditorHeader';
 import { LessonsList } from '@/components/editor/LessonsList';
 import { SlideEditor } from '@/components/editor/SlideEditor';
 import { CoursePlayer } from '@/components/runtime/CoursePlayer';
+import { EditorAIChat } from '@/components/editor/EditorAIChat';
 import { toast } from 'sonner';
 
 const Editor: React.FC = () => {
-  const navigate = useNavigate();
   const { courseId } = useParams();
 
   // Initialize course with mock data
@@ -292,7 +292,6 @@ const Editor: React.FC = () => {
         onRedo={handleRedo}
         onPreview={() => setIsPreviewMode(true)}
         onPublish={handlePublish}
-        onBack={() => navigate('/')}
         onSave={handleSave}
       />
 
@@ -324,6 +323,32 @@ const Editor: React.FC = () => {
           />
         </div>
       </div>
+
+      {/* AI Chat */}
+      <EditorAIChat
+        course={course}
+        selectedLesson={selectedLesson || null}
+        selectedSlide={selectedLesson?.slides.find(s => s.id === selectedSlideId) || null}
+        onUpdateCourse={(updates) => setCourse(prev => ({ ...prev, ...updates }))}
+        onUpdateSlide={handleUpdateSlide}
+        onAddLesson={(lesson) => {
+          const newLesson: Lesson = {
+            id: `lesson-${Date.now()}`,
+            courseId: course.id,
+            title: lesson.title || 'Новый урок',
+            description: lesson.description || '',
+            order: course.lessons.length + 1,
+            slides: [],
+            estimatedMinutes: lesson.estimatedMinutes || 3,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+          setCourse(prev => ({
+            ...prev,
+            lessons: [...prev.lessons, newLesson],
+          }));
+        }}
+      />
     </div>
   );
 };

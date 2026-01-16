@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const SYSTEM_PROMPT = `Ты — AI-ассистент для создания интерактивных образовательных курсов в стиле Duolingo.
+const BUILDER_SYSTEM_PROMPT = `Ты — AI-ассистент для создания интерактивных образовательных курсов в стиле Duolingo.
 
 Когда пользователь описывает курс, ты должен вернуть JSON со структурой курса.
 
@@ -45,24 +45,40 @@ const SYSTEM_PROMPT = `Ты — AI-ассистент для создания и
   ]
 }`;
 
+const CHAT_SYSTEM_PROMPT = `Ты — AI-ассистент для помощи в редактировании образовательных курсов.
+
+Ты помогаешь:
+1. Улучшать контент слайдов (делать понятнее, интереснее)
+2. Предлагать новые идеи для уроков и слайдов
+3. Проверять качество вопросов и ответов
+4. Советовать, как сделать курс более engaging
+
+Отвечай на русском языке. Будь кратким и полезным.
+Если пользователь просит улучшить конкретный слайд, предложи конкретные изменения.
+Если просят идеи — дай 3-5 конкретных вариантов.`;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { userMessage, agentRole } = await req.json();
+    const { userMessage, agentRole, mode } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    let systemPrompt = SYSTEM_PROMPT;
+    let systemPrompt = BUILDER_SYSTEM_PROMPT;
     let userPrompt = userMessage;
 
-    // Adjust prompts based on agent role
-    if (agentRole === "planner") {
+    // Chat mode for editor assistant
+    if (mode === "chat") {
+      systemPrompt = CHAT_SYSTEM_PROMPT;
+    }
+    // Adjust prompts based on agent role for course generation
+    else if (agentRole === "planner") {
       systemPrompt = `Ты — Planner AI. Твоя задача — проанализировать запрос пользователя и кратко описать план курса.
       
 Ответь на русском языке, кратко опиши:

@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
-  Undo2, Redo2, Play, Eye, Save, MoreHorizontal, 
-  Share2, Settings, Clock, Check, Loader2, ArrowLeft
+  Undo2, Redo2, Eye, Save, 
+  Share2, Clock, Loader2
 } from 'lucide-react';
 import { Course } from '@/types/course';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,6 @@ interface EditorHeaderProps {
   onRedo: () => void;
   onPreview: () => void;
   onPublish: () => void;
-  onBack: () => void;
   onSave: () => void;
 }
 
@@ -29,18 +28,15 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   onRedo,
   onPreview,
   onPublish,
-  onBack,
   onSave,
 }) => {
   return (
     <header className="h-16 border-b border-border bg-card flex items-center justify-between px-4">
       {/* Left section */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={onBack}>
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        
-        <div className="h-6 w-px bg-border" />
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ai to-primary flex items-center justify-center">
+          <span className="text-white font-bold text-lg">T</span>
+        </div>
         
         <div>
           <h1 className="font-bold text-foreground line-clamp-1">{course.title}</h1>
