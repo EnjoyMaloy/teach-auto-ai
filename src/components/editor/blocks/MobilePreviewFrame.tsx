@@ -203,13 +203,32 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         );
 
       case 'video':
+        // Extract YouTube video ID from various URL formats
+        const getYouTubeId = (url: string) => {
+          if (!url) return null;
+          const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+          const match = url.match(regExp);
+          return match && match[2].length === 11 ? match[2] : null;
+        };
+        
+        const videoId = getYouTubeId(block.videoUrl || '');
+        
         return (
-          <div className="flex-1 flex items-center justify-center p-4">
-            <div className="w-full aspect-video bg-foreground rounded-2xl flex items-center justify-center relative">
-              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center backdrop-blur-sm">
-                <Play className="w-8 h-8 text-primary-foreground ml-1" />
+          <div className="h-full w-full flex items-center justify-center overflow-hidden bg-black">
+            {videoId ? (
+              <iframe
+                src={`https://www.youtube.com/embed/${videoId}`}
+                className="w-full h-full"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center text-white/60">
+                <Play className="w-16 h-16 mb-4" />
+                <p className="text-sm">Вставьте ссылку на YouTube</p>
               </div>
-            </div>
+            )}
           </div>
         );
 
