@@ -21,7 +21,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 }) => {
   if (!block) {
     return (
-      <div className="w-full max-w-[320px] mx-auto">
+      <div className="w-full max-w-[400px] mx-auto">
         <div className="bg-card rounded-2xl overflow-hidden aspect-[9/16] flex items-center justify-center border border-border shadow-lg">
           <div className="text-center px-8">
             <div className="w-16 h-16 rounded-2xl bg-muted mx-auto mb-4 flex items-center justify-center">
@@ -301,7 +301,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   };
 
   return (
-    <div className="w-full max-w-[320px] mx-auto">
+    <div className="w-full max-w-[400px] mx-auto">
       <div className="bg-card rounded-2xl overflow-hidden aspect-[9/16] flex flex-col border border-border shadow-lg">
         {/* Progress bar */}
         <div className="h-8 flex items-center justify-center bg-muted/30">
