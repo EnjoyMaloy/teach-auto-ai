@@ -64,26 +64,26 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
     switch (slide.type) {
       case 'heading':
         return (
-          <div className="text-center py-8">
-            <h1 className="text-3xl font-bold text-foreground">{slide.content || 'Заголовок'}</h1>
+          <div className="text-center py-4">
+            <h1 className="text-xl font-bold text-foreground">{slide.content || 'Заголовок'}</h1>
           </div>
         );
 
       case 'text':
         return (
-          <div className="text-center py-8">
-            <p className="text-xl leading-relaxed text-foreground">{slide.content}</p>
+          <div className="text-center py-4">
+            <p className="text-base leading-relaxed text-foreground">{slide.content}</p>
           </div>
         );
 
       case 'image':
         return (
-          <div className="py-4">
+          <div className="py-2">
             {slide.imageUrl ? (
-              <img src={slide.imageUrl} alt="" className="w-full rounded-2xl object-contain max-h-[60vh]" />
+              <img src={slide.imageUrl} alt="" className="w-full rounded-xl object-contain max-h-[40vh]" />
             ) : (
-              <div className="aspect-video bg-muted rounded-2xl flex items-center justify-center">
-                <span className="text-muted-foreground">Нет изображения</span>
+              <div className="aspect-video bg-muted rounded-xl flex items-center justify-center">
+                <span className="text-muted-foreground text-sm">Нет изображения</span>
               </div>
             )}
           </div>
@@ -91,12 +91,12 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
       case 'video':
         return (
-          <div className="py-4">
+          <div className="py-2">
             {slide.videoUrl ? (
-              <video src={slide.videoUrl} controls className="w-full rounded-2xl max-h-[60vh]" />
+              <video src={slide.videoUrl} controls className="w-full rounded-xl max-h-[40vh]" />
             ) : (
-              <div className="aspect-video bg-muted rounded-2xl flex items-center justify-center">
-                <span className="text-muted-foreground">Нет видео</span>
+              <div className="aspect-video bg-muted rounded-xl flex items-center justify-center">
+                <span className="text-muted-foreground text-sm">Нет видео</span>
               </div>
             )}
           </div>
@@ -104,13 +104,13 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
       case 'audio':
         return (
-          <div className="py-8 text-center space-y-4">
-            <p className="text-xl font-medium text-foreground">{slide.content || 'Аудио'}</p>
+          <div className="py-4 text-center space-y-3">
+            <p className="text-base font-medium text-foreground">{slide.content || 'Аудио'}</p>
             {slide.audioUrl ? (
-              <audio src={slide.audioUrl} controls className="w-full max-w-md mx-auto" />
+              <audio src={slide.audioUrl} controls className="w-full mx-auto" />
             ) : (
-              <div className="p-8 bg-muted rounded-2xl flex items-center justify-center">
-                <span className="text-muted-foreground">Нет аудио</span>
+              <div className="p-4 bg-muted rounded-xl flex items-center justify-center">
+                <span className="text-muted-foreground text-sm">Нет аудио</span>
               </div>
             )}
           </div>
@@ -118,24 +118,24 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
       case 'image_text':
         return (
-          <div className="space-y-6">
-            <div className="aspect-video bg-muted rounded-2xl flex items-center justify-center overflow-hidden">
+          <div className="space-y-3">
+            <div className="aspect-video bg-muted rounded-xl flex items-center justify-center overflow-hidden max-h-[30vh]">
               {slide.imageUrl ? (
                 <img src={slide.imageUrl} alt="" className="w-full h-full object-cover" />
               ) : (
-                <span className="text-muted-foreground">Изображение</span>
+                <span className="text-muted-foreground text-sm">Изображение</span>
               )}
             </div>
-            <p className="text-lg text-center text-foreground">{slide.content}</p>
+            <p className="text-sm text-center text-foreground">{slide.content}</p>
           </div>
         );
 
       case 'single_choice':
       case 'multiple_choice':
         return (
-          <div className="space-y-6">
-            <p className="text-xl font-medium text-center text-foreground">{slide.content}</p>
-            <div className="space-y-3">
+          <div className="space-y-4">
+            <p className="text-base font-medium text-center text-foreground">{slide.content}</p>
+            <div className="space-y-2">
               {slide.options?.map(option => {
                 const isSelected = selectedOptions.includes(option.id);
                 const showCorrect = answered && option.isCorrect;
@@ -147,7 +147,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                     onClick={() => handleOptionClick(option.id)}
                     disabled={answered}
                     className={cn(
-                      'w-full p-4 rounded-xl border-2 text-left transition-all duration-200 flex items-center justify-between',
+                      'w-full p-3 rounded-lg border-2 text-left transition-all duration-200 flex items-center justify-between text-sm',
                       !answered && isSelected && 'border-primary bg-primary/10',
                       !answered && !isSelected && 'border-border hover:border-primary/50',
                       showCorrect && 'border-success bg-success/10',
@@ -155,8 +155,8 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                     )}
                   >
                     <span className="font-medium">{option.text}</span>
-                    {showCorrect && <Check className="w-5 h-5 text-success" />}
-                    {showIncorrect && <X className="w-5 h-5 text-destructive" />}
+                    {showCorrect && <Check className="w-4 h-4 text-success" />}
+                    {showIncorrect && <X className="w-4 h-4 text-destructive" />}
                   </button>
                 );
               })}
@@ -166,9 +166,9 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
       case 'true_false':
         return (
-          <div className="space-y-6">
-            <p className="text-xl font-medium text-center text-foreground">{slide.content}</p>
-            <div className="flex gap-4 justify-center">
+          <div className="space-y-4">
+            <p className="text-base font-medium text-center text-foreground">{slide.content}</p>
+            <div className="flex gap-3 justify-center">
               {[
                 { id: 'true', label: 'Верно' },
                 { id: 'false', label: 'Неверно' },
@@ -184,7 +184,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                     onClick={() => handleOptionClick(option.id)}
                     disabled={answered}
                     className={cn(
-                      'flex-1 max-w-[200px] p-4 rounded-xl border-2 font-medium transition-all duration-200',
+                      'flex-1 max-w-[140px] p-3 rounded-lg border-2 font-medium transition-all duration-200 text-sm',
                       !answered && isSelected && 'border-primary bg-primary/10',
                       !answered && !isSelected && 'border-border hover:border-primary/50',
                       showCorrect && 'border-success bg-success/10',
@@ -202,17 +202,17 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
       case 'fill_blank':
         const parts = slide.content.split('___');
         return (
-          <div className="space-y-6">
-            <p className="text-xl font-medium text-center text-foreground">
+          <div className="space-y-4">
+            <p className="text-base font-medium text-center text-foreground">
               {parts[0]}
-              <span className="inline-block mx-2">
+              <span className="inline-block mx-1">
                 <input
                   type="text"
                   value={textAnswer}
                   onChange={(e) => setTextAnswer(e.target.value)}
                   disabled={answered}
                   className={cn(
-                    'border-b-2 px-2 py-1 text-center outline-none bg-transparent min-w-[120px]',
+                    'border-b-2 px-2 py-0.5 text-center outline-none bg-transparent min-w-[80px] text-sm',
                     !answered && 'border-primary',
                     answered && isCorrect && 'border-success text-success',
                     answered && !isCorrect && 'border-destructive text-destructive'
@@ -223,7 +223,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
               {parts[1]}
             </p>
             {answered && !isCorrect && (
-              <p className="text-center text-sm text-muted-foreground">
+              <p className="text-center text-xs text-muted-foreground">
                 Правильный ответ: <strong className="text-success">{slide.blankWord || slide.correctAnswer as string}</strong>
               </p>
             )}
@@ -232,9 +232,9 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
       case 'slider':
         return (
-          <div className="space-y-6 py-8">
-            <p className="text-xl font-medium text-center text-foreground">{slide.content || 'Выберите значение'}</p>
-            <div className="max-w-md mx-auto">
+          <div className="space-y-4 py-4">
+            <p className="text-base font-medium text-center text-foreground">{slide.content || 'Выберите значение'}</p>
+            <div className="w-full">
               <input
                 type="range"
                 min={slide.sliderMin || 0}
@@ -245,7 +245,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                 disabled={answered}
                 className="w-full accent-primary"
               />
-              <div className="flex justify-between text-sm text-muted-foreground mt-2">
+              <div className="flex justify-between text-xs text-muted-foreground mt-1">
                 <span>{slide.sliderMin || 0}</span>
                 <span className="font-bold text-primary">{textAnswer || slide.sliderMin || 0}</span>
                 <span>{slide.sliderMax || 100}</span>
@@ -256,16 +256,16 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
       case 'matching':
         return (
-          <div className="space-y-6">
-            <p className="text-xl font-medium text-center text-foreground">{slide.content || 'Соедините пары'}</p>
-            <div className="space-y-3 max-w-md mx-auto">
+          <div className="space-y-4">
+            <p className="text-base font-medium text-center text-foreground">{slide.content || 'Соедините пары'}</p>
+            <div className="space-y-2 w-full">
               {slide.matchingPairs?.map((pair) => (
-                <div key={pair.id} className="flex items-center gap-3">
-                  <div className="flex-1 p-3 bg-muted rounded-xl text-sm font-medium">
+                <div key={pair.id} className="flex items-center gap-2">
+                  <div className="flex-1 p-2 bg-muted rounded-lg text-xs font-medium">
                     {pair.left}
                   </div>
-                  <span className="text-primary">→</span>
-                  <div className="flex-1 p-3 bg-primary/10 rounded-xl text-sm font-medium text-primary">
+                  <span className="text-primary text-xs">→</span>
+                  <div className="flex-1 p-2 bg-primary/10 rounded-lg text-xs font-medium text-primary">
                     {pair.right}
                   </div>
                 </div>
@@ -276,15 +276,15 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
       case 'ordering':
         return (
-          <div className="space-y-6">
-            <p className="text-xl font-medium text-center text-foreground">{slide.content || 'Расположите в порядке'}</p>
-            <div className="space-y-2 max-w-md mx-auto">
+          <div className="space-y-4">
+            <p className="text-base font-medium text-center text-foreground">{slide.content || 'Расположите в порядке'}</p>
+            <div className="space-y-1.5 w-full">
               {slide.orderingItems?.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-3 p-3 bg-card border border-border rounded-xl">
-                  <span className="w-6 h-6 rounded-lg bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold">
+                <div key={idx} className="flex items-center gap-2 p-2 bg-card border border-border rounded-lg">
+                  <span className="w-5 h-5 rounded bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold shrink-0">
                     {idx + 1}
                   </span>
-                  <span className="text-sm">{item}</span>
+                  <span className="text-xs">{item}</span>
                 </div>
               ))}
             </div>
@@ -293,20 +293,20 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
       case 'hotspot':
         return (
-          <div className="space-y-6">
-            <p className="text-xl font-medium text-center text-foreground">{slide.content || 'Нажмите на области'}</p>
-            <div className="relative bg-muted rounded-xl overflow-hidden max-h-[50vh] aspect-video mx-auto">
+          <div className="space-y-4">
+            <p className="text-base font-medium text-center text-foreground">{slide.content || 'Нажмите на области'}</p>
+            <div className="relative bg-muted rounded-lg overflow-hidden max-h-[35vh] aspect-video mx-auto">
               {slide.imageUrl ? (
                 <img src={slide.imageUrl} alt="" className="w-full h-full object-contain" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-muted-foreground">Нет изображения</span>
+                  <span className="text-muted-foreground text-sm">Нет изображения</span>
                 </div>
               )}
               {slide.hotspotAreas?.map((area) => (
                 <div
                   key={area.id}
-                  className="absolute border-2 border-primary bg-primary/20 rounded-lg cursor-pointer hover:bg-primary/40 transition-colors"
+                  className="absolute border-2 border-primary bg-primary/20 rounded cursor-pointer hover:bg-primary/40 transition-colors"
                   style={{
                     left: `${area.x}%`,
                     top: `${area.y}%`,
@@ -321,8 +321,8 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
       default:
         return (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">Тип блока не поддерживается</p>
+          <div className="text-center py-4">
+            <p className="text-muted-foreground text-sm">Тип блока не поддерживается</p>
           </div>
         );
     }
@@ -332,17 +332,17 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
   const canCheck = (selectedOptions.length > 0 || textAnswer.trim() !== '') && !answered;
 
   return (
-    <div className="max-w-2xl mx-auto h-full flex flex-col">
+    <div className="w-full h-full flex flex-col">
       <div className="slide-card flex-1">
         {renderContent()}
 
         {/* Explanation */}
         {answered && slide.explanation && (
-          <div className="mt-6 p-4 rounded-xl bg-primary/5 flex items-start gap-3 animate-fade-up">
-            <Lightbulb className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+          <div className="mt-4 p-3 rounded-lg bg-primary/5 flex items-start gap-2 animate-fade-up">
+            <Lightbulb className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-medium text-primary text-sm mb-1">Объяснение</p>
-              <p className="text-sm text-foreground">{slide.explanation}</p>
+              <p className="font-medium text-primary text-xs mb-0.5">Объяснение</p>
+              <p className="text-xs text-foreground">{slide.explanation}</p>
             </div>
           </div>
         )}
@@ -350,16 +350,16 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
       {/* Actions - only show if not hidden */}
       {!hideActions && (
-        <div className="mt-6 flex justify-center gap-4">
+        <div className="mt-4 flex justify-center gap-3">
           {needsCheck && !answered && (
-            <Button onClick={checkAnswer} disabled={!canCheck} size="lg">
+            <Button onClick={checkAnswer} disabled={!canCheck} size="sm">
               Проверить
             </Button>
           )}
           {(answered || !needsCheck) && (
-            <Button onClick={onNext} size="lg" className="animate-bounce-subtle">
+            <Button onClick={onNext} size="sm" className="animate-bounce-subtle">
               Далее
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
           )}
         </div>
