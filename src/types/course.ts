@@ -127,6 +127,16 @@ export interface AIMessage {
   };
 }
 
+export interface GeneratedSlide {
+  type: SlideType;
+  content: string;
+  imageUrl?: string;
+  options?: string[];
+  correctAnswer?: string | string[] | boolean;
+  explanation?: string;
+  blankWord?: string;
+}
+
 export interface CourseStructure {
   title: string;
   description: string;
@@ -135,8 +145,9 @@ export interface CourseStructure {
   lessons: {
     title: string;
     description: string;
-    slidesCount: number;
-    slideTypes: SlideType[];
+    slidesCount?: number;
+    slideTypes?: SlideType[];
+    slides?: GeneratedSlide[];
   }[];
 }
 
