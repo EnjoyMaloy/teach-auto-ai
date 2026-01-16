@@ -96,8 +96,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
   if (!block) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <div className="h-full max-h-[calc(100vh-200px)] aspect-[9/16] bg-card rounded-2xl overflow-hidden flex items-center justify-center border border-border shadow-lg">
+      <div className="h-full flex items-center justify-center p-4">
+        <div className="h-full max-h-[calc(100vh-160px)] w-full max-w-[420px] aspect-[9/16] bg-card rounded-2xl overflow-hidden flex items-center justify-center border border-border shadow-lg">
           <div className="text-center px-8">
             <div className="w-16 h-16 rounded-2xl bg-muted mx-auto mb-4 flex items-center justify-center">
               <Play className="w-8 h-8 text-muted-foreground" />
@@ -597,8 +597,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   };
 
   return (
-    <div className="h-full flex items-center justify-center">
-      <div className="h-full max-h-[calc(100vh-200px)] aspect-[9/16] bg-card rounded-2xl overflow-hidden flex flex-col border border-border shadow-lg">
+    <div className="h-full flex items-center justify-center p-4">
+      <div className="h-full max-h-[calc(100vh-160px)] w-full max-w-[420px] aspect-[9/16] bg-card rounded-2xl overflow-hidden flex flex-col border border-border shadow-lg">
         {/* Progress bar */}
         <div className="h-8 flex items-center justify-center bg-muted/30">
           <div className="flex items-center gap-1">
