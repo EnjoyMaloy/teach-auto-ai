@@ -211,7 +211,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           return match && match[2].length === 11 ? match[2] : null;
         };
         
-        const videoId = getYouTubeId(block.videoUrl || '');
+        const isYouTubeVideo = block.videoUrl?.includes('youtube.com') || block.videoUrl?.includes('youtu.be');
+        const videoId = isYouTubeVideo ? getYouTubeId(block.videoUrl || '') : null;
         
         return (
           <div className="h-full w-full flex items-center justify-center overflow-hidden bg-black">
@@ -223,10 +224,17 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
+            ) : block.videoUrl ? (
+              <video
+                src={block.videoUrl}
+                controls
+                className="w-full h-full object-contain"
+                playsInline
+              />
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-white/60">
                 <Play className="w-16 h-16 mb-4" />
-                <p className="text-sm">Вставьте ссылку на YouTube</p>
+                <p className="text-sm">Загрузите видео или вставьте ссылку</p>
               </div>
             )}
           </div>

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { VideoUploader } from './VideoUploader';
 import {
   Plus, Trash2, GripVertical, Upload, Sparkles,
   Heading, Type, Image, Play, Volume2, LayoutList,
@@ -205,15 +206,13 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
           </div>
         )}
 
-        {/* Video URL */}
+        {/* Video upload */}
         {block.type === 'video' && (
           <div className="space-y-2">
-            <Label className="text-foreground font-medium">URL видео</Label>
-            <Input
-              value={block.videoUrl || ''}
-              onChange={(e) => onUpdate({ videoUrl: e.target.value })}
-              placeholder="https://youtube.com/watch?v=..."
-              className="rounded-xl"
+            <Label className="text-foreground font-medium">Видео</Label>
+            <VideoUploader
+              videoUrl={block.videoUrl}
+              onUpdate={(url) => onUpdate({ videoUrl: url })}
             />
           </div>
         )}
