@@ -37,9 +37,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
 
   // Button depth and animation
   const isRaised = course.designSystem?.buttonDepth !== 'flat';
-  const pressAnimationClass = isRaised 
-    ? 'active:translate-y-1 active:shadow-none transition-all duration-75' 
-    : 'active:scale-95 transition-transform duration-75';
+  const pressAnimationClass = isRaised ? 'btn-raised' : 'btn-flat';
   
   const getRaisedButtonStyle = () => {
     if (!isRaised) return {};
