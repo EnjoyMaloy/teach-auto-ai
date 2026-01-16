@@ -55,6 +55,17 @@ const Editor: React.FC = () => {
     setCourse(next);
   }, [redoStack, course]);
 
+  // Course title update
+  const handleUpdateTitle = (title: string) => {
+    pushToUndo();
+    setCourse(prev => ({
+      ...prev,
+      title,
+      updatedAt: new Date(),
+    }));
+    toast.success('Название курса обновлено');
+  };
+
   // Lesson operations
   const handleSelectLesson = (lessonId: string) => {
     setSelectedLessonId(lessonId);
@@ -267,9 +278,6 @@ const Editor: React.FC = () => {
   };
 
   const handlePublish = () => {
-    toast.success('Курс опубликован!', {
-      description: 'Теперь ученики могут его проходить',
-    });
     setCourse(prev => ({
       ...prev,
       isPublished: true,
@@ -293,6 +301,7 @@ const Editor: React.FC = () => {
         onPreview={() => setIsPreviewMode(true)}
         onPublish={handlePublish}
         onSave={handleSave}
+        onUpdateTitle={handleUpdateTitle}
       />
 
       <div className="flex-1 flex overflow-hidden p-4 gap-4">
