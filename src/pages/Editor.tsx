@@ -453,7 +453,7 @@ const Editor: React.FC = () => {
             <div className="flex items-center justify-between px-5 py-4 border-b border-border">
               <div>
                 <h3 className="font-bold text-foreground">Блоки</h3>
-                <p className="text-xs text-muted-foreground">{blocks.length} блоков</p>
+                <p className="text-xs text-muted-foreground">{blocks.length} блоков • {Math.ceil(blocks.length * 10 / 60)} мин</p>
               </div>
               <Button 
                 variant="default" 
