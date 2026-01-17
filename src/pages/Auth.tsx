@@ -119,18 +119,18 @@ const Auth: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-white">
+    <div className="min-h-screen flex bg-white relative">
+      {/* Logo - Top Left Corner */}
+      <div className="absolute top-6 left-8 lg:left-16 xl:left-24 flex items-center gap-3 z-10">
+        <div className="w-10 h-10 bg-violet-300 rounded-full flex items-center justify-center">
+          <span className="text-white font-bold text-xl">А</span>
+        </div>
+        <span className="text-xl font-bold text-foreground">Open Academy</span>
+      </div>
+
       {/* Left side - Form */}
       <div className="flex-1 flex flex-col justify-center px-8 lg:px-16 xl:px-24">
         <div className="w-full max-w-[400px] mx-auto">
-          {/* Logo */}
-          <div className="flex items-center gap-3 mb-12">
-            <div className="w-10 h-10 bg-violet-300 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-xl">А</span>
-            </div>
-            <span className="text-xl font-bold text-foreground">Open Academy</span>
-          </div>
-
           {/* Title */}
           <h1 className="text-4xl font-semibold text-foreground mb-8">
             {isSignUp ? 'Создайте аккаунт' : 'Войдите в аккаунт'}
