@@ -23,7 +23,7 @@ import { useCourses } from '@/hooks/useCourses';
 import { EditorHeader } from '@/components/editor/EditorHeader';
 import { LessonsList } from '@/components/editor/LessonsList';
 import { CoursePlayer } from '@/components/runtime/CoursePlayer';
-import { EditorAIChat } from '@/components/editor/EditorAIChat';
+
 import { 
   BlockPreview, 
   BlockTypeSelector, 
@@ -614,44 +614,6 @@ const Editor: React.FC = () => {
           onClose={() => setShowBlockSelector(false)}
         />
       )}
-
-      {/* AI Chat */}
-      <EditorAIChat
-        course={course}
-        selectedLesson={selectedLesson || null}
-        selectedSlide={selectedLesson?.slides.find(s => s.id === selectedBlockId) || null}
-        onUpdateCourse={(updates) => setCourse(prev => prev ? ({ ...prev, ...updates }) : null)}
-        onUpdateSlide={(slideId, updates) => {
-          pushToUndo();
-          setCourse(prev => prev ? ({
-            ...prev,
-            lessons: prev.lessons.map(lesson => ({
-              ...lesson,
-              slides: lesson.slides.map(slide =>
-                slide.id === slideId ? { ...slide, ...updates } : slide
-              ),
-            })),
-          }) : null);
-        }}
-        onAddLesson={(lesson) => {
-          if (!course) return;
-          const newLesson: Lesson = {
-            id: `lesson-${Date.now()}`,
-            courseId: course.id,
-            title: lesson.title || 'Новый урок',
-            description: lesson.description || '',
-            order: course.lessons.length + 1,
-            slides: [],
-            estimatedMinutes: lesson.estimatedMinutes || 3,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          };
-          setCourse(prev => prev ? ({
-            ...prev,
-            lessons: [...prev.lessons, newLesson],
-          }) : null);
-        }}
-      />
     </div>
   );
 };
