@@ -121,7 +121,7 @@ const Auth: React.FC = () => {
           </h1>
 
           {/* Google Sign In Button */}
-          <Button type="button" variant="outline" className="w-full h-11 bg-white border-gray-200 hover:bg-gray-50 text-gray-700 font-normal" onClick={handleGoogleSignIn} disabled={isGoogleLoading || isLoading}>
+          <Button type="button" variant="outline" className="w-full h-11 bg-white border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold" onClick={handleGoogleSignIn} disabled={isGoogleLoading || isLoading}>
             {isGoogleLoading ? <Loader2 className="w-4 h-4 mr-3 animate-spin" /> : <span className="mr-3"><GoogleIcon /></span>}
             {isSignUp ? 'Зарегистрироваться через Google' : 'Войти через Google'}
           </Button>
