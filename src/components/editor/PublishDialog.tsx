@@ -217,6 +217,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
                     <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside mb-3">
                       <li>Откройте @BotFather → /mybots → выберите бота</li>
                       <li>Bot Settings → Menu Button → Configure menu button</li>
+                      <li>Введите название кнопки (например: "🎓 Открыть курс")</li>
                       <li>Отправьте URL ниже:</li>
                     </ol>
                     <div className="flex gap-2">
