@@ -189,6 +189,9 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
     );
   }
 
+  // Check if running in Telegram
+  const isTelegram = typeof window !== 'undefined' && !!window.Telegram?.WebApp;
+
   // Main player content
   const playerContent = (
     <div 
@@ -197,6 +200,9 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
         backgroundColor: `hsl(var(--ds-background, var(--background)))`,
         fontFamily: `var(--ds-font-family, inherit)`,
         borderRadius: 0,
+        // Add safe area padding for Telegram/mobile
+        paddingTop: fullscreen && isTelegram ? 'calc(env(safe-area-inset-top, 0px) + 10%)' : undefined,
+        paddingBottom: fullscreen && isTelegram ? 'calc(env(safe-area-inset-bottom, 0px) + 10%)' : undefined,
       }}
     >
       {/* Progress bar - same style as editor */}
