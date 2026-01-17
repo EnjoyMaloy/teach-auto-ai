@@ -49,12 +49,6 @@ const AppSidebar: React.FC = () => {
         </ul>
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-sidebar-border">
-        <p className="text-xs text-muted-foreground text-center">
-          © 2024 Open Academy
-        </p>
-      </div>
     </aside>;
 };
 export default AppSidebar;
