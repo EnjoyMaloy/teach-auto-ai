@@ -569,9 +569,9 @@ const Editor: React.FC = () => {
           </div>
 
           {/* Mobile Preview - Fixed mobile frame */}
-          <div className="flex-1 flex flex-col overflow-hidden bg-muted/30">
+          <div className="flex-1 flex flex-col overflow-hidden bg-card">
             {/* Preview header with mute button */}
-            <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-border">
               <span className="text-sm font-medium text-muted-foreground">Предпросмотр</span>
               <Button
                 variant="ghost"
@@ -592,11 +592,9 @@ const Editor: React.FC = () => {
                 )}
               </Button>
             </div>
-            {/* Centered mobile frame container */}
-            <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
-              <div 
-                className="h-full max-h-[calc(100vh-180px)] w-auto aspect-[9/16] rounded-xl border border-border shadow-lg overflow-hidden bg-card"
-              >
+            {/* Mobile frame container - fixed aspect ratio */}
+            <div className="flex-1 flex items-center justify-center overflow-hidden">
+              <div className="h-full w-auto aspect-[9/16] border-x border-border overflow-hidden">
                 <MobilePreviewFrame
                   block={selectedBlock}
                   lessonTitle={selectedLesson?.title}
