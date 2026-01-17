@@ -7,6 +7,8 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import Editor from "./pages/Editor";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Home from "./pages/Home";
+import Catalog from "./pages/Catalog";
 import CourseSettings from "./pages/CourseSettings";
 import CourseStats from "./pages/CourseStats";
 import PublicCourse from "./pages/PublicCourse";
@@ -47,7 +49,7 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/workshop" replace />;
   }
 
   return <>{children}</>;
@@ -56,7 +58,9 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 const AppRoutes = () => (
   <Routes>
     <Route path="/auth" element={<PublicRoute><Auth /></PublicRoute>} />
-    <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+    <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+    <Route path="/catalog" element={<ProtectedRoute><Catalog /></ProtectedRoute>} />
+    <Route path="/workshop" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
     <Route path="/editor/:courseId" element={<ProtectedRoute><Editor /></ProtectedRoute>} />
     <Route path="/course/:courseId/settings" element={<ProtectedRoute><CourseSettings /></ProtectedRoute>} />
     <Route path="/course/:courseId/stats" element={<ProtectedRoute><CourseStats /></ProtectedRoute>} />
