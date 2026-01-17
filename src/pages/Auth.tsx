@@ -139,18 +139,18 @@ const Auth: React.FC = () => {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm text-gray-600 font-normal">
+              <Label htmlFor="email" className="text-sm text-gray-700 font-semibold">
                 Email
               </Label>
-              <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} className={`h-11 bg-white border-gray-200 focus:border-gray-300 focus:ring-0 ${errors.email ? 'border-red-400' : ''}`} />
+              <Input id="email" type="email" placeholder="Введите ваш email" value={email} onChange={e => setEmail(e.target.value)} className={`h-11 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-0 placeholder:text-gray-400 ${errors.email ? 'border-red-400' : ''}`} />
               {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm text-gray-600 font-normal">
+              <Label htmlFor="password" className="text-sm text-gray-700 font-semibold">
                 Пароль
               </Label>
-              <Input id="password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} className={`h-11 bg-white border-gray-200 focus:border-gray-300 focus:ring-0 ${errors.password ? 'border-red-400' : ''}`} />
+              <Input id="password" type="password" placeholder="Введите ваш пароль" value={password} onChange={e => setPassword(e.target.value)} className={`h-11 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-0 placeholder:text-gray-400 ${errors.password ? 'border-red-400' : ''}`} />
               {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
             </div>
 
