@@ -86,7 +86,12 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         {/* Left section */}
         <div className="flex items-center gap-3">
           {onBack && (
-            <Button variant="ghost" size="icon" onClick={onBack} className="mr-1">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={onBack} 
+              className="mr-1 border-border/50 hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all"
+            >
               <ArrowLeft className="w-5 h-5" />
             </Button>
           )}
@@ -193,22 +198,23 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         </div>
 
         {/* Center section - Undo/Redo */}
-        <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+        <div className="flex items-center gap-1 bg-card border border-border/50 rounded-xl p-1.5 shadow-sm">
           <Button
             variant="ghost"
             size="icon-sm"
             onClick={onUndo}
             disabled={!canUndo}
-            className="rounded-md"
+            className="rounded-lg hover:bg-primary/10 hover:text-primary disabled:opacity-30 transition-all"
           >
             <Undo2 className="w-4 h-4" />
           </Button>
+          <div className="w-px h-4 bg-border/50" />
           <Button
             variant="ghost"
             size="icon-sm"
             onClick={onRedo}
             disabled={!canRedo}
-            className="rounded-md"
+            className="rounded-lg hover:bg-primary/10 hover:text-primary disabled:opacity-30 transition-all"
           >
             <Redo2 className="w-4 h-4" />
           </Button>
