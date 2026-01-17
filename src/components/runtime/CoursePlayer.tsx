@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { X, Trophy, Star, Clock } from 'lucide-react';
 import { Course } from '@/types/course';
 import { SlideRenderer, slideNeedsCheck } from './SlideRenderer';
@@ -25,7 +25,6 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
   const [totalAnswers, setTotalAnswers] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [answered, setAnswered] = useState(false);
-  const slideRendererRef = useRef<{ checkAnswer: () => void } | null>(null);
 
   const allSlides = course.lessons.flatMap(lesson => lesson.slides);
   const totalSlides = allSlides.length;
@@ -87,95 +86,106 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
   const needsCheck = currentSlide ? slideNeedsCheck(currentSlide.type) : false;
   const showContinue = !needsCheck || answered;
 
-  // Completion screen
-  if (isCompleted) {
+  // Completion screen content
+  const renderCompletionContent = () => {
     const accuracy = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 100;
     
     return (
-      <DesignSystemProvider config={course.designSystem}>
+      <div className="text-center animate-scale-in max-w-sm w-full">
         <div 
-          className={cn(
-            "flex flex-col items-center justify-center",
-            fullscreen ? "fixed inset-0 z-50 p-6" : "fixed inset-0 bg-muted/50 z-50 flex items-center justify-center p-4"
-          )}
-          style={{
-            backgroundColor: fullscreen 
-              ? `hsl(var(--ds-background, var(--background)))` 
-              : undefined,
+          className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+          style={{ backgroundColor: `hsl(var(--ds-success, var(--success)) / 0.1)` }}
+        >
+          <Trophy className="w-10 h-10" style={{ color: `hsl(var(--ds-success, var(--success)))` }} />
+        </div>
+        <h1 
+          className="text-2xl font-bold mb-2"
+          style={{ 
+            color: `hsl(var(--ds-foreground, var(--foreground)))`,
+            fontFamily: `var(--ds-heading-font-family, inherit)`,
           }}
         >
+          Курс пройден! 🎉
+        </h1>
+        <p className="text-sm mb-6" style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}>
+          {course.title}
+        </p>
+        
+        <div className="grid grid-cols-2 gap-3 mb-6">
           <div 
-            className={cn(
-              "flex flex-col items-center justify-center",
-              !fullscreen && "h-[calc(100vh-64px)] w-[calc((100vh-64px)*9/16)] max-w-full rounded-xl border shadow-2xl p-6"
-            )}
+            className="p-3 rounded-xl border"
+            style={{ 
+              backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.5)`,
+              borderColor: `hsl(var(--ds-muted, var(--border)))`,
+            }}
+          >
+            <Star className="w-5 h-5 mx-auto mb-1" style={{ color: `hsl(var(--ds-primary, var(--primary)))` }} />
+            <p className="text-xl font-bold" style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}>{accuracy}%</p>
+            <p className="text-xs" style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}>Точность</p>
+          </div>
+          <div 
+            className="p-3 rounded-xl border"
+            style={{ 
+              backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.5)`,
+              borderColor: `hsl(var(--ds-muted, var(--border)))`,
+            }}
+          >
+            <Clock className="w-5 h-5 mx-auto mb-1" style={{ color: `hsl(var(--ds-primary, var(--primary)))` }} />
+            <p className="text-xl font-bold" style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}>{course.estimatedMinutes}</p>
+            <p className="text-xs" style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}>Минут</p>
+          </div>
+        </div>
+
+        <button 
+          onClick={onClose} 
+          className={cn("w-full h-11 font-bold uppercase tracking-wide", pressAnimationClass)}
+          style={{
+            backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
+            color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
+            borderRadius: `var(--ds-button-radius, var(--radius))`,
+            ...getRaisedButtonStyle(),
+          }}
+        >
+          ЗАВЕРШИТЬ
+        </button>
+      </div>
+    );
+  };
+
+  // Completion screen - fullscreen mode
+  if (isCompleted && fullscreen) {
+    return (
+      <DesignSystemProvider config={course.designSystem}>
+        <div 
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center p-6"
+          style={{
+            backgroundColor: `hsl(var(--ds-background, var(--background)))`,
+            fontFamily: `var(--ds-font-family, inherit)`,
+          }}
+        >
+          {renderCompletionContent()}
+        </div>
+      </DesignSystemProvider>
+    );
+  }
+
+  // Completion screen - preview mode (with phone frame)
+  if (isCompleted) {
+    return (
+      <div className="fixed inset-0 bg-muted/50 z-50 flex items-center justify-center p-4">
+        <DesignSystemProvider config={course.designSystem}>
+          <div 
+            className="h-[calc(100vh-64px)] w-[calc((100vh-64px)*9/16)] max-w-full rounded-xl overflow-hidden flex flex-col items-center justify-center border shadow-2xl p-6"
             style={{
               backgroundColor: `hsl(var(--ds-card, var(--card)))`,
-              borderColor: fullscreen ? undefined : `hsl(var(--ds-muted, var(--border)))`,
+              borderColor: `hsl(var(--ds-muted, var(--border)))`,
               fontFamily: `var(--ds-font-family, inherit)`,
             }}
           >
-            <div className="text-center animate-scale-in max-w-sm w-full">
-              <div 
-                className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
-                style={{ backgroundColor: `hsl(var(--ds-success, var(--success)) / 0.1)` }}
-              >
-                <Trophy className="w-10 h-10" style={{ color: `hsl(var(--ds-success, var(--success)))` }} />
-              </div>
-              <h1 
-                className="text-2xl font-bold mb-2"
-                style={{ 
-                  color: `hsl(var(--ds-foreground, var(--foreground)))`,
-                  fontFamily: `var(--ds-heading-font-family, inherit)`,
-                }}
-              >
-                Курс пройден! 🎉
-              </h1>
-              <p className="text-sm mb-6" style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}>
-                {course.title}
-              </p>
-              
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                <div 
-                  className="p-3 rounded-xl border"
-                  style={{ 
-                    backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.5)`,
-                    borderColor: `hsl(var(--ds-muted, var(--border)))`,
-                  }}
-                >
-                  <Star className="w-5 h-5 mx-auto mb-1" style={{ color: `hsl(var(--ds-primary, var(--primary)))` }} />
-                  <p className="text-xl font-bold" style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}>{accuracy}%</p>
-                  <p className="text-xs" style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}>Точность</p>
-                </div>
-                <div 
-                  className="p-3 rounded-xl border"
-                  style={{ 
-                    backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.5)`,
-                    borderColor: `hsl(var(--ds-muted, var(--border)))`,
-                  }}
-                >
-                  <Clock className="w-5 h-5 mx-auto mb-1" style={{ color: `hsl(var(--ds-primary, var(--primary)))` }} />
-                  <p className="text-xl font-bold" style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}>{course.estimatedMinutes}</p>
-                  <p className="text-xs" style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}>Минут</p>
-                </div>
-              </div>
-
-              <button 
-                onClick={onClose} 
-                className={cn("w-full h-11 font-bold uppercase tracking-wide", pressAnimationClass)}
-                style={{
-                  backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
-                  color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
-                  borderRadius: `var(--ds-button-radius, var(--radius))`,
-                  ...getRaisedButtonStyle(),
-                }}
-              >
-                ЗАВЕРШИТЬ
-              </button>
-            </div>
+            {renderCompletionContent()}
           </div>
-        </div>
-      </DesignSystemProvider>
+        </DesignSystemProvider>
+      </div>
     );
   }
 
@@ -197,7 +207,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
         }}
       >
         <span 
-          className="text-xs"
+          className="text-xs truncate max-w-[100px]"
           style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
         >
           {currentLesson?.title}
@@ -291,7 +301,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
     </div>
   );
 
-  // Fullscreen mode - no frame, just content
+  // Fullscreen mode - no frame, just content (for Telegram/public view)
   if (fullscreen) {
     return (
       <DesignSystemProvider config={course.designSystem}>
