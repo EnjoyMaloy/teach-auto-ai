@@ -18,387 +18,6 @@ export interface SoundConfig {
   volume: number; // 0 to 1
 }
 
-const DEFAULT_SOUND_CONFIG: SoundConfig = {
-  enabled: true,
-  theme: 'duolingo',
-  volume: 0.5,
-};
-
-let audioContext: AudioContext | null = null;
-
-const getAudioContext = (): AudioContext => {
-  if (!audioContext) {
-    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-  }
-  return audioContext;
-};
-
-// Pre-warm the audio context on first user interaction
-export const initAudioContext = () => {
-  const ctx = getAudioContext();
-  if (ctx.state === 'suspended') {
-    ctx.resume();
-  }
-};
-
-// Sound generators for different themes
-const soundGenerators: Record<SoundTheme, Record<SoundType, (volume: number) => void>> = {
-  duolingo: {
-    tap: (volume) => {
-      const ctx = getAudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      
-      osc.frequency.setValueAtTime(800, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.05);
-      
-      gain.gain.setValueAtTime(0.3 * volume, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
-      
-      osc.start();
-      osc.stop(ctx.currentTime + 0.08);
-    },
-    
-    swipe: (volume) => {
-      const ctx = getAudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      
-      osc.type = 'sine';
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      
-      osc.frequency.setValueAtTime(400, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.1);
-      
-      gain.gain.setValueAtTime(0.2 * volume, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
-      
-      osc.start();
-      osc.stop(ctx.currentTime + 0.15);
-    },
-    
-    correct: (volume) => {
-      const ctx = getAudioContext();
-      
-      // Play ascending notes
-      [523.25, 659.25, 783.99].forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        
-        osc.type = 'sine';
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        
-        osc.frequency.value = freq;
-        
-        const startTime = ctx.currentTime + i * 0.08;
-        gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(0.3 * volume, startTime + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.2);
-        
-        osc.start(startTime);
-        osc.stop(startTime + 0.2);
-      });
-    },
-    
-    incorrect: (volume) => {
-      const ctx = getAudioContext();
-      
-      // Play descending dissonant notes
-      [350, 300].forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        
-        osc.type = 'sawtooth';
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        
-        osc.frequency.value = freq;
-        
-        const startTime = ctx.currentTime + i * 0.1;
-        gain.gain.setValueAtTime(0.15 * volume, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.15);
-        
-        osc.start(startTime);
-        osc.stop(startTime + 0.15);
-      });
-    },
-    
-    complete: (volume) => {
-      const ctx = getAudioContext();
-      
-      // Triumphant chord
-      [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        
-        osc.type = 'sine';
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        
-        osc.frequency.value = freq;
-        
-        const startTime = ctx.currentTime + i * 0.05;
-        gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(0.25 * volume, startTime + 0.05);
-        gain.gain.setValueAtTime(0.25 * volume, startTime + 0.3);
-        gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.6);
-        
-        osc.start(startTime);
-        osc.stop(startTime + 0.6);
-      });
-    },
-    
-    levelUp: (volume) => {
-      const ctx = getAudioContext();
-      
-      // Magical ascending arpeggio
-      [440, 554.37, 659.25, 880, 1108.73, 1318.51].forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        
-        osc.type = 'triangle';
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        
-        osc.frequency.value = freq;
-        
-        const startTime = ctx.currentTime + i * 0.06;
-        gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(0.2 * volume, startTime + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.3);
-        
-        osc.start(startTime);
-        osc.stop(startTime + 0.3);
-      });
-    },
-    
-    pop: (volume) => {
-      const ctx = getAudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      
-      osc.type = 'sine';
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      
-      osc.frequency.setValueAtTime(600, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.1);
-      
-      gain.gain.setValueAtTime(0.4 * volume, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-      
-      osc.start();
-      osc.stop(ctx.currentTime + 0.1);
-    },
-  },
-  
-  minimal: {
-    tap: (volume) => {
-      const ctx = getAudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      
-      osc.type = 'sine';
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      
-      osc.frequency.value = 1000;
-      gain.gain.setValueAtTime(0.1 * volume, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.03);
-      
-      osc.start();
-      osc.stop(ctx.currentTime + 0.03);
-    },
-    
-    swipe: (volume) => {
-      const ctx = getAudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      
-      osc.type = 'sine';
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      
-      osc.frequency.setValueAtTime(500, ctx.currentTime);
-      osc.frequency.linearRampToValueAtTime(700, ctx.currentTime + 0.08);
-      
-      gain.gain.setValueAtTime(0.1 * volume, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
-      
-      osc.start();
-      osc.stop(ctx.currentTime + 0.08);
-    },
-    
-    correct: (volume) => {
-      const ctx = getAudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      
-      osc.type = 'sine';
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      
-      osc.frequency.setValueAtTime(600, ctx.currentTime);
-      osc.frequency.linearRampToValueAtTime(800, ctx.currentTime + 0.1);
-      
-      gain.gain.setValueAtTime(0.15 * volume, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
-      
-      osc.start();
-      osc.stop(ctx.currentTime + 0.15);
-    },
-    
-    incorrect: (volume) => {
-      const ctx = getAudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      
-      osc.type = 'sine';
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      
-      osc.frequency.value = 300;
-      gain.gain.setValueAtTime(0.15 * volume, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
-      
-      osc.start();
-      osc.stop(ctx.currentTime + 0.15);
-    },
-    
-    complete: (volume) => soundGenerators.minimal.correct(volume),
-    levelUp: (volume) => soundGenerators.minimal.correct(volume),
-    pop: (volume) => soundGenerators.minimal.tap(volume),
-  },
-  
-  playful: {
-    tap: (volume) => {
-      const ctx = getAudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      
-      osc.type = 'square';
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      
-      osc.frequency.setValueAtTime(1200, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.05);
-      
-      gain.gain.setValueAtTime(0.1 * volume, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
-      
-      osc.start();
-      osc.stop(ctx.currentTime + 0.05);
-    },
-    
-    swipe: (volume) => {
-      const ctx = getAudioContext();
-      
-      [400, 500, 600].forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        
-        osc.type = 'triangle';
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        
-        osc.frequency.value = freq;
-        
-        const startTime = ctx.currentTime + i * 0.03;
-        gain.gain.setValueAtTime(0.15 * volume, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.08);
-        
-        osc.start(startTime);
-        osc.stop(startTime + 0.08);
-      });
-    },
-    
-    correct: (volume) => {
-      const ctx = getAudioContext();
-      
-      [523.25, 783.99, 1046.50].forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        
-        osc.type = 'triangle';
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        
-        osc.frequency.value = freq;
-        
-        const startTime = ctx.currentTime + i * 0.06;
-        gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(0.25 * volume, startTime + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.15);
-        
-        osc.start(startTime);
-        osc.stop(startTime + 0.15);
-      });
-    },
-    
-    incorrect: (volume) => {
-      const ctx = getAudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      
-      osc.type = 'square';
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      
-      osc.frequency.setValueAtTime(200, ctx.currentTime);
-      osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.2);
-      
-      gain.gain.setValueAtTime(0.1 * volume, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
-      
-      osc.start();
-      osc.stop(ctx.currentTime + 0.2);
-    },
-    
-    complete: (volume) => soundGenerators.duolingo.complete(volume),
-    levelUp: (volume) => soundGenerators.duolingo.levelUp(volume),
-    pop: (volume) => soundGenerators.duolingo.pop(volume),
-  },
-  
-  none: {
-    tap: () => {},
-    swipe: () => {},
-    correct: () => {},
-    incorrect: () => {},
-    complete: () => {},
-    levelUp: () => {},
-    pop: () => {},
-  },
-};
-
-// Main play sound function
-export const playSound = (type: SoundType, config: Partial<SoundConfig> = {}) => {
-  const finalConfig = { ...DEFAULT_SOUND_CONFIG, ...config };
-  
-  if (!finalConfig.enabled || finalConfig.theme === 'none') return;
-  
-  try {
-    const ctx = getAudioContext();
-    
-    // Resume if suspended (non-blocking)
-    if (ctx.state === 'suspended') {
-      ctx.resume();
-    }
-    
-    const generator = soundGenerators[finalConfig.theme]?.[type];
-    if (generator) {
-      generator(finalConfig.volume);
-    }
-  } catch (error) {
-    console.warn('Failed to play sound:', error);
-  }
-};
-
-// Sound settings for design system
 export interface SoundSettings {
   enabled: boolean;
   theme: SoundTheme;
@@ -417,3 +36,158 @@ export const SOUND_THEME_OPTIONS = [
   { value: 'playful', label: 'Игривые', description: 'Весёлые и энергичные' },
   { value: 'none', label: 'Без звука', description: 'Полностью отключить звуки' },
 ] as const;
+
+// Audio context singleton
+let audioContext: AudioContext | null = null;
+
+function getContext(): AudioContext {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  }
+  // Auto-resume if suspended
+  if (audioContext.state === 'suspended') {
+    audioContext.resume();
+  }
+  return audioContext;
+}
+
+// Simple oscillator helper
+function playTone(
+  frequency: number,
+  duration: number,
+  volume: number,
+  type: OscillatorType = 'sine',
+  delay: number = 0,
+  frequencyEnd?: number
+) {
+  const ctx = getContext();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = type;
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  const startTime = ctx.currentTime + delay;
+  
+  osc.frequency.setValueAtTime(frequency, startTime);
+  if (frequencyEnd) {
+    osc.frequency.exponentialRampToValueAtTime(frequencyEnd, startTime + duration);
+  }
+
+  gain.gain.setValueAtTime(volume, startTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+  osc.start(startTime);
+  osc.stop(startTime + duration);
+}
+
+// Sound definitions by theme
+const sounds: Record<SoundTheme, Record<SoundType, (vol: number) => void>> = {
+  duolingo: {
+    tap: (vol) => playTone(800, 0.08, 0.3 * vol, 'sine', 0, 600),
+    
+    swipe: (vol) => playTone(400, 0.15, 0.2 * vol, 'sine', 0, 600),
+    
+    correct: (vol) => {
+      playTone(523, 0.2, 0.3 * vol, 'sine', 0);
+      playTone(659, 0.2, 0.3 * vol, 'sine', 0.08);
+      playTone(784, 0.2, 0.3 * vol, 'sine', 0.16);
+    },
+    
+    incorrect: (vol) => {
+      playTone(350, 0.15, 0.15 * vol, 'sawtooth', 0);
+      playTone(300, 0.15, 0.15 * vol, 'sawtooth', 0.1);
+    },
+    
+    complete: (vol) => {
+      [523, 659, 784, 1047].forEach((freq, i) => {
+        playTone(freq, 0.5, 0.25 * vol, 'sine', i * 0.05);
+      });
+    },
+    
+    levelUp: (vol) => {
+      [440, 554, 659, 880, 1109, 1319].forEach((freq, i) => {
+        playTone(freq, 0.3, 0.2 * vol, 'triangle', i * 0.06);
+      });
+    },
+    
+    pop: (vol) => playTone(600, 0.1, 0.4 * vol, 'sine', 0, 200),
+  },
+
+  minimal: {
+    tap: (vol) => playTone(1000, 0.03, 0.1 * vol),
+    swipe: (vol) => playTone(500, 0.08, 0.1 * vol, 'sine', 0, 700),
+    correct: (vol) => playTone(600, 0.15, 0.15 * vol, 'sine', 0, 800),
+    incorrect: (vol) => playTone(300, 0.15, 0.15 * vol),
+    complete: (vol) => playTone(600, 0.15, 0.15 * vol, 'sine', 0, 800),
+    levelUp: (vol) => playTone(600, 0.15, 0.15 * vol, 'sine', 0, 800),
+    pop: (vol) => playTone(1000, 0.03, 0.1 * vol),
+  },
+
+  playful: {
+    tap: (vol) => playTone(1200, 0.05, 0.1 * vol, 'square', 0, 800),
+    
+    swipe: (vol) => {
+      [400, 500, 600].forEach((freq, i) => {
+        playTone(freq, 0.08, 0.15 * vol, 'triangle', i * 0.03);
+      });
+    },
+    
+    correct: (vol) => {
+      [523, 784, 1047].forEach((freq, i) => {
+        playTone(freq, 0.15, 0.25 * vol, 'triangle', i * 0.06);
+      });
+    },
+    
+    incorrect: (vol) => playTone(200, 0.2, 0.1 * vol, 'square', 0, 100),
+    
+    complete: (vol) => {
+      [523, 659, 784, 1047].forEach((freq, i) => {
+        playTone(freq, 0.5, 0.25 * vol, 'sine', i * 0.05);
+      });
+    },
+    
+    levelUp: (vol) => {
+      [440, 554, 659, 880, 1109, 1319].forEach((freq, i) => {
+        playTone(freq, 0.3, 0.2 * vol, 'triangle', i * 0.06);
+      });
+    },
+    
+    pop: (vol) => playTone(600, 0.1, 0.4 * vol, 'sine', 0, 200),
+  },
+
+  none: {
+    tap: () => {},
+    swipe: () => {},
+    correct: () => {},
+    incorrect: () => {},
+    complete: () => {},
+    levelUp: () => {},
+    pop: () => {},
+  },
+};
+
+// Main function to play sounds
+export function playSound(type: SoundType, config?: Partial<SoundConfig>) {
+  const enabled = config?.enabled ?? true;
+  const theme = config?.theme ?? 'duolingo';
+  const volume = config?.volume ?? 0.5;
+
+  if (!enabled || theme === 'none') return;
+
+  try {
+    sounds[theme]?.[type]?.(volume);
+  } catch (e) {
+    // Silently fail if audio not supported
+  }
+}
+
+// Pre-warm audio context (call on user interaction)
+export function initAudioContext() {
+  try {
+    getContext();
+  } catch {
+    // Audio not supported
+  }
+}

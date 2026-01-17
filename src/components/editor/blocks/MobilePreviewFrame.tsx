@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { AudioPlayer } from './AudioPlayer';
 import { DesignBlockEditor } from './DesignBlockEditor';
-import { playSound, SoundConfig, initAudioContext } from '@/lib/sounds';
+import { playSound, SoundConfig } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
 
 interface MobilePreviewFrameProps {
@@ -76,22 +76,6 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     resetState();
   }, [block?.id]);
 
-  // Initialize audio context on mount and first interaction
-  useEffect(() => {
-    initAudioContext();
-    
-    const handleInteraction = () => {
-      initAudioContext();
-    };
-    
-    document.addEventListener('click', handleInteraction, { once: true });
-    document.addEventListener('touchstart', handleInteraction, { once: true });
-    
-    return () => {
-      document.removeEventListener('click', handleInteraction);
-      document.removeEventListener('touchstart', handleInteraction);
-    };
-  }, []);
 
   const resetState = () => {
     setSelectedOptions([]);

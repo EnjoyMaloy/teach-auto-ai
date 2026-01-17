@@ -1,10 +1,10 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { X, Trophy, Star, Clock } from 'lucide-react';
 import { Course } from '@/types/course';
 import { SlideRenderer, slideNeedsCheck } from './SlideRenderer';
 import { DesignSystemProvider } from './DesignSystemProvider';
 import { cn } from '@/lib/utils';
-import { playSound, initAudioContext } from '@/lib/sounds';
+import { playSound } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
 
 interface CoursePlayerProps {
@@ -25,25 +25,6 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
   const [totalAnswers, setTotalAnswers] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [answered, setAnswered] = useState(false);
-
-  // Initialize audio context immediately on mount and on first interaction
-  useEffect(() => {
-    // Try to init immediately (may not work until user interaction)
-    initAudioContext();
-    
-    // Also init on first interaction as backup
-    const handleInteraction = () => {
-      initAudioContext();
-    };
-    
-    document.addEventListener('click', handleInteraction, { once: true });
-    document.addEventListener('touchstart', handleInteraction, { once: true });
-    
-    return () => {
-      document.removeEventListener('click', handleInteraction);
-      document.removeEventListener('touchstart', handleInteraction);
-    };
-  }, []);
 
   const allSlides = course.lessons.flatMap(lesson => lesson.slides);
   const totalSlides = allSlides.length;
