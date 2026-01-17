@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Undo2, Redo2, Eye, Save, 
-  Share2, Clock, Loader2, Pencil, Check, X, ArrowLeft, Palette
+  Share2, Clock, Loader2, Pencil, Check, X, ArrowLeft, Palette, CloudOff, Cloud
 } from 'lucide-react';
 import { Course } from '@/types/course';
 import { DesignSystemConfig } from '@/types/designSystem';
@@ -21,6 +21,8 @@ interface EditorHeaderProps {
   canUndo: boolean;
   canRedo: boolean;
   isSaving: boolean;
+  hasUnsavedChanges?: boolean;
+  lastSavedAt?: Date | null;
   onUndo: () => void;
   onRedo: () => void;
   onPreview: () => void;
@@ -36,6 +38,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   canUndo,
   canRedo,
   isSaving,
+  hasUnsavedChanges = false,
+  lastSavedAt,
   onUndo,
   onRedo,
   onPreview,
@@ -222,13 +226,29 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
         {/* Right section */}
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={onSave} disabled={isSaving}>
+          {/* Auto-save status */}
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
             {isSaving ? (
-              <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-            ) : (
-              <Save className="w-4 h-4 mr-1" />
-            )}
-            {isSaving ? 'Сохранение...' : 'Сохранить'}
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>Сохранение...</span>
+              </>
+            ) : hasUnsavedChanges ? (
+              <>
+                <CloudOff className="w-3.5 h-3.5" />
+                <span>Не сохранено</span>
+              </>
+            ) : lastSavedAt ? (
+              <>
+                <Cloud className="w-3.5 h-3.5 text-success" />
+                <span>Сохранено</span>
+              </>
+            ) : null}
+          </div>
+
+          <Button variant="ghost" size="sm" onClick={onSave} disabled={isSaving || !hasUnsavedChanges}>
+            <Save className="w-4 h-4 mr-1" />
+            Сохранить
           </Button>
 
           <div className="h-6 w-px bg-border" />
