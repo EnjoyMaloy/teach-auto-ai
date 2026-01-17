@@ -25,7 +25,7 @@ const navItems: NavItem[] = [{
 const AppSidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  return <aside className="w-64 bg-sidebar border-r border-sidebar-border flex flex-col h-screen fixed left-0 top-0">
+  return <aside className="w-64 bg-sidebar flex flex-col h-screen fixed left-0 top-0">
       {/* Logo */}
       <div className="p-6 bg-[#f7f7f8]">
         <img src={Logo} alt="Academy" className="h-7" />
