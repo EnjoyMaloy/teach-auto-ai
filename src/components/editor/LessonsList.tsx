@@ -13,11 +13,17 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Plus, BookOpen } from 'lucide-react';
-import { Lesson } from '@/types/course';
+import { Plus, BookOpen, Circle, List } from 'lucide-react';
+import { Lesson, LessonsDisplayType } from '@/types/course';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { SortableLessonItem } from './SortableLessonItem';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface LessonsListProps {
   lessons: Lesson[];
@@ -27,6 +33,9 @@ interface LessonsListProps {
   onDeleteLesson: (lessonId: string) => void;
   onDuplicateLesson: (lessonId: string) => void;
   onReorderLessons: (activeId: string, overId: string) => void;
+  displayType?: LessonsDisplayType;
+  onDisplayTypeChange?: (type: LessonsDisplayType) => void;
+  onUpdateLessonIcon?: (lessonId: string, icon: string) => void;
 }
 
 export const LessonsList: React.FC<LessonsListProps> = ({
@@ -37,6 +46,9 @@ export const LessonsList: React.FC<LessonsListProps> = ({
   onDeleteLesson,
   onDuplicateLesson,
   onReorderLessons,
+  displayType = 'circle_map',
+  onDisplayTypeChange,
+  onUpdateLessonIcon,
 }) => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -77,6 +89,42 @@ export const LessonsList: React.FC<LessonsListProps> = ({
         </Button>
       </div>
 
+      {/* Display type toggle */}
+      {onDisplayTypeChange && (
+        <div className="px-5 py-3 border-b border-border flex items-center justify-between">
+          <span className="text-xs text-muted-foreground">Тип карты:</span>
+          <TooltipProvider>
+            <ToggleGroup 
+              type="single" 
+              value={displayType} 
+              onValueChange={(v) => v && onDisplayTypeChange(v as LessonsDisplayType)}
+              className="gap-1"
+            >
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <ToggleGroupItem value="circle_map" size="sm" className="h-8 w-8 p-0">
+                    <Circle className="w-4 h-4" />
+                  </ToggleGroupItem>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>Кружки (Duolingo)</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <ToggleGroupItem value="list" size="sm" className="h-8 w-8 p-0">
+                    <List className="w-4 h-4" />
+                  </ToggleGroupItem>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>Список</p>
+                </TooltipContent>
+              </Tooltip>
+            </ToggleGroup>
+          </TooltipProvider>
+        </div>
+      )}
+
       {/* Lessons List */}
       <div className="flex-1 overflow-y-auto p-3 space-y-2">
         {lessons.length > 0 ? (
@@ -98,6 +146,7 @@ export const LessonsList: React.FC<LessonsListProps> = ({
                   onSelect={() => onSelectLesson(lesson.id)}
                   onDelete={() => onDeleteLesson(lesson.id)}
                   onDuplicate={() => onDuplicateLesson(lesson.id)}
+                  onUpdateIcon={onUpdateLessonIcon ? (icon) => onUpdateLessonIcon(lesson.id, icon) : undefined}
                 />
               ))}
             </SortableContext>

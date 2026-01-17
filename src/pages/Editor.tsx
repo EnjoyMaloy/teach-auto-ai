@@ -15,7 +15,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Course, Lesson, Slide } from '@/types/course';
+import { Course, Lesson, Slide, LessonsDisplayType } from '@/types/course';
 import { Block, BlockType, createEmptyBlock } from '@/types/blocks';
 import { DesignSystemConfig } from '@/types/designSystem';
 import { useAuth } from '@/hooks/useAuth';
@@ -496,6 +496,19 @@ const Editor: React.FC = () => {
             onDeleteLesson={handleDeleteLesson}
             onDuplicateLesson={handleDuplicateLesson}
             onReorderLessons={handleReorderLessons}
+            displayType={course.lessonsDisplayType || 'circle_map'}
+            onDisplayTypeChange={(type) => {
+              pushToUndo();
+              setCourse(prev => prev ? ({ ...prev, lessonsDisplayType: type, updatedAt: new Date() }) : null);
+            }}
+            onUpdateLessonIcon={(lessonId, icon) => {
+              pushToUndo();
+              setCourse(prev => prev ? ({
+                ...prev,
+                lessons: prev.lessons.map(l => l.id === lessonId ? { ...l, icon, updatedAt: new Date() } : l),
+                updatedAt: new Date(),
+              }) : null);
+            }}
           />
         </div>
 

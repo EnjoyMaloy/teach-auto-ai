@@ -126,6 +126,7 @@ export type Database = {
           id: string
           is_link_accessible: boolean | null
           is_published: boolean | null
+          lessons_display_type: string
           moderation_comment: string | null
           moderation_status: string | null
           published_at: string | null
@@ -148,6 +149,7 @@ export type Database = {
           id?: string
           is_link_accessible?: boolean | null
           is_published?: boolean | null
+          lessons_display_type?: string
           moderation_comment?: string | null
           moderation_status?: string | null
           published_at?: string | null
@@ -170,6 +172,7 @@ export type Database = {
           id?: string
           is_link_accessible?: boolean | null
           is_published?: boolean | null
+          lessons_display_type?: string
           moderation_comment?: string | null
           moderation_status?: string | null
           published_at?: string | null
@@ -193,9 +196,11 @@ export type Database = {
       lessons: {
         Row: {
           course_id: string
+          cover_image: string | null
           created_at: string
           description: string | null
           estimated_minutes: number | null
+          icon: string | null
           id: string
           order: number
           title: string
@@ -203,9 +208,11 @@ export type Database = {
         }
         Insert: {
           course_id: string
+          cover_image?: string | null
           created_at?: string
           description?: string | null
           estimated_minutes?: number | null
+          icon?: string | null
           id?: string
           order?: number
           title: string
@@ -213,9 +220,11 @@ export type Database = {
         }
         Update: {
           course_id?: string
+          cover_image?: string | null
           created_at?: string
           description?: string | null
           estimated_minutes?: number | null
+          icon?: string | null
           id?: string
           order?: number
           title?: string
