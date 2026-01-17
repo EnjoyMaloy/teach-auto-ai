@@ -568,10 +568,10 @@ const Editor: React.FC = () => {
             </div>
           </div>
 
-          {/* Mobile Preview - Full area */}
-          <div className="flex-1 flex flex-col overflow-hidden bg-card">
+          {/* Mobile Preview - Fixed mobile frame */}
+          <div className="flex-1 flex flex-col overflow-hidden bg-muted/30">
             {/* Preview header with mute button */}
-            <div className="flex items-center justify-between px-4 py-2 border-b border-border">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card">
               <span className="text-sm font-medium text-muted-foreground">Предпросмотр</span>
               <Button
                 variant="ghost"
@@ -592,17 +592,22 @@ const Editor: React.FC = () => {
                 )}
               </Button>
             </div>
-            <div className="flex-1 overflow-hidden">
-              <MobilePreviewFrame
-                block={selectedBlock}
-                lessonTitle={selectedLesson?.title}
-                blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
-                totalBlocks={blocks.length}
-                onContinue={handleContinueToNextBlock}
-                onUpdateBlock={handleUpdateBlock}
-                designSystem={course.designSystem}
-                isMuted={isPreviewMuted}
-              />
+            {/* Centered mobile frame container */}
+            <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
+              <div 
+                className="h-full max-h-[calc(100vh-180px)] w-auto aspect-[9/16] rounded-xl border border-border shadow-lg overflow-hidden bg-card"
+              >
+                <MobilePreviewFrame
+                  block={selectedBlock}
+                  lessonTitle={selectedLesson?.title}
+                  blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
+                  totalBlocks={blocks.length}
+                  onContinue={handleContinueToNextBlock}
+                  onUpdateBlock={handleUpdateBlock}
+                  designSystem={course.designSystem}
+                  isMuted={isPreviewMuted}
+                />
+              </div>
             </div>
           </div>
         </div>
