@@ -30,7 +30,22 @@ const getAudioContext = (): AudioContext => {
   if (!audioContext) {
     audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
   }
+  // Resume if suspended (required after user interaction)
+  if (audioContext.state === 'suspended') {
+    audioContext.resume();
+  }
   return audioContext;
+};
+
+// Pre-warm the audio context on first user interaction
+export const initAudioContext = () => {
+  const ctx = getAudioContext();
+  // Create a silent buffer to unlock audio on iOS/Safari
+  const buffer = ctx.createBuffer(1, 1, 22050);
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+  source.connect(ctx.destination);
+  source.start(0);
 };
 
 // Sound generators for different themes
