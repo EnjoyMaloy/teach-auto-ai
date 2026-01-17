@@ -345,7 +345,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
       case 'single_choice':
         return (
-          <div className="flex-1 flex flex-col p-4 overflow-auto">
+          <div className="flex-1 flex flex-col p-4 overflow-auto relative z-0">
             <p 
               className="text-lg font-semibold mb-4 text-center"
               style={{ color: `hsl(${ds.foregroundColor})` }}
@@ -379,11 +379,14 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                   <button
                     key={option.id}
                     type="button"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       if (answerState !== 'idle') return;
                       setSelectedOptions([option.id]);
                     }}
-                    className="w-full p-3 text-left transition-all text-sm border-2"
+                    disabled={answerState !== 'idle'}
+                    className="w-full p-3 text-left transition-all text-sm border-2 cursor-pointer"
                     style={{
                       borderColor,
                       backgroundColor: bgColor,
@@ -401,7 +404,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
       case 'multiple_choice':
         return (
-          <div className="flex-1 flex flex-col p-4 overflow-auto">
+          <div className="flex-1 flex flex-col p-4 overflow-auto relative z-0">
             <p 
               className="text-lg font-semibold mb-4 text-center"
               style={{ color: `hsl(${ds.foregroundColor})` }}
@@ -435,7 +438,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                   <button
                     key={option.id}
                     type="button"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       if (answerState !== 'idle') return;
                       setSelectedOptions(prev => 
                         prev.includes(option.id) 
@@ -443,7 +448,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                           : [...prev, option.id]
                       );
                     }}
-                    className="w-full p-3 text-left transition-all text-sm border-2 flex items-center gap-2"
+                    disabled={answerState !== 'idle'}
+                    className="w-full p-3 text-left transition-all text-sm border-2 flex items-center gap-2 cursor-pointer"
                     style={{
                       borderColor,
                       backgroundColor: bgColor,
@@ -452,7 +458,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                     }}
                   >
                     <div 
-                      className="w-5 h-5 rounded border-2 flex items-center justify-center shrink-0"
+                      className="w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 pointer-events-none"
                       style={{ 
                         borderColor: 'currentColor',
                         backgroundColor: isSelected ? 'currentColor' : 'transparent',
@@ -460,7 +466,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                     >
                       {isSelected && <Check className="w-3 h-3" style={{ color: `hsl(${ds.cardColor})` }} />}
                     </div>
-                    <span className="font-medium">{option.text}</span>
+                    <span className="font-medium pointer-events-none">{option.text}</span>
                   </button>
                 );
               })}
@@ -497,7 +503,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         };
         
         return (
-          <div className="flex-1 flex flex-col p-4">
+          <div className="flex-1 flex flex-col p-4 relative z-0">
             <p 
               className="text-lg font-semibold mb-6 text-center flex-1 flex items-center justify-center"
               style={{ color: `hsl(${ds.foregroundColor})` }}
@@ -507,11 +513,14 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             <div className="grid grid-cols-2 gap-3">
               <button 
                 type="button"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   if (answerState !== 'idle') return;
                   setTrueFalseAnswer(true);
                 }}
-                className="p-4 flex flex-col items-center gap-2 border-2 transition-all"
+                disabled={answerState !== 'idle'}
+                className="p-4 flex flex-col items-center gap-2 border-2 transition-all cursor-pointer"
                 style={getTFButtonStyle(true)}
               >
                 <Check className="w-8 h-8" />
@@ -519,11 +528,14 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
               </button>
               <button 
                 type="button"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   if (answerState !== 'idle') return;
                   setTrueFalseAnswer(false);
                 }}
-                className="p-4 flex flex-col items-center gap-2 border-2 transition-all"
+                disabled={answerState !== 'idle'}
+                className="p-4 flex flex-col items-center gap-2 border-2 transition-all cursor-pointer"
                 style={getTFButtonStyle(false)}
               >
                 <X className="w-8 h-8" />
@@ -854,7 +866,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto relative z-0">
         {renderContent()}
       </div>
 
@@ -915,7 +927,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         )}
         <button
           type="button"
-          onClick={() => {
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
             if (isInteractive && answerState === 'idle') {
               checkAnswer();
             } else {
