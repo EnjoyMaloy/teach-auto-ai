@@ -2,6 +2,8 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, BookOpen, PenTool } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Logo from '@/assets/Logo.svg';
+
 interface NavItem {
   icon: React.ElementType;
   label: string;
@@ -26,12 +28,7 @@ const AppSidebar: React.FC = () => {
   return <aside className="w-64 bg-sidebar border-r border-sidebar-border flex flex-col h-screen fixed left-0 top-0">
       {/* Logo */}
       <div className="p-6 bg-[#f7f7f8]">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-primary">
-            <span className="text-primary-foreground text-xl font-bold">А</span>
-          </div>
-          <span className="text-sidebar-foreground text-xl font-bold">Open Academy</span>
-        </div>
+        <img src={Logo} alt="Academy" className="h-6" />
       </div>
 
       {/* Navigation */}
