@@ -111,6 +111,8 @@ const Editor: React.FC = () => {
   const [redoStack, setRedoStack] = useState<Course[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isPreviewMuted, setIsPreviewMuted] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -162,7 +164,25 @@ const Editor: React.FC = () => {
     if (!course) return;
     setUndoStack(prev => [...prev.slice(-19), course]);
     setRedoStack([]);
+    setHasUnsavedChanges(true);
   }, [course]);
+
+  // Autosave effect - saves 2 seconds after last change
+  useEffect(() => {
+    if (!hasUnsavedChanges || !course || isSaving) return;
+
+    const timeoutId = setTimeout(async () => {
+      setIsSaving(true);
+      const success = await saveCourse(course);
+      setIsSaving(false);
+      if (success) {
+        setHasUnsavedChanges(false);
+        setLastSavedAt(new Date());
+      }
+    }, 2000);
+
+    return () => clearTimeout(timeoutId);
+  }, [course, hasUnsavedChanges, isSaving, saveCourse]);
 
   const handleUndo = useCallback(() => {
     if (undoStack.length === 0 || !course) return;
@@ -410,6 +430,8 @@ const Editor: React.FC = () => {
     const success = await saveCourse(course);
     setIsSaving(false);
     if (success) {
+      setHasUnsavedChanges(false);
+      setLastSavedAt(new Date());
       toast.success('Курс сохранён');
     }
   };
@@ -451,6 +473,8 @@ const Editor: React.FC = () => {
         canUndo={undoStack.length > 0}
         canRedo={redoStack.length > 0}
         isSaving={isSaving}
+        hasUnsavedChanges={hasUnsavedChanges}
+        lastSavedAt={lastSavedAt}
         onUndo={handleUndo}
         onRedo={handleRedo}
         onPreview={() => setIsPreviewMode(true)}
