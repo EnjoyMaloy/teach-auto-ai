@@ -25,27 +25,48 @@ const DEFAULT_SOUND_CONFIG: SoundConfig = {
 };
 
 let audioContext: AudioContext | null = null;
+let resumePromise: Promise<void> | null = null;
 
-const getAudioContext = (): AudioContext => {
+const ensureAudioContext = (): AudioContext | null => {
   if (!audioContext) {
-    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    try {
+      audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    } catch {
+      return null;
+    }
   }
-  // Resume if suspended (required after user interaction)
-  if (audioContext.state === 'suspended') {
-    audioContext.resume();
+  
+  // Non-blocking resume - don't await, just trigger it
+  if (audioContext.state === 'suspended' && !resumePromise) {
+    resumePromise = audioContext.resume().finally(() => {
+      resumePromise = null;
+    });
   }
+  
   return audioContext;
 };
 
-// Pre-warm the audio context on first user interaction
+// Alias for backward compatibility in generators
+const getAudioContext = ensureAudioContext;
+
+// Pre-warm the audio context on first user interaction (call this early!)
 export const initAudioContext = () => {
-  const ctx = getAudioContext();
+  const ctx = ensureAudioContext();
+  if (!ctx) return;
+  
+  // Force resume and create silent sound to unlock iOS
+  if (ctx.state === 'suspended') {
+    ctx.resume();
+  }
+  
   // Create a silent buffer to unlock audio on iOS/Safari
-  const buffer = ctx.createBuffer(1, 1, 22050);
-  const source = ctx.createBufferSource();
-  source.buffer = buffer;
-  source.connect(ctx.destination);
-  source.start(0);
+  try {
+    const buffer = ctx.createBuffer(1, 1, 22050);
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(ctx.destination);
+    source.start(0);
+  } catch {}
 };
 
 // Sound generators for different themes
@@ -53,6 +74,7 @@ const soundGenerators: Record<SoundTheme, Record<SoundType, (volume: number) => 
   duolingo: {
     tap: (volume) => {
       const ctx = getAudioContext();
+      if (!ctx) return;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       
@@ -382,19 +404,29 @@ const soundGenerators: Record<SoundTheme, Record<SoundType, (volume: number) => 
   },
 };
 
-// Main play sound function
+// Main play sound function - SYNC for instant playback
 export const playSound = (type: SoundType, config: Partial<SoundConfig> = {}) => {
   const finalConfig = { ...DEFAULT_SOUND_CONFIG, ...config };
   
   if (!finalConfig.enabled || finalConfig.theme === 'none') return;
   
   try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    
+    // If suspended, trigger resume but don't wait - sound may not play first time
+    // but will work on subsequent calls
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+      return; // Skip this sound, next one will work
+    }
+    
     const generator = soundGenerators[finalConfig.theme]?.[type];
     if (generator) {
       generator(finalConfig.volume);
     }
   } catch (error) {
-    console.warn('Failed to play sound:', error);
+    // Silent fail
   }
 };
 
