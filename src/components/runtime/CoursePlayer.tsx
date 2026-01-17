@@ -10,9 +10,15 @@ import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
 interface CoursePlayerProps {
   course: Course;
   onClose: () => void;
+  /** If true, renders fullscreen without phone frame (for public/telegram view) */
+  fullscreen?: boolean;
 }
 
-export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) => {
+export const CoursePlayer: React.FC<CoursePlayerProps> = ({ 
+  course, 
+  onClose,
+  fullscreen = false,
+}) => {
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
@@ -50,7 +56,6 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
   const completedSlides = course.lessons
     .slice(0, currentLessonIndex)
     .reduce((acc, lesson) => acc + lesson.slides.length, 0) + currentSlideIndex;
-  const progress = (completedSlides / totalSlides) * 100;
 
   const handleAnswer = useCallback((isCorrect: boolean) => {
     setTotalAnswers(prev => prev + 1);
@@ -70,47 +75,47 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
     if (currentSlideIndex < currentLesson.slides.length - 1) {
       setCurrentSlideIndex(prev => prev + 1);
     } else if (currentLessonIndex < course.lessons.length - 1) {
-      // Lesson completed, play level up sound
       playSound('levelUp', soundConfig);
       setCurrentLessonIndex(prev => prev + 1);
       setCurrentSlideIndex(0);
     } else {
-      // Course completed
       playSound('complete', soundConfig);
       setIsCompleted(true);
     }
   }, [currentSlideIndex, currentLesson?.slides.length, currentLessonIndex, course.lessons.length, soundConfig]);
 
-  const handlePrevious = useCallback(() => {
-    setAnswered(false);
-    playSound('tap', soundConfig);
-    
-    if (currentSlideIndex > 0) {
-      setCurrentSlideIndex(prev => prev - 1);
-    } else if (currentLessonIndex > 0) {
-      setCurrentLessonIndex(prev => prev - 1);
-      setCurrentSlideIndex(course.lessons[currentLessonIndex - 1].slides.length - 1);
-    }
-  }, [currentSlideIndex, currentLessonIndex, course.lessons, soundConfig]);
-
   const needsCheck = currentSlide ? slideNeedsCheck(currentSlide.type) : false;
   const showContinue = !needsCheck || answered;
 
+  // Completion screen
   if (isCompleted) {
     const accuracy = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 100;
     
     return (
-      <div className="fixed inset-0 bg-muted/50 z-50 flex items-center justify-center p-4">
-        <DesignSystemProvider config={course.designSystem}>
+      <DesignSystemProvider config={course.designSystem}>
+        <div 
+          className={cn(
+            "flex flex-col items-center justify-center",
+            fullscreen ? "fixed inset-0 z-50 p-6" : "fixed inset-0 bg-muted/50 z-50 flex items-center justify-center p-4"
+          )}
+          style={{
+            backgroundColor: fullscreen 
+              ? `hsl(var(--ds-background, var(--background)))` 
+              : undefined,
+          }}
+        >
           <div 
-            className="h-[calc(100vh-64px)] w-[calc((100vh-64px)*9/16)] max-w-full rounded-xl overflow-hidden flex flex-col items-center justify-center border shadow-2xl p-6"
+            className={cn(
+              "flex flex-col items-center justify-center",
+              !fullscreen && "h-[calc(100vh-64px)] w-[calc((100vh-64px)*9/16)] max-w-full rounded-xl border shadow-2xl p-6"
+            )}
             style={{
               backgroundColor: `hsl(var(--ds-card, var(--card)))`,
-              borderColor: `hsl(var(--ds-muted, var(--border)))`,
+              borderColor: fullscreen ? undefined : `hsl(var(--ds-muted, var(--border)))`,
               fontFamily: `var(--ds-font-family, inherit)`,
             }}
           >
-            <div className="text-center animate-scale-in">
+            <div className="text-center animate-scale-in max-w-sm w-full">
               <div 
                 className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
                 style={{ backgroundColor: `hsl(var(--ds-success, var(--success)) / 0.1)` }}
@@ -169,11 +174,135 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
               </button>
             </div>
           </div>
-        </DesignSystemProvider>
-      </div>
+        </div>
+      </DesignSystemProvider>
     );
   }
 
+  // Main player content
+  const playerContent = (
+    <div 
+      className="h-full w-full flex flex-col overflow-hidden"
+      style={{
+        backgroundColor: `hsl(var(--ds-background, var(--background)))`,
+        fontFamily: `var(--ds-font-family, inherit)`,
+      }}
+    >
+      {/* Progress bar - same style as editor */}
+      <div 
+        className="h-10 flex items-center justify-between px-4 border-b shrink-0"
+        style={{
+          backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.3)`,
+          borderColor: `hsl(var(--ds-muted, var(--border)))`,
+        }}
+      >
+        <span 
+          className="text-xs"
+          style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
+        >
+          {currentLesson?.title}
+        </span>
+        <div className="flex items-center gap-1">
+          {Array.from({ length: Math.min(totalSlides, 20) }).map((_, i) => (
+            <div
+              key={i}
+              className="rounded-full transition-all"
+              style={{
+                height: '6px',
+                width: i === completedSlides ? '24px' : '8px',
+                backgroundColor: i <= completedSlides 
+                  ? `hsl(var(--ds-primary, var(--primary))${i < completedSlides ? ' / 0.5' : ''})` 
+                  : `hsl(var(--ds-muted, var(--muted)))`,
+              }}
+            />
+          ))}
+          {totalSlides > 20 && (
+            <span 
+              className="text-xs ml-1" 
+              style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
+            >
+              +{totalSlides - 20}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {correctAnswers > 0 && (
+            <div 
+              className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+              style={{
+                backgroundColor: `hsl(var(--ds-success, var(--success)) / 0.1)`,
+                color: `hsl(var(--ds-success, var(--success)))`,
+              }}
+            >
+              <Star className="w-3 h-3" />
+              {correctAnswers}
+            </div>
+          )}
+          <span 
+            className="text-xs"
+            style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
+          >
+            {completedSlides + 1} / {totalSlides}
+          </span>
+        </div>
+      </div>
+
+      {/* Content */}
+      <main 
+        className="flex-1 overflow-hidden"
+        style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
+      >
+        {currentSlide && (
+          <SlideRenderer
+            key={currentSlide.id}
+            slide={currentSlide}
+            onAnswer={handleAnswer}
+            onNext={handleNext}
+            hideActions={true}
+          />
+        )}
+      </main>
+
+      {/* Bottom action button */}
+      <div 
+        className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0"
+        style={{
+          backgroundColor: `hsl(var(--ds-card, var(--card)))`,
+          borderColor: `hsl(var(--ds-muted, var(--border)))`,
+        }}
+      >
+        <button
+          onClick={handleNext}
+          disabled={needsCheck && !answered}
+          className={cn(
+            "flex-1 h-11 max-w-md font-bold uppercase tracking-wide disabled:opacity-50",
+            pressAnimationClass
+          )}
+          style={{
+            backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
+            color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
+            borderRadius: `var(--ds-button-radius, var(--radius))`,
+            ...getRaisedButtonStyle(),
+          }}
+        >
+          {showContinue ? 'ПРОДОЛЖИТЬ' : 'ПРОВЕРИТЬ'}
+        </button>
+      </div>
+    </div>
+  );
+
+  // Fullscreen mode - no frame, just content
+  if (fullscreen) {
+    return (
+      <DesignSystemProvider config={course.designSystem}>
+        <div className="fixed inset-0 z-50">
+          {playerContent}
+        </div>
+      </DesignSystemProvider>
+    );
+  }
+
+  // Preview mode - with phone frame
   return (
     <div className="fixed inset-0 bg-muted/50 z-50 flex items-center justify-center p-4">
       {/* Close button outside phone */}
@@ -184,116 +313,14 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
         <X className="w-5 h-5 text-muted-foreground" />
       </button>
 
-      {/* Mobile phone frame with design system - square aspect like editor */}
       <DesignSystemProvider config={course.designSystem}>
         <div 
           className="h-[calc(100vh-64px)] w-[calc((100vh-64px)*9/16)] max-w-full rounded-xl overflow-hidden flex flex-col border shadow-2xl"
           style={{
-            backgroundColor: `hsl(var(--ds-background, var(--background)))`,
             borderColor: `hsl(var(--ds-muted, var(--border)))`,
-            fontFamily: `var(--ds-font-family, inherit)`,
           }}
         >
-          {/* Progress bar - same style as editor */}
-          <div 
-            className="h-10 flex items-center justify-between px-4 border-b shrink-0"
-            style={{
-              backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.3)`,
-              borderColor: `hsl(var(--ds-muted, var(--border)))`,
-            }}
-          >
-            <span 
-              className="text-xs"
-              style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
-            >
-              {currentLesson?.title}
-            </span>
-            <div className="flex items-center gap-1">
-              {Array.from({ length: Math.min(totalSlides, 20) }).map((_, i) => (
-                <div
-                  key={i}
-                  className="rounded-full transition-all"
-                  style={{
-                    height: '6px',
-                    width: i === completedSlides ? '24px' : '8px',
-                    backgroundColor: i <= completedSlides 
-                      ? `hsl(var(--ds-primary, var(--primary))${i < completedSlides ? ' / 0.5' : ''})` 
-                      : `hsl(var(--ds-muted, var(--muted)))`,
-                  }}
-                />
-              ))}
-              {totalSlides > 20 && (
-                <span 
-                  className="text-xs ml-1" 
-                  style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
-                >
-                  +{totalSlides - 20}
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              {correctAnswers > 0 && (
-                <div 
-                  className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
-                  style={{
-                    backgroundColor: `hsl(var(--ds-success, var(--success)) / 0.1)`,
-                    color: `hsl(var(--ds-success, var(--success)))`,
-                  }}
-                >
-                  <Star className="w-3 h-3" />
-                  {correctAnswers}
-                </div>
-              )}
-              <span 
-                className="text-xs"
-                style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
-              >
-                {completedSlides + 1} / {totalSlides}
-              </span>
-            </div>
-          </div>
-
-          {/* Content */}
-          <main 
-            className="flex-1 overflow-hidden"
-            style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
-          >
-            {currentSlide && (
-              <SlideRenderer
-                key={currentSlide.id}
-                slide={currentSlide}
-                onAnswer={handleAnswer}
-                onNext={handleNext}
-                hideActions={true}
-              />
-            )}
-          </main>
-
-          {/* Bottom action button - same style as editor */}
-          <div 
-            className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0"
-            style={{
-              backgroundColor: `hsl(var(--ds-card, var(--card)))`,
-              borderColor: `hsl(var(--ds-muted, var(--border)))`,
-            }}
-          >
-            <button
-              onClick={handleNext}
-              disabled={needsCheck && !answered}
-              className={cn(
-                "flex-1 h-11 max-w-md font-bold uppercase tracking-wide disabled:opacity-50",
-                pressAnimationClass
-              )}
-              style={{
-                backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
-                color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
-                borderRadius: `var(--ds-button-radius, var(--radius))`,
-                ...getRaisedButtonStyle(),
-              }}
-            >
-              {showContinue ? 'ПРОДОЛЖИТЬ' : 'ПРОВЕРИТЬ'}
-            </button>
-          </div>
+          {playerContent}
         </div>
       </DesignSystemProvider>
     </div>
