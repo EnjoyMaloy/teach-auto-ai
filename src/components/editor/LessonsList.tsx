@@ -115,12 +115,6 @@ export const LessonsList: React.FC<LessonsListProps> = ({
           </div>
         )}
       </div>
-
-      {/* Footer Stats */}
-      <div className="px-5 py-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
-        <span>{lessons.length} уроков</span>
-        <span>{totalMinutes} мин</span>
-      </div>
     </div>
   );
 };
