@@ -181,34 +181,24 @@ const SortableSubBlockItem: React.FC<{
         return (
           <div>
             {isEditing ? (
-              <>
-                <div 
-                  className={cn('inline-block w-full', textAlignClass)}
-                  style={headingHighlightStyles}
-                >
-                  <input
-                    type="text"
-                    value={subBlock.content || ''}
-                    onChange={(e) => onUpdate({ content: e.target.value })}
-                    placeholder="Заголовок..."
-                    className={cn(
-                      'w-full bg-transparent outline-none',
-                      headingSizeClass, fontWeightClass, textAlignClass
-                    )}
-                    style={{ color: `hsl(${ds.foregroundColor})` }}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                </div>
-                <HighlightSelector currentHighlight={subBlock.highlight} />
-              </>
+              <input
+                type="text"
+                value={subBlock.content || ''}
+                onChange={(e) => onUpdate({ content: e.target.value })}
+                placeholder="Заголовок..."
+                className={cn(
+                  'w-full bg-transparent outline-none',
+                  headingSizeClass, fontWeightClass, textAlignClass
+                )}
+                style={{ color: `hsl(${ds.foregroundColor})` }}
+                onClick={(e) => e.stopPropagation()}
+              />
             ) : (
               <h2 
                 className={cn(headingSizeClass, fontWeightClass, textAlignClass)}
                 style={{ color: `hsl(${ds.foregroundColor})` }}
               >
-                <span style={headingHighlightStyles}>
-                  {subBlock.content || 'Заголовок'}
-                </span>
+                {subBlock.content || 'Заголовок'}
               </h2>
             )}
           </div>
