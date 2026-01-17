@@ -128,20 +128,30 @@ export interface ThemePreset {
 // Base themes that cannot be deleted
 export const BASE_THEMES: ThemePreset[] = [
   {
-    id: 'duolingo',
-    name: 'Duolingo',
+    id: 'google',
+    name: 'Google',
     config: {
-      primaryColor: '142 71% 45%',
+      // Google Blue #1A73E8
+      primaryColor: '214 82% 51%',
       primaryForeground: '0 0% 100%',
+      // Clean white background
       backgroundColor: '0 0% 100%',
-      foregroundColor: '0 0% 20%',
+      foregroundColor: '213 5% 25%',
       cardColor: '0 0% 100%',
-      mutedColor: '240 5% 96%',
-      successColor: '142 71% 45%',
-      destructiveColor: '0 84% 60%',
-      borderRadius: '1rem',
+      // Light gray muted #F1F3F4
+      mutedColor: '210 17% 95%',
+      accentColor: '214 82% 95%',
+      // Google Green #34A853
+      successColor: '142 53% 43%',
+      // Google Red #EA4335
+      destructiveColor: '5 81% 56%',
+      // Material Design uses 4-8px radius
+      borderRadius: '0.5rem',
       buttonStyle: 'rounded',
-      buttonDepth: 'raised',
+      buttonDepth: 'flat',
+      // Roboto is Google's signature font
+      fontFamily: '"Roboto", system-ui, sans-serif',
+      headingFontFamily: '"Roboto", system-ui, sans-serif',
     },
     isCustom: false,
   },
@@ -149,55 +159,82 @@ export const BASE_THEMES: ThemePreset[] = [
     id: 'notion',
     name: 'Notion',
     config: {
-      primaryColor: '0 0% 9%',
+      // Notion's dark text/primary #37352F
+      primaryColor: '30 11% 20%',
       primaryForeground: '0 0% 100%',
       backgroundColor: '0 0% 100%',
-      foregroundColor: '0 0% 9%',
+      foregroundColor: '30 11% 20%',
       cardColor: '0 0% 100%',
-      mutedColor: '0 0% 96%',
-      successColor: '142 71% 45%',
-      destructiveColor: '0 84% 60%',
-      borderRadius: '0.375rem',
+      // Notion's light gray
+      mutedColor: '45 9% 95%',
+      accentColor: '45 9% 93%',
+      successColor: '142 53% 43%',
+      destructiveColor: '0 72% 51%',
+      // Notion uses very subtle rounding
+      borderRadius: '0.25rem',
       buttonStyle: 'rounded',
       buttonDepth: 'flat',
+      // Notion uses system fonts with serif for some headers
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      headingFontFamily: 'Georgia, serif',
     },
     isCustom: false,
   },
   {
-    id: 'ocean',
-    name: 'Океан',
+    id: 'apple',
+    name: 'Apple',
     config: {
-      primaryColor: '199 89% 48%',
+      // Apple Blue #007AFF
+      primaryColor: '211 100% 50%',
       primaryForeground: '0 0% 100%',
-      backgroundColor: '200 20% 98%',
-      foregroundColor: '200 50% 10%',
+      // Clean white
+      backgroundColor: '0 0% 100%',
+      // Apple's dark gray text #1D1D1F
+      foregroundColor: '240 2% 12%',
       cardColor: '0 0% 100%',
-      mutedColor: '200 20% 92%',
-      accentColor: '199 89% 90%',
-      successColor: '160 60% 45%',
-      destructiveColor: '0 84% 60%',
-      borderRadius: '1rem',
-      buttonStyle: 'pill',
-      buttonDepth: 'raised',
+      // Light gray #F5F5F7
+      mutedColor: '240 5% 96%',
+      accentColor: '211 100% 96%',
+      // Apple Green #34C759
+      successColor: '142 69% 49%',
+      // Apple Red #FF3B30
+      destructiveColor: '4 100% 59%',
+      // Apple uses generous rounding
+      borderRadius: '0.75rem',
+      buttonStyle: 'rounded',
+      buttonDepth: 'flat',
+      // SF Pro is Apple's signature font
+      fontFamily: '"SF Pro Display", system-ui, -apple-system, sans-serif',
+      headingFontFamily: '"SF Pro Display", system-ui, -apple-system, sans-serif',
     },
     isCustom: false,
   },
   {
-    id: 'forest',
-    name: 'Лес',
+    id: 'duolingo',
+    name: 'Duolingo',
     config: {
-      primaryColor: '160 60% 35%',
+      // Duolingo Green #58CC02
+      primaryColor: '98 98% 40%',
       primaryForeground: '0 0% 100%',
-      backgroundColor: '120 10% 98%',
-      foregroundColor: '160 40% 10%',
-      cardColor: '120 10% 100%',
-      mutedColor: '120 10% 92%',
-      accentColor: '160 60% 90%',
-      successColor: '160 60% 35%',
-      destructiveColor: '0 70% 50%',
-      borderRadius: '0.5rem',
+      backgroundColor: '0 0% 100%',
+      // Duolingo's dark text #4B4B4B
+      foregroundColor: '0 0% 29%',
+      cardColor: '0 0% 100%',
+      // Light background
+      mutedColor: '0 0% 96%',
+      accentColor: '98 98% 95%',
+      // Same green for success
+      successColor: '98 98% 40%',
+      // Duolingo Red #FF4B4B
+      destructiveColor: '0 100% 65%',
+      // Duolingo uses very rounded, playful corners
+      borderRadius: '1rem',
       buttonStyle: 'rounded',
+      // Duolingo has signature 3D raised buttons
       buttonDepth: 'raised',
+      // Nunito is similar to Duolingo's Din Round
+      fontFamily: '"Nunito", system-ui, sans-serif',
+      headingFontFamily: '"Nunito", system-ui, sans-serif',
     },
     isCustom: false,
   },
