@@ -241,43 +241,50 @@ ${JSON.stringify(researchData, null, 2)}
         throw new Error('Курс не содержит уроков');
       }
 
-      // Step 3: Generate images for text slides
+      // Step 4: Generate images for all image_text slides
       updateStep('images', { status: 'active', message: 'Генерирую иллюстрации...' });
 
-      // Find slides that could use images (first text slide of each lesson)
+      // Find ALL slides that need images (image_text type)
       const slidesToIllustrate: { lessonIdx: number; slideIdx: number; content: string }[] = [];
       
       courseData.lessons.forEach((lesson, lessonIdx) => {
-        // Find first text slide in each lesson for illustration
-        const textSlideIdx = lesson.slides.findIndex(s => s.type === 'text');
-        if (textSlideIdx !== -1) {
-          slidesToIllustrate.push({
-            lessonIdx,
-            slideIdx: textSlideIdx,
-            content: lesson.slides[textSlideIdx].content
-          });
-        }
+        lesson.slides.forEach((slide, slideIdx) => {
+          // Generate images for all image_text slides
+          if (slide.type === 'image_text' && !slide.imageUrl) {
+            slidesToIllustrate.push({
+              lessonIdx,
+              slideIdx,
+              content: slide.content || lesson.title
+            });
+          }
+        });
       });
 
-      // Generate images in parallel (max 3 at a time)
+      // Generate images in parallel (batch of 5 at a time for speed)
       let imagesGenerated = 0;
-      const imagePromises = slidesToIllustrate.slice(0, 3).map(async ({ lessonIdx, slideIdx, content }) => {
-        const imageUrl = await generateImageForSlide(content, prompt);
-        if (imageUrl) {
-          courseData.lessons[lessonIdx].slides[slideIdx].imageUrl = imageUrl;
-          // Change slide type to image_text if image was generated
-          courseData.lessons[lessonIdx].slides[slideIdx].type = 'image_text' as SlideType;
-          imagesGenerated++;
-          updateStep('images', { message: `Создано ${imagesGenerated} изображений...` });
-        }
-        return imageUrl;
-      });
+      const totalImages = slidesToIllustrate.length;
+      
+      // Process in batches
+      const batchSize = 5;
+      for (let i = 0; i < slidesToIllustrate.length; i += batchSize) {
+        const batch = slidesToIllustrate.slice(i, i + batchSize);
+        
+        const imagePromises = batch.map(async ({ lessonIdx, slideIdx, content }) => {
+          const imageUrl = await generateImageForSlide(content, prompt);
+          if (imageUrl) {
+            courseData.lessons[lessonIdx].slides[slideIdx].imageUrl = imageUrl;
+            imagesGenerated++;
+            updateStep('images', { message: `Создано ${imagesGenerated} из ${totalImages} изображений...` });
+          }
+          return imageUrl;
+        });
 
-      await Promise.all(imagePromises);
+        await Promise.all(imagePromises);
+      }
 
       updateStep('images', { 
         status: 'completed', 
-        message: `${imagesGenerated} иллюстраций создано` 
+        message: totalImages > 0 ? `${imagesGenerated} иллюстраций создано` : 'Иллюстрации не требуются'
       });
 
       // Step 4: Finalize
