@@ -107,7 +107,7 @@ const Auth: React.FC = () => {
       {/* Logo - Top Left Corner */}
       <div className="absolute top-6 left-8 lg:left-16 xl:left-24 flex items-center gap-3 z-10">
         <div className="w-10 h-10 bg-violet-300 rounded-full flex items-center justify-center">
-          <span className="text-white text-xl font-extrabold">А</span>
+          <span className="text-white font-extrabold text-3xl">А</span>
         </div>
         <span className="text-xl font-bold text-foreground">Open Academy</span>
       </div>
