@@ -139,6 +139,31 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     }
   };
 
+  // Check if user has made a selection and can check their answer
+  const canCheck = (): boolean => {
+    if (!block) return false;
+    
+    switch (block.type) {
+      case 'single_choice':
+      case 'multiple_choice':
+        return selectedOptions.length > 0;
+      case 'true_false':
+        return trueFalseAnswer !== null;
+      case 'fill_blank':
+        return fillBlankInput.trim().length > 0;
+      case 'slider':
+        return true; // Slider always has a value
+      case 'matching':
+        return Object.keys(matchingSelected.pairs).length > 0;
+      case 'ordering':
+        return orderingItems.length > 0;
+      case 'hotspot':
+        return clickedHotspots.length > 0;
+      default:
+        return false;
+    }
+  };
+
   const handleContinue = () => {
     playSound('swipe', soundConfig);
     onContinue?.();
@@ -895,7 +920,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             "flex-1 h-11 max-w-md font-bold uppercase tracking-wide disabled:opacity-50",
             pressAnimationClass
           )}
-          disabled={isInteractive && answerState === 'idle' && selectedOptions.length === 0 && trueFalseAnswer === null && !fillBlankInput && Object.keys(matchingSelected.pairs).length === 0}
+          disabled={isInteractive && answerState === 'idle' && !canCheck()}
           style={{
             backgroundColor: `hsl(${ds.primaryColor})`,
             color: `hsl(${ds.primaryForeground})`,
