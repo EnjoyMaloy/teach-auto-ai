@@ -227,24 +227,22 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         {/* Right section */}
         <div className="flex items-center gap-3">
           {/* Auto-save status */}
-          <div className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg bg-muted/50">
-            {isSaving ? (
-              <>
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
-                <span className="text-muted-foreground">Сохранение...</span>
-              </>
-            ) : hasUnsavedChanges ? (
-              <>
-                <CloudOff className="w-3.5 h-3.5 text-muted-foreground" />
-                <span className="text-muted-foreground">Не сохранено</span>
-              </>
-            ) : lastSavedAt ? (
-              <>
-                <Cloud className="w-3.5 h-3.5 text-success" />
-                <span className="text-success">Сохранено</span>
-              </>
-            ) : null}
-          </div>
+          {isSaving ? (
+            <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+              <span className="text-primary font-medium">Сохранение...</span>
+            </div>
+          ) : hasUnsavedChanges ? (
+            <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20">
+              <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+              <span className="text-amber-600 font-medium">Не сохранено</span>
+            </div>
+          ) : lastSavedAt ? (
+            <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+              <Check className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="text-emerald-600 font-medium">Сохранено</span>
+            </div>
+          ) : null}
 
           <div className="h-6 w-px bg-border" />
 
