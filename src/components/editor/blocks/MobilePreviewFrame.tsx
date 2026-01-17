@@ -378,6 +378,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                 return (
                   <button
                     key={option.id}
+                    type="button"
                     onClick={() => {
                       if (answerState !== 'idle') return;
                       setSelectedOptions([option.id]);
@@ -433,6 +434,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                 return (
                   <button
                     key={option.id}
+                    type="button"
                     onClick={() => {
                       if (answerState !== 'idle') return;
                       setSelectedOptions(prev => 
@@ -504,6 +506,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             </p>
             <div className="grid grid-cols-2 gap-3">
               <button 
+                type="button"
                 onClick={() => {
                   if (answerState !== 'idle') return;
                   setTrueFalseAnswer(true);
@@ -515,6 +518,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                 <span className="font-semibold">Да</span>
               </button>
               <button 
+                type="button"
                 onClick={() => {
                   if (answerState !== 'idle') return;
                   setTrueFalseAnswer(false);
@@ -885,7 +889,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
       {/* Bottom navigation */}
       <div 
-        className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0"
+        className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0 relative z-10"
         style={{ 
           backgroundColor: `hsl(${ds.cardColor})`,
           borderColor: `hsl(${ds.mutedColor})`,
@@ -893,6 +897,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       >
         {isInteractive && answerState !== 'idle' && (
           <button
+            type="button"
             onClick={resetState}
             className={cn(
               "h-11 px-4 flex items-center gap-2 border-2 font-bold uppercase tracking-wide",
@@ -909,6 +914,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           </button>
         )}
         <button
+          type="button"
           onClick={() => {
             if (isInteractive && answerState === 'idle') {
               checkAnswer();
@@ -917,7 +923,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             }
           }}
           className={cn(
-            "flex-1 h-11 max-w-md font-bold uppercase tracking-wide disabled:opacity-50",
+            "flex-1 h-11 max-w-md font-bold uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed",
             pressAnimationClass
           )}
           disabled={isInteractive && answerState === 'idle' && !canCheck()}
