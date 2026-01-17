@@ -22,7 +22,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCourses } from '@/hooks/useCourses';
 import { EditorHeader } from '@/components/editor/EditorHeader';
 import { LessonsList } from '@/components/editor/LessonsList';
-import { CoursePlayer } from '@/components/runtime/CoursePlayer';
+import { FullscreenPreview } from '@/components/editor/FullscreenPreview';
 
 import { 
   BlockPreview, 
@@ -454,11 +454,18 @@ const Editor: React.FC = () => {
     );
   }
 
-  if (isPreviewMode) {
-    return <CoursePlayer course={course} onClose={() => setIsPreviewMode(false)} />;
-  }
-
   const selectedBlockIndex = blocks.findIndex(b => b.id === selectedBlockId);
+
+  if (isPreviewMode) {
+    return (
+      <FullscreenPreview 
+        course={course} 
+        onClose={() => setIsPreviewMode(false)}
+        initialLessonId={selectedLessonId || undefined}
+        initialBlockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
+      />
+    );
+  }
 
   const handleContinueToNextBlock = () => {
     if (selectedBlockIndex < blocks.length - 1) {
