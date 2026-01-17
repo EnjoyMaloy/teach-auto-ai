@@ -209,25 +209,57 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
               </div>
             ) : (
               <>
-                <div className="space-y-2">
-                  <Label htmlFor="telegram-token">API ключ Telegram бота</Label>
-                  <Input
-                    id="telegram-token"
-                    type="password"
-                    placeholder="123456789:ABCdefGHIjklMNOpqrSTUvwxYZ"
-                    value={telegramToken}
-                    onChange={(e) => setTelegramToken(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Создайте бота у <a 
-                      href="https://t.me/BotFather" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                    >
-                      @BotFather
-                    </a> и скопируйте токен
-                  </p>
+                <div className="space-y-4">
+                  <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                    <p className="font-medium text-sm text-foreground mb-2">
+                      1. Настройте Mini App в @BotFather:
+                    </p>
+                    <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside mb-3">
+                      <li>Откройте @BotFather → /mybots → выберите бота</li>
+                      <li>Bot Settings → Menu Button → Configure menu button</li>
+                      <li>Отправьте URL ниже:</li>
+                    </ol>
+                    <div className="flex gap-2">
+                      <Input
+                        value={webUrl}
+                        readOnly
+                        className="bg-background font-mono text-xs"
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleCopyLink}
+                        className="shrink-0"
+                      >
+                        {copied ? (
+                          <Check className="w-4 h-4 text-emerald-600" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="telegram-token">2. Введите API ключ бота</Label>
+                    <Input
+                      id="telegram-token"
+                      type="password"
+                      placeholder="123456789:ABCdefGHIjklMNOpqrSTUvwxYZ"
+                      value={telegramToken}
+                      onChange={(e) => setTelegramToken(e.target.value)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Токен можно получить у <a 
+                        href="https://t.me/BotFather" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        @BotFather
+                      </a> → /mybots → API Token
+                    </p>
+                  </div>
                 </div>
 
                 <div className="p-3 rounded-lg bg-muted/50 text-sm text-muted-foreground">
