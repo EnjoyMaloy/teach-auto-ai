@@ -14,6 +14,12 @@ declare global {
         ready: () => void;
         expand: () => void;
         isExpanded?: boolean;
+        initData?: string;
+        initDataUnsafe?: {
+          start_param?: string;
+        };
+        requestFullscreen?: () => void;
+        disableVerticalSwipes?: () => void;
       };
     };
   }
@@ -28,9 +34,33 @@ const PublicCourse: React.FC = () => {
 
   // Initialize Telegram WebApp - expand to fullscreen
   useEffect(() => {
-    if (window.Telegram?.WebApp) {
-      window.Telegram.WebApp.ready();
-      window.Telegram.WebApp.expand();
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      
+      // Immediately try to expand
+      tg.expand();
+      
+      // Try requestFullscreen if available (newer Telegram versions)
+      if (tg.requestFullscreen) {
+        try {
+          tg.requestFullscreen();
+        } catch (e) {
+          console.log('Fullscreen not available');
+        }
+      }
+      
+      // Disable vertical swipes to prevent accidental closing
+      if (tg.disableVerticalSwipes) {
+        tg.disableVerticalSwipes();
+      }
+      
+      // Retry expand after a short delay (sometimes needed for reliability)
+      setTimeout(() => {
+        if (!tg.isExpanded) {
+          tg.expand();
+        }
+      }, 100);
     }
   }, []);
 
