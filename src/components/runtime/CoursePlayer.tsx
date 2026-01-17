@@ -86,6 +86,17 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
   const needsCheck = currentSlide ? slideNeedsCheck(currentSlide.type) : false;
   const showContinue = !needsCheck || answered;
 
+  // Reset course to start over
+  const handleRestart = useCallback(() => {
+    setCurrentLessonIndex(0);
+    setCurrentSlideIndex(0);
+    setCorrectAnswers(0);
+    setTotalAnswers(0);
+    setIsCompleted(false);
+    setAnswered(false);
+    playSound('swipe', soundConfig);
+  }, [soundConfig]);
+
   // Completion screen content
   const renderCompletionContent = () => {
     const accuracy = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 100;
@@ -136,18 +147,34 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
           </div>
         </div>
 
-        <button 
-          onClick={onClose} 
-          className={cn("w-full h-11 font-bold uppercase tracking-wide", pressAnimationClass)}
-          style={{
-            backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
-            color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
-            borderRadius: `var(--ds-button-radius, var(--radius))`,
-            ...getRaisedButtonStyle(),
-          }}
-        >
-          ЗАВЕРШИТЬ
-        </button>
+        {/* For fullscreen/Telegram mode - show restart button */}
+        {fullscreen ? (
+          <button 
+            onClick={handleRestart} 
+            className={cn("w-full h-11 font-bold uppercase tracking-wide", pressAnimationClass)}
+            style={{
+              backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
+              color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
+              borderRadius: `var(--ds-button-radius, var(--radius))`,
+              ...getRaisedButtonStyle(),
+            }}
+          >
+            ПРОЙТИ ЗАНОВО
+          </button>
+        ) : (
+          <button 
+            onClick={onClose} 
+            className={cn("w-full h-11 font-bold uppercase tracking-wide", pressAnimationClass)}
+            style={{
+              backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
+              color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
+              borderRadius: `var(--ds-button-radius, var(--radius))`,
+              ...getRaisedButtonStyle(),
+            }}
+          >
+            ЗАВЕРШИТЬ
+          </button>
+        )}
       </div>
     );
   };
