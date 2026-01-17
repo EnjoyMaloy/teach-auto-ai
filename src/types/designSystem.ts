@@ -24,6 +24,31 @@ export interface DesignBlockSettings {
   highlightWavyColor?: string;
 }
 
+// Mascot settings for AI-generated characters
+export interface MascotSettings {
+  // AI prompt describing the mascot character
+  prompt?: string;
+  // Style notes (e.g., "flat vector", "3D cartoon", "pixel art")
+  style?: string;
+  // Approved mascot image URL
+  approvedImageUrl?: string;
+  // Whether the mascot is approved and locked
+  isApproved?: boolean;
+  // Character name
+  name?: string;
+  // Character personality traits for AI context
+  personality?: string;
+}
+
+export const DEFAULT_MASCOT_SETTINGS: MascotSettings = {
+  prompt: '',
+  style: 'flat vector illustration',
+  approvedImageUrl: '',
+  isApproved: false,
+  name: '',
+  personality: '',
+};
+
 export const DEFAULT_DESIGN_BLOCK_SETTINGS: Required<DesignBlockSettings> = {
   backdropLightColor: '0 0% 0% / 0.05',
   backdropDarkColor: '0 0% 0% / 0.9',
@@ -64,6 +89,9 @@ export interface DesignSystemConfig {
   
   // Design block settings
   designBlock?: DesignBlockSettings;
+  
+  // Mascot settings
+  mascot?: MascotSettings;
 }
 
 export const DEFAULT_SOUND_SETTINGS: SoundSettings = {

@@ -4,6 +4,7 @@ import {
   DEFAULT_DESIGN_SYSTEM,
   DEFAULT_SOUND_SETTINGS,
   DEFAULT_DESIGN_BLOCK_SETTINGS,
+  DEFAULT_MASCOT_SETTINGS,
   PRESET_THEMES,
   FONT_OPTIONS,
   BORDER_RADIUS_OPTIONS,
@@ -13,6 +14,7 @@ import {
 import { playSound, SOUND_THEME_OPTIONS } from '@/lib/sounds';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -34,7 +36,11 @@ import {
   Check,
   Volume2,
   VolumeX,
-  Layers
+  Layers,
+  Bot,
+  Lock,
+  Unlock,
+  ImageIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -339,7 +345,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
       <div className="space-y-4">
         <h3 className="font-semibold text-foreground">Детальные настройки</h3>
         <Tabs defaultValue="colors" className="w-full">
-          <TabsList className="w-full grid grid-cols-5 h-auto p-1 bg-muted/50">
+          <TabsList className="w-full grid grid-cols-6 h-auto p-1 bg-muted/50">
             <TabsTrigger value="colors" className="text-xs py-2 px-1 data-[state=active]:bg-background">
               <Palette className="w-3.5 h-3.5 mr-1" />
               Цвета
@@ -355,6 +361,10 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
             <TabsTrigger value="designblock" className="text-xs py-2 px-1 data-[state=active]:bg-background">
               <Layers className="w-3.5 h-3.5 mr-1" />
               Блоки
+            </TabsTrigger>
+            <TabsTrigger value="mascot" className="text-xs py-2 px-1 data-[state=active]:bg-background">
+              <Bot className="w-3.5 h-3.5 mr-1" />
+              Маскот
             </TabsTrigger>
             <TabsTrigger value="sound" className="text-xs py-2 px-1 data-[state=active]:bg-background">
               <Volume2 className="w-3.5 h-3.5 mr-1" />
@@ -854,6 +864,195 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                       </Button>
                     ))}
                   </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Mascot Tab */}
+            <TabsContent value="mascot" className="space-y-6">
+              <div className="space-y-6">
+                {/* Status banner */}
+                <div className={cn(
+                  "p-4 rounded-xl border-2 flex items-start gap-3",
+                  config.mascot?.isApproved 
+                    ? "bg-success/5 border-success/20" 
+                    : "bg-muted/50 border-border"
+                )}>
+                  {config.mascot?.isApproved ? (
+                    <Lock className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
+                  ) : (
+                    <Unlock className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                  )}
+                  <div className="flex-1">
+                    <p className="font-medium text-foreground">
+                      {config.mascot?.isApproved ? 'Маскот утверждён' : 'Маскот не утверждён'}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-0.5">
+                      {config.mascot?.isApproved 
+                        ? 'AI-агент будет использовать этого персонажа для генерации всех иллюстраций курса'
+                        : 'Опишите персонажа и утвердите его для использования в курсе'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Mascot name */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Имя персонажа</Label>
+                  <Input
+                    value={config.mascot?.name || ''}
+                    onChange={(e) => updateConfig({ 
+                      mascot: { 
+                        ...DEFAULT_MASCOT_SETTINGS, 
+                        ...config.mascot, 
+                        name: e.target.value 
+                      } 
+                    })}
+                    placeholder="Например: Профессор Лис, Робот Эдди, Сова Мудрила..."
+                    disabled={config.mascot?.isApproved}
+                  />
+                </div>
+
+                {/* AI Prompt */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Промт для ИИ</Label>
+                  <Textarea
+                    value={config.mascot?.prompt || ''}
+                    onChange={(e) => updateConfig({ 
+                      mascot: { 
+                        ...DEFAULT_MASCOT_SETTINGS, 
+                        ...config.mascot, 
+                        prompt: e.target.value 
+                      } 
+                    })}
+                    placeholder="Опишите внешний вид персонажа: вид животного/существа, одежда, цвета, особенности...
+
+Пример: Дружелюбный лис-профессор в очках и твидовом пиджаке. Рыжий мех с белым пятном на груди. Большие добрые глаза. Всегда носит с собой книгу."
+                    className="min-h-[120px] resize-none"
+                    disabled={config.mascot?.isApproved}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Чем подробнее описание, тем лучше ИИ сможет генерировать консистентные изображения
+                  </p>
+                </div>
+
+                {/* Style */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Стиль иллюстрации</Label>
+                  <Select
+                    value={config.mascot?.style || 'flat vector illustration'}
+                    onValueChange={(v) => updateConfig({ 
+                      mascot: { 
+                        ...DEFAULT_MASCOT_SETTINGS, 
+                        ...config.mascot, 
+                        style: v 
+                      } 
+                    })}
+                    disabled={config.mascot?.isApproved}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="flat vector illustration">Плоская векторная иллюстрация</SelectItem>
+                      <SelectItem value="3D cartoon">3D мультяшный</SelectItem>
+                      <SelectItem value="pixel art">Пиксель-арт</SelectItem>
+                      <SelectItem value="watercolor illustration">Акварельная иллюстрация</SelectItem>
+                      <SelectItem value="anime style">Аниме стиль</SelectItem>
+                      <SelectItem value="minimalist line art">Минималистичный лайн-арт</SelectItem>
+                      <SelectItem value="cute kawaii">Милый кавай</SelectItem>
+                      <SelectItem value="realistic illustration">Реалистичная иллюстрация</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Personality */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Характер персонажа</Label>
+                  <Textarea
+                    value={config.mascot?.personality || ''}
+                    onChange={(e) => updateConfig({ 
+                      mascot: { 
+                        ...DEFAULT_MASCOT_SETTINGS, 
+                        ...config.mascot, 
+                        personality: e.target.value 
+                      } 
+                    })}
+                    placeholder="Опишите характер: как персонаж говорит, какие эмоции выражает...
+
+Пример: Добрый и терпеливый учитель. Радуется успехам ученика, подбадривает при ошибках. Использует простые объяснения и шутки."
+                    className="min-h-[100px] resize-none"
+                    disabled={config.mascot?.isApproved}
+                  />
+                </div>
+
+                {/* Approved Image */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Референс изображение</Label>
+                  <div className="flex gap-3">
+                    <div className={cn(
+                      "w-24 h-24 rounded-xl border-2 border-dashed flex items-center justify-center overflow-hidden bg-muted/30",
+                      config.mascot?.approvedImageUrl ? "border-primary/30" : "border-border"
+                    )}>
+                      {config.mascot?.approvedImageUrl ? (
+                        <img 
+                          src={config.mascot.approvedImageUrl} 
+                          alt="Mascot" 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                      )}
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <Input
+                        value={config.mascot?.approvedImageUrl || ''}
+                        onChange={(e) => updateConfig({ 
+                          mascot: { 
+                            ...DEFAULT_MASCOT_SETTINGS, 
+                            ...config.mascot, 
+                            approvedImageUrl: e.target.value 
+                          } 
+                        })}
+                        placeholder="URL изображения маскота"
+                        disabled={config.mascot?.isApproved}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Загрузите или вставьте ссылку на референс изображение
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Approve button */}
+                <div className="pt-4 border-t border-border">
+                  <Button
+                    variant={config.mascot?.isApproved ? "outline" : "default"}
+                    onClick={() => updateConfig({ 
+                      mascot: { 
+                        ...DEFAULT_MASCOT_SETTINGS, 
+                        ...config.mascot, 
+                        isApproved: !config.mascot?.isApproved 
+                      } 
+                    })}
+                    className="w-full"
+                  >
+                    {config.mascot?.isApproved ? (
+                      <>
+                        <Unlock className="w-4 h-4 mr-2" />
+                        Разблокировать для редактирования
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-4 h-4 mr-2" />
+                        Утвердить маскота
+                      </>
+                    )}
+                  </Button>
+                  {!config.mascot?.isApproved && (
+                    <p className="text-xs text-muted-foreground text-center mt-2">
+                      После утверждения ИИ-агент будет использовать эти настройки для генерации персонажа
+                    </p>
+                  )}
                 </div>
               </div>
             </TabsContent>
