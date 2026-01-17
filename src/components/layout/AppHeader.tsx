@@ -29,7 +29,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
     navigate('/auth');
   };
   const userInitials = user?.email?.slice(0, 2).toUpperCase() || 'U';
-  return <header className="h-16 border-b border-border flex items-center justify-end px-6 gap-3 bg-white">
+  return <header className="h-16 border-b border-border flex items-center justify-end px-6 gap-3 bg-white border">
       {/* Language Selector */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
