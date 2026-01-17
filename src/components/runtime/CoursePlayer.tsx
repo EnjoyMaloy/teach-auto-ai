@@ -236,7 +236,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
         <div 
           className="shrink-0"
           style={{
-            height: 'calc(env(safe-area-inset-top, 0px) + 15vh)',
+            height: 'calc(env(safe-area-inset-top, 0px) + 8vh)',
             backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.3)`,
           }}
         />
