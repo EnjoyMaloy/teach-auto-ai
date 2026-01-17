@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Copy, Trash2 } from 'lucide-react';
+import { GripVertical, Copy, Trash2, BookOpen } from 'lucide-react';
 import { Lesson } from '@/types/course';
 import { cn } from '@/lib/utils';
 
@@ -40,34 +40,45 @@ export const SortableLessonItem: React.FC<SortableLessonItemProps> = ({
     <div
       ref={setNodeRef}
       style={style}
+      onClick={onSelect}
       className={cn(
-        'group flex items-center gap-2 p-3 rounded-xl cursor-pointer transition-all duration-200',
+        'group relative flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all duration-200',
+        'border-2',
         isSelected
-          ? 'bg-primary-light border-2 border-primary'
-          : 'hover:bg-muted border-2 border-transparent',
+          ? 'border-primary bg-primary-light shadow-sm'
+          : 'border-border bg-card hover:border-primary/50 hover:shadow-sm',
         isDragging && 'opacity-50 shadow-lg z-50'
       )}
-      onClick={onSelect}
     >
+      {/* Drag handle */}
       <div
-        className="cursor-grab opacity-50 hover:opacity-100 transition-opacity touch-none"
+        className="flex-shrink-0 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity touch-none"
         {...attributes}
         {...listeners}
+        onClick={(e) => e.stopPropagation()}
       >
         <GripVertical className="w-4 h-4 text-muted-foreground" />
       </div>
-      
-      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-        <span className="text-sm font-bold text-primary">{index + 1}</span>
+
+      {/* Lesson number */}
+      <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
+        {index + 1}
       </div>
-      
+
+      {/* Icon */}
+      <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+        <BookOpen className="w-5 h-5 text-primary" />
+      </div>
+
+      {/* Content */}
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-sm text-foreground truncate">{lesson.title}</p>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-sm font-semibold text-foreground truncate">{lesson.title}</p>
+        <p className="text-xs text-muted-foreground truncate mt-0.5">
           {lesson.slides.length} слайдов • {lesson.estimatedMinutes} мин
         </p>
       </div>
 
+      {/* Actions */}
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           onClick={(e) => {
