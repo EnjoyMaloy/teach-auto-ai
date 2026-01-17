@@ -541,7 +541,7 @@ const Editor: React.FC = () => {
         {/* Center: Block list + Mobile Preview */}
         <div className="flex-1 flex overflow-hidden">
           {/* Block list */}
-          <div className="w-80 flex-shrink-0 flex flex-col border-r border-border bg-card">
+          <div className="w-96 flex-shrink-0 flex flex-col border-r border-border bg-card">
             <div className="flex items-center justify-between px-5 py-4 border-b border-border">
               <div>
                 <h3 className="font-bold text-foreground">Блоки</h3>
@@ -607,8 +607,8 @@ const Editor: React.FC = () => {
             </div>
           </div>
 
-          {/* Mobile Preview - Fixed 9:16 frame */}
-          <div className="flex flex-col overflow-hidden bg-muted/30" style={{ width: 'calc((100vh - 120px) * 9 / 16)' }}>
+          {/* Mobile Preview - Fixed 9:16 frame, minimal width */}
+          <div className="flex flex-col overflow-hidden bg-muted/30 flex-shrink-0" style={{ width: 'calc((100vh - 120px) * 9 / 16)', minWidth: '280px' }}>
             {/* Preview header with mute button */}
             <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card">
               <span className="text-sm font-medium text-muted-foreground">Предпросмотр</span>
