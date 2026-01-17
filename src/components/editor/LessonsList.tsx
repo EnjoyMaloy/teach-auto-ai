@@ -61,7 +61,7 @@ export const LessonsList: React.FC<LessonsListProps> = ({
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border">
         <div>
           <h3 className="font-bold text-foreground">Уроки</h3>
           <p className="text-xs text-muted-foreground">{lessons.length} уроков</p>
@@ -77,10 +77,8 @@ export const LessonsList: React.FC<LessonsListProps> = ({
         </Button>
       </div>
 
-      <Separator className="mb-3 -mx-4 w-[calc(100%+2rem)]" />
-
       {/* Lessons List */}
-      <div className="flex-1 overflow-y-auto space-y-2">
+      <div className="flex-1 overflow-y-auto p-3 space-y-2">
         {lessons.length > 0 ? (
           <DndContext
             sensors={sensors}
@@ -119,8 +117,7 @@ export const LessonsList: React.FC<LessonsListProps> = ({
       </div>
 
       {/* Footer Stats */}
-      <Separator className="mt-3 -mx-4 w-[calc(100%+2rem)]" />
-      <div className="pt-3 flex items-center justify-between text-xs text-muted-foreground">
+      <div className="px-5 py-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
         <span>{lessons.length} уроков</span>
         <span>{totalMinutes} мин</span>
       </div>

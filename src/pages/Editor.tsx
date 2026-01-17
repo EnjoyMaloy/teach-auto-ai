@@ -434,7 +434,7 @@ const Editor: React.FC = () => {
 
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Lessons sidebar */}
-        <div className="w-72 flex-shrink-0 p-4 border-r border-border bg-card">
+        <div className="w-72 flex-shrink-0 flex flex-col border-r border-border bg-card">
           <LessonsList
             lessons={course.lessons}
             selectedLessonId={selectedLessonId}
