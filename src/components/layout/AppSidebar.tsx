@@ -25,7 +25,7 @@ const AppSidebar: React.FC = () => {
   const location = useLocation();
   return <aside className="w-64 bg-sidebar border-r border-sidebar-border flex flex-col h-screen fixed left-0 top-0">
       {/* Logo */}
-      <div className="p-6 border-b border-sidebar-border bg-[#f7f7f8]">
+      <div className="p-6 bg-[#f7f7f8]">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center bg-primary">
             <span className="text-primary-foreground text-xl font-bold">А</span>
