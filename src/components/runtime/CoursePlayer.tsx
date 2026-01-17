@@ -25,15 +25,15 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
   const [totalAnswers, setTotalAnswers] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [answered, setAnswered] = useState(false);
-  const [audioInitialized, setAudioInitialized] = useState(false);
 
-  // Initialize audio context on first interaction
+  // Initialize audio context immediately on mount and on first interaction
   useEffect(() => {
+    // Try to init immediately (may not work until user interaction)
+    initAudioContext();
+    
+    // Also init on first interaction as backup
     const handleInteraction = () => {
-      if (!audioInitialized) {
-        initAudioContext();
-        setAudioInitialized(true);
-      }
+      initAudioContext();
     };
     
     document.addEventListener('click', handleInteraction, { once: true });
@@ -43,7 +43,8 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
       document.removeEventListener('click', handleInteraction);
       document.removeEventListener('touchstart', handleInteraction);
     };
-  }, [audioInitialized]);
+  }, []);
+
   const allSlides = course.lessons.flatMap(lesson => lesson.slides);
   const totalSlides = allSlides.length;
   
