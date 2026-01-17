@@ -36,7 +36,12 @@ const dbLessonToLesson = (row: any, slides: Slide[]): Lesson => ({
 });
 
 // Convert database row to Course type
-const dbCourseToCourse = (row: any, lessons: Lesson[]): Course => ({
+const dbCourseToCourse = (row: any, lessons: Lesson[]): Course & { 
+  category?: string; 
+  isLinkAccessible?: boolean;
+  moderationStatus?: string;
+  moderationComment?: string;
+} => ({
   id: row.id,
   title: row.title,
   description: row.description || '',
@@ -54,7 +59,10 @@ const dbCourseToCourse = (row: any, lessons: Lesson[]): Course => ({
   tags: row.tags || [],
   designSystem: row.design_system as CourseDesignSystem | undefined,
   category: row.category || undefined,
-} as Course & { category?: string });
+  isLinkAccessible: row.is_link_accessible || false,
+  moderationStatus: row.moderation_status || undefined,
+  moderationComment: row.moderation_comment || undefined,
+});
 
 export const useCourses = () => {
   const { user } = useAuth();
