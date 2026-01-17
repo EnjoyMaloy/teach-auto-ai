@@ -3,7 +3,6 @@ import { X, Trophy, Star, Clock } from 'lucide-react';
 import { Course } from '@/types/course';
 import { SlideRenderer, slideNeedsCheck } from './SlideRenderer';
 import { DesignSystemProvider } from './DesignSystemProvider';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { playSound } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
@@ -104,7 +103,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
       <div className="fixed inset-0 bg-muted/50 z-50 flex items-center justify-center p-4">
         <DesignSystemProvider config={course.designSystem}>
           <div 
-            className="h-[calc(100vh-32px)] w-auto aspect-[9/16] rounded-3xl overflow-hidden flex flex-col items-center justify-center border shadow-2xl p-6"
+            className="h-[calc(100vh-64px)] w-[calc((100vh-64px)*9/16)] max-w-full rounded-xl overflow-hidden flex flex-col items-center justify-center border shadow-2xl p-6"
             style={{
               backgroundColor: `hsl(var(--ds-card, var(--card)))`,
               borderColor: `hsl(var(--ds-muted, var(--border)))`,
@@ -156,10 +155,9 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
                 </div>
               </div>
 
-              <Button 
-                size="lg" 
+              <button 
                 onClick={onClose} 
-                className={cn("w-full font-bold uppercase tracking-wide", pressAnimationClass)}
+                className={cn("w-full h-11 font-bold uppercase tracking-wide", pressAnimationClass)}
                 style={{
                   backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
                   color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
@@ -168,7 +166,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
                 }}
               >
                 ЗАВЕРШИТЬ
-              </Button>
+              </button>
             </div>
           </div>
         </DesignSystemProvider>
@@ -186,47 +184,54 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
         <X className="w-5 h-5 text-muted-foreground" />
       </button>
 
-      {/* Mobile phone frame with design system */}
+      {/* Mobile phone frame with design system - square aspect like editor */}
       <DesignSystemProvider config={course.designSystem}>
         <div 
-          className="h-[calc(100vh-32px)] w-auto aspect-[9/16] rounded-3xl overflow-hidden flex flex-col border shadow-2xl"
+          className="h-[calc(100vh-64px)] w-[calc((100vh-64px)*9/16)] max-w-full rounded-xl overflow-hidden flex flex-col border shadow-2xl"
           style={{
             backgroundColor: `hsl(var(--ds-background, var(--background)))`,
             borderColor: `hsl(var(--ds-muted, var(--border)))`,
             fontFamily: `var(--ds-font-family, inherit)`,
           }}
         >
-          {/* Header */}
-          <header 
-            className="flex items-center justify-between px-4 py-3 border-b shrink-0"
+          {/* Progress bar - same style as editor */}
+          <div 
+            className="h-10 flex items-center justify-between px-4 border-b shrink-0"
             style={{
-              backgroundColor: `hsl(var(--ds-card, var(--card)))`,
+              backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.3)`,
               borderColor: `hsl(var(--ds-muted, var(--border)))`,
             }}
           >
-            <div 
-              className="text-sm font-medium"
+            <span 
+              className="text-xs"
               style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
             >
-              {completedSlides + 1} / {totalSlides}
-            </div>
-
-            <div className="flex-1 max-w-[200px] mx-4">
-              <div 
-                className="h-1.5 rounded-full overflow-hidden"
-                style={{ backgroundColor: `hsl(var(--ds-muted, var(--muted)))` }}
-              >
-                <div 
-                  className="h-full transition-all duration-300 rounded-full"
-                  style={{ 
-                    width: `${progress}%`,
-                    background: `linear-gradient(to right, hsl(var(--ds-primary, var(--primary))), hsl(var(--ds-success, var(--success))))`,
+              {currentLesson?.title}
+            </span>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(totalSlides, 20) }).map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-full transition-all"
+                  style={{
+                    height: '6px',
+                    width: i === completedSlides ? '24px' : '8px',
+                    backgroundColor: i <= completedSlides 
+                      ? `hsl(var(--ds-primary, var(--primary))${i < completedSlides ? ' / 0.5' : ''})` 
+                      : `hsl(var(--ds-muted, var(--muted)))`,
                   }}
                 />
-              </div>
+              ))}
+              {totalSlides > 20 && (
+                <span 
+                  className="text-xs ml-1" 
+                  style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
+                >
+                  +{totalSlides - 20}
+                </span>
+              )}
             </div>
-
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               {correctAnswers > 0 && (
                 <div 
                   className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
@@ -239,33 +244,18 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
                   {correctAnswers}
                 </div>
               )}
-            </div>
-          </header>
-
-          {/* Lesson indicator */}
-          <div 
-            className="px-4 py-2 border-b shrink-0"
-            style={{
-              backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.3)`,
-              borderColor: `hsl(var(--ds-muted, var(--border)))`,
-            }}
-          >
-            <p className="text-xs text-center">
-              <span style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}>
-                Урок {currentLessonIndex + 1}:
-              </span>
               <span 
-                className="font-medium ml-1"
-                style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
+                className="text-xs"
+                style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
               >
-                {currentLesson?.title}
+                {completedSlides + 1} / {totalSlides}
               </span>
-            </p>
+            </div>
           </div>
 
           {/* Content */}
           <main 
-            className="flex-1 overflow-y-auto p-4"
+            className="flex-1 overflow-y-auto"
             style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
           >
             {currentSlide && (
@@ -279,18 +269,21 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
             )}
           </main>
 
-          {/* Bottom action button - Duolingo style */}
-          <footer 
-            className="px-4 py-4 border-t shrink-0"
+          {/* Bottom action button - same style as editor */}
+          <div 
+            className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0"
             style={{
               backgroundColor: `hsl(var(--ds-card, var(--card)))`,
               borderColor: `hsl(var(--ds-muted, var(--border)))`,
             }}
           >
-            <Button
+            <button
               onClick={handleNext}
               disabled={needsCheck && !answered}
-              className={cn("w-full h-12 text-base font-bold uppercase tracking-wide", pressAnimationClass)}
+              className={cn(
+                "flex-1 h-11 max-w-md font-bold uppercase tracking-wide disabled:opacity-50",
+                pressAnimationClass
+              )}
               style={{
                 backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
                 color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
@@ -299,8 +292,8 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
               }}
             >
               {showContinue ? 'ПРОДОЛЖИТЬ' : 'ПРОВЕРИТЬ'}
-            </Button>
-          </footer>
+            </button>
+          </div>
         </div>
       </DesignSystemProvider>
     </div>
