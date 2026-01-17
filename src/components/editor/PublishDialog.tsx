@@ -272,17 +272,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
 
           {/* Catalog Tab */}
           <TabsContent value="catalog" className="space-y-4 mt-4">
-            {isPublished ? (
-              <div className="p-4 rounded-lg bg-green-50 border border-green-200">
-                <div className="flex items-center gap-2 text-green-700 mb-2">
-                  <CheckCircle className="w-5 h-5" />
-                  <span className="font-semibold">Курс опубликован в каталоге</span>
-                </div>
-                <p className="text-sm text-green-600">
-                  Курс доступен всем пользователям платформы
-                </p>
-              </div>
-            ) : moderationStatus === 'pending' ? (
+            {moderationStatus === 'pending' ? (
               <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-200">
                 <div className="flex items-center gap-2 text-yellow-700 mb-2">
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -290,6 +280,16 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
                 </div>
                 <p className="text-sm text-yellow-600">
                   Курс проверяется модератором. Это может занять некоторое время.
+                </p>
+              </div>
+            ) : moderationStatus === 'approved' && isPublished ? (
+              <div className="p-4 rounded-lg bg-green-50 border border-green-200">
+                <div className="flex items-center gap-2 text-green-700 mb-2">
+                  <CheckCircle className="w-5 h-5" />
+                  <span className="font-semibold">Курс опубликован в каталоге</span>
+                </div>
+                <p className="text-sm text-green-600">
+                  Курс доступен всем пользователям платформы
                 </p>
               </div>
             ) : moderationStatus === 'rejected' ? (
