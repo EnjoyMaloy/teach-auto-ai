@@ -486,6 +486,24 @@ const Editor: React.FC = () => {
           pushToUndo();
           setCourse(prev => prev ? ({ ...prev, lessonsDisplayType: type, updatedAt: new Date() }) : null);
         }}
+        onAIGenerate={(generatedLessons) => {
+          if (!course) return;
+          pushToUndo();
+          // Replace or merge lessons
+          setCourse(prev => prev ? ({
+            ...prev,
+            lessons: generatedLessons.map((l, i) => ({ ...l, courseId: prev.id, order: i + 1 })),
+            updatedAt: new Date(),
+          }) : null);
+          // Select first lesson
+          if (generatedLessons.length > 0) {
+            setSelectedLessonId(generatedLessons[0].id);
+            if (generatedLessons[0].slides.length > 0) {
+              setSelectedBlockId(generatedLessons[0].slides[0].id);
+            }
+          }
+          toast.success(`Курс сгенерирован: ${generatedLessons.length} уроков`);
+        }}
         onBack={() => navigate('/')}
       />
 
