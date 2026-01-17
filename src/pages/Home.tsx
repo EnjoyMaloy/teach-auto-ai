@@ -134,12 +134,6 @@ const Home: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground">Главная</h1>
-        <p className="text-muted-foreground mt-1">
-          Добро пожаловать в Open Academy
-        </p>
-      </div>
 
       {isLoading ? (
         <div className="space-y-8">
