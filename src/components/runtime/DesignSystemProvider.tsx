@@ -41,7 +41,7 @@ export const DesignSystemProvider: React.FC<DesignSystemProviderProps> = ({
 
   return (
     <div 
-      className="design-system-scope w-full h-full"
+      className="design-system-scope"
       style={cssVariables}
     >
       {children}
