@@ -66,13 +66,30 @@ const PublicCourse: React.FC = () => {
 
   useEffect(() => {
     const fetchCourse = async () => {
+      // Log for debugging in Telegram
+      console.log('PublicCourse: Starting fetch, courseId:', courseId);
+      console.log('PublicCourse: URL:', window.location.href);
+      console.log('PublicCourse: Telegram WebApp:', !!window.Telegram?.WebApp);
+      
       if (!courseId) {
+        console.error('PublicCourse: No courseId in URL');
         setError('ID курса не указан');
         setIsLoading(false);
         return;
       }
 
+      // Validate courseId format (UUID)
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(courseId)) {
+        console.error('PublicCourse: Invalid courseId format:', courseId);
+        setError('Неверный формат ID курса');
+        setIsLoading(false);
+        return;
+      }
+
       try {
+        console.log('PublicCourse: Fetching course from Supabase...');
+        
         // Fetch course
         const { data: courseData, error: courseError } = await supabase
           .from('courses')
@@ -80,7 +97,12 @@ const PublicCourse: React.FC = () => {
           .eq('id', courseId)
           .single();
 
-        if (courseError) throw courseError;
+        console.log('PublicCourse: Course response:', { data: !!courseData, error: courseError });
+
+        if (courseError) {
+          console.error('PublicCourse: Course fetch error:', courseError);
+          throw courseError;
+        }
         if (!courseData) {
           setError('Курс не найден');
           setIsLoading(false);
@@ -94,7 +116,12 @@ const PublicCourse: React.FC = () => {
           .eq('course_id', courseId)
           .order('order', { ascending: true });
 
-        if (lessonsError) throw lessonsError;
+        console.log('PublicCourse: Lessons response:', { count: lessonsData?.length, error: lessonsError });
+
+        if (lessonsError) {
+          console.error('PublicCourse: Lessons fetch error:', lessonsError);
+          throw lessonsError;
+        }
 
         // Fetch slides for all lessons
         const lessonIds = lessonsData?.map(l => l.id) || [];
@@ -104,7 +131,12 @@ const PublicCourse: React.FC = () => {
           .in('lesson_id', lessonIds.length > 0 ? lessonIds : [''])
           .order('order', { ascending: true });
 
-        if (slidesError) throw slidesError;
+        console.log('PublicCourse: Slides response:', { count: slidesData?.length, error: slidesError });
+
+        if (slidesError) {
+          console.error('PublicCourse: Slides fetch error:', slidesError);
+          throw slidesError;
+        }
 
         // Build lessons with slides
         const lessonsWithSlides: Lesson[] = (lessonsData || []).map(lesson => ({
@@ -165,10 +197,12 @@ const PublicCourse: React.FC = () => {
           updatedAt: new Date(courseData.updated_at),
         };
 
+        console.log('PublicCourse: Course loaded successfully');
         setCourse(fullCourse);
       } catch (err) {
-        console.error('Error fetching course:', err);
-        setError('Не удалось загрузить курс');
+        console.error('PublicCourse: Error fetching course:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        setError(`Не удалось загрузить курс: ${errorMessage}`);
       } finally {
         setIsLoading(false);
       }
