@@ -21,6 +21,7 @@ interface MobilePreviewFrameProps {
   onUpdateBlock?: (updates: Partial<Block>) => void;
   designSystem?: CourseDesignSystem;
   isMuted?: boolean;
+  isReadOnly?: boolean;
 }
 
 type AnswerState = 'idle' | 'correct' | 'incorrect';
@@ -50,6 +51,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   onUpdateBlock,
   designSystem,
   isMuted = false,
+  isReadOnly = false,
 }) => {
   // Merge design system with defaults
   const ds = { ...DEFAULT_DS, ...designSystem };
@@ -337,9 +339,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         return (
           <DesignBlockEditor
             subBlocks={block.subBlocks || []}
-            onUpdateSubBlocks={(subBlocks) => onUpdateBlock?.({ subBlocks })}
+            onUpdateSubBlocks={isReadOnly ? undefined : (subBlocks) => onUpdateBlock?.({ subBlocks })}
             designSystem={designSystem}
-            isEditing={true}
+            isEditing={!isReadOnly}
           />
         );
 

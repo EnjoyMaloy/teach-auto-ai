@@ -22,7 +22,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCourses } from '@/hooks/useCourses';
 import { EditorHeader } from '@/components/editor/EditorHeader';
 import { LessonsList } from '@/components/editor/LessonsList';
-import { AIChatPanel } from '@/components/editor/AIChatPanel';
+
 import { FullscreenPreview } from '@/components/editor/FullscreenPreview';
 
 import { 
@@ -34,7 +34,7 @@ import {
 import { SortableBlockItem } from '@/components/editor/SortableBlockItem';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Loader2, Plus, Smartphone, Volume2, VolumeX, Sparkles } from 'lucide-react';
+import { Loader2, Plus, Smartphone, Volume2, VolumeX } from 'lucide-react';
 
 // Adapter: Convert Slide to Block for the new editor
 const slideToBlock = (slide: Slide): Block => ({
@@ -114,7 +114,7 @@ const Editor: React.FC = () => {
   const [isPreviewMuted, setIsPreviewMuted] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
-  const [showAIChat, setShowAIChat] = useState(false);
+  
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -679,31 +679,6 @@ const Editor: React.FC = () => {
         />
       )}
 
-      {/* AI Chat Panel */}
-      {showAIChat && course && (
-        <AIChatPanel
-          course={course}
-          selectedLesson={selectedLesson}
-          selectedSlide={selectedLesson?.slides.find(s => s.id === selectedBlockId)}
-          onApplyChanges={(updatedLessons) => {
-            pushToUndo();
-            setCourse(prev => prev ? { ...prev, lessons: updatedLessons } : prev);
-          }}
-          onClose={() => setShowAIChat(false)}
-        />
-      )}
-
-      {/* AI Chat Floating Button */}
-      {!showAIChat && (
-        <Button
-          onClick={() => setShowAIChat(true)}
-          className="fixed bottom-4 right-4 z-40 gap-2 shadow-lg"
-          size="lg"
-        >
-          <Sparkles className="w-5 h-5" />
-          AI Ассистент
-        </Button>
-      )}
     </div>
   );
 };
