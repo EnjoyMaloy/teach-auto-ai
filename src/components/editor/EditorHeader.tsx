@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
-  Undo2, Redo2, Eye, Save, 
-  Share2, Clock, Loader2, Pencil, Check, X, ArrowLeft, Palette, CloudOff, Cloud
+  Undo2, Redo2, Eye, 
+  Share2, Loader2, Pencil, Check, X, Palette, ChevronRight
 } from 'lucide-react';
 import { Course } from '@/types/course';
 import { DesignSystemConfig } from '@/types/designSystem';
@@ -87,60 +87,60 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   return (
     <>
       <header className="h-16 border-b border-border bg-card flex items-center justify-between px-4">
-        {/* Left section */}
-        <div className="flex items-center gap-4">
-          {onBack && (
-            <Button 
-              variant="outline" 
-              onClick={onBack} 
-              className="border-border hover:bg-primary hover:border-primary hover:text-white transition-all gap-2"
+        {/* Left section - Breadcrumbs */}
+        <div className="flex items-center gap-2">
+          {/* Breadcrumb navigation */}
+          <nav className="flex items-center gap-1">
+            <button
+              onClick={onBack}
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
             >
-              <ArrowLeft className="w-4 h-4" />
               Мастерская
-            </Button>
-          )}
-          
-          <div className="h-6 w-px bg-border" />
-          
-          {isEditing ? (
-            <div className="flex items-center gap-2">
-              <Input
-                value={editedTitle}
-                onChange={(e) => setEditedTitle(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="h-9 w-72 font-bold text-lg"
-                autoFocus
-              />
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={handleSaveTitle}
-                className="h-8 w-8 text-success hover:text-success hover:bg-success/10"
-              >
-                <Check className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={handleCancelEditing}
-                className="h-8 w-8 text-muted-foreground hover:bg-muted"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 group">
-              <h1 className="font-bold text-lg text-foreground line-clamp-1">{course.title}</h1>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={handleStartEditing}
-                className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted"
-              >
-                <Pencil className="w-3.5 h-3.5" />
-              </Button>
-            </div>
-          )}
+            </button>
+            <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
+            
+            {isEditing ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  value={editedTitle}
+                  onChange={(e) => setEditedTitle(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="h-8 w-64 font-semibold"
+                  autoFocus
+                />
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={handleSaveTitle}
+                  className="h-7 w-7 text-emerald-600 hover:text-emerald-600 hover:bg-emerald-500/10"
+                >
+                  <Check className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={handleCancelEditing}
+                  className="h-7 w-7 text-muted-foreground hover:bg-muted"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 group">
+                <span className="text-sm font-semibold text-foreground line-clamp-1 max-w-[200px]">
+                  {course.title}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={handleStartEditing}
+                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted"
+                >
+                  <Pencil className="w-3 h-3" />
+                </Button>
+              </div>
+            )}
+          </nav>
 
           {/* Design System Button */}
           <Popover open={showDesignSystem} onOpenChange={setShowDesignSystem}>
