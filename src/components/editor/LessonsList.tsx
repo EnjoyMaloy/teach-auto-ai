@@ -77,7 +77,7 @@ export const LessonsList: React.FC<LessonsListProps> = ({
         </Button>
       </div>
 
-      <Separator className="mb-3" />
+      <Separator className="mb-3 -mx-4 w-[calc(100%+2rem)]" />
 
       {/* Lessons List */}
       <div className="flex-1 overflow-y-auto space-y-2">
@@ -119,7 +119,7 @@ export const LessonsList: React.FC<LessonsListProps> = ({
       </div>
 
       {/* Footer Stats */}
-      <Separator className="mt-3" />
+      <Separator className="mt-3 -mx-4 w-[calc(100%+2rem)]" />
       <div className="pt-3 flex items-center justify-between text-xs text-muted-foreground">
         <span>{lessons.length} уроков</span>
         <span>{totalMinutes} мин</span>
