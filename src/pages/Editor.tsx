@@ -629,9 +629,9 @@ const Editor: React.FC = () => {
                 )}
               </Button>
             </div>
-            {/* Mobile frame container - fixed aspect ratio */}
-            <div className="flex-1 flex items-center justify-center overflow-hidden">
-              <div className="h-full w-auto aspect-[9/16] border-x border-border overflow-hidden">
+            {/* Mobile frame container - fixed width */}
+            <div className="flex-1 flex items-center justify-center overflow-hidden min-w-0">
+              <div className="h-full w-auto aspect-[9/16] overflow-hidden flex-shrink-0">
                 <MobilePreviewFrame
                   block={selectedBlock}
                   lessonTitle={selectedLesson?.title}
@@ -648,7 +648,7 @@ const Editor: React.FC = () => {
         </div>
 
         {/* Right: Block Editor */}
-        <div className="w-[420px] flex-shrink-0 border-l border-border bg-card overflow-hidden">
+        <div className="w-[420px] min-w-[280px] flex-shrink border-l border-border bg-card overflow-hidden">
           {selectedBlock ? (
             <BlockEditor
               block={selectedBlock}
