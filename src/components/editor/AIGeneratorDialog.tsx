@@ -18,7 +18,8 @@ import {
   Brain,
   Layers,
   BookOpen,
-  CheckCircle2
+  CheckCircle2,
+  Image
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -77,6 +78,27 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
     ));
   };
 
+  const generateImageForSlide = async (slideContent: string, coursePrompt: string): Promise<string | null> => {
+    try {
+      const response = await supabase.functions.invoke('generate-image', {
+        body: { 
+          prompt: coursePrompt,
+          slideContext: slideContent
+        },
+      });
+
+      if (response.error) {
+        console.error('Image generation error:', response.error);
+        return null;
+      }
+
+      return response.data?.imageUrl || null;
+    } catch (err) {
+      console.error('Image generation failed:', err);
+      return null;
+    }
+  };
+
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
 
@@ -87,7 +109,7 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
     const initialSteps: GenerationStep[] = [
       { id: 'plan', label: 'Планирование структуры', status: 'pending' },
       { id: 'generate', label: 'Генерация контента', status: 'pending' },
-      { id: 'review', label: 'Проверка качества', status: 'pending' },
+      { id: 'images', label: 'Создание иллюстраций', status: 'pending' },
       { id: 'finalize', label: 'Финализация курса', status: 'pending' },
     ];
     setSteps(initialSteps);
@@ -135,12 +157,9 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
 
       updateStep('generate', { status: 'completed', message: 'Контент создан' });
 
-      // Step 3: Parse and validate
-      updateStep('review', { status: 'active', message: 'Проверяю структуру...' });
-
+      // Parse course data
       let courseData: GeneratedCourse;
       try {
-        // Try to extract JSON from response
         const content = generateResponse.data?.content || '';
         const jsonMatch = content.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
@@ -156,12 +175,46 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
         throw new Error('Курс не содержит уроков');
       }
 
-      updateStep('review', { 
-        status: 'completed', 
-        message: `${courseData.lessons.length} уроков готово` 
+      // Step 3: Generate images for text slides
+      updateStep('images', { status: 'active', message: 'Генерирую иллюстрации...' });
+
+      // Find slides that could use images (first text slide of each lesson)
+      const slidesToIllustrate: { lessonIdx: number; slideIdx: number; content: string }[] = [];
+      
+      courseData.lessons.forEach((lesson, lessonIdx) => {
+        // Find first text slide in each lesson for illustration
+        const textSlideIdx = lesson.slides.findIndex(s => s.type === 'text');
+        if (textSlideIdx !== -1) {
+          slidesToIllustrate.push({
+            lessonIdx,
+            slideIdx: textSlideIdx,
+            content: lesson.slides[textSlideIdx].content
+          });
+        }
       });
 
-      // Step 4: Review (optional call to reviewer agent)
+      // Generate images in parallel (max 3 at a time)
+      let imagesGenerated = 0;
+      const imagePromises = slidesToIllustrate.slice(0, 3).map(async ({ lessonIdx, slideIdx, content }) => {
+        const imageUrl = await generateImageForSlide(content, prompt);
+        if (imageUrl) {
+          courseData.lessons[lessonIdx].slides[slideIdx].imageUrl = imageUrl;
+          // Change slide type to image_text if image was generated
+          courseData.lessons[lessonIdx].slides[slideIdx].type = 'image_text' as SlideType;
+          imagesGenerated++;
+          updateStep('images', { message: `Создано ${imagesGenerated} изображений...` });
+        }
+        return imageUrl;
+      });
+
+      await Promise.all(imagePromises);
+
+      updateStep('images', { 
+        status: 'completed', 
+        message: `${imagesGenerated} иллюстраций создано` 
+      });
+
+      // Step 4: Finalize
       updateStep('finalize', { status: 'active', message: 'Финализирую...' });
 
       // Convert to our Lesson/Slide format
@@ -174,6 +227,7 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
           type: genSlide.type || 'text',
           order: slideIndex + 1,
           content: genSlide.content || '',
+          imageUrl: genSlide.imageUrl,
           options: genSlide.options?.map(opt => ({
             id: crypto.randomUUID(),
             text: opt,
@@ -246,8 +300,8 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
         return <Brain className="w-4 h-4" />;
       case 'generate':
         return <Layers className="w-4 h-4" />;
-      case 'review':
-        return <Check className="w-4 h-4" />;
+      case 'images':
+        return <Image className="w-4 h-4" />;
       case 'finalize':
         return <BookOpen className="w-4 h-4" />;
       default:
