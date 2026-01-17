@@ -482,6 +482,10 @@ const Editor: React.FC = () => {
         onSave={handleSave}
         onUpdateTitle={handleUpdateTitle}
         onUpdateDesignSystem={handleUpdateDesignSystem}
+        onUpdateLessonsDisplayType={(type) => {
+          pushToUndo();
+          setCourse(prev => prev ? ({ ...prev, lessonsDisplayType: type, updatedAt: new Date() }) : null);
+        }}
         onBack={() => navigate('/')}
       />
 
@@ -496,11 +500,6 @@ const Editor: React.FC = () => {
             onDeleteLesson={handleDeleteLesson}
             onDuplicateLesson={handleDuplicateLesson}
             onReorderLessons={handleReorderLessons}
-            displayType={course.lessonsDisplayType || 'circle_map'}
-            onDisplayTypeChange={(type) => {
-              pushToUndo();
-              setCourse(prev => prev ? ({ ...prev, lessonsDisplayType: type, updatedAt: new Date() }) : null);
-            }}
             onUpdateLessonIcon={(lessonId, icon) => {
               pushToUndo();
               setCourse(prev => prev ? ({

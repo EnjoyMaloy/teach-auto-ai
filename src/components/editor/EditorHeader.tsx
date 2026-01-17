@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { 
   Undo2, Redo2, Eye, 
-  Share2, Loader2, Pencil, Check, X, Palette, ChevronRight
+  Share2, Loader2, Pencil, Check, X, Palette, ChevronRight, Map
 } from 'lucide-react';
-import { Course } from '@/types/course';
+import { Course, LessonsDisplayType } from '@/types/course';
 import { DesignSystemConfig } from '@/types/designSystem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
 
 interface EditorHeaderProps {
   course: Course;
@@ -30,6 +31,7 @@ interface EditorHeaderProps {
   onSave: () => void;
   onUpdateTitle: (title: string) => void;
   onUpdateDesignSystem: (config: DesignSystemConfig) => void;
+  onUpdateLessonsDisplayType?: (type: LessonsDisplayType) => void;
   onBack?: () => void;
 }
 
@@ -47,12 +49,14 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   onSave,
   onUpdateTitle,
   onUpdateDesignSystem,
+  onUpdateLessonsDisplayType,
   onBack,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(course.title);
   const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [showDesignSystem, setShowDesignSystem] = useState(false);
+  const [showMapSettings, setShowMapSettings] = useState(false);
 
   const handleStartEditing = () => {
     setEditedTitle(course.title);
@@ -82,6 +86,124 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   const handlePublishClick = () => {
     onPublish();
     setShowPublishDialog(true);
+  };
+
+  const currentDisplayType = course.lessonsDisplayType || 'circle_map';
+
+  // Mini preview component for map type
+  const MapTypePreview: React.FC<{ type: LessonsDisplayType; isSelected: boolean; onClick: () => void }> = ({ 
+    type, 
+    isSelected, 
+    onClick 
+  }) => {
+    const primaryColor = course.designSystem?.primaryColor || '262 83% 58%';
+    const mutedColor = course.designSystem?.mutedColor || '240 5% 96%';
+    const successColor = course.designSystem?.successColor || '142 71% 45%';
+    
+    return (
+      <button
+        onClick={onClick}
+        className={cn(
+          "flex-1 p-3 rounded-xl border-2 transition-all hover:border-primary/50",
+          isSelected ? "border-primary bg-primary/5" : "border-border bg-card"
+        )}
+      >
+        {/* Preview */}
+        <div 
+          className="h-32 rounded-lg mb-2 p-3 overflow-hidden"
+          style={{ backgroundColor: `hsl(${mutedColor} / 0.5)` }}
+        >
+          {type === 'circle_map' ? (
+            // Duolingo circles preview
+            <div className="flex flex-col items-center gap-2">
+              <div className="relative">
+                <div 
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs"
+                  style={{ backgroundColor: `hsl(${successColor})`, color: 'white' }}
+                >
+                  ✓
+                </div>
+              </div>
+              <div 
+                className="w-1 h-3 rounded-full"
+                style={{ backgroundColor: `hsl(${mutedColor})` }}
+              />
+              <div className="relative" style={{ marginLeft: '20px' }}>
+                <div 
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs"
+                  style={{ 
+                    backgroundColor: `hsl(${primaryColor})`, 
+                    color: 'white',
+                    boxShadow: `0 2px 0 0 hsl(${primaryColor} / 0.4)`
+                  }}
+                >
+                  2
+                </div>
+              </div>
+              <div 
+                className="w-1 h-3 rounded-full"
+                style={{ backgroundColor: `hsl(${mutedColor})` }}
+              />
+              <div className="relative" style={{ marginRight: '20px' }}>
+                <div 
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs opacity-50"
+                  style={{ backgroundColor: `hsl(${mutedColor})`, color: '#888' }}
+                >
+                  🔒
+                </div>
+              </div>
+            </div>
+          ) : (
+            // List preview
+            <div className="flex flex-col gap-1.5">
+              {[1, 2, 3].map((i) => (
+                <div 
+                  key={i}
+                  className="flex items-center gap-2 p-1.5 rounded-md"
+                  style={{ 
+                    backgroundColor: i === 1 
+                      ? `hsl(${successColor} / 0.15)` 
+                      : i === 2 
+                        ? 'white' 
+                        : `hsl(${mutedColor} / 0.5)`,
+                    opacity: i === 3 ? 0.5 : 1,
+                  }}
+                >
+                  <div 
+                    className="w-5 h-5 rounded flex items-center justify-center text-[8px]"
+                    style={{ 
+                      backgroundColor: i === 1 
+                        ? `hsl(${successColor} / 0.3)` 
+                        : `hsl(${mutedColor})`,
+                    }}
+                  >
+                    {i === 1 ? '✓' : i === 3 ? '🔒' : '📚'}
+                  </div>
+                  <div className="flex-1">
+                    <div 
+                      className="h-1.5 rounded-full w-3/4"
+                      style={{ backgroundColor: `hsl(${mutedColor})` }}
+                    />
+                    <div 
+                      className="h-1 rounded-full w-1/2 mt-1"
+                      style={{ backgroundColor: `hsl(${mutedColor} / 0.5)` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        
+        {/* Label */}
+        <p className={cn(
+          "text-sm font-medium text-center",
+          isSelected ? "text-primary" : "text-muted-foreground"
+        )}>
+          {type === 'circle_map' ? 'Кружки' : 'Список'}
+        </p>
+      </button>
+    );
   };
 
   return (
@@ -182,6 +304,50 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
               </ScrollArea>
             </PopoverContent>
           </Popover>
+
+          {/* Map Settings Button */}
+          {onUpdateLessonsDisplayType && (
+            <Popover open={showMapSettings} onOpenChange={setShowMapSettings}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Map className="w-4 h-4 mr-1" />
+                  Карта
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent 
+                className="w-[320px] p-4" 
+                align="start"
+                side="bottom"
+                sideOffset={8}
+              >
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="font-semibold text-sm mb-1">Тип карты уроков</h4>
+                    <p className="text-xs text-muted-foreground">
+                      Как ученики будут видеть список уроков
+                    </p>
+                  </div>
+                  
+                  <div className="flex gap-3">
+                    <MapTypePreview 
+                      type="circle_map" 
+                      isSelected={currentDisplayType === 'circle_map'}
+                      onClick={() => {
+                        onUpdateLessonsDisplayType('circle_map');
+                      }}
+                    />
+                    <MapTypePreview 
+                      type="list" 
+                      isSelected={currentDisplayType === 'list'}
+                      onClick={() => {
+                        onUpdateLessonsDisplayType('list');
+                      }}
+                    />
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
 
         {/* Center section - Undo/Redo */}
