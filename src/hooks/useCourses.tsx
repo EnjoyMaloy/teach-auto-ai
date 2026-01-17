@@ -334,11 +334,64 @@ export const useCourses = () => {
     }
   }, [user]);
 
+  // Fetch all published courses (for catalog)
+  const fetchPublishedCourses = useCallback(async (): Promise<Course[]> => {
+    setIsLoading(true);
+    try {
+      // Fetch all published courses
+      const { data: coursesData, error: coursesError } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('is_published', true)
+        .order('published_at', { ascending: false });
+
+      if (coursesError) throw coursesError;
+      if (!coursesData || coursesData.length === 0) {
+        return [];
+      }
+
+      // Fetch lessons for all courses
+      const courseIds = coursesData.map(c => c.id);
+      const { data: lessonsData, error: lessonsError } = await supabase
+        .from('lessons')
+        .select('*')
+        .in('course_id', courseIds);
+
+      if (lessonsError) throw lessonsError;
+
+      // Fetch slides for all lessons
+      const lessonIds = lessonsData?.map(l => l.id) || [];
+      let slidesData: any[] = [];
+      if (lessonIds.length > 0) {
+        const { data, error: slidesError } = await supabase
+          .from('slides')
+          .select('*')
+          .in('lesson_id', lessonIds);
+
+        if (slidesError) throw slidesError;
+        slidesData = data || [];
+      }
+
+      // Convert to app types
+      const slides = slidesData.map(dbSlideToSlide);
+      const lessons = (lessonsData || []).map(l => dbLessonToLesson(l, slides));
+      const courses = coursesData.map(c => dbCourseToCourse(c, lessons));
+
+      return courses;
+    } catch (error) {
+      console.error('Error fetching published courses:', error);
+      return [];
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   return {
     courses,
     isLoading,
     fetchCourses,
     fetchCourse,
+    fetchPublishedCourses,
     createCourse,
     saveCourse,
     deleteCourse,
