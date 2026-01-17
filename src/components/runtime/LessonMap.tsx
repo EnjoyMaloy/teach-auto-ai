@@ -23,14 +23,15 @@ interface LessonPopupProps {
 const LessonPopup: React.FC<LessonPopupProps> = ({ lesson, index, status, onStart, onClose }) => {
   return (
     <div 
-      className="absolute z-50 w-64 p-4 rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+      className="absolute w-64 p-4 rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 duration-200"
       style={{
         backgroundColor: `hsl(var(--ds-card, var(--card)))`,
         border: `2px solid hsl(var(--ds-muted, var(--border)))`,
-        top: '100%',
+        bottom: '100%',
         left: '50%',
         transform: 'translateX(-50%)',
-        marginTop: '12px',
+        marginBottom: '12px',
+        zIndex: 100,
       }}
     >
       {/* Arrow pointer */}
@@ -38,9 +39,9 @@ const LessonPopup: React.FC<LessonPopupProps> = ({ lesson, index, status, onStar
         className="absolute w-4 h-4 rotate-45"
         style={{
           backgroundColor: `hsl(var(--ds-card, var(--card)))`,
-          borderLeft: `2px solid hsl(var(--ds-muted, var(--border)))`,
-          borderTop: `2px solid hsl(var(--ds-muted, var(--border)))`,
-          top: '-9px',
+          borderRight: `2px solid hsl(var(--ds-muted, var(--border)))`,
+          borderBottom: `2px solid hsl(var(--ds-muted, var(--border)))`,
+          bottom: '-9px',
           left: '50%',
           transform: 'translateX(-50%)',
         }}

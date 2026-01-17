@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { VideoUploader } from './VideoUploader';
 import { AudioUploader } from './AudioUploader';
 import {
-  Plus, Trash2, GripVertical, Upload, Sparkles,
+  Plus, Trash2, GripVertical, Upload,
   Heading, Type, Image, Play, Volume2, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
   Link2, ListOrdered, SlidersHorizontal, MousePointer2,
@@ -511,14 +511,6 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
             </p>
           </div>
         )}
-      </div>
-
-      {/* AI Actions */}
-      <div className="px-5 py-4 border-t border-border bg-gradient-surface">
-        <Button variant="soft-ai" size="sm" className="w-full rounded-xl">
-          <Sparkles className="w-4 h-4 mr-2" />
-          Улучшить с AI
-        </Button>
       </div>
     </div>
   );
