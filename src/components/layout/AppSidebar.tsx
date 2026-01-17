@@ -27,7 +27,7 @@ const AppSidebar: React.FC = () => {
   const location = useLocation();
   return <aside className="w-64 bg-sidebar flex flex-col h-screen fixed left-0 top-0">
       {/* Logo */}
-      <div className="p-6 bg-[#f7f7f8]">
+      <div className="p-6 pb-7 bg-[#f7f7f8]">
         <img src={Logo} alt="Academy" className="h-7" />
       </div>
 
