@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils';
 const slideTypeConfig: Record<SlideType, { icon: React.ElementType; label: string; color: string }> = {
   heading: { icon: Type, label: 'Заголовок', color: 'bg-slate-100 text-slate-600' },
   text: { icon: Type, label: 'Текст', color: 'bg-blue-100 text-blue-600' },
-  image: { icon: Image, label: 'Картинка', color: 'bg-purple-100 text-purple-600' },
   video: { icon: Image, label: 'Видео', color: 'bg-red-100 text-red-600' },
   audio: { icon: Type, label: 'Аудио', color: 'bg-amber-100 text-amber-600' },
   image_text: { icon: Image, label: 'Картинка+Текст', color: 'bg-indigo-100 text-indigo-600' },

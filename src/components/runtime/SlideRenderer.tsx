@@ -89,19 +89,6 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
           </div>
         );
 
-      case 'image':
-        return (
-          <div className="h-full w-full flex items-center justify-center overflow-hidden">
-            {slide.imageUrl ? (
-              <img src={slide.imageUrl} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-muted flex items-center justify-center border-2 border-dashed border-border">
-                <span className="text-muted-foreground text-sm">Нет изображения</span>
-              </div>
-            )}
-          </div>
-        );
-
       case 'video':
         return (
           <div className="h-full w-full flex items-center justify-center overflow-hidden bg-black">
