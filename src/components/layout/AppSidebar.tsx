@@ -40,7 +40,7 @@ const AppSidebar: React.FC = () => {
           {navItems.map(item => {
           const isActive = location.pathname === item.path;
           return <li key={item.path}>
-                <button onClick={() => navigate(item.path)} className={cn("w-full flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all duration-200", isActive ? "bg-[#a66cff] text-white" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground")}>
+                <button onClick={() => navigate(item.path)} className={cn("w-full flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all duration-200", isActive ? "bg-[#a66cff] text-white hover:bg-[#924CFE]" : "text-[#464646] hover:bg-[#EBE9EA]")}>
                   <item.icon className="w-5 h-5" />
                   {item.label}
                 </button>
