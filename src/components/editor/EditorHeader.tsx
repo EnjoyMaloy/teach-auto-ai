@@ -225,31 +225,26 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         </div>
 
         {/* Right section */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {/* Auto-save status */}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg bg-muted/50">
             {isSaving ? (
               <>
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span>Сохранение...</span>
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+                <span className="text-muted-foreground">Сохранение...</span>
               </>
             ) : hasUnsavedChanges ? (
               <>
-                <CloudOff className="w-3.5 h-3.5" />
-                <span>Не сохранено</span>
+                <CloudOff className="w-3.5 h-3.5 text-muted-foreground" />
+                <span className="text-muted-foreground">Не сохранено</span>
               </>
             ) : lastSavedAt ? (
               <>
                 <Cloud className="w-3.5 h-3.5 text-success" />
-                <span>Сохранено</span>
+                <span className="text-success">Сохранено</span>
               </>
             ) : null}
           </div>
-
-          <Button variant="ghost" size="sm" onClick={onSave} disabled={isSaving || !hasUnsavedChanges}>
-            <Save className="w-4 h-4 mr-1" />
-            Сохранить
-          </Button>
 
           <div className="h-6 w-px bg-border" />
 
