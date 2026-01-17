@@ -6,6 +6,18 @@ import Underline from '@tiptap/extension-underline';
 import { Mark, mergeAttributes } from '@tiptap/core';
 import { cn } from '@/lib/utils';
 import { Highlighter, Underline as UnderlineIcon, Waves, X, Bold, Italic } from 'lucide-react';
+import DOMPurify from 'dompurify';
+
+// Configure DOMPurify to allow only safe formatting tags
+const DOMPURIFY_CONFIG = {
+  ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'span', 'mark', 'u', 'p', 'br'],
+  ALLOWED_ATTR: ['class', 'data-wavy', 'style'],
+  KEEP_CONTENT: true,
+};
+
+const sanitizeHtml = (html: string): string => {
+  return DOMPurify.sanitize(html, DOMPURIFY_CONFIG);
+};
 
 // Extend the Commands interface for TypeScript
 declare module '@tiptap/core' {
@@ -300,7 +312,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         style={{ color: textColor }}
       >
         <style>{dynamicStyles}</style>
-        <div dangerouslySetInnerHTML={{ __html: content || placeholder }} />
+        <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(content || placeholder) }} />
       </div>
     );
   }

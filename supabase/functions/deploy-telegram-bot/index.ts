@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,6 +11,81 @@ interface DeployRequest {
   courseId: string;
   courseTitle: string;
   webAppUrl: string;
+}
+
+// Helper function to verify user authentication and course ownership
+async function verifyAuthAndOwnership(
+  req: Request, 
+  courseId: string
+): Promise<{ user: any; supabaseClient: any; error: Response | null }> {
+  const authHeader = req.headers.get('Authorization');
+  
+  if (!authHeader) {
+    console.error("No authorization header provided");
+    return {
+      user: null,
+      supabaseClient: null,
+      error: new Response(
+        JSON.stringify({ error: "Требуется авторизация" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    };
+  }
+
+  const supabaseClient = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_ANON_KEY')!,
+    { global: { headers: { Authorization: authHeader } } }
+  );
+
+  const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+  
+  if (authError || !user) {
+    console.error("Auth verification failed:", authError?.message || "No user found");
+    return {
+      user: null,
+      supabaseClient: null,
+      error: new Response(
+        JSON.stringify({ error: "Недействительный токен авторизации" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    };
+  }
+
+  console.log(`Authenticated user: ${user.id}`);
+
+  // Verify course ownership
+  const { data: course, error: courseError } = await supabaseClient
+    .from('courses')
+    .select('author_id')
+    .eq('id', courseId)
+    .single();
+
+  if (courseError || !course) {
+    console.error("Course not found:", courseError?.message || "No course data");
+    return {
+      user: null,
+      supabaseClient: null,
+      error: new Response(
+        JSON.stringify({ error: "Курс не найден" }),
+        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    };
+  }
+
+  if (course.author_id !== user.id) {
+    console.error(`User ${user.id} attempted to deploy bot for course ${courseId} owned by ${course.author_id}`);
+    return {
+      user: null,
+      supabaseClient: null,
+      error: new Response(
+        JSON.stringify({ error: "У вас нет прав для деплоя бота этого курса" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    };
+  }
+
+  return { user, supabaseClient, error: null };
 }
 
 serve(async (req) => {
@@ -27,6 +103,14 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Verify authentication and course ownership
+    const { user, error: authError } = await verifyAuthAndOwnership(req, courseId);
+    if (authError) {
+      return authError;
+    }
+
+    console.log(`User ${user.id} deploying Telegram bot for course ${courseId}`);
 
     // Validate bot token by getting bot info
     const botInfoResponse = await fetch(`https://api.telegram.org/bot${botToken}/getMe`);
@@ -91,6 +175,8 @@ serve(async (req) => {
         short_description: `Интерактивный курс: ${courseTitle}`,
       }),
     });
+
+    console.log(`Successfully deployed bot @${botUsername} for course ${courseId} by user ${user.id}`);
 
     return new Response(
       JSON.stringify({
