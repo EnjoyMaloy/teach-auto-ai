@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
-import { Course, Lesson, Slide } from '@/types/course';
+import { Course, Lesson, Slide, SlideType } from '@/types/course';
 import { 
   Sparkles, 
   Loader2, 
@@ -13,16 +13,36 @@ import {
   X,
   Minimize2,
   Maximize2,
-  RefreshCw
+  Check,
+  Wand2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+
+interface PendingChanges {
+  action: 'update_slide' | 'add_slide' | 'update_lesson' | 'add_lesson';
+  slideId?: string;
+  lessonId?: string;
+  changes: {
+    content?: string;
+    type?: SlideType;
+    options?: { id: string; text: string; isCorrect: boolean }[];
+    correctAnswer?: string | string[] | boolean;
+    explanation?: string;
+    blankWord?: string;
+    title?: string;
+    description?: string;
+    slides?: any[];
+  };
+}
 
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
-  isApplying?: boolean;
+  pendingChanges?: PendingChanges;
+  changesApplied?: boolean;
 }
 
 interface AIChatPanelProps {
@@ -51,6 +71,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isApplying, setIsApplying] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -70,18 +91,17 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     context.push(`\nУроков в курсе: ${course.lessons.length}`);
     
     if (selectedLesson) {
-      context.push(`\nВыбранный урок: "${selectedLesson.title}"`);
+      context.push(`\nВыбранный урок (ID: ${selectedLesson.id}): "${selectedLesson.title}"`);
       context.push(`Слайдов в уроке: ${selectedLesson.slides.length}`);
       
-      // Add slide summaries
       selectedLesson.slides.forEach((slide, idx) => {
         const preview = slide.content?.substring(0, 100) || '';
-        context.push(`  Слайд ${idx + 1} (${slide.type}): ${preview}...`);
+        context.push(`  Слайд ${idx + 1} (ID: ${slide.id}, тип: ${slide.type}): ${preview}...`);
       });
     }
     
     if (selectedSlide) {
-      context.push(`\nВыбранный слайд:`);
+      context.push(`\nВыбранный слайд (ID: ${selectedSlide.id}):`);
       context.push(`  Тип: ${selectedSlide.type}`);
       context.push(`  Контент: ${selectedSlide.content}`);
       if (selectedSlide.options) {
@@ -93,6 +113,110 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
     
     return context.join('\n');
+  };
+
+  const applyChanges = (messageId: string, pendingChanges: PendingChanges) => {
+    setIsApplying(messageId);
+    
+    try {
+      let updatedLessons = [...course.lessons];
+      
+      if (pendingChanges.action === 'update_slide' && pendingChanges.slideId) {
+        updatedLessons = updatedLessons.map(lesson => ({
+          ...lesson,
+          slides: lesson.slides.map(slide => {
+            if (slide.id === pendingChanges.slideId) {
+              return {
+                ...slide,
+                ...pendingChanges.changes,
+                updatedAt: new Date(),
+              };
+            }
+            return slide;
+          }),
+        }));
+        toast.success('Слайд обновлён');
+      } 
+      else if (pendingChanges.action === 'add_slide' && pendingChanges.lessonId) {
+        updatedLessons = updatedLessons.map(lesson => {
+          if (lesson.id === pendingChanges.lessonId) {
+            const newSlide: Slide = {
+              id: crypto.randomUUID(),
+              lessonId: lesson.id,
+              type: pendingChanges.changes.type || 'text',
+              order: lesson.slides.length + 1,
+              content: pendingChanges.changes.content || '',
+              options: pendingChanges.changes.options,
+              correctAnswer: pendingChanges.changes.correctAnswer,
+              explanation: pendingChanges.changes.explanation,
+              blankWord: pendingChanges.changes.blankWord,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+            return {
+              ...lesson,
+              slides: [...lesson.slides, newSlide],
+            };
+          }
+          return lesson;
+        });
+        toast.success('Новый слайд добавлен');
+      }
+      else if (pendingChanges.action === 'update_lesson' && pendingChanges.lessonId) {
+        updatedLessons = updatedLessons.map(lesson => {
+          if (lesson.id === pendingChanges.lessonId) {
+            return {
+              ...lesson,
+              title: pendingChanges.changes.title || lesson.title,
+              description: pendingChanges.changes.description || lesson.description,
+              updatedAt: new Date(),
+            };
+          }
+          return lesson;
+        });
+        toast.success('Урок обновлён');
+      }
+      else if (pendingChanges.action === 'add_lesson') {
+        const newLesson: Lesson = {
+          id: crypto.randomUUID(),
+          courseId: course.id,
+          title: pendingChanges.changes.title || 'Новый урок',
+          description: pendingChanges.changes.description || '',
+          order: updatedLessons.length + 1,
+          estimatedMinutes: 5,
+          slides: (pendingChanges.changes.slides || []).map((s: any, idx: number) => ({
+            id: crypto.randomUUID(),
+            lessonId: '',
+            type: s.type || 'text',
+            order: idx + 1,
+            content: s.content || '',
+            options: s.options,
+            correctAnswer: s.correctAnswer,
+            explanation: s.explanation,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        // Set lessonId for slides
+        newLesson.slides = newLesson.slides.map(s => ({ ...s, lessonId: newLesson.id }));
+        updatedLessons.push(newLesson);
+        toast.success('Новый урок добавлен');
+      }
+      
+      onApplyChanges(updatedLessons);
+      
+      // Mark message as applied
+      setMessages(prev => prev.map(m => 
+        m.id === messageId ? { ...m, changesApplied: true } : m
+      ));
+    } catch (err) {
+      console.error('Error applying changes:', err);
+      toast.error('Не удалось применить изменения');
+    } finally {
+      setIsApplying(null);
+    }
   };
 
   const handleSend = async () => {
@@ -116,14 +240,45 @@ ${context}
 
 Запрос пользователя: ${userMessage.content}
 
-Если пользователь просит изменить контент, верни JSON с изменениями в формате:
+ВАЖНО: Если пользователь просит изменить контент, ты ДОЛЖЕН вернуть JSON с изменениями.
+
+Формат ответа для изменения существующего слайда:
 {
-  "action": "update_slide" | "add_slide" | "update_lesson",
-  "changes": { ... },
-  "explanation": "Что было изменено"
+  "action": "update_slide",
+  "slideId": "ID слайда из контекста",
+  "changes": {
+    "content": "Новый текст",
+    "explanation": "Новое объяснение (для квизов)"
+  },
+  "explanation": "Краткое описание что изменено"
 }
 
-Если это просто вопрос — отвечай текстом.`;
+Формат для добавления нового слайда:
+{
+  "action": "add_slide",
+  "lessonId": "ID урока из контекста",
+  "changes": {
+    "type": "single_choice",
+    "content": "Вопрос?",
+    "options": [
+      { "id": "1", "text": "Вариант 1", "isCorrect": false },
+      { "id": "2", "text": "Вариант 2", "isCorrect": true }
+    ],
+    "correctAnswer": "Вариант 2",
+    "explanation": "Объяснение ответа"
+  },
+  "explanation": "Добавлен новый вопрос"
+}
+
+Формат для обновления урока:
+{
+  "action": "update_lesson",
+  "lessonId": "ID урока",
+  "changes": { "title": "Новое название" },
+  "explanation": "Изменено название урока"
+}
+
+Если это просто вопрос без изменений — отвечай обычным текстом без JSON.`;
 
       const response = await supabase.functions.invoke('generate-course', {
         body: { 
@@ -139,11 +294,22 @@ ${context}
       const content = response.data?.content || 'Извините, не удалось получить ответ.';
       
       // Check if response contains JSON with changes
-      let parsedResponse = null;
+      let parsedResponse: any = null;
+      let pendingChanges: PendingChanges | undefined;
+      
       try {
         const jsonMatch = content.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           parsedResponse = JSON.parse(jsonMatch[0]);
+          
+          if (parsedResponse?.action && parsedResponse?.changes) {
+            pendingChanges = {
+              action: parsedResponse.action,
+              slideId: parsedResponse.slideId,
+              lessonId: parsedResponse.lessonId,
+              changes: parsedResponse.changes,
+            };
+          }
         }
       } catch (e) {
         // Not JSON, just text response
@@ -154,15 +320,10 @@ ${context}
         role: 'assistant',
         content: parsedResponse?.explanation || content,
         timestamp: new Date(),
+        pendingChanges,
       };
 
       setMessages(prev => [...prev, assistantMessage]);
-
-      // If there are changes to apply, show apply button
-      if (parsedResponse?.action && parsedResponse?.changes) {
-        // For now, just show what would change
-        // In future, implement actual changes
-      }
 
     } catch (err) {
       console.error('Chat error:', err);
@@ -239,40 +400,73 @@ ${context}
       <ScrollArea className="flex-1 p-4" ref={scrollRef}>
         <div className="space-y-4">
           {messages.map((message) => (
-            <div
-              key={message.id}
-              className={cn(
-                "flex gap-3",
-                message.role === 'user' ? "flex-row-reverse" : ""
-              )}
-            >
-              <div className={cn(
-                "w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0",
-                message.role === 'user' 
-                  ? "bg-primary text-primary-foreground" 
-                  : "bg-muted"
-              )}>
-                {message.role === 'user' 
-                  ? <User className="w-4 h-4" /> 
-                  : <Bot className="w-4 h-4" />
-                }
-              </div>
-              <div className={cn(
-                "max-w-[280px] rounded-xl px-3 py-2 text-sm",
-                message.role === 'user'
-                  ? "bg-primary text-primary-foreground rounded-tr-sm"
-                  : "bg-muted rounded-tl-sm"
-              )}>
-                <p className="whitespace-pre-wrap">{message.content}</p>
-                <span className={cn(
-                  "text-[10px] mt-1 block",
+            <div key={message.id}>
+              <div
+                className={cn(
+                  "flex gap-3",
+                  message.role === 'user' ? "flex-row-reverse" : ""
+                )}
+              >
+                <div className={cn(
+                  "w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0",
                   message.role === 'user' 
-                    ? "text-primary-foreground/70" 
-                    : "text-muted-foreground"
+                    ? "bg-primary text-primary-foreground" 
+                    : "bg-muted"
                 )}>
-                  {message.timestamp.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' })}
-                </span>
+                  {message.role === 'user' 
+                    ? <User className="w-4 h-4" /> 
+                    : <Bot className="w-4 h-4" />
+                  }
+                </div>
+                <div className={cn(
+                  "max-w-[280px] rounded-xl px-3 py-2 text-sm",
+                  message.role === 'user'
+                    ? "bg-primary text-primary-foreground rounded-tr-sm"
+                    : "bg-muted rounded-tl-sm"
+                )}>
+                  <p className="whitespace-pre-wrap">{message.content}</p>
+                  <span className={cn(
+                    "text-[10px] mt-1 block",
+                    message.role === 'user' 
+                      ? "text-primary-foreground/70" 
+                      : "text-muted-foreground"
+                  )}>
+                    {message.timestamp.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
               </div>
+              
+              {/* Apply Changes Button */}
+              {message.pendingChanges && !message.changesApplied && (
+                <div className="ml-10 mt-2">
+                  <Button
+                    size="sm"
+                    onClick={() => applyChanges(message.id, message.pendingChanges!)}
+                    disabled={isApplying === message.id}
+                    className="gap-2 bg-emerald-600 hover:bg-emerald-700"
+                  >
+                    {isApplying === message.id ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Применяю...
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 className="w-4 h-4" />
+                        Применить изменения
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+              
+              {/* Applied indicator */}
+              {message.changesApplied && (
+                <div className="ml-10 mt-2 flex items-center gap-1.5 text-xs text-emerald-600">
+                  <Check className="w-4 h-4" />
+                  <span>Изменения применены</span>
+                </div>
+              )}
             </div>
           ))}
           
