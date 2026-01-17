@@ -32,20 +32,14 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   return <header className="h-16 border-b border-gray-100 flex items-center justify-between px-6 bg-white">
       {/* Search */}
       <button 
-        className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all"
+        className="flex items-center gap-2.5 px-4 py-2.5 rounded-[5px] transition-all border border-transparent hover:border-[#EBE9EA]"
         style={{ 
           backgroundColor: '#F7F7F8',
           color: '#8D8D8D'
         }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.border = '1px solid #EBE9EA';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.border = '1px solid transparent';
-        }}
       >
-        <Search className="w-4 h-4" />
-        <span className="text-sm">Найти курс</span>
+        <Search className="w-[18px] h-[18px]" />
+        <span className="text-[15px]">Найти курс</span>
       </button>
 
       <div className="flex items-center gap-3">
