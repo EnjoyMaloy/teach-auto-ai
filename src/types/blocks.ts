@@ -6,7 +6,6 @@ export type BlockType =
   // Content blocks
   | 'text'
   | 'heading'
-  | 'image'
   | 'video'
   | 'audio'
   | 'image_text'
@@ -129,16 +128,6 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     colorClass: 'text-primary',
     bgClass: 'bg-primary/10',
     description: 'Текстовый блок'
-  },
-  image: {
-    type: 'image',
-    icon: 'Image',
-    label: 'Image',
-    labelRu: 'Картинка',
-    category: 'content',
-    colorClass: 'text-accent-foreground',
-    bgClass: 'bg-accent',
-    description: 'Изображение на весь экран'
   },
   video: {
     type: 'video',

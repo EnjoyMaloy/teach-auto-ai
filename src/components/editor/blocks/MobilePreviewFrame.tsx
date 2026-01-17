@@ -228,23 +228,6 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           </div>
         );
 
-      case 'image':
-        return (
-          <div className="h-full w-full flex items-center justify-center overflow-hidden">
-            {block.imageUrl ? (
-              <img 
-                src={block.imageUrl} 
-                alt="" 
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-muted flex items-center justify-center border-2 border-dashed border-border">
-                <span className="text-muted-foreground text-sm">Нет изображения</span>
-              </div>
-            )}
-          </div>
-        );
-
       case 'video':
         // Extract YouTube video ID from various URL formats
         const getYouTubeId = (url: string) => {

@@ -153,7 +153,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
         )}
 
         {/* Image upload */}
-        {['image', 'image_text', 'hotspot'].includes(block.type) && (
+        {['image_text', 'hotspot'].includes(block.type) && (
           <div className="space-y-2">
             <Label className="text-foreground font-medium">Изображение</Label>
             <div className="border-2 border-dashed border-border rounded-2xl p-4 text-center bg-muted/30 hover:bg-muted/50 transition-colors">

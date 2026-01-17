@@ -3,12 +3,11 @@ import { SubBlock } from './designBlock';
 export type SlideType = 
   | 'text' 
   | 'heading'
-  | 'image'
   | 'video'
   | 'audio'
   | 'image_text'
   | 'design' // Composable design block
-  | 'single_choice' 
+  | 'single_choice'
   | 'multiple_choice' 
   | 'true_false' 
   | 'fill_blank'

@@ -75,12 +75,19 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Create image generation prompt based on slide context
-    const imagePrompt = `Create a simple, clean educational illustration for a course slide.
+    // Create image generation prompt - ONLY visual illustration, NO text on image
+    const imagePrompt = `Create a simple, clean illustration for an educational course.
 Topic: ${prompt}
-${slideContext ? `Slide content: ${slideContext}` : ''}
+${slideContext ? `Context: ${slideContext}` : ''}
 
-Style: Modern, minimalist, suitable for educational content. Use clean shapes and professional colors.`;
+CRITICAL REQUIREMENTS:
+- Create ONLY a visual illustration (objects, scenes, nature, people, icons)
+- DO NOT include ANY text, words, letters, numbers, or labels on the image
+- DO NOT include quiz elements, questions, or answers
+- Style: Modern, minimalist, flat design with clean shapes
+- Use professional, vibrant colors
+- Examples: a cup of tea, a tree, a person reading, abstract shapes, nature scenes
+- The image should visually represent the concept, not explain it with text`;
 
     console.log(`Generating image for: ${prompt.substring(0, 50)}...`);
 
