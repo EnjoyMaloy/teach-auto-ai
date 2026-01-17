@@ -18,7 +18,6 @@ import {
   TrendingDown,
   Star,
   MessageSquare,
-  Sparkles,
   Settings,
   Edit3,
   AlertCircle,
@@ -78,8 +77,6 @@ const CourseStats: React.FC = () => {
     avgRating: 0,
     totalReviews: 0,
   });
-  const [aiRecommendations, setAiRecommendations] = useState<string[]>([]);
-  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -177,105 +174,6 @@ const CourseStats: React.FC = () => {
     loadData();
   }, [courseId, user, fetchCourse, navigate]);
 
-  const generateAIRecommendations = async () => {
-    if (!course) return;
-    
-    setIsGeneratingAI(true);
-    
-    try {
-      const context = {
-        courseName: course.title,
-        slideStats: slideStats.map(s => ({
-          title: s.slideTitle,
-          retentionRate: s.retentionRate,
-          correctRate: s.correctRate,
-        })),
-        reviews: reviews.map(r => ({
-          rating: r.rating,
-          comment: r.comment,
-        })),
-        summary,
-      };
-
-      const { data, error } = await supabase.functions.invoke('generate-course', {
-        body: {
-          userMessage: `Проанализируй статистику курса и дай 3-5 конкретных рекомендаций по улучшению:
-          
-Курс: ${context.courseName}
-Общая статистика:
-- Просмотров: ${context.summary.totalViews}
-- Уникальных пользователей: ${context.summary.uniqueUsers}
-- Процент завершения: ${context.summary.completionRate}%
-- Средний рейтинг: ${context.summary.avgRating.toFixed(1)}
-
-Слайды с низким удержанием (< 70%):
-${context.slideStats.filter(s => s.retentionRate < 70).map(s => `- "${s.title}": ${s.retentionRate}%`).join('\n') || 'Нет'}
-
-Последние отзывы:
-${context.reviews.slice(0, 5).map(r => `- ${r.rating}/5: "${r.comment}"`).join('\n') || 'Нет отзывов'}
-
-Ответь кратко, список рекомендаций в формате JSON массива строк.`,
-          mode: 'chat',
-          agentRole: 'reviewer',
-        },
-      });
-
-      if (error) throw error;
-
-      // Parse AI response
-      const content = data.content;
-      try {
-        const jsonMatch = content.match(/\[[\s\S]*\]/);
-        if (jsonMatch) {
-          const recommendations = JSON.parse(jsonMatch[0]);
-          setAiRecommendations(recommendations);
-        } else {
-          // Fallback: split by newlines
-          setAiRecommendations(content.split('\n').filter((line: string) => line.trim().startsWith('-')).map((line: string) => line.replace(/^-\s*/, '')));
-        }
-      } catch {
-        setAiRecommendations([content]);
-      }
-    } catch (error) {
-      console.error('Error generating AI recommendations:', error);
-      toast.error('Ошибка генерации рекомендаций');
-    } finally {
-      setIsGeneratingAI(false);
-    }
-  };
-
-  const generateReviewRecommendation = async (review: Review) => {
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-course', {
-        body: {
-          userMessage: `Пользователь оставил отзыв о курсе:
-Рейтинг: ${review.rating}/5
-Комментарий: "${review.comment}"
-
-Дай одну краткую конкретную рекомендацию как улучшить курс на основе этого отзыва. Ответ в одном предложении.`,
-          mode: 'chat',
-          agentRole: 'reviewer',
-        },
-      });
-
-      if (error) throw error;
-
-      // Update review with AI recommendation
-      await supabase
-        .from('course_reviews')
-        .update({ ai_recommendation: data.content })
-        .eq('id', review.id);
-
-      setReviews(prev => prev.map(r => 
-        r.id === review.id ? { ...r, aiRecommendation: data.content } : r
-      ));
-
-      toast.success('Рекомендация сгенерирована');
-    } catch (error) {
-      console.error('Error generating review recommendation:', error);
-      toast.error('Ошибка генерации рекомендации');
-    }
-  };
 
   if (isLoading) {
     return (
@@ -445,68 +343,6 @@ ${context.reviews.slice(0, 5).map(r => `- ${r.rating}/5: "${r.comment}"`).join('
             </CardContent>
           </Card>
 
-          {/* AI Recommendations */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5" />
-                    AI Рекомендации
-                  </CardTitle>
-                  <CardDescription>
-                    Автоматический анализ и советы по улучшению
-                  </CardDescription>
-                </div>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={generateAIRecommendations}
-                  disabled={isGeneratingAI}
-                >
-                  {isGeneratingAI ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Sparkles className="w-4 h-4" />
-                  )}
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {aiRecommendations.length === 0 ? (
-                <div className="text-center py-8">
-                  <Sparkles className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground mb-4">
-                    Нажмите кнопку для генерации рекомендаций на основе статистики
-                  </p>
-                  <Button onClick={generateAIRecommendations} disabled={isGeneratingAI}>
-                    {isGeneratingAI ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Анализ...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        Сгенерировать
-                      </>
-                    )}
-                  </Button>
-                </div>
-              ) : (
-                <ul className="space-y-3">
-                  {aiRecommendations.map((rec, index) => (
-                    <li key={index} className="flex gap-3 p-3 bg-muted/50 rounded-lg">
-                      <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-xs font-medium text-primary">{index + 1}</span>
-                      </div>
-                      <p className="text-sm">{rec}</p>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
         </div>
 
         {/* Reviews Section */}
@@ -517,7 +353,7 @@ ${context.reviews.slice(0, 5).map(r => `- ${r.rating}/5: "${r.comment}"`).join('
               Отзывы учеников
             </CardTitle>
             <CardDescription>
-              Отзывы с рекомендациями AI по улучшению курса
+              Отзывы учеников курса
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -553,25 +389,6 @@ ${context.reviews.slice(0, 5).map(r => `- ${r.rating}/5: "${r.comment}"`).join('
 
                     {review.comment && (
                       <p className="text-sm mb-3">{review.comment}</p>
-                    )}
-
-                    {review.aiRecommendation ? (
-                      <div className="bg-ai/5 border border-ai/20 rounded-lg p-3">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Sparkles className="w-4 h-4 text-ai" />
-                          <span className="text-xs font-medium text-ai">AI Рекомендация</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">{review.aiRecommendation}</p>
-                      </div>
-                    ) : (
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => generateReviewRecommendation(review)}
-                      >
-                        <Sparkles className="w-4 h-4 mr-1" />
-                        Сгенерировать рекомендацию
-                      </Button>
                     )}
                   </div>
                 ))}
