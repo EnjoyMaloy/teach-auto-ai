@@ -347,11 +347,12 @@ export const useCourses = () => {
   const fetchPublishedCourses = useCallback(async (): Promise<Course[]> => {
     setIsLoading(true);
     try {
-      // Fetch all published courses
+      // Fetch all published and approved courses
       const { data: coursesData, error: coursesError } = await supabase
         .from('courses')
         .select('*')
         .eq('is_published', true)
+        .eq('moderation_status', 'approved')
         .order('published_at', { ascending: false });
 
       if (coursesError) throw coursesError;
