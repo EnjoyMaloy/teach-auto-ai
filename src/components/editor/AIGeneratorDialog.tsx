@@ -15,6 +15,7 @@ import {
   Loader2, 
   Check, 
   AlertCircle,
+  Search,
   Brain,
   Layers,
   BookOpen,
@@ -120,49 +121,99 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
     setIsGenerating(true);
     setError(null);
     
-    // Initialize steps
+    // Initialize steps - new 4-step pipeline
     const initialSteps: GenerationStep[] = [
-      { id: 'plan', label: 'Планирование структуры', status: 'pending' },
-      { id: 'generate', label: 'Генерация контента', status: 'pending' },
+      { id: 'research', label: 'Исследование темы', status: 'pending' },
+      { id: 'structure', label: 'Планирование структуры', status: 'pending' },
+      { id: 'content', label: 'Генерация контента', status: 'pending' },
       { id: 'images', label: 'Создание иллюстраций', status: 'pending' },
-      { id: 'finalize', label: 'Финализация курса', status: 'pending' },
     ];
     setSteps(initialSteps);
 
     try {
-      // Step 1: Planning
-      updateStep('plan', { status: 'active', message: 'Анализирую запрос...' });
+      // Step 1: Research - gather facts about the topic
+      updateStep('research', { status: 'active', message: 'Изучаю тему...' });
       
-      const planResponse = await supabase.functions.invoke('generate-course', {
+      const researchResponse = await supabase.functions.invoke('generate-course', {
         body: { 
-          userMessage: prompt, 
-          agentRole: 'planner' 
+          userMessage: `Исследуй тему: "${prompt}"`, 
+          agentRole: 'research' 
         },
       });
 
-      if (planResponse.error) {
-        throw new Error(planResponse.error.message || 'Ошибка при планировании');
+      if (researchResponse.error) {
+        throw new Error(researchResponse.error.message || 'Ошибка при исследовании');
       }
 
-      updateStep('plan', { 
+      let researchData: any = {};
+      try {
+        const content = researchResponse.data?.content || '';
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          researchData = JSON.parse(jsonMatch[0]);
+        }
+      } catch (e) {
+        console.log('Research parse warning:', e);
+      }
+
+      const factsCount = researchData.keyFacts?.length || 0;
+      updateStep('research', { 
         status: 'completed', 
-        message: planResponse.data?.content?.substring(0, 100) + '...' 
+        message: `Найдено ${factsCount} ключевых фактов` 
       });
 
-      // Step 2: Generate content
-      updateStep('generate', { status: 'active', message: 'Создаю уроки и слайды...' });
+      // Step 2: Structure - plan the course based on research
+      updateStep('structure', { status: 'active', message: 'Планирую структуру...' });
+
+      const structureResponse = await supabase.functions.invoke('generate-course', {
+        body: { 
+          userMessage: `Запрос пользователя: "${prompt}"
+
+Исследование темы:
+${JSON.stringify(researchData, null, 2)}
+
+Создай структуру курса СТРОГО по требованиям пользователя. Если указано количество уроков или блоков - следуй им точно.`, 
+          agentRole: 'structure' 
+        },
+      });
+
+      if (structureResponse.error) {
+        throw new Error(structureResponse.error.message || 'Ошибка при планировании');
+      }
+
+      let structureData: any = {};
+      try {
+        const content = structureResponse.data?.content || '';
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          structureData = JSON.parse(jsonMatch[0]);
+        }
+      } catch (e) {
+        console.log('Structure parse warning:', e);
+      }
+
+      const lessonsCount = structureData.lessons?.length || 0;
+      const blocksCount = structureData.lessons?.reduce((acc: number, l: any) => acc + (l.blocks?.length || 0), 0) || 0;
+      updateStep('structure', { 
+        status: 'completed', 
+        message: `${lessonsCount} уроков, ${blocksCount} блоков` 
+      });
+
+      // Step 3: Generate actual content for blocks
+      updateStep('content', { status: 'active', message: 'Создаю контент...' });
 
       const generateResponse = await supabase.functions.invoke('generate-course', {
         body: { 
-          userMessage: `Создай полный курс по теме: "${prompt}". 
+          userMessage: `Запрос пользователя: "${prompt}"
 
-Требования:
-- 2-4 урока
-- 4-6 слайдов в каждом уроке
-- Разные типы слайдов: text, single_choice, multiple_choice, true_false, fill_blank
-- Краткий, понятный контент
-- Интересные вопросы с объяснениями`, 
-          agentRole: 'builder' 
+Структура курса:
+${JSON.stringify(structureData, null, 2)}
+
+Исследование:
+${JSON.stringify(researchData, null, 2)}
+
+Создай полный контент для КАЖДОГО блока по этой структуре. Следуй плану точно.`, 
+          agentRole: 'content' 
         },
       });
 
@@ -170,7 +221,7 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
         throw new Error(generateResponse.error.message || 'Ошибка при генерации');
       }
 
-      updateStep('generate', { status: 'completed', message: 'Контент создан' });
+      updateStep('content', { status: 'completed', message: 'Контент создан' });
 
       // Parse course data
       let courseData: GeneratedCourse;
@@ -330,14 +381,14 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
 
   const getStepIconByType = (stepId: string) => {
     switch (stepId) {
-      case 'plan':
+      case 'research':
+        return <Search className="w-4 h-4" />;
+      case 'structure':
         return <Brain className="w-4 h-4" />;
-      case 'generate':
+      case 'content':
         return <Layers className="w-4 h-4" />;
       case 'images':
         return <Image className="w-4 h-4" />;
-      case 'finalize':
-        return <BookOpen className="w-4 h-4" />;
       default:
         return null;
     }
