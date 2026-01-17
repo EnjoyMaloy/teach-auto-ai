@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
 import { useCourses } from '@/hooks/useCourses';
 import { Course } from '@/types/course';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { 
   Plus, 
-  BookOpen, 
   Clock, 
   FileText, 
   Trash2, 
-  LogOut,
   Loader2,
   Sparkles,
   Settings,
@@ -22,7 +20,9 @@ import {
   Edit3,
   MoreHorizontal,
   Globe,
-  FileEdit
+  FileEdit,
+  Search,
+  Star
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -42,23 +42,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import AppLayout from '@/components/layout/AppLayout';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
   const { courses, isLoading, fetchCourses, createCourse, deleteCourse } = useCourses();
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'drafts' | 'published'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchCourses();
   }, [fetchCourses]);
 
   const filteredCourses = courses.filter(course => {
-    if (activeTab === 'drafts') return !course.isPublished;
-    if (activeTab === 'published') return course.isPublished;
-    return true;
+    const matchesTab = activeTab === 'all' ? true :
+      activeTab === 'drafts' ? !course.isPublished :
+      course.isPublished;
+    
+    const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (course.description?.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    return matchesTab && matchesSearch;
   });
 
   const draftsCount = courses.filter(c => !c.isPublished).length;
@@ -84,12 +90,6 @@ const Dashboard: React.FC = () => {
     setCourseToDelete(null);
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-    toast.success('Вы вышли из аккаунта');
-    navigate('/auth');
-  };
-
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('ru-RU', {
       day: 'numeric',
@@ -99,47 +99,50 @@ const Dashboard: React.FC = () => {
   };
 
   const CourseCard = ({ course }: { course: Course }) => (
-    <Card 
-      className="group cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/50 overflow-hidden"
-    >
+    <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 hover:border-primary/30 overflow-hidden bg-card">
       {/* Banner */}
       <div 
-        className="h-32 bg-gradient-to-br from-primary/20 to-primary/5 relative"
+        className="h-36 relative overflow-hidden"
         style={course.coverImage ? { 
           backgroundImage: `url(${course.coverImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         } : {}}
       >
-        <div className="absolute top-2 right-2 flex gap-1">
+        {!course.coverImage && (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+        
+        {/* Status Badge */}
+        <div className="absolute top-3 left-3">
           {course.isPublished ? (
-            <Badge className="bg-success/90 text-white">
+            <Badge className="bg-emerald-500/90 text-white border-0">
               <Globe className="w-3 h-3 mr-1" />
               Опубликован
             </Badge>
           ) : (
-            <Badge variant="secondary">
+            <Badge variant="secondary" className="bg-white/90 text-foreground border-0">
               <FileEdit className="w-3 h-3 mr-1" />
               Черновик
             </Badge>
           )}
         </div>
-      </div>
 
-      <CardHeader className="pb-2">
-        <div className="flex items-start justify-between">
-          <div className="flex-1" onClick={() => navigate(`/editor/${course.id}`)}>
-            <CardTitle className="text-lg line-clamp-1">{course.title}</CardTitle>
-            <CardDescription className="line-clamp-2 mt-1">
-              {course.description || 'Без описания'}
-            </CardDescription>
-          </div>
+        {/* Rating */}
+        <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/50 backdrop-blur-sm px-2 py-1 rounded-full">
+          <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+          <span className="text-xs text-white font-medium">4.9</span>
+        </div>
+
+        {/* Menu */}
+        <div className="absolute bottom-3 right-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="opacity-0 group-hover:opacity-100 transition-opacity -mt-1 -mr-2"
+                className="h-8 w-8 bg-black/30 backdrop-blur-sm hover:bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={(e) => e.stopPropagation()}
               >
                 <MoreHorizontal className="w-4 h-4" />
@@ -175,16 +178,24 @@ const Dashboard: React.FC = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+      </div>
+
+      <CardHeader className="pb-2" onClick={() => navigate(`/editor/${course.id}`)}>
+        <CardTitle className="text-base font-semibold line-clamp-1">{course.title}</CardTitle>
+        <CardDescription className="line-clamp-2 text-sm">
+          {course.description || 'Без описания'}
+        </CardDescription>
       </CardHeader>
+
       <CardContent onClick={() => navigate(`/editor/${course.id}`)}>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <FileText className="w-4 h-4" />
-            {course.lessons.length} {course.lessons.length === 1 ? 'урок' : 'уроков'}
+            <span>{course.lessons.length} уроков</span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <Clock className="w-4 h-4" />
-            {course.estimatedMinutes || 0} мин
+            <span>{course.estimatedMinutes || 0} мин</span>
           </div>
         </div>
         <div className="mt-3 pt-3 border-t border-border text-xs text-muted-foreground">
@@ -195,7 +206,7 @@ const Dashboard: React.FC = () => {
   );
 
   const EmptyState = () => (
-    <Card className="border-dashed">
+    <Card className="border-dashed border-2">
       <CardContent className="flex flex-col items-center justify-center py-16">
         <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
           <Sparkles className="w-8 h-8 text-primary" />
@@ -211,7 +222,7 @@ const Dashboard: React.FC = () => {
            'Используйте ИИ-ассистента для быстрого создания интерактивных курсов'}
         </p>
         {activeTab !== 'published' && (
-          <Button onClick={handleCreateCourse} disabled={isCreating}>
+          <Button onClick={handleCreateCourse} disabled={isCreating} size="lg">
             {isCreating ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : (
@@ -225,41 +236,21 @@ const Dashboard: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h1 className="font-semibold text-foreground">LearnForge AI</h1>
-              <p className="text-sm text-muted-foreground">{user?.email}</p>
-            </div>
-          </div>
-
-          <Button variant="ghost" onClick={handleSignOut}>
-            <LogOut className="w-4 h-4 mr-2" />
-            Выход
-          </Button>
-        </div>
-      </header>
-
-      {/* Main content */}
-      <main className="container mx-auto px-4 py-8">
+    <AppLayout>
+      {/* Page Header */}
+      <div className="mb-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Библиотека курсов</h2>
+            <h1 className="text-2xl font-bold text-foreground">Мастерская авторов</h1>
             <p className="text-muted-foreground mt-1">
               {courses.length > 0 
                 ? `${courses.length} ${courses.length === 1 ? 'курс' : courses.length < 5 ? 'курса' : 'курсов'}`
-                : 'У вас пока нет курсов'
+                : 'Создайте свой первый курс'
               }
             </p>
           </div>
 
-          <Button onClick={handleCreateCourse} disabled={isCreating}>
+          <Button onClick={handleCreateCourse} disabled={isCreating} size="lg">
             {isCreating ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : (
@@ -269,38 +260,51 @@ const Dashboard: React.FC = () => {
           </Button>
         </div>
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)} className="mb-6">
-          <TabsList>
-            <TabsTrigger value="all" className="gap-2">
-              Все курсы
-              <Badge variant="secondary" className="ml-1">{courses.length}</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="drafts" className="gap-2">
-              Черновики
-              <Badge variant="secondary" className="ml-1">{draftsCount}</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="published" className="gap-2">
-              Опубликованные
-              <Badge variant="secondary" className="ml-1">{publishedCount}</Badge>
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        {/* Search and Filters */}
+        <div className="flex items-center gap-4">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Поиск курсов..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-card"
+            />
+          </div>
 
-        {isLoading ? (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          </div>
-        ) : filteredCourses.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredCourses.map(course => (
-              <CourseCard key={course.id} course={course} />
-            ))}
-          </div>
-        )}
-      </main>
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
+            <TabsList className="bg-card">
+              <TabsTrigger value="all" className="gap-2">
+                Все
+                <Badge variant="secondary" className="ml-1 bg-muted">{courses.length}</Badge>
+              </TabsTrigger>
+              <TabsTrigger value="drafts" className="gap-2">
+                Черновики
+                <Badge variant="secondary" className="ml-1 bg-muted">{draftsCount}</Badge>
+              </TabsTrigger>
+              <TabsTrigger value="published" className="gap-2">
+                Опубликованные
+                <Badge variant="secondary" className="ml-1 bg-muted">{publishedCount}</Badge>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+      </div>
+
+      {/* Content */}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      ) : filteredCourses.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {filteredCourses.map(course => (
+            <CourseCard key={course.id} course={course} />
+          ))}
+        </div>
+      )}
 
       {/* Delete confirmation dialog */}
       <AlertDialog open={!!courseToDelete} onOpenChange={() => setCourseToDelete(null)}>
@@ -322,7 +326,7 @@ const Dashboard: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </AppLayout>
   );
 };
 
