@@ -53,7 +53,8 @@ const dbCourseToCourse = (row: any, lessons: Lesson[]): Course => ({
   updatedAt: new Date(row.updated_at),
   tags: row.tags || [],
   designSystem: row.design_system as CourseDesignSystem | undefined,
-});
+  category: row.category || undefined,
+} as Course & { category?: string });
 
 export const useCourses = () => {
   const { user } = useAuth();

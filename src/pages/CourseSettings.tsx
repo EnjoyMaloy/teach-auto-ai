@@ -9,6 +9,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { 
   ArrowLeft, 
   Save, 
   Loader2, 
@@ -18,13 +25,15 @@ import {
   Settings,
   BarChart3,
   Edit3,
-  Palette
+  Palette,
+  Tag
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DesignSystemEditor } from '@/components/editor/DesignSystemEditor';
 import { DesignSystemConfig, DEFAULT_DESIGN_SYSTEM } from '@/types/designSystem';
 import { CourseDesignSystem } from '@/types/course';
+import { COURSE_CATEGORIES } from '@/lib/categories';
 
 const CourseSettings: React.FC = () => {
   const { courseId } = useParams();
@@ -45,6 +54,7 @@ const CourseSettings: React.FC = () => {
   const [coverImage, setCoverImage] = useState<string | undefined>();
   const [tags, setTags] = useState<string[]>([]);
   const [tagsInput, setTagsInput] = useState('');
+  const [category, setCategory] = useState<string>('');
   const [designSystem, setDesignSystem] = useState<DesignSystemConfig>(DEFAULT_DESIGN_SYSTEM);
   const [activeTab, setActiveTab] = useState('general');
 
@@ -63,7 +73,7 @@ const CourseSettings: React.FC = () => {
         setCoverImage(course.coverImage);
         setTags(course.tags || []);
         setTagsInput((course.tags || []).join(', '));
-        
+        setCategory((course as any).category || '');
         // Load design system
         if (course.designSystem) {
           setDesignSystem({ ...DEFAULT_DESIGN_SYSTEM, ...course.designSystem });
@@ -169,10 +179,13 @@ const CourseSettings: React.FC = () => {
       designSystem: designSystem as CourseDesignSystem,
     });
 
-    // Update short_description directly
+    // Update short_description and category directly
     await supabase
       .from('courses')
-      .update({ short_description: shortDescription })
+      .update({ 
+        short_description: shortDescription,
+        category: category || null 
+      })
       .eq('id', courseId);
 
     setIsSaving(false);
@@ -367,12 +380,37 @@ const CourseSettings: React.FC = () => {
                   </div>
 
                   <div className="space-y-2">
+                    <Label htmlFor="category">Категория курса</Label>
+                    <Select value={category} onValueChange={setCategory}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Выберите категорию" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {COURSE_CATEGORIES.map(cat => {
+                          const Icon = cat.icon;
+                          return (
+                            <SelectItem key={cat.id} value={cat.id}>
+                              <div className="flex items-center gap-2">
+                                <div 
+                                  className="w-3 h-3 rounded-full" 
+                                  style={{ backgroundColor: cat.color }}
+                                />
+                                {cat.name}
+                              </div>
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="tags">Теги (через запятую)</Label>
                     <Input
                       id="tags"
                       value={tagsInput}
                       onChange={(e) => setTagsInput(e.target.value)}
-                      placeholder="React, TypeScript, Frontend"
+                      placeholder="DeFi, Staking, Yield"
                     />
                   </div>
                 </CardContent>

@@ -116,6 +116,7 @@ export type Database = {
       courses: {
         Row: {
           author_id: string
+          category: string | null
           cover_image: string | null
           created_at: string
           current_version: number | null
@@ -133,6 +134,7 @@ export type Database = {
         }
         Insert: {
           author_id: string
+          category?: string | null
           cover_image?: string | null
           created_at?: string
           current_version?: number | null
@@ -150,6 +152,7 @@ export type Database = {
         }
         Update: {
           author_id?: string
+          category?: string | null
           cover_image?: string | null
           created_at?: string
           current_version?: number | null
