@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { 
   Undo2, Redo2, Eye, 
-  Share2, Loader2, Pencil, Check, X, Palette, ChevronRight, Map
+  Share2, Loader2, Pencil, Check, X, Palette, ChevronRight, Map, Sparkles
 } from 'lucide-react';
-import { Course, LessonsDisplayType } from '@/types/course';
+import { Course, Lesson, LessonsDisplayType } from '@/types/course';
 import { DesignSystemConfig } from '@/types/designSystem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PublishDialog } from './PublishDialog';
 import { DesignSystemEditor } from './DesignSystemEditor';
+import { AIGeneratorDialog } from './AIGeneratorDialog';
 import {
   Popover,
   PopoverContent,
@@ -32,6 +33,7 @@ interface EditorHeaderProps {
   onUpdateTitle: (title: string) => void;
   onUpdateDesignSystem: (config: DesignSystemConfig) => void;
   onUpdateLessonsDisplayType?: (type: LessonsDisplayType) => void;
+  onAIGenerate?: (lessons: Lesson[]) => void;
   onBack?: () => void;
 }
 
@@ -50,6 +52,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   onUpdateTitle,
   onUpdateDesignSystem,
   onUpdateLessonsDisplayType,
+  onAIGenerate,
   onBack,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -57,6 +60,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [showDesignSystem, setShowDesignSystem] = useState(false);
   const [showMapSettings, setShowMapSettings] = useState(false);
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
 
   const handleStartEditing = () => {
     setEditedTitle(course.title);
@@ -395,6 +399,19 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
           <div className="h-6 w-px bg-border" />
 
+          {/* AI Generator Button */}
+          {onAIGenerate && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setShowAIGenerator(true)}
+              className="gap-1.5 border-primary/30 text-primary hover:bg-primary/10 hover:text-primary"
+            >
+              <Sparkles className="w-4 h-4" />
+              AI
+            </Button>
+          )}
+
           <Button variant="outline" size="sm" onClick={onPreview}>
             <Eye className="w-4 h-4 mr-1" />
             Предпросмотр
@@ -418,6 +435,16 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         moderationComment={(course as any).moderationComment || null}
         onUpdate={() => window.location.reload()}
       />
+
+      {/* AI Generator Dialog */}
+      {onAIGenerate && (
+        <AIGeneratorDialog
+          open={showAIGenerator}
+          onOpenChange={setShowAIGenerator}
+          onGenerated={onAIGenerate}
+          courseId={course.id}
+        />
+      )}
     </>
   );
 };
