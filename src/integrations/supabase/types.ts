@@ -124,9 +124,13 @@ export type Database = {
           design_system: Json | null
           estimated_minutes: number | null
           id: string
+          is_link_accessible: boolean | null
           is_published: boolean | null
+          moderation_comment: string | null
+          moderation_status: string | null
           published_at: string | null
           short_description: string | null
+          submitted_for_moderation_at: string | null
           tags: string[] | null
           target_audience: string | null
           title: string
@@ -142,9 +146,13 @@ export type Database = {
           design_system?: Json | null
           estimated_minutes?: number | null
           id?: string
+          is_link_accessible?: boolean | null
           is_published?: boolean | null
+          moderation_comment?: string | null
+          moderation_status?: string | null
           published_at?: string | null
           short_description?: string | null
+          submitted_for_moderation_at?: string | null
           tags?: string[] | null
           target_audience?: string | null
           title: string
@@ -160,9 +168,13 @@ export type Database = {
           design_system?: Json | null
           estimated_minutes?: number | null
           id?: string
+          is_link_accessible?: boolean | null
           is_published?: boolean | null
+          moderation_comment?: string | null
+          moderation_status?: string | null
           published_at?: string | null
           short_description?: string | null
+          submitted_for_moderation_at?: string | null
           tags?: string[] | null
           target_audience?: string | null
           title?: string
