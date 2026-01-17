@@ -32,7 +32,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   return <header className="h-16 border-b border-gray-100 flex items-center justify-between px-6 bg-white">
       {/* Search */}
       <button 
-        className="flex items-center gap-2.5 px-4 py-2.5 rounded-[5px] transition-all border border-transparent hover:border-[#EBE9EA]"
+        className="flex items-center gap-2.5 px-4 py-3 rounded-[5px] transition-all border border-transparent hover:border-[#EBE9EA]"
         style={{ 
           backgroundColor: '#F7F7F8',
           color: '#8D8D8D'
