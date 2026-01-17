@@ -255,7 +255,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onClose }) =
 
           {/* Content */}
           <main 
-            className="flex-1 overflow-y-auto"
+            className="flex-1 overflow-hidden"
             style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
           >
             {currentSlide && (

@@ -64,25 +64,38 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
     switch (slide.type) {
       case 'heading':
         return (
-          <div className="text-center py-4">
-            <h1 className="text-xl font-bold text-foreground">{slide.content || 'Заголовок'}</h1>
+          <div className="h-full flex items-center justify-center p-8">
+            <h1 
+              className="text-3xl font-bold text-center leading-tight"
+              style={{ 
+                color: `hsl(var(--ds-foreground, var(--foreground)))`,
+                fontFamily: `var(--ds-heading-font-family, inherit)`,
+              }}
+            >
+              {slide.content || 'Заголовок'}
+            </h1>
           </div>
         );
 
       case 'text':
         return (
-          <div className="text-center py-4">
-            <p className="text-base leading-relaxed text-foreground">{slide.content}</p>
+          <div className="h-full flex items-center justify-center p-8">
+            <p 
+              className="text-base leading-relaxed text-center"
+              style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
+            >
+              {slide.content}
+            </p>
           </div>
         );
 
       case 'image':
         return (
-          <div className="py-2">
+          <div className="h-full w-full flex items-center justify-center overflow-hidden">
             {slide.imageUrl ? (
-              <img src={slide.imageUrl} alt="" className="w-full rounded-xl object-contain max-h-[40vh]" />
+              <img src={slide.imageUrl} alt="" className="w-full h-full object-cover" />
             ) : (
-              <div className="aspect-video bg-muted rounded-xl flex items-center justify-center">
+              <div className="w-full h-full bg-muted flex items-center justify-center border-2 border-dashed border-border">
                 <span className="text-muted-foreground text-sm">Нет изображения</span>
               </div>
             )}
@@ -91,12 +104,12 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
       case 'video':
         return (
-          <div className="py-2">
+          <div className="h-full w-full flex items-center justify-center overflow-hidden bg-black">
             {slide.videoUrl ? (
-              <video src={slide.videoUrl} controls className="w-full rounded-xl max-h-[40vh]" />
+              <video src={slide.videoUrl} controls className="w-full h-full object-contain" playsInline />
             ) : (
-              <div className="aspect-video bg-muted rounded-xl flex items-center justify-center">
-                <span className="text-muted-foreground text-sm">Нет видео</span>
+              <div className="w-full h-full flex flex-col items-center justify-center text-white/60">
+                <span className="text-sm">Загрузите видео</span>
               </div>
             )}
           </div>
@@ -104,29 +117,46 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
       case 'audio':
         return (
-          <div className="py-4 text-center space-y-3">
-            <p className="text-base font-medium text-foreground">{slide.content || 'Аудио'}</p>
-            {slide.audioUrl ? (
-              <audio src={slide.audioUrl} controls className="w-full mx-auto" />
-            ) : (
-              <div className="p-4 bg-muted rounded-xl flex items-center justify-center">
-                <span className="text-muted-foreground text-sm">Нет аудио</span>
-              </div>
+          <div className="h-full flex flex-col items-center justify-center p-6 gap-4">
+            <div 
+              className="w-20 h-20 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: `hsl(var(--ds-muted, var(--muted)))` }}
+            >
+              <span className="text-2xl">🎵</span>
+            </div>
+            <p 
+              className="text-center font-medium"
+              style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
+            >
+              {slide.content || 'Аудио'}
+            </p>
+            {slide.audioUrl && (
+              <audio src={slide.audioUrl} controls className="w-full max-w-xs" />
             )}
           </div>
         );
 
       case 'image_text':
         return (
-          <div className="space-y-3">
-            <div className="aspect-video bg-muted rounded-xl flex items-center justify-center overflow-hidden max-h-[30vh]">
+          <div className="flex-1 flex flex-col h-full">
+            <div className="flex-1 bg-muted flex items-center justify-center overflow-hidden">
               {slide.imageUrl ? (
                 <img src={slide.imageUrl} alt="" className="w-full h-full object-cover" />
               ) : (
-                <span className="text-muted-foreground text-sm">Изображение</span>
+                <span className="text-muted-foreground">Изображение</span>
               )}
             </div>
-            <p className="text-sm text-center text-foreground">{slide.content}</p>
+            <div 
+              className="p-4"
+              style={{ backgroundColor: `hsl(var(--ds-card, var(--card)))` }}
+            >
+              <p 
+                className="text-sm"
+                style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
+              >
+                {slide.content || 'Описание к картинке...'}
+              </p>
+            </div>
           </div>
         );
 
@@ -332,13 +362,13 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
   const canCheck = (selectedOptions.length > 0 || textAnswer.trim() !== '') && !answered;
 
   return (
-    <div className="w-full h-full flex flex-col">
-      <div className="slide-card flex-1">
+    <div className="w-full h-full flex flex-col overflow-hidden">
+      <div className="flex-1 overflow-auto">
         {renderContent()}
 
         {/* Explanation */}
         {answered && slide.explanation && (
-          <div className="mt-4 p-3 rounded-lg bg-primary/5 flex items-start gap-2 animate-fade-up">
+          <div className="mx-4 mb-4 p-3 rounded-lg bg-primary/5 flex items-start gap-2 animate-fade-up">
             <Lightbulb className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
             <div>
               <p className="font-medium text-primary text-xs mb-0.5">Объяснение</p>
