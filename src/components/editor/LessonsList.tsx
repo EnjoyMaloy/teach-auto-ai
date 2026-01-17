@@ -16,6 +16,7 @@ import {
 import { Plus, BookOpen } from 'lucide-react';
 import { Lesson } from '@/types/course';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import { SortableLessonItem } from './SortableLessonItem';
 
 interface LessonsListProps {
@@ -55,15 +56,28 @@ export const LessonsList: React.FC<LessonsListProps> = ({
     }
   };
 
+  const totalMinutes = lessons.reduce((acc, l) => acc + l.estimatedMinutes, 0);
+
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <h3 className="font-bold text-foreground">Уроки</h3>
-        <Button variant="ghost" size="icon-sm" onClick={onAddLesson}>
-          <Plus className="w-4 h-4" />
+        <div>
+          <h3 className="font-bold text-foreground">Уроки</h3>
+          <p className="text-xs text-muted-foreground">{lessons.length} уроков</p>
+        </div>
+        <Button 
+          variant="default" 
+          size="sm"
+          onClick={onAddLesson}
+          className="rounded-xl"
+        >
+          <Plus className="w-4 h-4 mr-1.5" />
+          Добавить
         </Button>
       </div>
+
+      <Separator className="mb-3" />
 
       {/* Lessons List */}
       <div className="flex-1 overflow-y-auto space-y-2">
@@ -102,6 +116,13 @@ export const LessonsList: React.FC<LessonsListProps> = ({
             </Button>
           </div>
         )}
+      </div>
+
+      {/* Footer Stats */}
+      <Separator className="mt-3" />
+      <div className="pt-3 flex items-center justify-between text-xs text-muted-foreground">
+        <span>{lessons.length} уроков</span>
+        <span>{totalMinutes} мин</span>
       </div>
     </div>
   );
