@@ -222,14 +222,23 @@ const PublicCourse: React.FC = () => {
 
   if (error || !course) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4 p-4">
         <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
           <AlertCircle className="w-8 h-8 text-destructive" />
         </div>
-        <h1 className="text-xl font-semibold text-foreground">{error || 'Курс не найден'}</h1>
+        <h1 className="text-xl font-semibold text-foreground text-center">{error || 'Курс не найден'}</h1>
         <p className="text-muted-foreground text-center max-w-md">
           Возможно, курс был удалён или ссылка недействительна
         </p>
+        
+        {/* Debug info for Telegram */}
+        <div className="mt-4 p-3 bg-muted rounded-lg text-xs text-muted-foreground max-w-sm w-full">
+          <p><strong>Debug:</strong></p>
+          <p>URL: {window.location.href}</p>
+          <p>courseId: {courseId || 'undefined'}</p>
+          <p>Telegram: {window.Telegram?.WebApp ? 'да' : 'нет'}</p>
+        </div>
+        
         <Button variant="outline" onClick={() => navigate('/')} className="mt-4">
           <ArrowLeft className="w-4 h-4 mr-2" />
           На главную
