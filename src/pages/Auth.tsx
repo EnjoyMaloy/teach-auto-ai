@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Loader2, BookOpen } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { z } from 'zod';
 import authIllustration from '@/assets/auth-illustration.jpg';
 
@@ -124,15 +124,15 @@ const Auth: React.FC = () => {
       <div className="flex-1 flex flex-col justify-center px-8 lg:px-16 xl:px-24">
         <div className="w-full max-w-[400px] mx-auto">
           {/* Logo */}
-          <div className="flex items-center gap-2 mb-12">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-primary-foreground" />
+          <div className="flex items-center gap-3 mb-12">
+            <div className="w-10 h-10 bg-violet-300 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-xl">А</span>
             </div>
-            <span className="text-xl font-semibold text-foreground">LearnForge AI</span>
+            <span className="text-xl font-bold text-foreground">Open Academy</span>
           </div>
 
           {/* Title */}
-          <h1 className="text-2xl font-semibold text-foreground mb-8">
+          <h1 className="text-4xl font-semibold text-foreground mb-8">
             {isSignUp ? 'Создайте аккаунт' : 'Войдите в аккаунт'}
           </h1>
 
