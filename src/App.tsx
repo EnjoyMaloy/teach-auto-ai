@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import CourseSettings from "./pages/CourseSettings";
 import CourseStats from "./pages/CourseStats";
+import PublicCourse from "./pages/PublicCourse";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 
@@ -59,6 +60,7 @@ const AppRoutes = () => (
     <Route path="/editor/:courseId" element={<ProtectedRoute><Editor /></ProtectedRoute>} />
     <Route path="/course/:courseId/settings" element={<ProtectedRoute><CourseSettings /></ProtectedRoute>} />
     <Route path="/course/:courseId/stats" element={<ProtectedRoute><CourseStats /></ProtectedRoute>} />
+    <Route path="/course/:courseId" element={<PublicCourse />} />
     <Route path="*" element={<NotFound />} />
   </Routes>
 );
