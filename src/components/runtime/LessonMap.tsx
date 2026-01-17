@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Lesson, LessonsDisplayType } from '@/types/course';
-import { Check, Lock, Play, Clock, BookOpen } from 'lucide-react';
+import { Check, Lock, Clock, BookOpen, Play, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 interface LessonMapProps {
   lessons: Lesson[];
@@ -11,6 +12,93 @@ interface LessonMapProps {
   onSelectLesson: (lessonId: string, lessonIndex: number) => void;
 }
 
+interface LessonPopupProps {
+  lesson: Lesson;
+  index: number;
+  status: 'completed' | 'current' | 'locked';
+  onStart: () => void;
+  onClose: () => void;
+}
+
+const LessonPopup: React.FC<LessonPopupProps> = ({ lesson, index, status, onStart, onClose }) => {
+  return (
+    <div 
+      className="absolute z-50 w-64 p-4 rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+      style={{
+        backgroundColor: `hsl(var(--ds-card, var(--card)))`,
+        border: `2px solid hsl(var(--ds-muted, var(--border)))`,
+        top: '100%',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        marginTop: '12px',
+      }}
+    >
+      {/* Arrow pointer */}
+      <div 
+        className="absolute w-4 h-4 rotate-45"
+        style={{
+          backgroundColor: `hsl(var(--ds-card, var(--card)))`,
+          borderLeft: `2px solid hsl(var(--ds-muted, var(--border)))`,
+          borderTop: `2px solid hsl(var(--ds-muted, var(--border)))`,
+          top: '-9px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+        }}
+      />
+      
+      <button
+        onClick={onClose}
+        className="absolute top-2 right-2 p-1 rounded-full hover:bg-muted/50 transition-colors"
+        style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.5)` }}
+      >
+        <X className="w-4 h-4" />
+      </button>
+      
+      <div className="text-center">
+        <p 
+          className="text-xs font-medium mb-1"
+          style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
+        >
+          Урок {index + 1}
+        </p>
+        <h3 
+          className="font-bold text-lg mb-2"
+          style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
+        >
+          {lesson.title}
+        </h3>
+        <div 
+          className="flex items-center justify-center gap-3 text-xs mb-4"
+          style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
+        >
+          <span className="flex items-center gap-1">
+            <BookOpen className="w-3 h-3" />
+            {lesson.slides.length} слайдов
+          </span>
+          <span className="flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            {lesson.estimatedMinutes} мин
+          </span>
+        </div>
+        
+        <Button
+          onClick={onStart}
+          className="w-full gap-2"
+          style={{
+            backgroundColor: status === 'completed' 
+              ? `hsl(var(--ds-success, var(--success)))` 
+              : `hsl(var(--ds-primary, var(--primary)))`,
+            color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
+          }}
+        >
+          <Play className="w-4 h-4" />
+          {status === 'completed' ? 'Повторить' : 'Начать'}
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 export const LessonMap: React.FC<LessonMapProps> = ({
   lessons,
   displayType,
@@ -18,6 +106,8 @@ export const LessonMap: React.FC<LessonMapProps> = ({
   currentLessonId,
   onSelectLesson,
 }) => {
+  const [selectedPopupId, setSelectedPopupId] = useState<string | null>(null);
+  
   const getLessonStatus = (lesson: Lesson, index: number): 'completed' | 'current' | 'locked' => {
     if (completedLessons.includes(lesson.id)) {
       return 'completed';
@@ -27,6 +117,18 @@ export const LessonMap: React.FC<LessonMapProps> = ({
       return 'current';
     }
     return 'locked';
+  };
+
+  const handleCircleClick = (lesson: Lesson, index: number) => {
+    const status = getLessonStatus(lesson, index);
+    if (status === 'locked') return;
+    
+    setSelectedPopupId(selectedPopupId === lesson.id ? null : lesson.id);
+  };
+
+  const handleStartLesson = (lessonId: string, index: number) => {
+    setSelectedPopupId(null);
+    onSelectLesson(lessonId, index);
   };
 
   if (displayType === 'list') {
@@ -76,7 +178,9 @@ export const LessonMap: React.FC<LessonMapProps> = ({
                 ) : status === 'locked' ? (
                   <Lock className="w-5 h-5" style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.5)` }} />
                 ) : (
-                  lesson.icon || '📚'
+                  <span className="font-bold" style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}>
+                    {index + 1}
+                  </span>
                 )}
               </div>
               <div className="flex-1 min-w-0">
@@ -113,7 +217,7 @@ export const LessonMap: React.FC<LessonMapProps> = ({
     );
   }
 
-  // Circle map (Duolingo style)
+  // Circle map (Duolingo style) - clean circles with numbers only
   return (
     <div className="flex flex-col items-center py-8 px-4 w-full">
       <h2 
@@ -126,21 +230,13 @@ export const LessonMap: React.FC<LessonMapProps> = ({
         Выберите урок
       </h2>
       
-      <div className="relative flex flex-col items-center gap-6 w-full max-w-xs">
-        {/* Connecting line */}
-        <div 
-          className="absolute left-1/2 top-0 bottom-0 w-1 -translate-x-1/2 rounded-full"
-          style={{ 
-            backgroundColor: `hsl(var(--ds-muted, var(--muted)))`,
-            zIndex: 0,
-          }}
-        />
-        
+      <div className="relative flex flex-col items-center gap-8 w-full max-w-xs">
         {lessons.map((lesson, index) => {
           const status = getLessonStatus(lesson, index);
           const isLocked = status === 'locked';
+          const isPopupOpen = selectedPopupId === lesson.id;
           // Zigzag pattern
-          const offset = index % 2 === 0 ? -40 : 40;
+          const offset = index % 2 === 0 ? -50 : 50;
           
           return (
             <div 
@@ -149,11 +245,12 @@ export const LessonMap: React.FC<LessonMapProps> = ({
               style={{ marginLeft: `${offset}px` }}
             >
               <button
-                onClick={() => !isLocked && onSelectLesson(lesson.id, index)}
+                onClick={() => handleCircleClick(lesson, index)}
                 disabled={isLocked}
                 className={cn(
-                  "relative w-20 h-20 rounded-full flex items-center justify-center text-3xl transition-all",
-                  isLocked ? "opacity-60 cursor-not-allowed" : "hover:scale-110 active:scale-95"
+                  "relative w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold transition-all",
+                  isLocked ? "opacity-60 cursor-not-allowed" : "hover:scale-110 active:scale-95",
+                  isPopupOpen && "scale-110"
                 )}
                 style={{
                   backgroundColor: status === 'completed'
@@ -167,47 +264,29 @@ export const LessonMap: React.FC<LessonMapProps> = ({
                   boxShadow: !isLocked 
                     ? `0 4px 0 0 hsl(${status === 'completed' ? 'var(--ds-success, var(--success))' : 'var(--ds-primary, var(--primary))'} / 0.4)`
                     : undefined,
-                  // Ring styling via box-shadow for current state
-                  outline: status === 'current' ? `4px solid hsl(var(--ds-primary, var(--primary)) / 0.3)` : undefined,
-                  outlineOffset: status === 'current' ? '4px' : undefined,
+                  outline: isPopupOpen ? `4px solid hsl(var(--ds-primary, var(--primary)) / 0.3)` : undefined,
+                  outlineOffset: isPopupOpen ? '4px' : undefined,
                 }}
               >
                 {status === 'completed' ? (
-                  <Check className="w-8 h-8" />
+                  <Check className="w-7 h-7" />
                 ) : status === 'locked' ? (
-                  <Lock className="w-7 h-7" />
+                  <Lock className="w-6 h-6" />
                 ) : (
-                  lesson.icon || '📚'
+                  index + 1
                 )}
-                
-                {/* Lesson number badge */}
-                <span 
-                  className="absolute -top-1 -right-1 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center"
-                  style={{
-                    backgroundColor: `hsl(var(--ds-card, var(--card)))`,
-                    color: `hsl(var(--ds-foreground, var(--foreground)))`,
-                    border: `2px solid hsl(var(--ds-muted, var(--border)))`,
-                  }}
-                >
-                  {index + 1}
-                </span>
               </button>
               
-              <p 
-                className={cn(
-                  "mt-2 text-sm font-medium text-center max-w-[100px] truncate",
-                  isLocked && "opacity-50"
-                )}
-                style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
-              >
-                {lesson.title}
-              </p>
-              <p 
-                className="text-xs"
-                style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
-              >
-                {lesson.estimatedMinutes} мин
-              </p>
+              {/* Popup on click */}
+              {isPopupOpen && (
+                <LessonPopup
+                  lesson={lesson}
+                  index={index}
+                  status={status}
+                  onStart={() => handleStartLesson(lesson.id, index)}
+                  onClose={() => setSelectedPopupId(null)}
+                />
+              )}
             </div>
           );
         })}

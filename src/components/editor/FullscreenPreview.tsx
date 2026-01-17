@@ -122,6 +122,7 @@ export const FullscreenPreview: React.FC<FullscreenPreviewProps> = ({
               onContinue={handleContinue}
               designSystem={course.designSystem}
               isMuted={false}
+              isReadOnly={true}
             />
           ) : (
             <div className="h-full overflow-auto">
