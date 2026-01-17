@@ -1,8 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { X, Trophy, Star, Clock } from 'lucide-react';
+import { X, Trophy, Star, Clock, ArrowLeft } from 'lucide-react';
 import { Course } from '@/types/course';
 import { SlideRenderer, slideNeedsCheck } from './SlideRenderer';
 import { DesignSystemProvider } from './DesignSystemProvider';
+import { LessonMap } from './LessonMap';
 import { cn } from '@/lib/utils';
 import { playSound } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
@@ -14,23 +15,26 @@ interface CoursePlayerProps {
   fullscreen?: boolean;
 }
 
+type PlayerView = 'map' | 'lesson';
+
 export const CoursePlayer: React.FC<CoursePlayerProps> = ({ 
   course, 
   onClose,
   fullscreen = false,
 }) => {
+  // View state: map or lesson
+  const [currentView, setCurrentView] = useState<PlayerView>('map');
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [totalAnswers, setTotalAnswers] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [answered, setAnswered] = useState(false);
+  const [completedLessons, setCompletedLessons] = useState<string[]>([]);
 
-  const allSlides = course.lessons.flatMap(lesson => lesson.slides);
-  const totalSlides = allSlides.length;
-  
   const currentLesson = course.lessons[currentLessonIndex];
   const currentSlide = currentLesson?.slides[currentSlideIndex];
+  const totalSlidesInLesson = currentLesson?.slides.length || 0;
 
   // Sound settings helper
   const soundConfig = {
@@ -51,11 +55,6 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
     };
   };
 
-  // Calculate progress
-  const completedSlides = course.lessons
-    .slice(0, currentLessonIndex)
-    .reduce((acc, lesson) => acc + lesson.slides.length, 0) + currentSlideIndex;
-
   const handleAnswer = useCallback((isCorrect: boolean) => {
     setTotalAnswers(prev => prev + 1);
     if (isCorrect) {
@@ -72,16 +71,41 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
     playSound('swipe', soundConfig);
     
     if (currentSlideIndex < currentLesson.slides.length - 1) {
+      // Next slide in current lesson
       setCurrentSlideIndex(prev => prev + 1);
-    } else if (currentLessonIndex < course.lessons.length - 1) {
-      playSound('levelUp', soundConfig);
-      setCurrentLessonIndex(prev => prev + 1);
-      setCurrentSlideIndex(0);
     } else {
-      playSound('complete', soundConfig);
-      setIsCompleted(true);
+      // Lesson completed
+      playSound('levelUp', soundConfig);
+      setCompletedLessons(prev => [...prev, currentLesson.id]);
+      
+      // Check if all lessons are completed
+      const allCompleted = course.lessons.every(
+        l => l.id === currentLesson.id || completedLessons.includes(l.id)
+      );
+      
+      if (allCompleted) {
+        playSound('complete', soundConfig);
+        setIsCompleted(true);
+      } else {
+        // Go back to map
+        setCurrentView('map');
+        setCurrentSlideIndex(0);
+      }
     }
-  }, [currentSlideIndex, currentLesson?.slides.length, currentLessonIndex, course.lessons.length, soundConfig]);
+  }, [currentSlideIndex, currentLesson, course.lessons, completedLessons, soundConfig]);
+
+  const handleSelectLesson = useCallback((lessonId: string, lessonIndex: number) => {
+    playSound('swipe', soundConfig);
+    setCurrentLessonIndex(lessonIndex);
+    setCurrentSlideIndex(0);
+    setCurrentView('lesson');
+  }, [soundConfig]);
+
+  const handleBackToMap = useCallback(() => {
+    playSound('swipe', soundConfig);
+    setCurrentView('map');
+    setCurrentSlideIndex(0);
+  }, [soundConfig]);
 
   const needsCheck = currentSlide ? slideNeedsCheck(currentSlide.type) : false;
   const showContinue = !needsCheck || answered;
@@ -94,6 +118,8 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
     setTotalAnswers(0);
     setIsCompleted(false);
     setAnswered(false);
+    setCompletedLessons([]);
+    setCurrentView('map');
     playSound('swipe', soundConfig);
   }, [soundConfig]);
 
@@ -219,15 +245,70 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
   // Check if running in Telegram
   const isTelegram = typeof window !== 'undefined' && !!window.Telegram?.WebApp;
 
-  // Main player content
-  const playerContent = (
+  // Lesson Map content
+  const mapContent = (
+    <div 
+      className="h-full w-full flex flex-col overflow-hidden"
+      style={{
+        backgroundColor: `hsl(var(--ds-background, var(--background)))`,
+        fontFamily: `var(--ds-font-family, inherit)`,
+      }}
+    >
+      {/* Top spacer with gray background for Telegram */}
+      {fullscreen && isTelegram && (
+        <div 
+          className="shrink-0"
+          style={{
+            height: 'calc(env(safe-area-inset-top, 0px) + 8vh)',
+            backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.3)`,
+          }}
+        />
+      )}
+      
+      {/* Header */}
+      <div 
+        className="h-14 flex items-center justify-center px-4 border-b shrink-0"
+        style={{
+          backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.3)`,
+          borderColor: `hsl(var(--ds-muted, var(--border)))`,
+        }}
+      >
+        <h1 
+          className="font-bold text-center truncate"
+          style={{ 
+            color: `hsl(var(--ds-foreground, var(--foreground)))`,
+            fontFamily: `var(--ds-heading-font-family, inherit)`,
+          }}
+        >
+          {course.title}
+        </h1>
+      </div>
+
+      {/* Lesson Map */}
+      <div 
+        className="flex-1 overflow-y-auto"
+        style={{ 
+          paddingBottom: fullscreen && isTelegram ? 'calc(env(safe-area-inset-bottom, 0px) + 10%)' : undefined,
+        }}
+      >
+        <LessonMap
+          lessons={course.lessons}
+          displayType={course.lessonsDisplayType || 'circle_map'}
+          completedLessons={completedLessons}
+          onSelectLesson={handleSelectLesson}
+        />
+      </div>
+    </div>
+  );
+
+  // Lesson player content
+  const lessonContent = (
     <div 
       className="h-full w-full flex flex-col overflow-hidden"
       style={{
         backgroundColor: `hsl(var(--ds-background, var(--background)))`,
         fontFamily: `var(--ds-font-family, inherit)`,
         borderRadius: 0,
-        // Add safe area padding for Telegram/mobile - only bottom
         paddingBottom: fullscreen && isTelegram ? 'calc(env(safe-area-inset-bottom, 0px) + 10%)' : undefined,
       }}
     >
@@ -242,7 +323,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
         />
       )}
       
-      {/* Progress bar - same style as editor */}
+      {/* Progress bar */}
       <div 
         className="h-10 flex items-center justify-between px-4 border-b shrink-0"
         style={{
@@ -250,35 +331,43 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
           borderColor: `hsl(var(--ds-muted, var(--border)))`,
         }}
       >
-        <span 
-          className="text-xs truncate max-w-[100px]"
-          style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
+        {/* Back button */}
+        <button
+          onClick={handleBackToMap}
+          className="p-1 rounded-lg hover:bg-black/10 transition-colors"
         >
-          {currentLesson?.title}
-        </span>
+          <ArrowLeft 
+            className="w-5 h-5" 
+            style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)))` }} 
+          />
+        </button>
+        
+        {/* Progress dots */}
         <div className="flex items-center gap-1">
-          {Array.from({ length: Math.min(totalSlides, 20) }).map((_, i) => (
+          {Array.from({ length: Math.min(totalSlidesInLesson, 15) }).map((_, i) => (
             <div
               key={i}
               className="rounded-full transition-all"
               style={{
                 height: '6px',
-                width: i === completedSlides ? '24px' : '8px',
-                backgroundColor: i <= completedSlides 
-                  ? `hsl(var(--ds-primary, var(--primary))${i < completedSlides ? ' / 0.5' : ''})` 
+                width: i === currentSlideIndex ? '24px' : '8px',
+                backgroundColor: i <= currentSlideIndex 
+                  ? `hsl(var(--ds-primary, var(--primary))${i < currentSlideIndex ? ' / 0.5' : ''})` 
                   : `hsl(var(--ds-muted, var(--muted)))`,
               }}
             />
           ))}
-          {totalSlides > 20 && (
+          {totalSlidesInLesson > 15 && (
             <span 
               className="text-xs ml-1" 
               style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
             >
-              +{totalSlides - 20}
+              +{totalSlidesInLesson - 15}
             </span>
           )}
         </div>
+        
+        {/* Score and counter */}
         <div className="flex items-center gap-2">
           {correctAnswers > 0 && (
             <div 
@@ -296,7 +385,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
             className="text-xs"
             style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
           >
-            {completedSlides + 1} / {totalSlides}
+            {currentSlideIndex + 1} / {totalSlidesInLesson}
           </span>
         </div>
       </div>
@@ -339,11 +428,16 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
             ...getRaisedButtonStyle(),
           }}
         >
-          {showContinue ? 'ПРОДОЛЖИТЬ' : 'ПРОВЕРИТЬ'}
+          {currentSlideIndex < totalSlidesInLesson - 1 
+            ? (showContinue ? 'ПРОДОЛЖИТЬ' : 'ПРОВЕРИТЬ')
+            : 'ЗАВЕРШИТЬ УРОК'
+          }
         </button>
       </div>
     </div>
   );
+
+  const playerContent = currentView === 'map' ? mapContent : lessonContent;
 
   // Fullscreen mode - no frame, just content (for Telegram/public view)
   if (fullscreen) {

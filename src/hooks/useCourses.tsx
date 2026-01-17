@@ -31,6 +31,8 @@ const dbLessonToLesson = (row: any, slides: Slide[]): Lesson => ({
   order: row.order,
   slides: slides.filter(s => s.lessonId === row.id).sort((a, b) => a.order - b.order),
   estimatedMinutes: row.estimated_minutes,
+  icon: row.icon,
+  coverImage: row.cover_image,
   createdAt: new Date(row.created_at),
   updatedAt: new Date(row.updated_at),
 });
@@ -58,6 +60,7 @@ const dbCourseToCourse = (row: any, lessons: Lesson[]): Course & {
   updatedAt: new Date(row.updated_at),
   tags: row.tags || [],
   designSystem: row.design_system as CourseDesignSystem | undefined,
+  lessonsDisplayType: row.lessons_display_type || 'circle_map',
   category: row.category || undefined,
   isLinkAccessible: row.is_link_accessible || false,
   moderationStatus: row.moderation_status || undefined,
@@ -225,6 +228,7 @@ export const useCourses = () => {
           published_at: course.publishedAt?.toISOString(),
           tags: course.tags,
           design_system: course.designSystem as any,
+          lessons_display_type: course.lessonsDisplayType || 'circle_map',
           updated_at: new Date().toISOString(),
         })
         .eq('id', course.id);
@@ -258,6 +262,8 @@ export const useCourses = () => {
               description: lesson.description,
               order: lesson.order,
               estimated_minutes: lesson.estimatedMinutes,
+              icon: lesson.icon,
+              cover_image: lesson.coverImage,
               updated_at: new Date().toISOString(),
             })
             .eq('id', lesson.id);
@@ -271,6 +277,8 @@ export const useCourses = () => {
               description: lesson.description,
               order: lesson.order,
               estimated_minutes: lesson.estimatedMinutes,
+              icon: lesson.icon,
+              cover_image: lesson.coverImage,
             });
         }
 

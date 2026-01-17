@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Copy, Trash2, BookOpen } from 'lucide-react';
+import { GripVertical, Copy, Trash2 } from 'lucide-react';
 import { Lesson } from '@/types/course';
 import { cn } from '@/lib/utils';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+
+// Common lesson icons
+const LESSON_ICONS = [
+  '📚', '📖', '✏️', '💡', '🎯', '🔥', '⭐', '🚀',
+  '💪', '🧠', '📝', '🎓', '📊', '🔬', '🎨', '🎵',
+  '💻', '📱', '🌍', '🏆', '💎', '🔑', '⚡', '🌟',
+];
 
 interface SortableLessonItemProps {
   lesson: Lesson;
@@ -12,6 +24,7 @@ interface SortableLessonItemProps {
   onSelect: () => void;
   onDelete: () => void;
   onDuplicate: () => void;
+  onUpdateIcon?: (icon: string) => void;
 }
 
 export const SortableLessonItem: React.FC<SortableLessonItemProps> = ({
@@ -21,7 +34,10 @@ export const SortableLessonItem: React.FC<SortableLessonItemProps> = ({
   onSelect,
   onDelete,
   onDuplicate,
+  onUpdateIcon,
 }) => {
+  const [iconPickerOpen, setIconPickerOpen] = useState(false);
+  
   const {
     attributes,
     listeners,
@@ -66,9 +82,49 @@ export const SortableLessonItem: React.FC<SortableLessonItemProps> = ({
       </div>
 
       {/* Icon */}
-      <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-        <BookOpen className="w-5 h-5 text-primary" />
-      </div>
+      <Popover open={iconPickerOpen} onOpenChange={setIconPickerOpen}>
+        <PopoverTrigger asChild>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onUpdateIcon) {
+                setIconPickerOpen(true);
+              }
+            }}
+            className={cn(
+              "flex-shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-xl",
+              onUpdateIcon && "hover:bg-primary/20 transition-colors cursor-pointer"
+            )}
+          >
+            {lesson.icon || '📚'}
+          </button>
+        </PopoverTrigger>
+        {onUpdateIcon && (
+          <PopoverContent 
+            className="w-64 p-2" 
+            align="start"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="grid grid-cols-8 gap-1">
+              {LESSON_ICONS.map((icon) => (
+                <button
+                  key={icon}
+                  onClick={() => {
+                    onUpdateIcon(icon);
+                    setIconPickerOpen(false);
+                  }}
+                  className={cn(
+                    "w-7 h-7 rounded-md flex items-center justify-center text-lg hover:bg-muted transition-colors",
+                    lesson.icon === icon && "bg-primary/20"
+                  )}
+                >
+                  {icon}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        )}
+      </Popover>
 
       {/* Content */}
       <div className="flex-1 min-w-0">

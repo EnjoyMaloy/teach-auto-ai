@@ -67,9 +67,13 @@ export interface Lesson {
   order: number;
   slides: Slide[];
   estimatedMinutes: number;
+  icon?: string;
+  coverImage?: string;
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type LessonsDisplayType = 'circle_map' | 'list';
 
 export interface CourseVersion {
   id: string;
@@ -129,6 +133,7 @@ export interface Course {
   updatedAt: Date;
   tags: string[];
   designSystem?: CourseDesignSystem;
+  lessonsDisplayType?: LessonsDisplayType;
 }
 
 export interface User {
