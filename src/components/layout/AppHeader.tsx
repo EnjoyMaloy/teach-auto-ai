@@ -40,18 +40,20 @@ const AppHeader: React.FC<AppHeaderProps> = ({
         {/* Language Selector */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
-              <Globe className="w-4 h-4" />
-              {language === 'ru' ? 'RU' : 'EN'}
-              <ChevronDown className="w-3 h-3" />
-            </Button>
+            <button className="flex items-center gap-2 rounded-[5px] border border-[#EBE9EA] bg-white hover:border-[#D5D3D4] transition-all py-[10px] px-[16px]">
+              <span className="text-[16px]">{language === 'ru' ? '🇷🇺' : '🇬🇧'}</span>
+              <span className="text-[14px] text-[#8D8D8D] font-medium">{language === 'ru' ? 'RU' : 'EN'}</span>
+              <ChevronDown className="w-3 h-3 text-[#8D8D8D]" />
+            </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onLanguageChange('ru')}>
-              🇷🇺 Русский
+          <DropdownMenuContent align="end" className="min-w-[120px]">
+            <DropdownMenuItem onClick={() => onLanguageChange('ru')} className="gap-2">
+              <span className="text-[16px]">🇷🇺</span>
+              <span>Русский</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onLanguageChange('en')}>
-              🇺🇸 English
+            <DropdownMenuItem onClick={() => onLanguageChange('en')} className="gap-2">
+              <span className="text-[16px]">🇬🇧</span>
+              <span>English</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
