@@ -56,19 +56,17 @@ export const LessonsList: React.FC<LessonsListProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col bg-card rounded-2xl shadow-soft overflow-hidden">
+    <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-border">
-        <div className="flex items-center justify-between">
-          <h3 className="font-bold text-foreground">Уроки</h3>
-          <Button variant="ghost" size="icon-sm" onClick={onAddLesson}>
-            <Plus className="w-4 h-4" />
-          </Button>
-        </div>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-bold text-foreground">Уроки</h3>
+        <Button variant="ghost" size="icon-sm" onClick={onAddLesson}>
+          <Plus className="w-4 h-4" />
+        </Button>
       </div>
 
       {/* Lessons List */}
-      <div className="flex-1 overflow-y-auto p-2 space-y-1">
+      <div className="flex-1 overflow-y-auto space-y-2">
         {lessons.length > 0 ? (
           <DndContext
             sensors={sensors}
@@ -104,14 +102,6 @@ export const LessonsList: React.FC<LessonsListProps> = ({
             </Button>
           </div>
         )}
-      </div>
-
-      {/* Footer Stats */}
-      <div className="px-4 py-3 border-t border-border bg-muted/30">
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{lessons.length} уроков</span>
-          <span>{lessons.reduce((acc, l) => acc + l.estimatedMinutes, 0)} мин</span>
-        </div>
       </div>
     </div>
   );
