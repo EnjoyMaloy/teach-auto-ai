@@ -317,19 +317,48 @@ const Editor: React.FC = () => {
     }) : null);
   };
 
-  const handleDeleteBlock = () => {
-    if (!course || !selectedBlockId) return;
+  const handleDeleteBlock = (blockId?: string) => {
+    const idToDelete = blockId || selectedBlockId;
+    if (!course || !idToDelete) return;
     pushToUndo();
     setCourse(prev => prev ? ({
       ...prev,
       lessons: prev.lessons.map(lesson => ({
         ...lesson,
-        slides: lesson.slides.filter(s => s.id !== selectedBlockId),
+        slides: lesson.slides.filter(s => s.id !== idToDelete),
       })),
       updatedAt: new Date(),
     }) : null);
-    setSelectedBlockId(null);
+    if (idToDelete === selectedBlockId) {
+      setSelectedBlockId(null);
+    }
     toast.success('Блок удалён');
+  };
+
+  const handleDuplicateBlock = (blockId: string) => {
+    if (!course || !selectedLessonId) return;
+    const lesson = course.lessons.find(l => l.id === selectedLessonId);
+    if (!lesson) return;
+    const slide = lesson.slides.find(s => s.id === blockId);
+    if (!slide) return;
+    
+    pushToUndo();
+    const newSlide = {
+      ...slide,
+      id: `slide-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      order: lesson.slides.length + 1,
+    };
+    
+    setCourse(prev => prev ? ({
+      ...prev,
+      lessons: prev.lessons.map(l =>
+        l.id === selectedLessonId
+          ? { ...l, slides: [...l.slides, newSlide], updatedAt: new Date() }
+          : l
+      ),
+      updatedAt: new Date(),
+    }) : null);
+    toast.success('Блок скопирован');
   };
 
   // Reorder
@@ -485,6 +514,8 @@ const Editor: React.FC = () => {
                           index={index}
                           isSelected={selectedBlockId === block.id}
                           onSelect={() => setSelectedBlockId(block.id)}
+                          onDelete={() => handleDeleteBlock(block.id)}
+                          onDuplicate={() => handleDuplicateBlock(block.id)}
                         />
                       ))}
                     </div>

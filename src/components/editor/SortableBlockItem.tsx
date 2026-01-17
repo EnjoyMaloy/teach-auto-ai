@@ -7,7 +7,7 @@ import {
   Heading, Type, Image, Play, Volume2, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
   Link2, ListOrdered, SlidersHorizontal, MousePointer2,
-  GripVertical, Layers
+  GripVertical, Layers, Copy, Trash2
 } from 'lucide-react';
 
 const iconMap = {
@@ -21,6 +21,8 @@ interface SortableBlockItemProps {
   index: number;
   isSelected: boolean;
   onSelect: () => void;
+  onDelete?: () => void;
+  onDuplicate?: () => void;
 }
 
 export const SortableBlockItem: React.FC<SortableBlockItemProps> = ({
@@ -28,6 +30,8 @@ export const SortableBlockItem: React.FC<SortableBlockItemProps> = ({
   index,
   isSelected,
   onSelect,
+  onDelete,
+  onDuplicate,
 }) => {
   const {
     attributes,
@@ -88,6 +92,32 @@ export const SortableBlockItem: React.FC<SortableBlockItemProps> = ({
             ? `${block.subBlocks?.length || 0} элементов`
             : block.content || 'Пустой блок...'}
         </p>
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        {onDuplicate && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDuplicate();
+            }}
+            className="p-1.5 rounded-lg hover:bg-muted-foreground/10 transition-colors"
+          >
+            <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+          </button>
+        )}
+        {onDelete && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors"
+          >
+            <Trash2 className="w-3.5 h-3.5 text-destructive" />
+          </button>
+        )}
       </div>
     </div>
   );
