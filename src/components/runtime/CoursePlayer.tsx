@@ -227,11 +227,21 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
         backgroundColor: `hsl(var(--ds-background, var(--background)))`,
         fontFamily: `var(--ds-font-family, inherit)`,
         borderRadius: 0,
-        // Add safe area padding for Telegram/mobile
-        paddingTop: fullscreen && isTelegram ? 'calc(env(safe-area-inset-top, 0px) + 10%)' : undefined,
+        // Add safe area padding for Telegram/mobile - only bottom
         paddingBottom: fullscreen && isTelegram ? 'calc(env(safe-area-inset-bottom, 0px) + 10%)' : undefined,
       }}
     >
+      {/* Top spacer with gray background for Telegram */}
+      {fullscreen && isTelegram && (
+        <div 
+          className="shrink-0"
+          style={{
+            height: 'calc(env(safe-area-inset-top, 0px) + 15vh)',
+            backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.3)`,
+          }}
+        />
+      )}
+      
       {/* Progress bar - same style as editor */}
       <div 
         className="h-10 flex items-center justify-between px-4 border-b shrink-0"
