@@ -305,7 +305,12 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
   if (fullscreen) {
     return (
       <DesignSystemProvider config={course.designSystem}>
-        <div className="fixed inset-0 z-50">
+        <div 
+          className="fixed inset-0 z-50"
+          style={{
+            backgroundColor: `hsl(var(--ds-background, var(--background)))`,
+          }}
+        >
           {playerContent}
         </div>
       </DesignSystemProvider>
