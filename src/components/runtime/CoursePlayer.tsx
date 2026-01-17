@@ -196,6 +196,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
       style={{
         backgroundColor: `hsl(var(--ds-background, var(--background)))`,
         fontFamily: `var(--ds-font-family, inherit)`,
+        borderRadius: 0,
       }}
     >
       {/* Progress bar - same style as editor */}
@@ -309,6 +310,9 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
           className="fixed inset-0 z-50"
           style={{
             backgroundColor: `hsl(var(--ds-background, var(--background)))`,
+            borderRadius: 0,
+            border: 'none',
+            boxShadow: 'none',
           }}
         >
           {playerContent}
