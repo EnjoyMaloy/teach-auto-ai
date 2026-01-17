@@ -49,7 +49,7 @@ const ColorInput: React.FC<{
   onChange: (value: string) => void;
   description?: string;
 }> = ({ label, value, onChange, description }) => {
-  // Convert HSL string to hex for the color picker
+  // Convert HSL string to hex for display
   const hslToHex = (hsl: string): string => {
     try {
       const [h, s, l] = hsl.split(' ').map(v => parseFloat(v));
@@ -69,18 +69,20 @@ const ColorInput: React.FC<{
       else { r = c; g = 0; b = x; }
       
       const toHex = (v: number) => Math.round((v + m) * 255).toString(16).padStart(2, '0');
-      return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+      return `${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
     } catch {
-      return '#6366f1';
+      return '6366F1';
     }
   };
   
   // Convert hex to HSL string
   const hexToHsl = (hex: string): string => {
     try {
-      const r = parseInt(hex.slice(1, 3), 16) / 255;
-      const g = parseInt(hex.slice(3, 5), 16) / 255;
-      const b = parseInt(hex.slice(5, 7), 16) / 255;
+      // Remove # if present
+      const cleanHex = hex.replace('#', '');
+      const r = parseInt(cleanHex.slice(0, 2), 16) / 255;
+      const g = parseInt(cleanHex.slice(2, 4), 16) / 255;
+      const b = parseInt(cleanHex.slice(4, 6), 16) / 255;
       
       const max = Math.max(r, g, b);
       const min = Math.min(r, g, b);
@@ -102,28 +104,61 @@ const ColorInput: React.FC<{
       return value;
     }
   };
+
+  const [hexValue, setHexValue] = React.useState(hslToHex(value));
+  const [isFocused, setIsFocused] = React.useState(false);
+
+  // Update hex when value prop changes (from outside)
+  React.useEffect(() => {
+    if (!isFocused) {
+      setHexValue(hslToHex(value));
+    }
+  }, [value, isFocused]);
+
+  const handleHexChange = (newHex: string) => {
+    // Remove any non-hex characters except #
+    const cleaned = newHex.replace(/[^0-9A-Fa-f]/g, '').slice(0, 6);
+    setHexValue(cleaned.toUpperCase());
+    
+    // Only convert to HSL if we have a valid 6-char hex
+    if (cleaned.length === 6) {
+      onChange(hexToHsl(cleaned));
+    }
+  };
+
+  const handleColorPickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const hex = e.target.value.replace('#', '').toUpperCase();
+    setHexValue(hex);
+    onChange(hexToHsl(hex));
+  };
   
   return (
     <div className="space-y-2">
-      <Label className="text-sm">{label}</Label>
-      <div className="flex gap-2">
+      <Label className="text-sm font-medium text-foreground">{label}</Label>
+      <div className="flex items-center gap-2">
         <div 
-          className="w-10 h-10 rounded-lg border border-border overflow-hidden cursor-pointer relative"
+          className="w-10 h-10 rounded-xl border-2 border-border overflow-hidden cursor-pointer relative flex-shrink-0 shadow-sm hover:border-primary/50 transition-colors"
           style={{ backgroundColor: `hsl(${value})` }}
         >
           <input
             type="color"
-            value={hslToHex(value)}
-            onChange={(e) => onChange(hexToHsl(e.target.value))}
+            value={`#${hslToHex(value)}`}
+            onChange={handleColorPickerChange}
             className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
           />
         </div>
-        <Input
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="flex-1 font-mono text-xs"
-          placeholder="262 83% 58%"
-        />
+        <div className="flex-1 relative">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-mono text-sm">#</span>
+          <Input
+            value={hexValue}
+            onChange={(e) => handleHexChange(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            className="pl-7 font-mono text-sm uppercase tracking-wider bg-background"
+            placeholder="FFFFFF"
+            maxLength={6}
+          />
+        </div>
       </div>
       {description && (
         <p className="text-xs text-muted-foreground">{description}</p>
@@ -235,107 +270,99 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   return (
     <div className="space-y-6">
       {/* Presets */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5" />
-            Готовые темы
-          </CardTitle>
-          <CardDescription>
-            Выберите готовую тему или настройте свою
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {PRESET_THEMES.map((preset) => (
-              <button
-                key={preset.id}
-                onClick={() => applyPreset(preset.id)}
-                className={cn(
-                  "relative p-3 rounded-xl border-2 transition-all text-left",
-                  activePreset === preset.id 
-                    ? "border-primary bg-primary/5" 
-                    : "border-border hover:border-primary/50"
-                )}
-              >
-                <div className="flex gap-1 mb-2">
-                  <div 
-                    className="w-4 h-4 rounded-full"
-                    style={{ backgroundColor: `hsl(${preset.config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor})` }}
-                  />
-                  <div 
-                    className="w-4 h-4 rounded-full"
-                    style={{ backgroundColor: `hsl(${preset.config.backgroundColor || DEFAULT_DESIGN_SYSTEM.backgroundColor})` }}
-                  />
-                  <div 
-                    className="w-4 h-4 rounded-full border"
-                    style={{ 
-                      backgroundColor: `hsl(${preset.config.foregroundColor || DEFAULT_DESIGN_SYSTEM.foregroundColor})`,
-                      borderColor: `hsl(${preset.config.mutedColor || DEFAULT_DESIGN_SYSTEM.mutedColor})`
-                    }}
-                  />
-                </div>
-                <p className="text-sm font-medium">{preset.name}</p>
-                {activePreset === preset.id && (
-                  <Check className="absolute top-2 right-2 w-4 h-4 text-primary" />
-                )}
-              </button>
-            ))}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold text-foreground flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-primary" />
+              Готовые темы
+            </h3>
+            <p className="text-xs text-muted-foreground mt-0.5">Быстрый старт с готовым дизайном</p>
           </div>
           <Button 
-            variant="outline" 
+            variant="ghost" 
             size="sm" 
             onClick={resetToDefault}
-            className="mt-4"
+            className="text-xs"
           >
-            <RotateCcw className="w-4 h-4 mr-2" />
+            <RotateCcw className="w-3 h-3 mr-1" />
             Сбросить
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {PRESET_THEMES.map((preset) => (
+            <button
+              key={preset.id}
+              onClick={() => applyPreset(preset.id)}
+              className={cn(
+                "relative p-3 rounded-xl border-2 transition-all text-left bg-card",
+                activePreset === preset.id 
+                  ? "border-primary bg-primary/5" 
+                  : "border-border hover:border-primary/50"
+              )}
+            >
+              <div className="flex gap-1 mb-2">
+                <div 
+                  className="w-5 h-5 rounded-full border border-border/50"
+                  style={{ backgroundColor: `hsl(${preset.config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor})` }}
+                />
+                <div 
+                  className="w-5 h-5 rounded-full border border-border/50"
+                  style={{ backgroundColor: `hsl(${preset.config.backgroundColor || DEFAULT_DESIGN_SYSTEM.backgroundColor})` }}
+                />
+                <div 
+                  className="w-5 h-5 rounded-full border border-border/50"
+                  style={{ backgroundColor: `hsl(${preset.config.foregroundColor || DEFAULT_DESIGN_SYSTEM.foregroundColor})` }}
+                />
+              </div>
+              <p className="text-sm font-medium text-foreground">{preset.name}</p>
+              {activePreset === preset.id && (
+                <Check className="absolute top-2 right-2 w-4 h-4 text-primary" />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Preview */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Предпросмотр</CardTitle>
-        </CardHeader>
-        <CardContent 
-          className="p-6 rounded-xl"
+      <div className="space-y-3">
+        <h3 className="font-semibold text-foreground">Предпросмотр</h3>
+        <div 
+          className="p-4 rounded-xl border border-border"
           style={{ backgroundColor: `hsl(${config.backgroundColor})` }}
         >
           <PreviewCard />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Detailed Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Детальные настройки</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="colors">
-            <TabsList className="mb-4 flex-wrap">
-              <TabsTrigger value="colors">
-                <Palette className="w-4 h-4 mr-2" />
-                Цвета
-              </TabsTrigger>
-              <TabsTrigger value="typography">
-                <Type className="w-4 h-4 mr-2" />
-                Шрифты
-              </TabsTrigger>
-              <TabsTrigger value="shape">
-                <Square className="w-4 h-4 mr-2" />
-                Форма
-              </TabsTrigger>
-              <TabsTrigger value="designblock">
-                <Layers className="w-4 h-4 mr-2" />
-                Дизайн-блок
-              </TabsTrigger>
-              <TabsTrigger value="sound">
-                <Volume2 className="w-4 h-4 mr-2" />
-                Звуки
-              </TabsTrigger>
-            </TabsList>
+      <div className="space-y-4">
+        <h3 className="font-semibold text-foreground">Детальные настройки</h3>
+        <Tabs defaultValue="colors" className="w-full">
+          <TabsList className="w-full grid grid-cols-5 h-auto p-1 bg-muted/50">
+            <TabsTrigger value="colors" className="text-xs py-2 px-1 data-[state=active]:bg-background">
+              <Palette className="w-3.5 h-3.5 mr-1" />
+              Цвета
+            </TabsTrigger>
+            <TabsTrigger value="typography" className="text-xs py-2 px-1 data-[state=active]:bg-background">
+              <Type className="w-3.5 h-3.5 mr-1" />
+              Шрифты
+            </TabsTrigger>
+            <TabsTrigger value="shape" className="text-xs py-2 px-1 data-[state=active]:bg-background">
+              <Square className="w-3.5 h-3.5 mr-1" />
+              Форма
+            </TabsTrigger>
+            <TabsTrigger value="designblock" className="text-xs py-2 px-1 data-[state=active]:bg-background">
+              <Layers className="w-3.5 h-3.5 mr-1" />
+              Блоки
+            </TabsTrigger>
+            <TabsTrigger value="sound" className="text-xs py-2 px-1 data-[state=active]:bg-background">
+              <Volume2 className="w-3.5 h-3.5 mr-1" />
+              Звуки
+            </TabsTrigger>
+          </TabsList>
+
+          <div className="mt-4">
 
             <TabsContent value="colors" className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -830,9 +857,9 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 </div>
               </div>
             </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+          </div>
+        </Tabs>
+      </div>
     </div>
   );
 };
