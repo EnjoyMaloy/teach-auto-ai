@@ -21,8 +21,7 @@ import {
   MoreHorizontal,
   Globe,
   FileEdit,
-  Search,
-  Star
+  Search
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -98,7 +97,7 @@ const Dashboard: React.FC = () => {
     }).format(date);
   };
 
-  const CourseCard = ({ course }: { course: Course }) => (
+  const CourseCard = ({ course }: { course: Course & { moderationStatus?: string } }) => (
     <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 hover:border-primary/30 overflow-hidden bg-card">
       {/* Banner */}
       <div 
@@ -115,8 +114,13 @@ const Dashboard: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
         
         {/* Status Badge */}
-        <div className="absolute top-3 left-3">
-          {course.isPublished ? (
+        <div className="absolute top-3 left-3 flex gap-2">
+          {course.moderationStatus === 'pending' ? (
+            <Badge className="bg-yellow-500/90 text-white border-0">
+              <Clock className="w-3 h-3 mr-1" />
+              На модерации
+            </Badge>
+          ) : course.isPublished ? (
             <Badge className="bg-emerald-500/90 text-white border-0">
               <Globe className="w-3 h-3 mr-1" />
               Опубликован
@@ -129,11 +133,18 @@ const Dashboard: React.FC = () => {
           )}
         </div>
 
-        {/* Rating */}
-        <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/50 backdrop-blur-sm px-2 py-1 rounded-full">
-          <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-          <span className="text-xs text-white font-medium">4.9</span>
-        </div>
+        {/* Delete button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-3 right-3 h-8 w-8 bg-black/30 backdrop-blur-sm hover:bg-destructive/80 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+          onClick={(e) => {
+            e.stopPropagation();
+            setCourseToDelete(course);
+          }}
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
 
         {/* Menu */}
         <div className="absolute bottom-3 right-3">
@@ -242,12 +253,6 @@ const Dashboard: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Мастерская авторов</h1>
-            <p className="text-muted-foreground mt-1">
-              {courses.length > 0 
-                ? `${courses.length} ${courses.length === 1 ? 'курс' : courses.length < 5 ? 'курса' : 'курсов'}`
-                : 'Создайте свой первый курс'
-              }
-            </p>
           </div>
 
           <Button onClick={handleCreateCourse} disabled={isCreating} size="lg">
