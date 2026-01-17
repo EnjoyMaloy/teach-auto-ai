@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { LogOut, User, ChevronDown, Search } from 'lucide-react';
+import { LogOut, User, ChevronDown, Search, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface AppHeaderProps {
@@ -16,10 +17,21 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   onLanguageChange
 }) => {
   const navigate = useNavigate();
-  const {
-    user,
-    signOut
-  } = useAuth();
+  const { user, signOut } = useAuth();
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      setUserRole(data?.role || null);
+    };
+    fetchUserRole();
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -28,6 +40,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   };
 
   const userInitials = user?.email?.slice(0, 2).toUpperCase() || 'U';
+  const isModerator = userRole === 'moderator' || userRole === 'admin';
 
   return (
     <header className="h-16 border-b border-gray-100 flex items-center justify-between px-6 bg-white my-0 py-[40px]">
@@ -71,10 +84,22 @@ const AppHeader: React.FC<AppHeaderProps> = ({
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem className="gap-2 cursor-pointer">
+            <DropdownMenuItem className="gap-2 cursor-pointer" onClick={() => navigate('/profile')}>
               <User className="w-4 h-4" />
               {language === 'ru' ? 'Профиль' : 'Profile'}
             </DropdownMenuItem>
+            {isModerator && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  className="gap-2 cursor-pointer text-purple-600 focus:text-purple-700"
+                  onClick={() => navigate('/moderation')}
+                >
+                  <Shield className="w-4 h-4" />
+                  {language === 'ru' ? 'Модерация' : 'Moderation'}
+                </DropdownMenuItem>
+              </>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut} className="gap-2 cursor-pointer text-destructive focus:text-destructive">
               <LogOut className="w-4 h-4" />
