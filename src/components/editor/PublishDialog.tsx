@@ -28,13 +28,17 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
   courseTitle,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [copiedTelegram, setCopiedTelegram] = useState(false);
   const [telegramToken, setTelegramToken] = useState('');
   const [isDeploying, setIsDeploying] = useState(false);
   const [telegramDeployed, setTelegramDeployed] = useState(false);
   const [botUsername, setBotUsername] = useState<string | null>(null);
   const [botLink, setBotLink] = useState<string | null>(null);
 
-  const webUrl = `${window.location.origin}/course/${courseId}`;
+  // Published URL для публичного доступа (без авторизации Lovable)
+  const publishedUrl = 'https://teach-auto-ai.lovable.app';
+  const webUrl = `${publishedUrl}/course/${courseId}`;
+  const previewUrl = `${window.location.origin}/course/${courseId}`;
 
   const handleCopyLink = async () => {
     try {
@@ -42,6 +46,17 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
       setCopied(true);
       toast.success('Ссылка скопирована!');
       setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error('Не удалось скопировать ссылку');
+    }
+  };
+
+  const handleCopyTelegramLink = async () => {
+    try {
+      await navigator.clipboard.writeText(webUrl);
+      setCopiedTelegram(true);
+      toast.success('URL для Mini App скопирован!');
+      setTimeout(() => setCopiedTelegram(false), 2000);
     } catch {
       toast.error('Не удалось скопировать ссылку');
     }
@@ -153,7 +168,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
               </div>
             </div>
 
-            <Button className="w-full" onClick={() => window.open(webUrl, '_blank')}>
+            <Button className="w-full" onClick={() => window.open(previewUrl, '_blank')}>
               <ExternalLink className="w-4 h-4 mr-2" />
               Открыть в новой вкладке
             </Button>
@@ -229,10 +244,10 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={handleCopyLink}
+                        onClick={handleCopyTelegramLink}
                         className="shrink-0"
                       >
-                        {copied ? (
+                        {copiedTelegram ? (
                           <Check className="w-4 h-4 text-emerald-600" />
                         ) : (
                           <Copy className="w-4 h-4" />
