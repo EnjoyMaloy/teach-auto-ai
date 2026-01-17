@@ -2,43 +2,34 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Moon, Sun, Globe, LogOut, User, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
-
 interface AppHeaderProps {
   theme: 'light' | 'dark';
   onThemeChange: (theme: 'light' | 'dark') => void;
   language: string;
   onLanguageChange: (lang: string) => void;
 }
-
 const AppHeader: React.FC<AppHeaderProps> = ({
   theme,
   onThemeChange,
   language,
-  onLanguageChange,
+  onLanguageChange
 }) => {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
-
+  const {
+    user,
+    signOut
+  } = useAuth();
   const handleSignOut = async () => {
     await signOut();
     toast.success('Вы вышли из аккаунта');
     navigate('/auth');
   };
-
   const userInitials = user?.email?.slice(0, 2).toUpperCase() || 'U';
-
-  return (
-    <header className="h-16 bg-card border-b border-border flex items-center justify-end px-6 gap-3">
+  return <header className="h-16 border-b border-border flex items-center justify-end px-6 gap-3 bg-white">
       {/* Language Selector */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -59,17 +50,8 @@ const AppHeader: React.FC<AppHeaderProps> = ({
       </DropdownMenu>
 
       {/* Theme Toggle */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => onThemeChange(theme === 'light' ? 'dark' : 'light')}
-        className="text-muted-foreground hover:text-foreground"
-      >
-        {theme === 'light' ? (
-          <Moon className="w-4 h-4" />
-        ) : (
-          <Sun className="w-4 h-4" />
-        )}
+      <Button variant="ghost" size="icon" onClick={() => onThemeChange(theme === 'light' ? 'dark' : 'light')} className="text-muted-foreground hover:text-foreground">
+        {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
       </Button>
 
       {/* User Menu */}
@@ -101,8 +83,6 @@ const AppHeader: React.FC<AppHeaderProps> = ({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </header>
-  );
+    </header>;
 };
-
 export default AppHeader;
