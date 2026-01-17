@@ -833,15 +833,12 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     >
       {/* Progress bar */}
       <div 
-        className="h-10 flex items-center justify-between px-4 border-b shrink-0"
+        className="h-10 flex items-center justify-center px-4 border-b shrink-0"
         style={{ 
           backgroundColor: `hsl(${ds.mutedColor} / 0.3)`,
           borderColor: `hsl(${ds.mutedColor})`,
         }}
       >
-        <span className="text-xs" style={{ color: `hsl(${ds.foregroundColor} / 0.6)` }}>
-          {lessonTitle}
-        </span>
         <div className="flex items-center gap-1">
           {Array.from({ length: Math.min(totalBlocks, 20) }).map((_, i) => (
             <div
@@ -862,9 +859,6 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             </span>
           )}
         </div>
-        <span className="text-xs" style={{ color: `hsl(${ds.foregroundColor} / 0.6)` }}>
-          {blockIndex + 1} / {totalBlocks}
-        </span>
       </div>
 
       {/* Content */}
