@@ -230,7 +230,7 @@ const Editor: React.FC = () => {
     if (!course) return;
     pushToUndo();
     const newLesson: Lesson = {
-      id: `lesson-${Date.now()}`,
+      id: crypto.randomUUID(),
       courseId: course.id,
       title: `Урок ${course.lessons.length + 1}`,
       description: '',
@@ -277,12 +277,12 @@ const Editor: React.FC = () => {
     
     const newLesson: Lesson = {
       ...lesson,
-      id: `lesson-${Date.now()}`,
+      id: crypto.randomUUID(),
       title: `${lesson.title} (копия)`,
       order: course.lessons.length + 1,
       slides: lesson.slides.map(s => ({
         ...s,
-        id: `slide-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: crypto.randomUUID(),
       })),
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -365,7 +365,7 @@ const Editor: React.FC = () => {
     pushToUndo();
     const newSlide = {
       ...slide,
-      id: `slide-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: crypto.randomUUID(),
       order: lesson.slides.length + 1,
     };
     
