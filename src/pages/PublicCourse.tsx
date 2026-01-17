@@ -167,7 +167,11 @@ const PublicCourse: React.FC = () => {
     );
   }
 
-  return <CoursePlayer course={course} onClose={() => navigate('/')} fullscreen />;
+  return (
+    <div className="fixed inset-0 bg-white" style={{ background: 'white' }}>
+      <CoursePlayer course={course} onClose={() => navigate('/')} fullscreen />
+    </div>
+  );
 };
 
 export default PublicCourse;
