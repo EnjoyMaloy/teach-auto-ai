@@ -37,14 +37,29 @@ interface GenerationStep {
   message?: string;
 }
 
+interface GeneratedSubBlock {
+  type: string;
+  order: number;
+  content?: string;
+  textAlign?: string;
+  textSize?: string;
+  fontWeight?: string;
+  badgeText?: string;
+  badgeVariant?: string;
+  iconName?: string;
+  buttonLabel?: string;
+  buttonVariant?: string;
+}
+
 interface GeneratedSlide {
   type: SlideType;
-  content: string;
+  content?: string;
   imageUrl?: string;
   options?: string[];
   correctAnswer?: string | string[] | boolean;
   explanation?: string;
   blankWord?: string;
+  subBlocks?: GeneratedSubBlock[];
 }
 
 interface GeneratedLesson {
@@ -221,26 +236,45 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
       const lessons: Lesson[] = courseData.lessons.map((genLesson, lessonIndex) => {
         const lessonId = crypto.randomUUID();
         
-        const slides: Slide[] = (genLesson.slides || []).map((genSlide, slideIndex) => ({
-          id: crypto.randomUUID(),
-          lessonId,
-          type: genSlide.type || 'text',
-          order: slideIndex + 1,
-          content: genSlide.content || '',
-          imageUrl: genSlide.imageUrl,
-          options: genSlide.options?.map(opt => ({
+        const slides: Slide[] = (genLesson.slides || []).map((genSlide, slideIndex) => {
+          // Process subBlocks for design type
+          const subBlocks = genSlide.subBlocks?.map((sb, sbIndex) => ({
             id: crypto.randomUUID(),
-            text: opt,
-            isCorrect: Array.isArray(genSlide.correctAnswer) 
-              ? genSlide.correctAnswer.includes(opt)
-              : genSlide.correctAnswer === opt,
-          })),
-          correctAnswer: genSlide.correctAnswer,
-          explanation: genSlide.explanation,
-          blankWord: genSlide.blankWord,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        }));
+            type: sb.type as any,
+            order: sb.order || sbIndex + 1,
+            content: sb.content,
+            textAlign: sb.textAlign as any,
+            textSize: sb.textSize as any,
+            fontWeight: sb.fontWeight as any,
+            badgeText: sb.badgeText,
+            badgeVariant: sb.badgeVariant as any,
+            iconName: sb.iconName,
+            buttonLabel: sb.buttonLabel,
+            buttonVariant: sb.buttonVariant as any,
+          }));
+
+          return {
+            id: crypto.randomUUID(),
+            lessonId,
+            type: genSlide.type || 'text',
+            order: slideIndex + 1,
+            content: genSlide.content || '',
+            imageUrl: genSlide.imageUrl,
+            subBlocks: genSlide.type === 'design' ? subBlocks : undefined,
+            options: genSlide.options?.map(opt => ({
+              id: crypto.randomUUID(),
+              text: opt,
+              isCorrect: Array.isArray(genSlide.correctAnswer) 
+                ? genSlide.correctAnswer.includes(opt)
+                : genSlide.correctAnswer === opt,
+            })),
+            correctAnswer: genSlide.correctAnswer,
+            explanation: genSlide.explanation,
+            blankWord: genSlide.blankWord,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+        });
 
         return {
           id: lessonId,
