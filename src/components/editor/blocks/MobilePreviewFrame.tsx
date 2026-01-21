@@ -1113,21 +1113,21 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   if (fillContainer) {
     return (
       <div 
-        className="h-full w-full flex flex-col overflow-hidden"
+        className="flex-1 w-full flex flex-col overflow-hidden min-h-0 relative"
         style={{ 
           backgroundColor: `hsl(${ds.backgroundColor})`,
           fontFamily: ds.fontFamily,
         }}
       >
         {progressBar}
-        {/* Content area fills remaining space */}
-        <div className="flex-1 min-h-0 overflow-auto relative z-0 flex flex-col justify-center">
+        {/* Content area with padding for fixed bottom nav */}
+        <div className="flex-1 min-h-0 overflow-auto relative z-0 flex flex-col justify-center px-4 py-4 pb-20">
           {renderContent()}
         </div>
         {resultFeedback}
-        {/* Bottom nav pinned to bottom with shrink-0 */}
+        {/* Bottom nav fixed at bottom */}
         <div 
-          className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0 relative z-10"
+          className="absolute bottom-0 left-0 right-0 h-16 border-t flex items-center justify-center gap-3 px-4 z-10"
           style={{ 
             backgroundColor: `hsl(${ds.cardColor})`,
             borderColor: `hsl(${ds.mutedColor})`,
