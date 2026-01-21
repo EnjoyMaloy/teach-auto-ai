@@ -521,8 +521,8 @@ const Editor: React.FC = () => {
       />
 
       <div className="flex-1 flex overflow-hidden">
-        {/* Left: Lessons sidebar */}
-        <div className="w-72 flex-shrink-0 flex flex-col border-r border-border bg-card">
+        {/* Left: Lessons sidebar - hides first on resize (order-1, lowest priority) */}
+        <div className="hidden xl:flex w-72 flex-shrink-0 flex-col border-r border-border bg-card order-1">
           <LessonsList
             lessons={course.lessons}
             selectedLessonId={selectedLessonId}
@@ -542,117 +542,114 @@ const Editor: React.FC = () => {
           />
         </div>
 
-        {/* Center: Block list + Mobile Preview */}
-        <div className="flex-1 flex overflow-hidden">
-          {/* Block list */}
-          <div className="w-96 flex-shrink-0 flex flex-col border-r border-border bg-card">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-              <div>
-                <h3 className="font-bold text-foreground">Блоки</h3>
-                <p className="text-xs text-muted-foreground">{blocks.length} блоков • {Math.ceil(blocks.length * 10 / 60)} мин</p>
-              </div>
-              <Button 
-                variant="default" 
-                size="sm"
-                onClick={() => setShowBlockSelector(true)}
-                className="rounded-xl"
-              >
-                <Plus className="w-4 h-4 mr-1.5" />
-                Добавить
-              </Button>
+        {/* Blocks list - hides second on resize (order-2) */}
+        <div className="hidden lg:flex w-96 flex-shrink-0 flex-col border-r border-border bg-card order-2">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+            <div>
+              <h3 className="font-bold text-foreground">Блоки</h3>
+              <p className="text-xs text-muted-foreground">{blocks.length} блоков • {Math.ceil(blocks.length * 10 / 60)} мин</p>
             </div>
-
-            <div className="flex-1 overflow-y-auto p-3">
-              {blocks.length > 0 ? (
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleReorderBlocks}
-                >
-                  <SortableContext
-                    items={blocks.map(b => b.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    <div className="space-y-2">
-                      {blocks.map((block, index) => (
-                        <SortableBlockItem
-                          key={block.id}
-                          block={block}
-                          index={index}
-                          isSelected={selectedBlockId === block.id}
-                          onSelect={() => setSelectedBlockId(block.id)}
-                          onDelete={() => handleDeleteBlock(block.id)}
-                          onDuplicate={() => handleDuplicateBlock(block.id)}
-                        />
-                      ))}
-                    </div>
-                  </SortableContext>
-                </DndContext>
-              ) : (
-                <div className="text-center py-16">
-                  <div className="w-16 h-16 rounded-2xl bg-primary/10 mx-auto mb-4 flex items-center justify-center">
-                    <Smartphone className="w-8 h-8 text-primary" />
-                  </div>
-                  <p className="text-foreground font-medium mb-2">Начните создавать</p>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Добавьте первый блок урока
-                  </p>
-                  <Button 
-                    variant="default" 
-                    size="sm"
-                    onClick={() => setShowBlockSelector(true)}
-                    className="rounded-xl"
-                  >
-                    <Plus className="w-4 h-4 mr-1.5" />
-                    Добавить блок
-                  </Button>
-                </div>
-              )}
-            </div>
+            <Button 
+              variant="default" 
+              size="sm"
+              onClick={() => setShowBlockSelector(true)}
+              className="rounded-xl"
+            >
+              <Plus className="w-4 h-4 mr-1.5" />
+              Добавить
+            </Button>
           </div>
 
-          {/* Mobile Preview - Fixed 9:16 frame, minimal width */}
-          <div className="flex flex-col overflow-hidden bg-muted/30 flex-shrink-0" style={{ width: 'calc((100vh - 120px) * 9 / 16)', minWidth: '280px' }}>
-            {/* Preview header with mute button */}
-            <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card">
-              <span className="text-sm font-medium text-muted-foreground">Фаст вью</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsPreviewMuted(!isPreviewMuted)}
-                className="gap-2"
+          <div className="flex-1 overflow-y-auto p-3">
+            {blocks.length > 0 ? (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleReorderBlocks}
               >
-                {isPreviewMuted ? (
-                  <>
-                    <VolumeX className="w-4 h-4" />
-                    <span className="text-xs">Звук выкл</span>
-                  </>
-                ) : (
-                  <>
-                    <Volume2 className="w-4 h-4" />
-                    <span className="text-xs">Звук вкл</span>
-                  </>
-                )}
-              </Button>
-            </div>
-            {/* Mobile frame - fixed 9:16 aspect ratio */}
-            <div className="flex-1 overflow-hidden">
-              <MobilePreviewFrame
-                block={selectedBlock}
-                lessonTitle={selectedLesson?.title}
-                blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
-                totalBlocks={blocks.length}
-                onContinue={handleContinueToNextBlock}
-                onUpdateBlock={handleUpdateBlock}
-                designSystem={course.designSystem}
-                isMuted={isPreviewMuted}
-              />
-            </div>
+                <SortableContext
+                  items={blocks.map(b => b.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-2">
+                    {blocks.map((block, index) => (
+                      <SortableBlockItem
+                        key={block.id}
+                        block={block}
+                        index={index}
+                        isSelected={selectedBlockId === block.id}
+                        onSelect={() => setSelectedBlockId(block.id)}
+                        onDelete={() => handleDeleteBlock(block.id)}
+                        onDuplicate={() => handleDuplicateBlock(block.id)}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
+            ) : (
+              <div className="text-center py-16">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 mx-auto mb-4 flex items-center justify-center">
+                  <Smartphone className="w-8 h-8 text-primary" />
+                </div>
+                <p className="text-foreground font-medium mb-2">Начните создавать</p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Добавьте первый блок урока
+                </p>
+                <Button 
+                  variant="default" 
+                  size="sm"
+                  onClick={() => setShowBlockSelector(true)}
+                  className="rounded-xl"
+                >
+                  <Plus className="w-4 h-4 mr-1.5" />
+                  Добавить блок
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Right: Block Editor */}
-        <div className="w-[420px] min-w-[280px] flex-shrink border-l border-border bg-card overflow-hidden">
+        {/* Mobile Preview - HIGHEST PRIORITY, always visible (order-3) */}
+        <div className="flex flex-col overflow-hidden bg-muted/30 flex-1 min-w-[280px] order-3" style={{ maxWidth: 'calc((100vh - 120px) * 9 / 16)' }}>
+          {/* Preview header with mute button */}
+          <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card">
+            <span className="text-sm font-medium text-muted-foreground">Фаст вью</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsPreviewMuted(!isPreviewMuted)}
+              className="gap-2"
+            >
+              {isPreviewMuted ? (
+                <>
+                  <VolumeX className="w-4 h-4" />
+                  <span className="text-xs">Звук выкл</span>
+                </>
+              ) : (
+                <>
+                  <Volume2 className="w-4 h-4" />
+                  <span className="text-xs">Звук вкл</span>
+                </>
+              )}
+            </Button>
+          </div>
+          {/* Mobile frame - fixed 9:16 aspect ratio */}
+          <div className="flex-1 overflow-hidden">
+            <MobilePreviewFrame
+              block={selectedBlock}
+              lessonTitle={selectedLesson?.title}
+              blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
+              totalBlocks={blocks.length}
+              onContinue={handleContinueToNextBlock}
+              onUpdateBlock={handleUpdateBlock}
+              designSystem={course.designSystem}
+              isMuted={isPreviewMuted}
+            />
+          </div>
+        </div>
+
+        {/* Right: Block Editor - hides third on resize (order-4) */}
+        <div className="hidden md:flex w-[420px] min-w-[280px] flex-shrink-0 flex-col border-l border-border bg-card overflow-hidden order-4">
           {selectedBlock ? (
             <BlockEditor
               block={selectedBlock}
