@@ -69,7 +69,7 @@ export const LessonsList: React.FC<LessonsListProps> = ({
       <div className="flex items-center justify-between px-5 py-4 border-b border-border">
         <div>
           <h3 className="font-bold text-foreground">Уроки</h3>
-          <p className="text-xs text-muted-foreground">{lessons.length} уроков • {totalMinutes} мин</p>
+          <p className="text-xs text-muted-foreground">{totalMinutes} мин</p>
         </div>
         <Button 
           variant="default" 
