@@ -126,15 +126,13 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
       case 'image_text':
         return (
           <div className="flex-1 flex flex-col h-full">
-            <div className="flex-1 bg-muted flex items-center justify-center overflow-hidden">
-              {slide.imageUrl ? (
+            {slide.imageUrl && (
+              <div className="flex-1 bg-muted flex items-center justify-center overflow-hidden">
                 <img src={slide.imageUrl} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-muted-foreground">Изображение</span>
-              )}
-            </div>
+              </div>
+            )}
             <div 
-              className="p-4"
+              className={`p-4 ${!slide.imageUrl ? 'flex-1 flex items-center' : ''}`}
               style={{ backgroundColor: `hsl(var(--ds-card, var(--card)))` }}
             >
               <p 
