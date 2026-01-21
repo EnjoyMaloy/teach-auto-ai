@@ -521,8 +521,8 @@ const Editor: React.FC = () => {
       />
 
       <div className="flex-1 flex overflow-hidden">
-        {/* Left: Lessons sidebar - hides first on resize (order-1, lowest priority) */}
-        <div className="hidden xl:flex w-72 flex-shrink-0 flex-col border-r border-border bg-card order-1">
+        {/* Left: Lessons sidebar - hides first on resize, flexible width */}
+        <div className="hidden xl:flex w-72 min-w-[200px] max-w-[320px] flex-1 flex-col border-r border-border bg-card order-1">
           <LessonsList
             lessons={course.lessons}
             selectedLessonId={selectedLessonId}
@@ -542,8 +542,8 @@ const Editor: React.FC = () => {
           />
         </div>
 
-        {/* Blocks list - hides second on resize (order-2) */}
-        <div className="hidden lg:flex w-96 flex-shrink-0 flex-col border-r border-border bg-card order-2">
+        {/* Blocks list - hides second on resize, flexible width */}
+        <div className="hidden lg:flex w-80 min-w-[280px] max-w-[420px] flex-1 flex-col border-r border-border bg-card order-2">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
             <div>
               <h3 className="font-bold text-foreground">Блоки</h3>
@@ -648,8 +648,8 @@ const Editor: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Block Editor - hides third on resize (order-4) */}
-        <div className="hidden md:flex w-[420px] min-w-[280px] flex-shrink-0 flex-col border-l border-border bg-card overflow-hidden order-4">
+        {/* Right: Block Editor - hides third on resize, flexible width */}
+        <div className="hidden md:flex w-[380px] min-w-[300px] max-w-[480px] flex-1 flex-col border-l border-border bg-card overflow-hidden order-4">
           {selectedBlock ? (
             <BlockEditor
               block={selectedBlock}
