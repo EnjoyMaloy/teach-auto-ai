@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Block, BLOCK_CONFIGS } from '@/types/blocks';
 import { CourseDesignSystem } from '@/types/course';
 import { cn } from '@/lib/utils';
@@ -11,6 +11,39 @@ import { AudioPlayer } from './AudioPlayer';
 import { DesignBlockEditor } from './DesignBlockEditor';
 import { playSound, SoundConfig } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
+
+// Hook to compensate for browser zoom - keeps preview at consistent size
+const useZoomCompensation = () => {
+  const [scale, setScale] = useState(1);
+  
+  useEffect(() => {
+    const updateScale = () => {
+      // devicePixelRatio changes with browser zoom
+      // At 100% zoom, it equals the device's base ratio (usually 1 on desktop, 2-3 on mobile)
+      // At 150% zoom, it becomes 1.5x the base ratio
+      // We want to counteract this by scaling inversely
+      const baseRatio = 1; // Assume base ratio of 1 for simplicity
+      const currentRatio = window.devicePixelRatio;
+      const zoomLevel = currentRatio / baseRatio;
+      setScale(1 / zoomLevel);
+    };
+    
+    updateScale();
+    
+    // Listen for zoom changes via resize and media query
+    window.addEventListener('resize', updateScale);
+    
+    // Also check periodically for devicePixelRatio changes (some browsers don't fire events)
+    const interval = setInterval(updateScale, 500);
+    
+    return () => {
+      window.removeEventListener('resize', updateScale);
+      clearInterval(interval);
+    };
+  }, []);
+  
+  return scale;
+};
 
 interface MobilePreviewFrameProps {
   block: Block | null;
@@ -53,6 +86,10 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   isMuted = false,
   isReadOnly = false,
 }) => {
+  // Compensate for browser zoom to maintain consistent preview size
+  const zoomScale = useZoomCompensation();
+  const containerRef = useRef<HTMLDivElement>(null);
+  
   // Merge design system with defaults
   const ds = { ...DEFAULT_DS, ...designSystem };
   
@@ -849,12 +886,24 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
   return (
     <div 
-      className="h-full w-full flex flex-col overflow-hidden"
+      ref={containerRef}
+      className="h-full w-full overflow-hidden"
       style={{ 
-        backgroundColor: `hsl(${ds.backgroundColor})`,
-        fontFamily: ds.fontFamily,
+        // The outer container fills the available space
       }}
     >
+      {/* Inner container with zoom compensation */}
+      <div 
+        className="h-full w-full flex flex-col origin-top-left"
+        style={{ 
+          backgroundColor: `hsl(${ds.backgroundColor})`,
+          fontFamily: ds.fontFamily,
+          // Apply inverse zoom to maintain consistent size
+          transform: `scale(${zoomScale})`,
+          width: `${100 / zoomScale}%`,
+          height: `${100 / zoomScale}%`,
+        }}
+      >
       {/* Progress bar */}
       <div 
         className="h-10 flex items-center justify-center px-4 border-b shrink-0"
@@ -987,6 +1036,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         >
           {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ПРОДОЛЖИТЬ'}
         </button>
+      </div>
       </div>
     </div>
   );
