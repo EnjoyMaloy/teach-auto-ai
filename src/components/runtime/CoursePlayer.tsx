@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Trophy, Star, Clock } from 'lucide-react';
 import { Course, Slide } from '@/types/course';
 import { DesignSystemProvider } from './DesignSystemProvider';
@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { playSound } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
 import { Block, BlockType } from '@/types/blocks';
+import { Button } from '@/components/ui/button';
 
 interface CoursePlayerProps {
   course: Course;
@@ -16,35 +17,59 @@ interface CoursePlayerProps {
   fullscreen?: boolean;
 }
 
-type PlayerView = 'map' | 'lesson';
+// Adapter: Convert Slide to Block for MobilePreviewFrame
+const slideToBlock = (slide: Slide): Block => ({
+  id: slide.id,
+  lessonId: slide.lessonId,
+  type: slide.type as BlockType,
+  order: slide.order,
+  content: slide.content,
+  imageUrl: slide.imageUrl,
+  videoUrl: slide.videoUrl,
+  audioUrl: slide.audioUrl,
+  options: slide.options,
+  correctAnswer: slide.correctAnswer,
+  explanation: slide.explanation,
+  blankWord: slide.blankWord,
+  matchingPairs: slide.matchingPairs,
+  sliderMin: slide.sliderMin,
+  sliderMax: slide.sliderMax,
+  sliderCorrect: slide.sliderCorrect,
+  sliderStep: slide.sliderStep,
+  orderingItems: slide.orderingItems,
+  correctOrder: slide.correctOrder,
+  backgroundColor: slide.backgroundColor,
+  textColor: slide.textColor,
+  createdAt: slide.createdAt,
+  updatedAt: slide.updatedAt,
+});
+
+type ViewMode = 'lesson' | 'map' | 'completed';
 
 export const CoursePlayer: React.FC<CoursePlayerProps> = ({ 
   course, 
   onClose,
   fullscreen = false,
 }) => {
-  // View state: map or lesson
-  const [currentView, setCurrentView] = useState<PlayerView>('map');
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [currentBlockIndex, setCurrentBlockIndex] = useState(0);
+  const [completedLessons, setCompletedLessons] = useState<string[]>([]);
+  const [viewMode, setViewMode] = useState<ViewMode>('map');
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [totalAnswers, setTotalAnswers] = useState(0);
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [answered, setAnswered] = useState(false);
-  const [completedLessons, setCompletedLessons] = useState<string[]>([]);
 
   const currentLesson = course.lessons[currentLessonIndex];
-  const currentSlide = currentLesson?.slides[currentSlideIndex];
-  const totalSlidesInLesson = currentLesson?.slides.length || 0;
+  const blocks = currentLesson?.slides?.map(slideToBlock) || [];
+  const currentBlock = blocks[currentBlockIndex] || null;
 
-  // Sound settings helper
+  // Sound settings
   const soundConfig = {
     enabled: course.designSystem?.sound?.enabled ?? DEFAULT_SOUND_SETTINGS.enabled,
     theme: course.designSystem?.sound?.theme ?? DEFAULT_SOUND_SETTINGS.theme,
     volume: course.designSystem?.sound?.volume ?? DEFAULT_SOUND_SETTINGS.volume,
   };
 
-  // Button depth for completion screen
+  // Button styling for completion screen
   const isRaised = course.designSystem?.buttonDepth !== 'flat';
   const pressAnimationClass = isRaised ? 'btn-raised' : 'btn-flat';
   
@@ -56,159 +81,106 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
     };
   };
 
-  const handleAnswer = useCallback((isCorrect: boolean) => {
-    setTotalAnswers(prev => prev + 1);
-    if (isCorrect) {
-      setCorrectAnswers(prev => prev + 1);
-      playSound('correct', soundConfig);
-    } else {
-      playSound('incorrect', soundConfig);
-    }
-    setAnswered(true);
-  }, [soundConfig]);
-
-  const handleNext = useCallback(() => {
-    setAnswered(false);
+  const handleContinue = () => {
     playSound('swipe', soundConfig);
     
-    if (currentSlideIndex < currentLesson.slides.length - 1) {
-      // Next slide in current lesson
-      setCurrentSlideIndex(prev => prev + 1);
+    if (currentBlockIndex < blocks.length - 1) {
+      // Next block in current lesson
+      setCurrentBlockIndex(currentBlockIndex + 1);
     } else {
-      // Lesson completed
-      playSound('levelUp', soundConfig);
-      setCompletedLessons(prev => [...prev, currentLesson.id]);
+      // Lesson completed - mark as completed and show map
+      if (currentLesson && !completedLessons.includes(currentLesson.id)) {
+        setCompletedLessons(prev => [...prev, currentLesson.id]);
+        playSound('levelUp', soundConfig);
+      }
       
-      // Check if all lessons are completed
+      // Check if all lessons completed
       const allCompleted = course.lessons.every(
         l => l.id === currentLesson.id || completedLessons.includes(l.id)
       );
       
       if (allCompleted) {
         playSound('complete', soundConfig);
-        setIsCompleted(true);
+        setViewMode('completed');
       } else {
-        // Go back to map
-        setCurrentView('map');
-        setCurrentSlideIndex(0);
+        setViewMode('map');
       }
     }
-  }, [currentSlideIndex, currentLesson, course.lessons, completedLessons, soundConfig]);
+  };
 
-  const handleSelectLesson = useCallback((lessonId: string, lessonIndex: number) => {
+  const handleSelectLesson = (lessonId: string, lessonIndex: number) => {
     playSound('swipe', soundConfig);
     setCurrentLessonIndex(lessonIndex);
-    setCurrentSlideIndex(0);
-    setCurrentView('lesson');
-  }, [soundConfig]);
+    setCurrentBlockIndex(0);
+    setViewMode('lesson');
+  };
 
-  const handleBackToMap = useCallback(() => {
-    playSound('swipe', soundConfig);
-    setCurrentView('map');
-    setCurrentSlideIndex(0);
-  }, [soundConfig]);
-
-  // Check if slide type requires checking (quiz types)
-  const isInteractiveSlide = (type: string) => 
-    ['single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'slider', 'matching', 'ordering'].includes(type);
-  
-  const needsCheck = currentSlide ? isInteractiveSlide(currentSlide.type) : false;
-  const showContinue = !needsCheck || answered;
-  
-  // Adapter: Convert Slide to Block for MobilePreviewFrame
-  const slideToBlock = (slide: Slide): Block => ({
-    id: slide.id,
-    lessonId: slide.lessonId,
-    type: slide.type as BlockType,
-    order: slide.order,
-    content: slide.content,
-    imageUrl: slide.imageUrl,
-    videoUrl: slide.videoUrl,
-    audioUrl: slide.audioUrl,
-    options: slide.options,
-    correctAnswer: slide.correctAnswer,
-    explanation: slide.explanation,
-    blankWord: slide.blankWord,
-    matchingPairs: slide.matchingPairs,
-    sliderMin: slide.sliderMin,
-    sliderMax: slide.sliderMax,
-    sliderCorrect: slide.sliderCorrect,
-    sliderStep: slide.sliderStep,
-    orderingItems: slide.orderingItems,
-    correctOrder: slide.correctOrder,
-    backgroundColor: slide.backgroundColor,
-    textColor: slide.textColor,
-    createdAt: slide.createdAt,
-    updatedAt: slide.updatedAt,
-  });
-
-  // Reset course to start over
-  const handleRestart = useCallback(() => {
+  const handleRestart = () => {
     setCurrentLessonIndex(0);
-    setCurrentSlideIndex(0);
+    setCurrentBlockIndex(0);
     setCorrectAnswers(0);
     setTotalAnswers(0);
-    setIsCompleted(false);
-    setAnswered(false);
     setCompletedLessons([]);
-    setCurrentView('map');
+    setViewMode('map');
     playSound('swipe', soundConfig);
-  }, [soundConfig]);
+  };
 
-  // Completion screen content
+  const displayType = course.lessonsDisplayType || 'circle_map';
+
+  // Completion screen
   const renderCompletionContent = () => {
     const accuracy = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 100;
+    const ds = course.designSystem;
     
     return (
-      <div className="text-center animate-scale-in max-w-sm w-full">
-        <div 
-          className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
-          style={{ backgroundColor: `hsl(var(--ds-success, var(--success)) / 0.1)` }}
-        >
-          <Trophy className="w-10 h-10" style={{ color: `hsl(var(--ds-success, var(--success)))` }} />
-        </div>
-        <h1 
-          className="text-2xl font-bold mb-2"
-          style={{ 
-            color: `hsl(var(--ds-foreground, var(--foreground)))`,
-            fontFamily: `var(--ds-heading-font-family, inherit)`,
-          }}
-        >
-          Курс пройден! 🎉
-        </h1>
-        <p className="text-sm mb-6" style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}>
-          {course.title}
-        </p>
-        
-        <div className="grid grid-cols-2 gap-3 mb-6">
+      <div className="h-full w-full flex flex-col items-center justify-center p-6">
+        <div className="text-center animate-scale-in max-w-sm w-full">
           <div 
-            className="p-3 rounded-xl border"
+            className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+            style={{ backgroundColor: `hsl(var(--ds-success, var(--success)) / 0.1)` }}
+          >
+            <Trophy className="w-10 h-10" style={{ color: `hsl(var(--ds-success, var(--success)))` }} />
+          </div>
+          <h1 
+            className="text-2xl font-bold mb-2"
             style={{ 
-              backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.5)`,
-              borderColor: `hsl(var(--ds-muted, var(--border)))`,
+              color: `hsl(var(--ds-foreground, var(--foreground)))`,
+              fontFamily: `var(--ds-heading-font-family, inherit)`,
             }}
           >
-            <Star className="w-5 h-5 mx-auto mb-1" style={{ color: `hsl(var(--ds-primary, var(--primary)))` }} />
-            <p className="text-xl font-bold" style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}>{accuracy}%</p>
-            <p className="text-xs" style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}>Точность</p>
+            Курс пройден! 🎉
+          </h1>
+          <p className="text-sm mb-6" style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}>
+            {course.title}
+          </p>
+          
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            <div 
+              className="p-3 rounded-xl border"
+              style={{ 
+                backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.5)`,
+                borderColor: `hsl(var(--ds-muted, var(--border)))`,
+              }}
+            >
+              <Star className="w-5 h-5 mx-auto mb-1" style={{ color: `hsl(var(--ds-primary, var(--primary)))` }} />
+              <p className="text-xl font-bold" style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}>{accuracy}%</p>
+              <p className="text-xs" style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}>Точность</p>
+            </div>
+            <div 
+              className="p-3 rounded-xl border"
+              style={{ 
+                backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.5)`,
+                borderColor: `hsl(var(--ds-muted, var(--border)))`,
+              }}
+            >
+              <Clock className="w-5 h-5 mx-auto mb-1" style={{ color: `hsl(var(--ds-primary, var(--primary)))` }} />
+              <p className="text-xl font-bold" style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}>{course.estimatedMinutes || 5}</p>
+              <p className="text-xs" style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}>Минут</p>
+            </div>
           </div>
-          <div 
-            className="p-3 rounded-xl border"
-            style={{ 
-              backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.5)`,
-              borderColor: `hsl(var(--ds-muted, var(--border)))`,
-            }}
-          >
-            <Clock className="w-5 h-5 mx-auto mb-1" style={{ color: `hsl(var(--ds-primary, var(--primary)))` }} />
-            <p className="text-xl font-bold" style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}>{course.estimatedMinutes}</p>
-            <p className="text-xs" style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}>Минут</p>
-          </div>
-        </div>
 
-        {/* For fullscreen/Telegram mode - show restart button */}
-        {fullscreen ? (
           <button 
-            onClick={handleRestart} 
+            onClick={fullscreen ? handleRestart : onClose} 
             className={cn("w-full h-11 font-bold uppercase tracking-wide", pressAnimationClass)}
             style={{
               backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
@@ -217,142 +189,49 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
               ...getRaisedButtonStyle(),
             }}
           >
-            ПРОЙТИ ЗАНОВО
+            {fullscreen ? 'ПРОЙТИ ЗАНОВО' : 'ЗАВЕРШИТЬ'}
           </button>
-        ) : (
-          <button 
-            onClick={onClose} 
-            className={cn("w-full h-11 font-bold uppercase tracking-wide", pressAnimationClass)}
-            style={{
-              backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
-              color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
-              borderRadius: `var(--ds-button-radius, var(--radius))`,
-              ...getRaisedButtonStyle(),
-            }}
-          >
-            ЗАВЕРШИТЬ
-          </button>
-        )}
+        </div>
       </div>
     );
   };
 
-  // Completion screen - fullscreen mode
-  if (isCompleted && fullscreen) {
-    return (
-      <DesignSystemProvider config={course.designSystem}>
-        <div 
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center p-6"
-          style={{
-            backgroundColor: `hsl(var(--ds-background, var(--background)))`,
-            fontFamily: `var(--ds-font-family, inherit)`,
-          }}
-        >
-          {renderCompletionContent()}
-        </div>
-      </DesignSystemProvider>
-    );
-  }
-
-  // Completion screen - preview mode (with phone frame)
-  if (isCompleted) {
-    return (
-      <div className="fixed inset-0 bg-muted/50 z-50 flex items-center justify-center p-4">
-        <DesignSystemProvider config={course.designSystem}>
-          <div 
-            className="h-[calc(100vh-64px)] w-[calc((100vh-64px)*9/16)] max-w-full rounded-xl overflow-hidden flex flex-col items-center justify-center border shadow-2xl p-6"
-            style={{
-              backgroundColor: `hsl(var(--ds-card, var(--card)))`,
-              borderColor: `hsl(var(--ds-muted, var(--border)))`,
-              fontFamily: `var(--ds-font-family, inherit)`,
-            }}
-          >
-            {renderCompletionContent()}
-          </div>
-        </DesignSystemProvider>
-      </div>
-    );
-  }
-
-  // Check if running in Telegram
-  const isTelegram = typeof window !== 'undefined' && !!window.Telegram?.WebApp;
-
-  // Lesson Map content
-  const mapContent = (
-    <div 
-      className="h-full w-full flex flex-col overflow-hidden"
-      style={{
-        backgroundColor: `hsl(var(--ds-background, var(--background)))`,
-        fontFamily: `var(--ds-font-family, inherit)`,
-      }}
-    >
-      {/* Top spacer with gray background for Telegram */}
-      {fullscreen && isTelegram && (
-        <div 
-          className="shrink-0"
-          style={{
-            height: 'calc(env(safe-area-inset-top, 0px) + 8vh)',
-            backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.3)`,
-          }}
+  // Main content based on view mode
+  const renderContent = () => {
+    if (viewMode === 'completed') {
+      return renderCompletionContent();
+    }
+    
+    if (viewMode === 'lesson') {
+      return (
+        <MobilePreviewFrame
+          block={currentBlock}
+          lessonTitle={currentLesson?.title}
+          blockIndex={currentBlockIndex}
+          totalBlocks={blocks.length}
+          onContinue={handleContinue}
+          designSystem={course.designSystem}
+          isMuted={false}
+          isReadOnly={true}
         />
-      )}
-      
-      {/* Header */}
-      <div 
-        className="h-14 flex items-center justify-center px-4 border-b shrink-0"
-        style={{
-          backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.3)`,
-          borderColor: `hsl(var(--ds-muted, var(--border)))`,
-        }}
-      >
-        <h1 
-          className="font-bold text-center truncate"
-          style={{ 
-            color: `hsl(var(--ds-foreground, var(--foreground)))`,
-            fontFamily: `var(--ds-heading-font-family, inherit)`,
-          }}
-        >
-          {course.title}
-        </h1>
-      </div>
-
-      {/* Lesson Map */}
-      <div 
-        className="flex-1 overflow-y-auto"
-        style={{ 
-          paddingBottom: fullscreen && isTelegram ? 'calc(env(safe-area-inset-bottom, 0px) + 10%)' : undefined,
-        }}
-      >
+      );
+    }
+    
+    // Map view
+    return (
+      <div className="h-full overflow-auto">
         <LessonMap
           lessons={course.lessons}
-          displayType={course.lessonsDisplayType || 'circle_map'}
+          displayType={displayType}
           completedLessons={completedLessons}
+          currentLessonId={currentLesson?.id}
           onSelectLesson={handleSelectLesson}
         />
       </div>
-    </div>
-  );
+    );
+  };
 
-  // Lesson player content - use MobilePreviewFrame which works perfectly in editor preview
-  const lessonContent = currentSlide ? (
-    <MobilePreviewFrame
-      key={currentSlide.id}
-      block={slideToBlock(currentSlide)}
-      lessonTitle={currentLesson?.title}
-      blockIndex={currentSlideIndex}
-      totalBlocks={totalSlidesInLesson}
-      onContinue={handleNext}
-      designSystem={course.designSystem}
-      isMuted={false}
-      isReadOnly={true}
-      fillContainer={true}
-      hideHeader={false}
-    />
-  ) : null;
-
-  const playerContent = currentView === 'map' ? mapContent : lessonContent;
-
-  // Fullscreen mode - fills parent container (for Telegram/public view)
+  // Fullscreen mode (Telegram / public link)
   if (fullscreen) {
     return (
       <DesignSystemProvider config={course.designSystem}>
@@ -362,31 +241,34 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
             backgroundColor: `hsl(var(--ds-background, var(--background)))`,
           }}
         >
-          {playerContent}
+          {renderContent()}
         </div>
       </DesignSystemProvider>
     );
   }
 
-  // Preview mode - with phone frame
+  // Preview mode - with phone frame (same as FullscreenPreview)
   return (
-    <div className="fixed inset-0 bg-muted/50 z-50 flex items-center justify-center p-4">
-      {/* Close button outside phone */}
-      <button 
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      {/* Close button */}
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={onClose}
-        className="absolute top-4 right-4 p-3 rounded-xl bg-card border border-border hover:bg-muted transition-colors shadow-lg z-10"
+        className="absolute top-4 right-4 z-20 bg-card/90 hover:bg-card border border-border shadow-lg"
       >
-        <X className="w-5 h-5 text-muted-foreground" />
-      </button>
+        <X className="w-5 h-5" />
+      </Button>
 
+      {/* Phone frame */}
       <DesignSystemProvider config={course.designSystem}>
         <div 
-          className="h-[calc(100vh-64px)] w-[calc((100vh-64px)*9/16)] max-w-full rounded-xl overflow-hidden flex flex-col border shadow-2xl"
+          className="h-[calc(100vh-80px)] w-[calc((100vh-80px)*9/16)] max-w-full rounded-[2.5rem] overflow-hidden flex flex-col border-4 border-foreground/20 shadow-2xl"
           style={{
-            borderColor: `hsl(var(--ds-muted, var(--border)))`,
+            backgroundColor: `hsl(var(--ds-background, var(--background)))`,
           }}
         >
-          {playerContent}
+          {renderContent()}
         </div>
       </DesignSystemProvider>
     </div>
