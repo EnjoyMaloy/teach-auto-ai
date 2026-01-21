@@ -78,6 +78,20 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     resetState();
   }, [block?.id]);
 
+  // Update ordering items when block content changes (for live preview in editor)
+  useEffect(() => {
+    if (block?.orderingItems && answerState === 'idle') {
+      // Only update if items have changed and user hasn't started interacting
+      setOrderingItems([...block.orderingItems].sort(() => Math.random() - 0.5));
+    }
+  }, [JSON.stringify(block?.orderingItems)]);
+
+  // Update matching pairs when block content changes
+  useEffect(() => {
+    if (block?.matchingPairs && answerState === 'idle') {
+      setShuffledRights([...block.matchingPairs.map(p => p.right)].sort(() => Math.random() - 0.5));
+    }
+  }, [JSON.stringify(block?.matchingPairs)]);
 
   const resetState = () => {
     setSelectedOptions([]);
