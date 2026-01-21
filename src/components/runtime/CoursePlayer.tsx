@@ -422,7 +422,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
       </div>
 
       {/* Content + Bottom action - using MobilePreviewFrame for consistent rendering */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden min-h-0">
         {currentSlide && (
           <MobilePreviewFrame
             key={currentSlide.id}
