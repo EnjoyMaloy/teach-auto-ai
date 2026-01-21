@@ -4,6 +4,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -401,14 +402,31 @@ ${JSON.stringify(researchData, null, 2)}
     }
   };
 
+  // Prevent closing dialog while generating
+  const handleOpenChange = (newOpen: boolean) => {
+    if (isGenerating && !newOpen) {
+      // Don't allow closing while generating
+      return;
+    }
+    onOpenChange(newOpen);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent 
+        className="sm:max-w-[500px]"
+        onPointerDownOutside={(e) => isGenerating && e.preventDefault()}
+        onEscapeKeyDown={(e) => isGenerating && e.preventDefault()}
+        onInteractOutside={(e) => isGenerating && e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
             AI Генератор курса
           </DialogTitle>
+          <DialogDescription>
+            Опишите тему и AI создаст курс с уроками и слайдами
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
