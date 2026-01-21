@@ -421,8 +421,8 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
         </div>
       </div>
 
-      {/* Content + Bottom action - using MobilePreviewFrame in normal mode (fixed dimensions) */}
-      <div className="flex-1 min-h-0 overflow-hidden">
+      {/* Content + Bottom action - using MobilePreviewFrame with fillContainer for fullscreen */}
+      <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
         {currentSlide && (
           <MobilePreviewFrame
             key={currentSlide.id}
@@ -431,7 +431,6 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
             blockIndex={currentSlideIndex}
             totalBlocks={totalSlidesInLesson}
             onContinue={() => {
-              // Track answer if interactive
               if (isInteractiveSlide(currentSlide.type)) {
                 if (!answered) {
                   setAnswered(true);
@@ -443,6 +442,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
             isMuted={false}
             isReadOnly={true}
             hideHeader={true}
+            fillContainer={fullscreen}
           />
         )}
       </div>

@@ -65,6 +65,8 @@ interface MobilePreviewFrameProps {
   embedded?: boolean;
   /** If true, hides the progress bar header - useful when parent component has its own */
   hideHeader?: boolean;
+  /** If true, fills the container 100% without zoom scaling - for fullscreen/public view */
+  fillContainer?: boolean;
 }
 
 type AnswerState = 'idle' | 'correct' | 'incorrect' | 'partial';
@@ -97,6 +99,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   isReadOnly = false,
   embedded = false,
   hideHeader = false,
+  fillContainer = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   // Scale preview to fit container while maintaining fixed internal dimensions
@@ -1102,6 +1105,24 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ПРОДОЛЖИТЬ'}
           </button>
         </div>
+      </div>
+    );
+  }
+
+  // fillContainer mode - fills parent 100% without zoom, for fullscreen/public view
+  if (fillContainer) {
+    return (
+      <div 
+        className="h-full w-full flex flex-col overflow-hidden"
+        style={{ 
+          backgroundColor: `hsl(${ds.backgroundColor})`,
+          fontFamily: ds.fontFamily,
+        }}
+      >
+        {progressBar}
+        {contentArea}
+        {resultFeedback}
+        {bottomNavigation}
       </div>
     );
   }
