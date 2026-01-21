@@ -454,17 +454,14 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
 
   const playerContent = currentView === 'map' ? mapContent : lessonContent;
 
-  // Fullscreen mode - no frame, just content (for Telegram/public view)
+  // Fullscreen mode - fills parent container (for Telegram/public view)
   if (fullscreen) {
     return (
       <DesignSystemProvider config={course.designSystem}>
         <div 
-          className="fixed inset-0 z-50"
+          className="h-full w-full"
           style={{
             backgroundColor: `hsl(var(--ds-background, var(--background)))`,
-            borderRadius: 0,
-            border: 'none',
-            boxShadow: 'none',
           }}
         >
           {playerContent}
