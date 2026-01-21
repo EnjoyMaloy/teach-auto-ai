@@ -299,33 +299,6 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
           </div>
         );
 
-      case 'hotspot':
-        return (
-          <div className="space-y-4">
-            <p className="text-base font-medium text-center text-foreground">{slide.content || 'Нажмите на области'}</p>
-            <div className="relative bg-muted rounded-lg overflow-hidden max-h-[35vh] aspect-video mx-auto">
-              {slide.imageUrl ? (
-                <img src={slide.imageUrl} alt="" className="w-full h-full object-contain" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-muted-foreground text-sm">Нет изображения</span>
-                </div>
-              )}
-              {slide.hotspotAreas?.map((area) => (
-                <div
-                  key={area.id}
-                  className="absolute border-2 border-primary bg-primary/20 rounded cursor-pointer hover:bg-primary/40 transition-colors"
-                  style={{
-                    left: `${area.x}%`,
-                    top: `${area.y}%`,
-                    width: `${area.width}%`,
-                    height: `${area.height}%`,
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-        );
 
       default:
         return (
