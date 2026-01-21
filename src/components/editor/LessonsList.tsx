@@ -59,6 +59,10 @@ export const LessonsList: React.FC<LessonsListProps> = ({
     }
   };
 
+  // Calculate total course duration: 1 block = 30 seconds, rounded down to minutes
+  const totalBlocks = lessons.reduce((sum, lesson) => sum + (lesson.slides?.length || 0), 0);
+  const totalMinutes = Math.floor((totalBlocks * 30) / 60);
+
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
@@ -115,6 +119,15 @@ export const LessonsList: React.FC<LessonsListProps> = ({
           </div>
         )}
       </div>
+
+      {/* Footer with total duration */}
+      {lessons.length > 0 && (
+        <div className="px-5 py-3 border-t border-border">
+          <p className="text-xs text-muted-foreground text-center">
+            Всего: {totalMinutes} мин
+          </p>
+        </div>
+      )}
     </div>
   );
 };
