@@ -615,7 +615,7 @@ const Editor: React.FC = () => {
           <div className="flex flex-col overflow-hidden bg-muted/30 flex-shrink-0" style={{ width: 'calc((100vh - 120px) * 9 / 16)', minWidth: '280px' }}>
             {/* Preview header with mute button */}
             <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card">
-              <span className="text-sm font-medium text-muted-foreground">Предпросмотр</span>
+              <span className="text-sm font-medium text-muted-foreground">Фаст вью</span>
               <Button
                 variant="ghost"
                 size="sm"
