@@ -327,7 +327,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                 <img src={block.imageUrl} alt="" className="w-full h-full object-cover" />
               </div>
             )}
-            <div className={`p-4 bg-card ${!block.imageUrl ? 'flex-1 flex items-center' : ''}`}>
+            <div className={`p-4 ${!block.imageUrl ? 'flex-1 flex items-center' : ''}`}>
               <p className="text-sm text-foreground">{block.content || 'Описание к картинке...'}</p>
             </div>
           </div>
