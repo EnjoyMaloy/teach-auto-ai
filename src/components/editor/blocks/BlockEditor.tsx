@@ -33,6 +33,16 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
   onDelete,
 }) => {
   const config = BLOCK_CONFIGS[block.type];
+  
+  // Guard against missing block config (e.g., removed hotspot blocks)
+  if (!config) {
+    return (
+      <div className="h-full flex items-center justify-center p-8 text-muted-foreground">
+        <p>Этот тип блока больше не поддерживается</p>
+      </div>
+    );
+  }
+  
   const IconComponent = iconMap[config.icon as keyof typeof iconMap];
 
   const addOption = () => {
