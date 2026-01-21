@@ -421,32 +421,31 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
         </div>
       </div>
 
-      {/* Content + Bottom action - using MobilePreviewFrame for consistent rendering */}
-      {currentSlide && (
-        <MobilePreviewFrame
-          key={currentSlide.id}
-          block={slideToBlock(currentSlide)}
-          lessonTitle={currentLesson?.title}
-          blockIndex={currentSlideIndex}
-          totalBlocks={totalSlidesInLesson}
-          onContinue={() => {
-            // Track answer if interactive
-            if (isInteractiveSlide(currentSlide.type)) {
-              // MobilePreviewFrame handles its own answer checking internally
-              // We just need to track that the slide was answered
-              if (!answered) {
-                setAnswered(true);
+      {/* Content + Bottom action - using MobilePreviewFrame in normal mode (fixed dimensions) */}
+      <div className="flex-1 min-h-0 overflow-hidden">
+        {currentSlide && (
+          <MobilePreviewFrame
+            key={currentSlide.id}
+            block={slideToBlock(currentSlide)}
+            lessonTitle={currentLesson?.title}
+            blockIndex={currentSlideIndex}
+            totalBlocks={totalSlidesInLesson}
+            onContinue={() => {
+              // Track answer if interactive
+              if (isInteractiveSlide(currentSlide.type)) {
+                if (!answered) {
+                  setAnswered(true);
+                }
               }
-            }
-            handleNext();
-          }}
-          designSystem={course.designSystem}
-          isMuted={false}
-          isReadOnly={true}
-          embedded={true}
-          hideHeader={true}
-        />
-      )}
+              handleNext();
+            }}
+            designSystem={course.designSystem}
+            isMuted={false}
+            isReadOnly={true}
+            hideHeader={true}
+          />
+        )}
+      </div>
     </div>
   );
 
