@@ -12,7 +12,7 @@ import {
   Heading, Type, Image, Play, Volume2, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
   Link2, ListOrdered, SlidersHorizontal, MousePointer2,
-  Lightbulb, Layers, CheckCircle, XCircle
+  Lightbulb, Layers, CheckCircle, XCircle, AlertCircle
 } from 'lucide-react';
 
 const iconMap = {
@@ -317,6 +317,24 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                   rows={2}
                 />
               </div>
+              
+              {/* Partial correct - only for multiple choice */}
+              {block.type === 'multiple_choice' && (
+                <div className="space-y-2">
+                  <Label className="text-foreground font-medium flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-warning" />
+                    Объяснение "Почти" (выбраны не все правильные)
+                  </Label>
+                  <Textarea
+                    value={block.explanationPartial || ''}
+                    onChange={(e) => onUpdate({ explanationPartial: e.target.value })}
+                    placeholder="Объясните, что ответ почти правильный, но не хватает..."
+                    className="rounded-xl resize-none placeholder:text-muted-foreground/50"
+                    rows={2}
+                  />
+                </div>
+              )}
+              
               <div className="space-y-2">
                 <Label className="text-foreground font-medium flex items-center gap-2">
                   <XCircle className="w-4 h-4 text-destructive" />

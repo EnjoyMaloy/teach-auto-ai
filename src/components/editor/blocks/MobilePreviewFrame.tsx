@@ -4,7 +4,7 @@ import { CourseDesignSystem } from '@/types/course';
 import { cn } from '@/lib/utils';
 import { 
   Play, Volume2, Check, X,
-  ChevronRight, RotateCcw, Sparkles
+  ChevronRight, RotateCcw, Sparkles, AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AudioPlayer } from './AudioPlayer';
@@ -24,7 +24,7 @@ interface MobilePreviewFrameProps {
   isReadOnly?: boolean;
 }
 
-type AnswerState = 'idle' | 'correct' | 'incorrect';
+type AnswerState = 'idle' | 'correct' | 'incorrect' | 'partial';
 
 // Default design system values
 const DEFAULT_DS = {
@@ -102,8 +102,19 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         break;
       case 'multiple_choice':
         const correctIds = block.options?.filter(o => o.isCorrect).map(o => o.id) || [];
-        isCorrect = correctIds.length === selectedOptions.length && 
-                    correctIds.every(id => selectedOptions.includes(id));
+        const allCorrectSelected = correctIds.every(id => selectedOptions.includes(id));
+        const noIncorrectSelected = selectedOptions.every(id => correctIds.includes(id));
+        
+        if (allCorrectSelected && noIncorrectSelected) {
+          isCorrect = true;
+        } else if (noIncorrectSelected && selectedOptions.length > 0 && selectedOptions.length < correctIds.length) {
+          // Partial - selected some correct but not all, and no incorrect
+          setAnswerState('partial');
+          playSound('incorrect', soundConfig);
+          return;
+        } else {
+          isCorrect = false;
+        }
         break;
       case 'true_false':
         isCorrect = trueFalseAnswer === block.correctAnswer;
@@ -879,10 +890,14 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           style={{
             backgroundColor: answerState === 'correct' 
               ? `hsl(${ds.successColor} / 0.1)` 
-              : `hsl(${ds.destructiveColor} / 0.1)`,
+              : answerState === 'partial'
+                ? `hsl(45 93% 47% / 0.1)` // Warning yellow
+                : `hsl(${ds.destructiveColor} / 0.1)`,
             color: answerState === 'correct' 
               ? `hsl(${ds.successColor})` 
-              : `hsl(${ds.destructiveColor})`,
+              : answerState === 'partial'
+                ? `hsl(45 93% 40%)` // Warning yellow darker
+                : `hsl(${ds.destructiveColor})`,
           }}
         >
           <div className="flex flex-col items-center gap-1">
@@ -891,6 +906,11 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                 <>
                   <Sparkles className="w-4 h-4" />
                   <span>Правильно!</span>
+                </>
+              ) : answerState === 'partial' ? (
+                <>
+                  <AlertCircle className="w-4 h-4" />
+                  <span>Почти!</span>
                 </>
               ) : (
                 <>
@@ -901,6 +921,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             </div>
             {answerState === 'correct' && block?.explanationCorrect && (
               <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanationCorrect}</p>
+            )}
+            {answerState === 'partial' && block?.explanationPartial && (
+              <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanationPartial}</p>
             )}
             {answerState === 'incorrect' && block?.explanation && (
               <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanation}</p>
