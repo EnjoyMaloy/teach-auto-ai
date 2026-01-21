@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { X, Trophy, Star, Clock, ArrowLeft } from 'lucide-react';
+import { X, Trophy, Star, Clock } from 'lucide-react';
 import { Course, Slide } from '@/types/course';
 import { DesignSystemProvider } from './DesignSystemProvider';
 import { LessonMap } from './LessonMap';
-import { SlideView } from './SlideView';
+import { MobilePreviewFrame } from '@/components/editor/blocks/MobilePreviewFrame';
 import { cn } from '@/lib/utils';
 import { playSound } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
@@ -333,117 +333,22 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
     </div>
   );
 
-  // Lesson player content
-  const lessonContent = (
-    <div 
-      className="h-full w-full grid overflow-hidden"
-      style={{
-        backgroundColor: `hsl(var(--ds-background, var(--background)))`,
-        fontFamily: `var(--ds-font-family, inherit)`,
-        gridTemplateRows: fullscreen && isTelegram 
-          ? 'auto 40px 1fr' // telegram spacer + header + content
-          : '40px 1fr', // header + content
-        paddingBottom: fullscreen && isTelegram ? 'env(safe-area-inset-bottom, 0px)' : undefined,
-      }}
-    >
-      {/* Top spacer with gray background for Telegram */}
-      {fullscreen && isTelegram && (
-        <div 
-          className="shrink-0"
-          style={{
-            height: 'calc(env(safe-area-inset-top, 0px) + 8vh)',
-            backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.3)`,
-          }}
-        />
-      )}
-      
-      {/* Progress bar */}
-      <div 
-        className="h-10 flex items-center justify-between px-4 border-b shrink-0"
-        style={{
-          backgroundColor: `hsl(var(--ds-muted, var(--muted)) / 0.3)`,
-          borderColor: `hsl(var(--ds-muted, var(--border)))`,
-        }}
-      >
-        {/* Back button */}
-        <button
-          onClick={handleBackToMap}
-          className="p-1 rounded-lg hover:bg-black/10 transition-colors"
-        >
-          <ArrowLeft 
-            className="w-5 h-5" 
-            style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)))` }} 
-          />
-        </button>
-        
-        {/* Progress dots */}
-        <div className="flex items-center gap-1">
-          {Array.from({ length: Math.min(totalSlidesInLesson, 15) }).map((_, i) => (
-            <div
-              key={i}
-              className="rounded-full transition-all"
-              style={{
-                height: '6px',
-                width: i === currentSlideIndex ? '24px' : '8px',
-                backgroundColor: i <= currentSlideIndex 
-                  ? `hsl(var(--ds-primary, var(--primary))${i < currentSlideIndex ? ' / 0.5' : ''})` 
-                  : `hsl(var(--ds-muted, var(--muted)))`,
-              }}
-            />
-          ))}
-          {totalSlidesInLesson > 15 && (
-            <span 
-              className="text-xs ml-1" 
-              style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
-            >
-              +{totalSlidesInLesson - 15}
-            </span>
-          )}
-        </div>
-        
-        {/* Score and counter */}
-        <div className="flex items-center gap-2">
-          {correctAnswers > 0 && (
-            <div 
-              className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
-              style={{
-                backgroundColor: `hsl(var(--ds-success, var(--success)) / 0.1)`,
-                color: `hsl(var(--ds-success, var(--success)))`,
-              }}
-            >
-              <Star className="w-3 h-3" />
-              {correctAnswers}
-            </div>
-          )}
-          <span 
-            className="text-xs"
-            style={{ color: `hsl(var(--ds-foreground, var(--muted-foreground)) / 0.6)` }}
-          >
-            {currentSlideIndex + 1} / {totalSlidesInLesson}
-          </span>
-        </div>
-      </div>
-
-      {/* Content + Bottom action - using SlideView directly */}
-      {currentSlide && (
-        <SlideView
-          key={currentSlide.id}
-          block={slideToBlock(currentSlide)}
-          designSystem={course.designSystem}
-          onContinue={() => {
-            if (isInteractiveSlide(currentSlide.type)) {
-              if (!answered) {
-                setAnswered(true);
-              }
-            }
-            handleNext();
-          }}
-          isMuted={false}
-          isReadOnly={true}
-        />
-      )}
-    </div>
-  );
+  // Lesson player content - use MobilePreviewFrame which works perfectly in editor preview
+  const lessonContent = currentSlide ? (
+    <MobilePreviewFrame
+      key={currentSlide.id}
+      block={slideToBlock(currentSlide)}
+      lessonTitle={currentLesson?.title}
+      blockIndex={currentSlideIndex}
+      totalBlocks={totalSlidesInLesson}
+      onContinue={handleNext}
+      designSystem={course.designSystem}
+      isMuted={false}
+      isReadOnly={true}
+      fillContainer={true}
+      hideHeader={false}
+    />
+  ) : null;
 
   const playerContent = currentView === 'map' ? mapContent : lessonContent;
 
