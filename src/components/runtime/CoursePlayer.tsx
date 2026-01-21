@@ -1,13 +1,13 @@
 import React, { useState, useCallback } from 'react';
 import { X, Trophy, Star, Clock, ArrowLeft } from 'lucide-react';
-import { Course } from '@/types/course';
-import { SlideRenderer, slideNeedsCheck } from './SlideRenderer';
+import { Course, Slide } from '@/types/course';
+import { MobilePreviewFrame } from '@/components/editor/blocks/MobilePreviewFrame';
 import { DesignSystemProvider } from './DesignSystemProvider';
 import { LessonMap } from './LessonMap';
 import { cn } from '@/lib/utils';
 import { playSound } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
-
+import { Block, BlockType } from '@/types/blocks';
 interface CoursePlayerProps {
   course: Course;
   onClose: () => void;
@@ -43,7 +43,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
     volume: course.designSystem?.sound?.volume ?? DEFAULT_SOUND_SETTINGS.volume,
   };
 
-  // Button depth and animation
+  // Button depth for completion screen
   const isRaised = course.designSystem?.buttonDepth !== 'flat';
   const pressAnimationClass = isRaised ? 'btn-raised' : 'btn-flat';
   
@@ -107,8 +107,39 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
     setCurrentSlideIndex(0);
   }, [soundConfig]);
 
-  const needsCheck = currentSlide ? slideNeedsCheck(currentSlide.type) : false;
+  // Check if slide type requires checking (quiz types)
+  const isInteractiveSlide = (type: string) => 
+    ['single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'slider', 'matching', 'ordering'].includes(type);
+  
+  const needsCheck = currentSlide ? isInteractiveSlide(currentSlide.type) : false;
   const showContinue = !needsCheck || answered;
+  
+  // Adapter: Convert Slide to Block for MobilePreviewFrame
+  const slideToBlock = (slide: Slide): Block => ({
+    id: slide.id,
+    lessonId: slide.lessonId,
+    type: slide.type as BlockType,
+    order: slide.order,
+    content: slide.content,
+    imageUrl: slide.imageUrl,
+    videoUrl: slide.videoUrl,
+    audioUrl: slide.audioUrl,
+    options: slide.options,
+    correctAnswer: slide.correctAnswer,
+    explanation: slide.explanation,
+    blankWord: slide.blankWord,
+    matchingPairs: slide.matchingPairs,
+    sliderMin: slide.sliderMin,
+    sliderMax: slide.sliderMax,
+    sliderCorrect: slide.sliderCorrect,
+    sliderStep: slide.sliderStep,
+    orderingItems: slide.orderingItems,
+    correctOrder: slide.correctOrder,
+    backgroundColor: slide.backgroundColor,
+    textColor: slide.textColor,
+    createdAt: slide.createdAt,
+    updatedAt: slide.updatedAt,
+  });
 
   // Reset course to start over
   const handleRestart = useCallback(() => {
@@ -390,49 +421,33 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
         </div>
       </div>
 
-      {/* Content */}
-      <main 
-        className="flex-1 overflow-hidden"
-        style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
-      >
+      {/* Content + Bottom action - using MobilePreviewFrame for consistent rendering */}
+      <div className="flex-1 flex flex-col overflow-hidden">
         {currentSlide && (
-          <SlideRenderer
+          <MobilePreviewFrame
             key={currentSlide.id}
-            slide={currentSlide}
-            onAnswer={handleAnswer}
-            onNext={handleNext}
-            hideActions={true}
+            block={slideToBlock(currentSlide)}
+            lessonTitle={currentLesson?.title}
+            blockIndex={currentSlideIndex}
+            totalBlocks={totalSlidesInLesson}
+            onContinue={() => {
+              // Track answer if interactive
+              if (isInteractiveSlide(currentSlide.type)) {
+                // MobilePreviewFrame handles its own answer checking internally
+                // We just need to track that the slide was answered
+                if (!answered) {
+                  setAnswered(true);
+                }
+              }
+              handleNext();
+            }}
+            designSystem={course.designSystem}
+            isMuted={false}
+            isReadOnly={true}
+            embedded={true}
+            hideHeader={true}
           />
         )}
-      </main>
-
-      {/* Bottom action button */}
-      <div 
-        className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0"
-        style={{
-          backgroundColor: `hsl(var(--ds-card, var(--card)))`,
-          borderColor: `hsl(var(--ds-muted, var(--border)))`,
-        }}
-      >
-        <button
-          onClick={handleNext}
-          disabled={needsCheck && !answered}
-          className={cn(
-            "flex-1 h-11 max-w-md font-bold uppercase tracking-wide disabled:opacity-50",
-            pressAnimationClass
-          )}
-          style={{
-            backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
-            color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,
-            borderRadius: `var(--ds-button-radius, var(--radius))`,
-            ...getRaisedButtonStyle(),
-          }}
-        >
-          {currentSlideIndex < totalSlidesInLesson - 1 
-            ? (showContinue ? 'ПРОДОЛЖИТЬ' : 'ПРОВЕРИТЬ')
-            : 'ЗАВЕРШИТЬ УРОК'
-          }
-        </button>
       </div>
     </div>
   );
