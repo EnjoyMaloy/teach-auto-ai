@@ -380,18 +380,69 @@ export const SlideView: React.FC<SlideViewProps> = ({
     </div>
   );
 
+  // Bottom nav height
+  const NAV_HEIGHT = 64; // h-16 = 64px
+
   return (
-    <div className="h-full w-full grid overflow-hidden" style={{ gridTemplateRows: '1fr auto' }}>
-      {/* Content - centered */}
-      <div className="flex-1 min-h-0 overflow-auto flex flex-col justify-center items-center px-4 py-4">
+    <div 
+      className="relative w-full h-full overflow-hidden"
+      style={{ 
+        backgroundColor: `hsl(${ds.backgroundColor})`,
+        fontFamily: ds.fontFamily,
+      }}
+    >
+      {/* Content area - absolute positioned to fill space above bottom nav */}
+      <div 
+        className="absolute inset-0 overflow-auto flex flex-col justify-center items-center px-4 py-4"
+        style={{ 
+          bottom: `${NAV_HEIGHT}px`,
+        }}
+      >
         {renderContent()}
       </div>
 
-      {resultFeedback}
+      {/* Result feedback - positioned above bottom nav */}
+      {answerState !== 'idle' && (
+        <div 
+          className="absolute left-0 right-0 px-4 py-3 text-center text-sm font-medium"
+          style={{
+            bottom: `${NAV_HEIGHT}px`,
+            backgroundColor: answerState === 'correct' 
+              ? `hsl(${ds.successColor} / 0.95)` 
+              : answerState === 'partial'
+                ? `hsl(45 93% 47% / 0.95)`
+                : `hsl(${ds.destructiveColor} / 0.95)`,
+            color: answerState === 'correct' 
+              ? `hsl(0 0% 100%)` 
+              : answerState === 'partial'
+                ? `hsl(0 0% 100%)`
+                : `hsl(0 0% 100%)`,
+          }}
+        >
+          <div className="flex items-center justify-center gap-2">
+            {answerState === 'correct' ? (
+              <>
+                <Sparkles className="w-4 h-4" />
+                <span>Правильно!</span>
+              </>
+            ) : answerState === 'partial' ? (
+              <>
+                <AlertCircle className="w-4 h-4" />
+                <span>Почти!</span>
+              </>
+            ) : (
+              <>
+                <X className="w-4 h-4" />
+                <span>Неправильно</span>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
-      {/* Bottom nav - shrink-0 to stay at bottom */}
+      {/* Bottom nav - absolute positioned at bottom */}
       <div 
-        className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0"
+        className="absolute bottom-0 left-0 right-0 h-16 border-t flex items-center justify-center gap-3 px-4"
         style={{ 
           backgroundColor: `hsl(${ds.cardColor})`,
           borderColor: `hsl(${ds.mutedColor})`,
