@@ -32,35 +32,16 @@ const PublicCourse: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize Telegram WebApp - expand to fullscreen
+  // Initialize Telegram WebApp - just signal ready, no fullscreen
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
       
-      // Immediately try to expand
-      tg.expand();
-      
-      // Try requestFullscreen if available (newer Telegram versions)
-      if (tg.requestFullscreen) {
-        try {
-          tg.requestFullscreen();
-        } catch (e) {
-          console.log('Fullscreen not available');
-        }
-      }
-      
       // Disable vertical swipes to prevent accidental closing
       if (tg.disableVerticalSwipes) {
         tg.disableVerticalSwipes();
       }
-      
-      // Retry expand after a short delay (sometimes needed for reliability)
-      setTimeout(() => {
-        if (!tg.isExpanded) {
-          tg.expand();
-        }
-      }, 100);
     }
   }, []);
 
@@ -260,31 +241,14 @@ const PublicCourse: React.FC = () => {
     );
   }
 
-  // Check if running in Telegram
-  const isTelegram = !!window.Telegram?.WebApp;
-
-  // In Telegram - always full screen
-  if (isTelegram) {
-    return (
-      <div className="fixed inset-0" style={{ background: 'white' }}>
-        <CoursePlayer course={course} onClose={() => navigate('/')} fullscreen />
-      </div>
-    );
-  }
-
-  // On web - full screen on mobile, phone-like container on desktop (md+)
+  // Universal mobile-like container for all platforms (Telegram, mobile web, desktop)
   return (
-    <div className="fixed inset-0 bg-muted/80 md:flex md:items-center md:justify-center md:p-4">
+    <div className="fixed inset-0 bg-muted/80 flex items-center justify-center">
       <div 
-        className="w-full h-full md:w-auto md:h-auto md:max-w-[420px] md:max-h-[90vh] md:rounded-2xl md:shadow-2xl md:overflow-hidden"
-        style={{ 
-          background: 'white',
-        }}
+        className="w-full h-full max-w-[420px] max-h-[100dvh] md:max-h-[90vh] md:rounded-2xl md:shadow-2xl overflow-hidden"
+        style={{ background: 'white' }}
       >
-        {/* On mobile: full size. On desktop: constrained with aspect ratio */}
-        <div className="h-full w-full md:h-[min(90vh,746px)] md:w-[420px]">
-          <CoursePlayer course={course} onClose={() => navigate('/')} fullscreen />
-        </div>
+        <CoursePlayer course={course} onClose={() => navigate('/')} fullscreen />
       </div>
     </div>
   );
