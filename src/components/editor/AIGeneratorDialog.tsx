@@ -57,6 +57,7 @@ interface GeneratedSlide {
   type: SlideType;
   content?: string;
   imageUrl?: string;
+  imageDescription?: string; // AI-generated description for image generation
   options?: string[];
   correctAnswer?: string | string[] | boolean;
   explanation?: string;
@@ -242,20 +243,21 @@ ${JSON.stringify(researchData, null, 2)}
         throw new Error('Курс не содержит уроков');
       }
 
-      // Step 4: Generate images for all image_text slides
+      // Step 4: Generate images for all image_text slides (max 8)
       updateStep('images', { status: 'active', message: 'Генерирую иллюстрации...' });
 
-      // Find ALL slides that need images (image_text type)
-      const slidesToIllustrate: { lessonIdx: number; slideIdx: number; content: string }[] = [];
+      // Find ALL slides that need images (image_text type), limit to 8
+      const slidesToIllustrate: { lessonIdx: number; slideIdx: number; description: string }[] = [];
       
       courseData.lessons.forEach((lesson, lessonIdx) => {
         lesson.slides.forEach((slide, slideIdx) => {
-          // Generate images for all image_text slides
-          if (slide.type === 'image_text' && !slide.imageUrl) {
+          // Generate images for image_text slides that have imageDescription
+          if (slide.type === 'image_text' && !slide.imageUrl && slidesToIllustrate.length < 8) {
             slidesToIllustrate.push({
               lessonIdx,
               slideIdx,
-              content: slide.content || lesson.title
+              // Use imageDescription if available, otherwise fall back to content
+              description: slide.imageDescription || slide.content || lesson.title
             });
           }
         });
@@ -269,18 +271,19 @@ ${JSON.stringify(researchData, null, 2)}
           message: 'Иллюстрации не требуются'
         });
       } else {
-        // Generate images in parallel (batch of 5 at a time for speed)
+        // Generate images in parallel (batch of 3 at a time to avoid rate limits)
         let imagesGenerated = 0;
         let imageErrors = 0;
         
-        // Process in batches
-        const batchSize = 5;
+        // Process in smaller batches to avoid rate limits
+        const batchSize = 3;
         for (let i = 0; i < slidesToIllustrate.length; i += batchSize) {
           const batch = slidesToIllustrate.slice(i, i + batchSize);
           
-          const imagePromises = batch.map(async ({ lessonIdx, slideIdx, content }) => {
+          const imagePromises = batch.map(async ({ lessonIdx, slideIdx, description }) => {
             try {
-              const imageUrl = await generateImageForSlide(content, prompt);
+              // Use the detailed imageDescription for generation
+              const imageUrl = await generateImageForSlide(description, prompt);
               if (imageUrl) {
                 courseData.lessons[lessonIdx].slides[slideIdx].imageUrl = imageUrl;
                 imagesGenerated++;
