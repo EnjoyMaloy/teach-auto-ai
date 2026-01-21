@@ -27,6 +27,7 @@ interface LessonsListProps {
   onDuplicateLesson: (lessonId: string) => void;
   onReorderLessons: (activeId: string, overId: string) => void;
   onUpdateLessonIcon?: (lessonId: string, icon: string) => void;
+  onUpdateLessonTitle?: (lessonId: string, title: string) => void;
 }
 
 export const LessonsList: React.FC<LessonsListProps> = ({
@@ -38,6 +39,7 @@ export const LessonsList: React.FC<LessonsListProps> = ({
   onDuplicateLesson,
   onReorderLessons,
   onUpdateLessonIcon,
+  onUpdateLessonTitle,
 }) => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -57,16 +59,11 @@ export const LessonsList: React.FC<LessonsListProps> = ({
     }
   };
 
-  const totalMinutes = lessons.reduce((acc, l) => acc + l.estimatedMinutes, 0);
-
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-        <div>
-          <h3 className="font-bold text-foreground">Уроки</h3>
-          <p className="text-xs text-muted-foreground">{lessons.length} уроков • {totalMinutes} мин</p>
-        </div>
+        <h3 className="font-bold text-foreground">Уроки</h3>
         <Button 
           variant="default" 
           size="sm"
@@ -100,6 +97,7 @@ export const LessonsList: React.FC<LessonsListProps> = ({
                   onDelete={() => onDeleteLesson(lesson.id)}
                   onDuplicate={() => onDuplicateLesson(lesson.id)}
                   onUpdateIcon={onUpdateLessonIcon ? (icon) => onUpdateLessonIcon(lesson.id, icon) : undefined}
+                  onUpdateTitle={onUpdateLessonTitle ? (title) => onUpdateLessonTitle(lesson.id, title) : undefined}
                 />
               ))}
             </SortableContext>

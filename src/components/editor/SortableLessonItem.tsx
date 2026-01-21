@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Copy, Trash2 } from 'lucide-react';
@@ -13,6 +13,7 @@ interface SortableLessonItemProps {
   onDelete: () => void;
   onDuplicate: () => void;
   onUpdateIcon?: (icon: string) => void;
+  onUpdateTitle?: (title: string) => void;
 }
 
 export const SortableLessonItem: React.FC<SortableLessonItemProps> = ({
@@ -22,7 +23,12 @@ export const SortableLessonItem: React.FC<SortableLessonItemProps> = ({
   onSelect,
   onDelete,
   onDuplicate,
+  onUpdateTitle,
 }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(lesson.title);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const {
     attributes,
     listeners,
@@ -35,6 +41,40 @@ export const SortableLessonItem: React.FC<SortableLessonItemProps> = ({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+  };
+
+  useEffect(() => {
+    setEditedTitle(lesson.title);
+  }, [lesson.title]);
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onUpdateTitle) {
+      setIsEditing(true);
+    }
+  };
+
+  const handleSave = () => {
+    if (onUpdateTitle && editedTitle.trim()) {
+      onUpdateTitle(editedTitle.trim());
+    }
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSave();
+    } else if (e.key === 'Escape') {
+      setEditedTitle(lesson.title);
+      setIsEditing(false);
+    }
   };
 
   return (
@@ -68,10 +108,26 @@ export const SortableLessonItem: React.FC<SortableLessonItemProps> = ({
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-foreground truncate">{lesson.title}</p>
-        <p className="text-xs text-muted-foreground truncate mt-0.5">
-          {lesson.slides.length} слайдов • {lesson.estimatedMinutes} мин
-        </p>
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            type="text"
+            value={editedTitle}
+            onChange={(e) => setEditedTitle(e.target.value)}
+            onBlur={handleSave}
+            onKeyDown={handleKeyDown}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full text-sm font-semibold text-foreground bg-transparent border-b-2 border-primary outline-none"
+          />
+        ) : (
+          <p 
+            className="text-sm font-semibold text-foreground truncate"
+            onDoubleClick={handleDoubleClick}
+            title="Двойной клик для редактирования"
+          >
+            {lesson.title}
+          </p>
+        )}
       </div>
 
       {/* Actions */}
