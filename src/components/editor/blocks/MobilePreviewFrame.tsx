@@ -341,59 +341,61 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
       case 'single_choice':
         return (
-          <div className="flex-1 flex flex-col p-4 overflow-auto relative z-0 justify-center">
-            <p 
-              className="text-lg font-semibold mb-4 text-center"
-              style={{ color: `hsl(${ds.foregroundColor})` }}
-            >
-              {block.content || 'Вопрос?'}
-            </p>
-            <div className="space-y-2">
-              {(block.options || []).map((option) => {
-                const isSelected = selectedOptions.includes(option.id);
-                const showResult = answerState !== 'idle';
-                
-                let borderColor = `hsl(${ds.mutedColor})`;
-                let bgColor = `hsl(${ds.cardColor})`;
-                let textColor = `hsl(${ds.foregroundColor})`;
-                
-                if (showResult && option.isCorrect) {
-                  borderColor = `hsl(${ds.successColor})`;
-                  bgColor = `hsl(${ds.successColor} / 0.1)`;
-                  textColor = `hsl(${ds.successColor})`;
-                } else if (showResult && isSelected && !option.isCorrect) {
-                  borderColor = `hsl(${ds.destructiveColor})`;
-                  bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
-                  textColor = `hsl(${ds.destructiveColor})`;
-                } else if (!showResult && isSelected) {
-                  borderColor = `hsl(${ds.primaryColor})`;
-                  bgColor = `hsl(${ds.primaryColor} / 0.1)`;
-                  textColor = `hsl(${ds.primaryColor})`;
-                }
-                
-                return (
-                  <button
-                    key={option.id}
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (answerState !== 'idle') return;
-                      setSelectedOptions([option.id]);
-                    }}
-                    disabled={answerState !== 'idle'}
-                    className="w-full p-3 text-left transition-all text-sm border-2 cursor-pointer"
-                    style={{
-                      borderColor,
-                      backgroundColor: bgColor,
-                      color: textColor,
-                      borderRadius: ds.borderRadius,
-                    }}
-                  >
-                    <span className="font-medium">{option.text}</span>
-                  </button>
-                );
-              })}
+          <div className="flex-1 flex flex-col items-center justify-center p-4 overflow-auto relative z-0 h-full min-h-0">
+            <div className="w-full">
+              <p 
+                className="text-lg font-semibold mb-4 text-center"
+                style={{ color: `hsl(${ds.foregroundColor})` }}
+              >
+                {block.content || 'Вопрос?'}
+              </p>
+              <div className="space-y-2">
+                {(block.options || []).map((option) => {
+                  const isSelected = selectedOptions.includes(option.id);
+                  const showResult = answerState !== 'idle';
+                  
+                  let borderColor = `hsl(${ds.mutedColor})`;
+                  let bgColor = `hsl(${ds.cardColor})`;
+                  let textColor = `hsl(${ds.foregroundColor})`;
+                  
+                  if (showResult && option.isCorrect) {
+                    borderColor = `hsl(${ds.successColor})`;
+                    bgColor = `hsl(${ds.successColor} / 0.1)`;
+                    textColor = `hsl(${ds.successColor})`;
+                  } else if (showResult && isSelected && !option.isCorrect) {
+                    borderColor = `hsl(${ds.destructiveColor})`;
+                    bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
+                    textColor = `hsl(${ds.destructiveColor})`;
+                  } else if (!showResult && isSelected) {
+                    borderColor = `hsl(${ds.primaryColor})`;
+                    bgColor = `hsl(${ds.primaryColor} / 0.1)`;
+                    textColor = `hsl(${ds.primaryColor})`;
+                  }
+                  
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (answerState !== 'idle') return;
+                        setSelectedOptions([option.id]);
+                      }}
+                      disabled={answerState !== 'idle'}
+                      className="w-full p-3 text-left transition-all text-sm border-2 cursor-pointer"
+                      style={{
+                        borderColor,
+                        backgroundColor: bgColor,
+                        color: textColor,
+                        borderRadius: ds.borderRadius,
+                      }}
+                    >
+                      <span className="font-medium">{option.text}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         );
