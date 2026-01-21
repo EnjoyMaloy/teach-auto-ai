@@ -131,10 +131,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                 <img src={slide.imageUrl} alt="" className="w-full h-full object-cover" />
               </div>
             )}
-            <div 
-              className={`p-4 ${!slide.imageUrl ? 'flex-1 flex items-center' : ''}`}
-              style={{ backgroundColor: `hsl(var(--ds-card, var(--card)))` }}
-            >
+            <div className={`p-4 ${!slide.imageUrl ? 'flex-1 flex items-center' : ''}`}>
               <p 
                 className="text-sm"
                 style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
