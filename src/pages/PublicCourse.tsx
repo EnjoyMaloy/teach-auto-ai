@@ -243,9 +243,9 @@ const PublicCourse: React.FC = () => {
 
   // Universal mobile-like container for all platforms (Telegram, mobile web, desktop)
   return (
-    <div className="fixed inset-0 bg-muted/80 md:flex md:items-center md:justify-center md:p-4">
+    <div className="fixed inset-0 bg-muted/80 flex items-center justify-center">
       <div 
-        className="w-full h-full max-w-[420px] mx-auto md:h-[min(90vh,750px)] md:rounded-2xl md:shadow-2xl overflow-hidden flex flex-col"
+        className="w-full h-full max-w-[420px] md:h-[min(90vh,750px)] md:rounded-2xl md:shadow-2xl overflow-hidden"
         style={{ background: 'white' }}
       >
         <CoursePlayer course={course} onClose={() => navigate('/')} fullscreen />
