@@ -522,22 +522,6 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
           </div>
         )}
 
-        {/* Explanation field */}
-        {['single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'matching', 'ordering', 'slider', 'hotspot'].includes(block.type) && (
-          <div className="space-y-2">
-            <Label className="text-foreground font-medium flex items-center gap-2">
-              <Lightbulb className="w-4 h-4 text-warning-foreground" />
-              Объяснение
-            </Label>
-            <Textarea
-              value={block.explanation || ''}
-              onChange={(e) => onUpdate({ explanation: e.target.value })}
-              placeholder="Почему это правильный ответ..."
-              rows={2}
-              className="rounded-xl resize-none"
-            />
-          </div>
-        )}
 
         {/* Design block inline editing notice */}
         {block.type === 'design' && (
