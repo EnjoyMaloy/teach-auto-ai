@@ -206,7 +206,7 @@ export const SlideEditor: React.FC<SlideEditorProps> = ({
             <textarea
               value={selectedSlide.content}
               onChange={(e) => onUpdateSlide(selectedSlide.id, { content: e.target.value })}
-              className="w-full h-24 px-3 py-2 rounded-lg bg-background border border-border text-sm resize-none focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+              className="w-full h-24 px-3 py-2 rounded-lg bg-background border border-border text-sm resize-none focus:ring-2 focus:ring-primary focus:border-transparent outline-none placeholder:text-muted-foreground/50"
               placeholder="Введите текст слайда..."
             />
           </div>
@@ -221,7 +221,7 @@ export const SlideEditor: React.FC<SlideEditorProps> = ({
                 type="text"
                 value={selectedSlide.explanation || ''}
                 onChange={(e) => onUpdateSlide(selectedSlide.id, { explanation: e.target.value })}
-                className="w-full px-3 py-2 rounded-lg bg-background border border-border text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                className="w-full px-3 py-2 rounded-lg bg-background border border-border text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none placeholder:text-muted-foreground/50"
                 placeholder="Почему это правильный ответ..."
               />
             </div>
