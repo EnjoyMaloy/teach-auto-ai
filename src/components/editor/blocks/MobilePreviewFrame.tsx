@@ -321,15 +321,11 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
       case 'image_text':
         return (
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col items-center justify-center p-4 gap-4">
             {block.imageUrl && (
-              <div className="flex-1 bg-muted flex items-center justify-center">
-                <img src={block.imageUrl} alt="" className="w-full h-full object-cover" />
-              </div>
+              <img src={block.imageUrl} alt="" className="w-full rounded-2xl object-contain" />
             )}
-            <div className={`p-4 ${!block.imageUrl ? 'flex-1 flex items-center' : ''}`}>
-              <p className="text-sm text-foreground">{block.content || 'Описание к картинке...'}</p>
-            </div>
+            <p className="text-sm text-foreground text-center">{block.content || 'Описание к картинке...'}</p>
           </div>
         );
 
