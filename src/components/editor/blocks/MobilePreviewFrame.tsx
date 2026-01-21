@@ -1112,27 +1112,29 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   // fillContainer mode - fills parent 100% without zoom, for fullscreen/public view
   if (fillContainer) {
     return (
-      <>
-        {progressBar}
-        {/* Content area with padding for fixed bottom nav */}
-        <div 
-          className="flex-1 min-h-0 overflow-auto flex flex-col justify-center px-4 py-4 pb-20"
-          style={{ 
-            backgroundColor: `hsl(${ds.backgroundColor})`,
-            fontFamily: ds.fontFamily,
-          }}
-        >
+      <div 
+        className="h-full w-full flex flex-col overflow-hidden"
+        style={{ 
+          backgroundColor: `hsl(${ds.backgroundColor})`,
+          fontFamily: ds.fontFamily,
+        }}
+      >
+        {/* Only show progress bar if not hidden */}
+        {!hideHeader && progressBar}
+        
+        {/* Content area - flex-1 with flex centering */}
+        <div className="flex-1 min-h-0 overflow-auto flex flex-col justify-center items-center px-4 py-4">
           {renderContent()}
         </div>
+        
         {resultFeedback}
-        {/* Bottom nav fixed to viewport bottom */}
+        
+        {/* Bottom nav */}
         <div 
-          className="fixed bottom-0 left-0 right-0 h-16 border-t flex items-center justify-center gap-3 px-4 z-50"
+          className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0 z-10"
           style={{ 
             backgroundColor: `hsl(${ds.cardColor})`,
             borderColor: `hsl(${ds.mutedColor})`,
-            maxWidth: '420px',
-            margin: '0 auto',
           }}
         >
           {isInteractive && answerState !== 'idle' && (
@@ -1179,7 +1181,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ПРОДОЛЖИТЬ'}
           </button>
         </div>
-      </>
+      </div>
     );
   }
 
