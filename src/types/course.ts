@@ -40,6 +40,7 @@ export interface Slide {
   options?: SlideOption[];
   correctAnswer?: string | string[] | boolean | number;
   explanation?: string;
+  explanationCorrect?: string;
   hints?: SlideHint[];
   blankWord?: string;
   matchingPairs?: { id: string; left: string; right: string }[];

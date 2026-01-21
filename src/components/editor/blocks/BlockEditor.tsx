@@ -313,7 +313,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                   value={block.explanationCorrect || ''}
                   onChange={(e) => onUpdate({ explanationCorrect: e.target.value })}
                   placeholder="Объясните, почему этот ответ правильный..."
-                  className="rounded-xl resize-none"
+                  className="rounded-xl resize-none placeholder:text-muted-foreground/50"
                   rows={2}
                 />
               </div>
@@ -326,7 +326,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                   value={block.explanation || ''}
                   onChange={(e) => onUpdate({ explanation: e.target.value })}
                   placeholder="Объясните, почему другие ответы неправильные..."
-                  className="rounded-xl resize-none"
+                  className="rounded-xl resize-none placeholder:text-muted-foreground/50"
                   rows={2}
                 />
               </div>
