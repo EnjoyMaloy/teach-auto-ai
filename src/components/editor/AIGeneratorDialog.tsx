@@ -261,35 +261,60 @@ ${JSON.stringify(researchData, null, 2)}
         });
       });
 
-      // Generate images in parallel (batch of 5 at a time for speed)
-      let imagesGenerated = 0;
       const totalImages = slidesToIllustrate.length;
       
-      // Process in batches
-      const batchSize = 5;
-      for (let i = 0; i < slidesToIllustrate.length; i += batchSize) {
-        const batch = slidesToIllustrate.slice(i, i + batchSize);
-        
-        const imagePromises = batch.map(async ({ lessonIdx, slideIdx, content }) => {
-          const imageUrl = await generateImageForSlide(content, prompt);
-          if (imageUrl) {
-            courseData.lessons[lessonIdx].slides[slideIdx].imageUrl = imageUrl;
-            imagesGenerated++;
-            updateStep('images', { message: `Создано ${imagesGenerated} из ${totalImages} изображений...` });
-          }
-          return imageUrl;
+      if (totalImages === 0) {
+        updateStep('images', { 
+          status: 'completed', 
+          message: 'Иллюстрации не требуются'
         });
+      } else {
+        // Generate images in parallel (batch of 5 at a time for speed)
+        let imagesGenerated = 0;
+        let imageErrors = 0;
+        
+        // Process in batches
+        const batchSize = 5;
+        for (let i = 0; i < slidesToIllustrate.length; i += batchSize) {
+          const batch = slidesToIllustrate.slice(i, i + batchSize);
+          
+          const imagePromises = batch.map(async ({ lessonIdx, slideIdx, content }) => {
+            try {
+              const imageUrl = await generateImageForSlide(content, prompt);
+              if (imageUrl) {
+                courseData.lessons[lessonIdx].slides[slideIdx].imageUrl = imageUrl;
+                imagesGenerated++;
+                updateStep('images', { message: `Создано ${imagesGenerated} из ${totalImages} изображений...` });
+              } else {
+                imageErrors++;
+              }
+              return imageUrl;
+            } catch (err) {
+              console.error('Image generation error:', err);
+              imageErrors++;
+              return null;
+            }
+          });
 
-        await Promise.all(imagePromises);
+          await Promise.all(imagePromises);
+        }
+
+        // Mark images step as completed (with warning if some failed)
+        if (imagesGenerated > 0) {
+          updateStep('images', { 
+            status: 'completed', 
+            message: imageErrors > 0 
+              ? `${imagesGenerated} из ${totalImages} иллюстраций (${imageErrors} не удалось)`
+              : `${imagesGenerated} иллюстраций создано`
+          });
+        } else {
+          // All images failed - still continue but show warning
+          updateStep('images', { 
+            status: 'completed', 
+            message: 'Не удалось создать иллюстрации (можно добавить позже)'
+          });
+        }
       }
-
-      updateStep('images', { 
-        status: 'completed', 
-        message: totalImages > 0 ? `${imagesGenerated} иллюстраций создано` : 'Иллюстрации не требуются'
-      });
-
-      // Step 4: Finalize
-      updateStep('finalize', { status: 'active', message: 'Финализирую...' });
 
       // Convert to our Lesson/Slide format
       const lessons: Lesson[] = courseData.lessons.map((genLesson, lessonIndex) => {
@@ -348,7 +373,7 @@ ${JSON.stringify(researchData, null, 2)}
         };
       });
 
-      updateStep('finalize', { status: 'completed', message: 'Готово!' });
+      // Generation complete - no separate finalize step needed
 
       // Wait a moment to show completion
       await new Promise(resolve => setTimeout(resolve, 500));
