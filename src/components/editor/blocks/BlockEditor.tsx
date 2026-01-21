@@ -106,7 +106,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
             </Label>
             {block.type === 'heading' ? (
               <div className="space-y-1">
-                <Input
+                <Textarea
                   value={block.content}
                   onChange={(e) => {
                     if (e.target.value.length <= 75) {
@@ -114,8 +114,9 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                     }
                   }}
                   placeholder="Введите заголовок..."
-                  className="text-lg font-normal rounded-xl w-full"
+                  className="text-lg font-normal rounded-xl resize-none min-h-[60px]"
                   maxLength={75}
+                  rows={2}
                 />
                 <p className="text-xs text-muted-foreground text-right">{block.content.length}/75</p>
               </div>
