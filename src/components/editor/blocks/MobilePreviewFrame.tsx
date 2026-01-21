@@ -341,14 +341,14 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
       case 'single_choice':
         return (
-          <div className="flex-1 flex flex-col p-4 overflow-auto relative z-0">
+          <div className="flex-1 flex flex-col p-4 overflow-auto relative z-0 justify-center">
             <p 
               className="text-lg font-semibold mb-4 text-center"
               style={{ color: `hsl(${ds.foregroundColor})` }}
             >
               {block.content || 'Вопрос?'}
             </p>
-            <div className="space-y-2 flex-1 flex flex-col justify-center">
+            <div className="space-y-2">
               {(block.options || []).map((option) => {
                 const isSelected = selectedOptions.includes(option.id);
                 const showResult = answerState !== 'idle';
