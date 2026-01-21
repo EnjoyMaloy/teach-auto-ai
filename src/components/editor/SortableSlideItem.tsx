@@ -20,7 +20,7 @@ const slideTypeConfig: Record<SlideType, { icon: React.ElementType; label: strin
   matching: { icon: Type, label: 'Соответствие', color: 'bg-cyan-100 text-cyan-600' },
   ordering: { icon: Type, label: 'Порядок', color: 'bg-orange-100 text-orange-600' },
   slider: { icon: Type, label: 'Ползунок', color: 'bg-violet-100 text-violet-600' },
-  hotspot: { icon: Image, label: 'Точки', color: 'bg-rose-100 text-rose-600' },
+  
 };
 
 interface SortableSlideItemProps {

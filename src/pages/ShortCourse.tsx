@@ -20,22 +20,26 @@ const ShortCourse: React.FC = () => {
       }
 
       try {
-        // Query courses where ID starts with the short ID (cast UUID to text for LIKE)
+        // Query courses using RPC function that handles UUID to text conversion
         const { data, error: queryError } = await supabase
-          .from('courses')
-          .select('id, is_link_accessible, is_published')
-          .filter('id::text', 'ilike', `${shortId}%`)
-          .limit(1)
-          .single();
+          .rpc('find_course_by_short_id', { short_id: shortId });
 
-        if (queryError || !data) {
-          console.error('Course not found for shortId:', shortId);
+        if (queryError || !data || data.length === 0) {
+          console.error('Course not found for shortId:', shortId, queryError);
           setError('Курс не найден');
           return;
         }
 
+        const course = data[0];
+        
+        // Check if course is accessible
+        if (!course.is_published && !course.is_link_accessible) {
+          setError('Курс недоступен');
+          return;
+        }
+
         // Redirect to full course URL
-        navigate(`/course/${data.id}`, { replace: true });
+        navigate(`/course/${course.id}`, { replace: true });
       } catch (err) {
         console.error('Error finding course:', err);
         setError('Ошибка поиска курса');

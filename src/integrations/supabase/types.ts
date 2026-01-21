@@ -367,7 +367,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      find_course_by_short_id: {
+        Args: { short_id: string }
+        Returns: {
+          id: string
+          is_link_accessible: boolean
+          is_published: boolean
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
