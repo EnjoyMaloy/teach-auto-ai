@@ -539,6 +539,14 @@ const Editor: React.FC = () => {
                 updatedAt: new Date(),
               }) : null);
             }}
+            onUpdateLessonTitle={(lessonId, title) => {
+              pushToUndo();
+              setCourse(prev => prev ? ({
+                ...prev,
+                lessons: prev.lessons.map(l => l.id === lessonId ? { ...l, title, updatedAt: new Date() } : l),
+                updatedAt: new Date(),
+              }) : null);
+            }}
           />
         </div>
 
