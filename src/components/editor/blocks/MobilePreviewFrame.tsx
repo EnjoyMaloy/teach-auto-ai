@@ -188,7 +188,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             <Play className="w-8 h-8" style={{ color: `hsl(${ds.foregroundColor} / 0.5)` }} />
           </div>
           <p style={{ color: `hsl(${ds.foregroundColor} / 0.5)` }} className="text-sm">
-            Выберите блок для предпросмотра
+            Выберите блок для Фаст вью
           </p>
         </div>
       </div>
