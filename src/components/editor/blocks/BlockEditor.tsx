@@ -12,7 +12,7 @@ import {
   Heading, Type, Image, Play, Volume2, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
   Link2, ListOrdered, SlidersHorizontal, MousePointer2,
-  Lightbulb, Layers
+  Lightbulb, Layers, CheckCircle, XCircle
 } from 'lucide-react';
 
 const iconMap = {
@@ -302,16 +302,34 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
               Добавить вариант
             </Button>
             
-            {/* Explanation field */}
-            <div className="space-y-2 pt-2 border-t border-border">
-              <Label className="text-foreground font-medium">Объяснение (при неправильном ответе)</Label>
-              <Textarea
-                value={block.explanation || ''}
-                onChange={(e) => onUpdate({ explanation: e.target.value })}
-                placeholder="Объясните, почему этот ответ правильный..."
-                className="rounded-xl resize-none"
-                rows={2}
-              />
+            {/* Explanation fields */}
+            <div className="space-y-3 pt-3 border-t border-border">
+              <div className="space-y-2">
+                <Label className="text-foreground font-medium flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-success" />
+                  Объяснение почему это правильный ответ
+                </Label>
+                <Textarea
+                  value={block.explanationCorrect || ''}
+                  onChange={(e) => onUpdate({ explanationCorrect: e.target.value })}
+                  placeholder="Объясните, почему этот ответ правильный..."
+                  className="rounded-xl resize-none"
+                  rows={2}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-foreground font-medium flex items-center gap-2">
+                  <XCircle className="w-4 h-4 text-destructive" />
+                  Объяснение почему это неправильный ответ
+                </Label>
+                <Textarea
+                  value={block.explanation || ''}
+                  onChange={(e) => onUpdate({ explanation: e.target.value })}
+                  placeholder="Объясните, почему другие ответы неправильные..."
+                  className="rounded-xl resize-none"
+                  rows={2}
+                />
+              </div>
             </div>
           </div>
         )}

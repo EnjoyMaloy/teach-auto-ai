@@ -60,7 +60,8 @@ export interface Block {
   // Quiz specific
   options?: BlockOption[];
   correctAnswer?: string | string[] | boolean | number;
-  explanation?: string;
+  explanation?: string; // For incorrect answers
+  explanationCorrect?: string; // For correct answers
   
   // Fill blank
   blankWord?: string;
