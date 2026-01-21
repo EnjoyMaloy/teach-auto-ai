@@ -12,41 +12,41 @@ import { DesignBlockEditor } from './DesignBlockEditor';
 import { playSound, SoundConfig } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
 
-// Hook to compensate for browser zoom - keeps preview at consistent size
-const useZoomCompensation = () => {
+// Fixed preview dimensions (simulating a mobile screen at 100% browser zoom)
+const PREVIEW_BASE_WIDTH = 375; // iPhone width in CSS pixels
+const PREVIEW_BASE_HEIGHT = 667; // iPhone height in CSS pixels
+
+// Hook to scale preview content to fit container while maintaining fixed internal dimensions
+const usePreviewScale = (containerRef: React.RefObject<HTMLDivElement>) => {
   const [scale, setScale] = useState(1);
-  const baseRatioRef = useRef<number | null>(null);
   
   useEffect(() => {
-    // Store the initial devicePixelRatio as baseline
-    if (baseRatioRef.current === null) {
-      baseRatioRef.current = window.devicePixelRatio;
-    }
-    
     const updateScale = () => {
-      const baseRatio = baseRatioRef.current || 1;
-      const currentRatio = window.devicePixelRatio;
-      // Calculate zoom change relative to baseline
-      const zoomChange = currentRatio / baseRatio;
-      // Compensate by inverse scaling
-      setScale(1 / zoomChange);
+      if (!containerRef.current) return;
+      
+      const containerWidth = containerRef.current.clientWidth;
+      const containerHeight = containerRef.current.clientHeight;
+      
+      // Calculate scale to fit content in container
+      const scaleX = containerWidth / PREVIEW_BASE_WIDTH;
+      const scaleY = containerHeight / PREVIEW_BASE_HEIGHT;
+      const newScale = Math.min(scaleX, scaleY);
+      
+      setScale(newScale);
     };
     
     updateScale();
     
-    // Listen for zoom changes via resize
-    window.addEventListener('resize', updateScale);
-    
-    // Media query for devicePixelRatio changes
-    const mediaQuery = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
-    const handleMediaChange = () => updateScale();
-    mediaQuery.addEventListener('change', handleMediaChange);
+    // Use ResizeObserver for more reliable size detection
+    const resizeObserver = new ResizeObserver(updateScale);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
     
     return () => {
-      window.removeEventListener('resize', updateScale);
-      mediaQuery.removeEventListener('change', handleMediaChange);
+      resizeObserver.disconnect();
     };
-  }, []);
+  }, [containerRef]);
   
   return scale;
 };
@@ -92,9 +92,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   isMuted = false,
   isReadOnly = false,
 }) => {
-  // Compensate for browser zoom to maintain consistent preview size
-  const zoomScale = useZoomCompensation();
   const containerRef = useRef<HTMLDivElement>(null);
+  // Scale preview to fit container while maintaining fixed internal dimensions
+  const previewScale = usePreviewScale(containerRef);
   
   // Merge design system with defaults
   const ds = { ...DEFAULT_DS, ...designSystem };
@@ -893,21 +893,24 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   return (
     <div 
       ref={containerRef}
-      className="h-full w-full overflow-hidden"
+      className="h-full w-full overflow-hidden flex items-center justify-center"
       style={{ 
-        // The outer container fills the available space
+        backgroundColor: `hsl(${ds.mutedColor} / 0.2)`,
       }}
     >
-      {/* Inner container with zoom compensation */}
+      {/* Inner container with fixed dimensions, scaled to fit */}
       <div 
-        className="h-full w-full flex flex-col origin-top-left"
+        className="flex flex-col overflow-hidden origin-center"
         style={{ 
           backgroundColor: `hsl(${ds.backgroundColor})`,
           fontFamily: ds.fontFamily,
-          // Apply inverse zoom to maintain consistent size
-          transform: `scale(${zoomScale})`,
-          width: `${100 / zoomScale}%`,
-          height: `${100 / zoomScale}%`,
+          // Fixed internal dimensions (mobile screen size)
+          width: `${PREVIEW_BASE_WIDTH}px`,
+          height: `${PREVIEW_BASE_HEIGHT}px`,
+          // Scale to fit container
+          transform: `scale(${previewScale})`,
+          // Prevent blurry text
+          willChange: 'transform',
         }}
       >
       {/* Progress bar */}
