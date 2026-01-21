@@ -48,6 +48,12 @@ export const SortableBlockItem: React.FC<SortableBlockItemProps> = ({
   };
 
   const config = BLOCK_CONFIGS[block.type];
+  
+  // Skip rendering if block type doesn't exist in config (e.g., removed hotspot blocks)
+  if (!config) {
+    return null;
+  }
+  
   const IconComponent = iconMap[config.icon as keyof typeof iconMap];
 
   return (
