@@ -15,30 +15,36 @@ import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
 // Hook to compensate for browser zoom - keeps preview at consistent size
 const useZoomCompensation = () => {
   const [scale, setScale] = useState(1);
+  const baseRatioRef = useRef<number | null>(null);
   
   useEffect(() => {
+    // Store the initial devicePixelRatio as baseline
+    if (baseRatioRef.current === null) {
+      baseRatioRef.current = window.devicePixelRatio;
+    }
+    
     const updateScale = () => {
-      // devicePixelRatio changes with browser zoom
-      // At 100% zoom, it equals the device's base ratio (usually 1 on desktop, 2-3 on mobile)
-      // At 150% zoom, it becomes 1.5x the base ratio
-      // We want to counteract this by scaling inversely
-      const baseRatio = 1; // Assume base ratio of 1 for simplicity
+      const baseRatio = baseRatioRef.current || 1;
       const currentRatio = window.devicePixelRatio;
-      const zoomLevel = currentRatio / baseRatio;
-      setScale(1 / zoomLevel);
+      // Calculate zoom change relative to baseline
+      const zoomChange = currentRatio / baseRatio;
+      // Compensate by inverse scaling
+      setScale(1 / zoomChange);
     };
     
     updateScale();
     
-    // Listen for zoom changes via resize and media query
+    // Listen for zoom changes via resize
     window.addEventListener('resize', updateScale);
     
-    // Also check periodically for devicePixelRatio changes (some browsers don't fire events)
-    const interval = setInterval(updateScale, 500);
+    // Media query for devicePixelRatio changes
+    const mediaQuery = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+    const handleMediaChange = () => updateScale();
+    mediaQuery.addEventListener('change', handleMediaChange);
     
     return () => {
       window.removeEventListener('resize', updateScale);
-      clearInterval(interval);
+      mediaQuery.removeEventListener('change', handleMediaChange);
     };
   }, []);
   
