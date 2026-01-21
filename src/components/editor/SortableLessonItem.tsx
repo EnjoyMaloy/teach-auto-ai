@@ -121,7 +121,7 @@ export const SortableLessonItem: React.FC<SortableLessonItemProps> = ({
           />
         ) : (
           <p 
-            className="text-sm font-semibold text-foreground truncate"
+            className="text-sm font-semibold text-foreground line-clamp-2"
             onDoubleClick={handleDoubleClick}
             title="Двойной клик для редактирования"
           >
