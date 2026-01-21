@@ -23,7 +23,8 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
   fullscreen = false,
 }) => {
   // View state: map or lesson
-  const [currentView, setCurrentView] = useState<PlayerView>('map');
+  // DEBUG: Start directly in lesson view to test button positioning
+  const [currentView, setCurrentView] = useState<PlayerView>('lesson');
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
@@ -422,7 +423,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
       </div>
 
       {/* Content + Bottom action - using MobilePreviewFrame with fillContainer for fullscreen */}
-      <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+      <div className="flex-1 min-h-0 flex flex-col">
         {currentSlide && (
           <MobilePreviewFrame
             key={currentSlide.id}
@@ -442,7 +443,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
             isMuted={false}
             isReadOnly={true}
             hideHeader={true}
-            fillContainer={fullscreen}
+            fillContainer={true}
           />
         )}
       </div>
