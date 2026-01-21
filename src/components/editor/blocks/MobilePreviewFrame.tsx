@@ -70,8 +70,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   const [fillBlankInput, setFillBlankInput] = useState('');
   const [answerState, setAnswerState] = useState<AnswerState>('idle');
   const [matchingSelected, setMatchingSelected] = useState<{ left: string | null; pairs: Record<string, string> }>({ left: null, pairs: {} });
+  const [shuffledRights, setShuffledRights] = useState<string[]>([]);
   const [orderingItems, setOrderingItems] = useState<string[]>([]);
-  const [clickedHotspots, setClickedHotspots] = useState<string[]>([]);
 
   // Reset state when block changes
   useEffect(() => {
@@ -86,8 +86,11 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     setFillBlankInput('');
     setAnswerState('idle');
     setMatchingSelected({ left: null, pairs: {} });
+    // Shuffle right options for matching
+    if (block?.matchingPairs) {
+      setShuffledRights([...block.matchingPairs.map(p => p.right)].sort(() => Math.random() - 0.5));
+    }
     setOrderingItems(block?.orderingItems ? [...block.orderingItems].sort(() => Math.random() - 0.5) : []);
-    setClickedHotspots([]);
   };
 
   const checkAnswer = () => {
@@ -123,8 +126,13 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         isCorrect = fillBlankInput.toLowerCase().trim() === (block.blankWord || '').toLowerCase().trim();
         break;
       case 'slider':
-        const tolerance = ((block.sliderMax || 100) - (block.sliderMin || 0)) * 0.1;
-        isCorrect = Math.abs(sliderValue - (block.sliderCorrect || 50)) <= tolerance;
+        // Support range or exact answer with tolerance
+        if (block.sliderCorrectMax !== undefined) {
+          isCorrect = sliderValue >= (block.sliderCorrect || 0) && sliderValue <= block.sliderCorrectMax;
+        } else {
+          const tolerance = ((block.sliderMax || 100) - (block.sliderMin || 0)) * 0.05;
+          isCorrect = Math.abs(sliderValue - (block.sliderCorrect || 50)) <= tolerance;
+        }
         break;
       case 'matching':
         const allPairsCorrect = block.matchingPairs?.every(pair => 
@@ -134,11 +142,6 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         break;
       case 'ordering':
         isCorrect = JSON.stringify(orderingItems) === JSON.stringify(block.orderingItems);
-        break;
-      case 'hotspot':
-        const correctAreas = block.hotspotAreas?.map(a => a.id) || [];
-        isCorrect = correctAreas.length === clickedHotspots.length && 
-                    correctAreas.every(id => clickedHotspots.includes(id));
         break;
     }
 
@@ -170,8 +173,6 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         return Object.keys(matchingSelected.pairs).length > 0;
       case 'ordering':
         return orderingItems.length > 0;
-      case 'hotspot':
-        return clickedHotspots.length > 0;
       default:
         return false;
     }
@@ -206,7 +207,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     );
   }
 
-  const isInteractive = ['single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'slider', 'matching', 'ordering', 'hotspot'].includes(block.type);
+  const isInteractive = ['single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'slider', 'matching', 'ordering'].includes(block.type);
 
   // Button depth and style
   const isRaised = designSystem?.buttonDepth !== 'flat';
@@ -595,41 +596,88 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
       case 'slider':
         const showSliderResult = answerState !== 'idle';
-        const tolerance = ((block.sliderMax || 100) - (block.sliderMin || 0)) * 0.1;
-        const isSliderCorrect = Math.abs(sliderValue - (block.sliderCorrect || 50)) <= tolerance;
+        const hasRange = block.sliderCorrectMax !== undefined;
+        const isSliderCorrect = hasRange 
+          ? (sliderValue >= (block.sliderCorrect || 0) && sliderValue <= (block.sliderCorrectMax || 100))
+          : Math.abs(sliderValue - (block.sliderCorrect || 50)) <= ((block.sliderMax || 100) - (block.sliderMin || 0)) * 0.05;
+        
+        const sliderPercent = ((sliderValue - (block.sliderMin || 0)) / ((block.sliderMax || 100) - (block.sliderMin || 0))) * 100;
         
         return (
-          <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6">
-            <p className="text-lg font-semibold text-center text-foreground">
+          <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6 h-full min-h-0">
+            <p 
+              className="text-lg font-semibold text-center"
+              style={{ color: `hsl(${ds.foregroundColor})` }}
+            >
               {block.content || 'Выберите значение'}
             </p>
-            <div className="w-full">
-              <input
-                type="range"
-                min={block.sliderMin || 0}
-                max={block.sliderMax || 100}
-                step={block.sliderStep || 1}
-                value={sliderValue}
-                onChange={(e) => setSliderValue(Number(e.target.value))}
-                disabled={answerState !== 'idle'}
-                className="w-full accent-primary disabled:opacity-50"
-              />
-              <div className="flex justify-between text-sm text-muted-foreground mt-2">
-                <span>{block.sliderMin || 0}</span>
-                <span className={cn(
-                  "font-bold",
+            
+            <div className="w-full max-w-xs space-y-6">
+              {/* Current value display */}
+              <div 
+                className={cn(
+                  "text-5xl font-bold text-center transition-colors",
                   showSliderResult && isSliderCorrect && "text-success",
                   showSliderResult && !isSliderCorrect && "text-destructive",
                   !showSliderResult && "text-primary"
-                )}>
-                  {sliderValue}
-                </span>
-                <span>{block.sliderMax || 100}</span>
+                )}
+              >
+                {sliderValue}
+              </div>
+              
+              {/* Custom styled slider */}
+              <div className="relative pt-2 pb-6">
+                <div 
+                  className="h-3 rounded-full overflow-hidden"
+                  style={{ backgroundColor: `hsl(${ds.mutedColor})` }}
+                >
+                  <div 
+                    className="h-full rounded-full transition-all"
+                    style={{ 
+                      width: `${sliderPercent}%`,
+                      backgroundColor: showSliderResult 
+                        ? (isSliderCorrect ? `hsl(${ds.successColor})` : `hsl(${ds.destructiveColor})`)
+                        : `hsl(${ds.primaryColor})`
+                    }}
+                  />
+                </div>
+                <input
+                  type="range"
+                  min={block.sliderMin || 0}
+                  max={block.sliderMax || 100}
+                  step={block.sliderStep || 1}
+                  value={sliderValue}
+                  onChange={(e) => setSliderValue(Number(e.target.value))}
+                  disabled={answerState !== 'idle'}
+                  className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                  style={{ height: '20px', top: '50%', transform: 'translateY(-50%)' }}
+                />
+                <div 
+                  className={cn(
+                    "absolute top-1/2 -translate-y-1/2 w-7 h-7 rounded-full shadow-lg border-4 border-white transition-all pointer-events-none",
+                    showSliderResult && isSliderCorrect && "bg-success",
+                    showSliderResult && !isSliderCorrect && "bg-destructive",
+                    !showSliderResult && "bg-primary"
+                  )}
+                  style={{ left: `calc(${sliderPercent}% - 14px)` }}
+                />
+                
+                {/* Min/Max labels */}
+                <div 
+                  className="flex justify-between text-sm mt-3"
+                  style={{ color: `hsl(${ds.foregroundColor} / 0.5)` }}
+                >
+                  <span>{block.sliderMin || 0}</span>
+                  <span>{block.sliderMax || 100}</span>
+                </div>
               </div>
             </div>
+            
             {showSliderResult && !isSliderCorrect && (
-              <p className="text-sm text-muted-foreground">
-                Правильный ответ: <span className="text-success font-medium">{block.sliderCorrect}</span>
+              <p className="text-sm" style={{ color: `hsl(${ds.foregroundColor} / 0.6)` }}>
+                Правильный ответ: <span className="text-success font-bold">
+                  {hasRange ? `${block.sliderCorrect} - ${block.sliderCorrectMax}` : block.sliderCorrect}
+                </span>
               </p>
             )}
           </div>
@@ -637,9 +685,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
       case 'matching':
         const showMatchResult = answerState !== 'idle';
-        const availableRights = (block.matchingPairs || [])
-          .map(p => p.right)
-          .filter(r => !Object.values(matchingSelected.pairs).includes(r));
+        // Use shuffled rights from state
+        const availableRights = shuffledRights.filter(r => !Object.values(matchingSelected.pairs).includes(r));
         
         return (
           <div className="flex-1 flex flex-col items-center justify-center p-4 overflow-auto h-full min-h-0">
@@ -773,60 +820,6 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                   );
                 })}
               </div>
-            </div>
-          </div>
-        );
-
-      case 'hotspot':
-        const showHotspotResult = answerState !== 'idle';
-        
-        return (
-          <div className="flex-1 flex flex-col items-center justify-center p-4 overflow-auto h-full min-h-0">
-            <div className="w-full">
-              <p className="text-lg font-semibold mb-4 text-center text-foreground">
-                {block.content || 'Нажмите на правильные области'}
-              </p>
-              <div className="relative bg-muted rounded-xl overflow-hidden border border-border min-h-[200px]">
-                {block.imageUrl ? (
-                  <img src={block.imageUrl} alt="" className="w-full h-full object-contain" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center min-h-[200px]">
-                    <span className="text-muted-foreground text-sm">Загрузите изображение</span>
-                  </div>
-                )}
-                {(block.hotspotAreas || []).map((area) => {
-                  const isClicked = clickedHotspots.includes(area.id);
-                  
-                  return (
-                    <button
-                      key={area.id}
-                      onClick={() => {
-                        if (answerState !== 'idle') return;
-                        setClickedHotspots(prev => 
-                          prev.includes(area.id)
-                            ? prev.filter(id => id !== area.id)
-                            : [...prev, area.id]
-                        );
-                      }}
-                      className={cn(
-                        "absolute rounded-lg transition-all",
-                        showHotspotResult && "border-2 border-success bg-success/30",
-                        !showHotspotResult && isClicked && "border-2 border-primary bg-primary/30",
-                        !showHotspotResult && !isClicked && "border-2 border-transparent hover:border-primary/50 hover:bg-primary/10"
-                      )}
-                      style={{
-                        left: `${area.x}%`,
-                        top: `${area.y}%`,
-                        width: `${area.width}%`,
-                        height: `${area.height}%`,
-                      }}
-                    />
-                  );
-                })}
-              </div>
-              <p className="text-xs text-muted-foreground text-center mt-2">
-                Выбрано: {clickedHotspots.length} / {block.hotspotAreas?.length || 0}
-              </p>
             </div>
           </div>
         );

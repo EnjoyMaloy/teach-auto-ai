@@ -96,7 +96,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
       {/* Editor content */}
       <div className="flex-1 overflow-y-auto p-5 space-y-5">
         {/* Content field */}
-        {['heading', 'text', 'image_text', 'single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'matching', 'ordering', 'slider', 'hotspot'].includes(block.type) && (
+        {['heading', 'text', 'image_text', 'single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'matching', 'ordering', 'slider'].includes(block.type) && (
           <div className="space-y-2">
             <Label className="text-foreground font-medium">
               {block.type === 'heading' ? 'Заголовок' : 
@@ -168,7 +168,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
         )}
 
         {/* Image upload */}
-        {['image_text', 'hotspot'].includes(block.type) && (
+        {['image_text'].includes(block.type) && (
           <div className="space-y-2">
             <Label className="text-foreground font-medium">Изображение</Label>
             <div className="border-2 border-dashed border-border rounded-2xl p-4 text-center bg-muted/30 hover:bg-muted/50 transition-colors">
@@ -318,23 +318,6 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                 />
               </div>
               
-              {/* Partial correct - only for multiple choice */}
-              {block.type === 'multiple_choice' && (
-                <div className="space-y-2">
-                  <Label className="text-foreground font-medium flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-warning" />
-                    Объяснение "Почти" (выбраны не все правильные)
-                  </Label>
-                  <Textarea
-                    value={block.explanationPartial || ''}
-                    onChange={(e) => onUpdate({ explanationPartial: e.target.value })}
-                    placeholder="Объясните, что ответ почти правильный, но не хватает..."
-                    className="rounded-xl resize-none placeholder:text-muted-foreground/50"
-                    rows={2}
-                  />
-                </div>
-              )}
-              
               <div className="space-y-2">
                 <Label className="text-foreground font-medium flex items-center gap-2">
                   <XCircle className="w-4 h-4 text-destructive" />
@@ -354,37 +337,86 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
 
         {/* True/False toggle */}
         {block.type === 'true_false' && (
-          <div className="space-y-2">
-            <Label className="text-foreground font-medium">Правильный ответ</Label>
-            <div className="flex items-center gap-3">
-              <Button
-                variant={block.correctAnswer === true ? 'default' : 'outline'}
-                onClick={() => onUpdate({ correctAnswer: true })}
-                className="flex-1 rounded-xl"
-              >
-                Да
-              </Button>
-              <Button
-                variant={block.correctAnswer === false ? 'default' : 'outline'}
-                onClick={() => onUpdate({ correctAnswer: false })}
-                className="flex-1 rounded-xl"
-              >
-                Нет
-              </Button>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-foreground font-medium">Правильный ответ</Label>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant={block.correctAnswer === true ? 'default' : 'outline'}
+                  onClick={() => onUpdate({ correctAnswer: true })}
+                  className="flex-1 rounded-xl"
+                >
+                  Да
+                </Button>
+                <Button
+                  variant={block.correctAnswer === false ? 'default' : 'outline'}
+                  onClick={() => onUpdate({ correctAnswer: false })}
+                  className="flex-1 rounded-xl"
+                >
+                  Нет
+                </Button>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="text-foreground font-medium flex items-center gap-2">
+                <XCircle className="w-4 h-4 text-destructive" />
+                Объяснение при неправильном ответе
+              </Label>
+              <Textarea
+                value={block.explanation || ''}
+                onChange={(e) => onUpdate({ explanation: e.target.value })}
+                placeholder="Объясните, почему ответ неправильный..."
+                className="rounded-xl resize-none placeholder:text-muted-foreground/50"
+                rows={2}
+              />
             </div>
           </div>
         )}
 
         {/* Fill blank word */}
         {block.type === 'fill_blank' && (
-          <div className="space-y-2">
-            <Label className="text-foreground font-medium">Правильное слово</Label>
-            <Input
-              value={block.blankWord || ''}
-              onChange={(e) => onUpdate({ blankWord: e.target.value })}
-              placeholder="Слово для пропуска..."
-              className="rounded-xl"
-            />
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-foreground font-medium flex items-center gap-2">
+                Вставить пропуск в текст
+                <Button
+                  variant="soft"
+                  size="sm"
+                  onClick={() => {
+                    const textarea = document.querySelector('textarea[placeholder="Введите текст..."]') as HTMLTextAreaElement;
+                    if (textarea) {
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      const text = block.content;
+                      const newText = text.slice(0, start) + '___' + text.slice(end);
+                      onUpdate({ content: newText });
+                    } else {
+                      // If no cursor, append to content
+                      onUpdate({ content: (block.content || '') + ' ___ ' });
+                    }
+                  }}
+                  className="rounded-lg text-xs"
+                >
+                  Вставить ___
+                </Button>
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Нажмите кнопку или введите ___ в тексте выше для обозначения пропуска
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-foreground font-medium">Правильное слово</Label>
+              <Input
+                value={block.blankWord || ''}
+                onChange={(e) => onUpdate({ blankWord: e.target.value })}
+                placeholder="Слово для пропуска..."
+                className="rounded-xl"
+              />
+              <p className="text-xs text-muted-foreground">
+                Регистр не учитывается при проверке
+              </p>
+            </div>
           </div>
         )}
 
@@ -420,14 +452,37 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                 />
               </div>
             </div>
+            
             <div className="space-y-2">
               <Label className="text-foreground font-medium">Правильный ответ</Label>
-              <Input
-                type="number"
-                value={block.sliderCorrect || 50}
-                onChange={(e) => onUpdate({ sliderCorrect: Number(e.target.value) })}
-                className="rounded-xl"
-              />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">Точное значение или от</Label>
+                  <Input
+                    type="number"
+                    value={block.sliderCorrect ?? 50}
+                    onChange={(e) => onUpdate({ sliderCorrect: Number(e.target.value) })}
+                    className="rounded-xl"
+                    placeholder="Точное или мин"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">До (для диапазона)</Label>
+                  <Input
+                    type="number"
+                    value={block.sliderCorrectMax ?? ''}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      onUpdate({ sliderCorrectMax: val ? Number(val) : undefined });
+                    }}
+                    className="rounded-xl"
+                    placeholder="Оставьте пустым"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Оставьте "До" пустым для точного ответа, или укажите диапазон
+              </p>
             </div>
           </div>
         )}

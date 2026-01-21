@@ -280,7 +280,6 @@ export type Database = {
           explanation_correct: string | null
           explanation_partial: string | null
           hints: Json | null
-          hotspot_areas: Json | null
           id: string
           image_url: string | null
           lesson_id: string
@@ -309,7 +308,6 @@ export type Database = {
           explanation_correct?: string | null
           explanation_partial?: string | null
           hints?: Json | null
-          hotspot_areas?: Json | null
           id?: string
           image_url?: string | null
           lesson_id: string
@@ -338,7 +336,6 @@ export type Database = {
           explanation_correct?: string | null
           explanation_partial?: string | null
           hints?: Json | null
-          hotspot_areas?: Json | null
           id?: string
           image_url?: string | null
           lesson_id?: string
