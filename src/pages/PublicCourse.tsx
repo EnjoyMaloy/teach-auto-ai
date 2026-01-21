@@ -260,9 +260,21 @@ const PublicCourse: React.FC = () => {
     );
   }
 
+  // Check if running in Telegram - only constrain width on desktop web
+  const isTelegram = !!window.Telegram?.WebApp;
+
   return (
-    <div className="fixed inset-0 bg-white" style={{ background: 'white' }}>
-      <CoursePlayer course={course} onClose={() => navigate('/')} fullscreen />
+    <div className="fixed inset-0 bg-muted flex items-center justify-center">
+      {/* Mobile container - full screen on mobile/Telegram, constrained on desktop */}
+      <div 
+        className={isTelegram 
+          ? "w-full h-full" 
+          : "w-full h-full md:w-auto md:h-[calc(100vh-32px)] md:aspect-[9/16] md:max-h-screen md:rounded-2xl md:shadow-2xl md:overflow-hidden"
+        }
+        style={{ background: 'white' }}
+      >
+        <CoursePlayer course={course} onClose={() => navigate('/')} fullscreen />
+      </div>
     </div>
   );
 };
