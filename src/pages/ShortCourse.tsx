@@ -20,11 +20,11 @@ const ShortCourse: React.FC = () => {
       }
 
       try {
-        // Query courses where ID starts with the short ID
+        // Query courses where ID starts with the short ID (cast UUID to text for LIKE)
         const { data, error: queryError } = await supabase
           .from('courses')
-          .select('id')
-          .ilike('id', `${shortId}%`)
+          .select('id, is_link_accessible, is_published')
+          .filter('id::text', 'ilike', `${shortId}%`)
           .limit(1)
           .single();
 
