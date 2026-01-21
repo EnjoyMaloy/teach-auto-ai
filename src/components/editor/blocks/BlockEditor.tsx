@@ -106,17 +106,23 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
             </Label>
             {block.type === 'heading' ? (
               <div className="space-y-1">
-                <Textarea
+                <textarea
                   value={block.content}
                   onChange={(e) => {
                     if (e.target.value.length <= 75) {
                       onUpdate({ content: e.target.value });
                     }
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
                   }}
                   placeholder="Введите заголовок..."
-                  className="text-lg font-normal rounded-xl resize-none min-h-[60px]"
+                  className="flex w-full rounded-xl border border-input bg-background px-3 py-2 text-lg font-normal ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 overflow-hidden"
                   maxLength={75}
-                  rows={2}
+                  style={{ minHeight: '44px', resize: 'none' }}
                 />
                 <p className="text-xs text-muted-foreground text-right">{block.content.length}/75</p>
               </div>
