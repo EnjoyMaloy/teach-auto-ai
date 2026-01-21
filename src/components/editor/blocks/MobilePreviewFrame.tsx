@@ -922,9 +922,6 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             {answerState === 'correct' && block?.explanationCorrect && (
               <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanationCorrect}</p>
             )}
-            {answerState === 'partial' && block?.explanationPartial && (
-              <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanationPartial}</p>
-            )}
             {answerState === 'incorrect' && block?.explanation && (
               <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanation}</p>
             )}
