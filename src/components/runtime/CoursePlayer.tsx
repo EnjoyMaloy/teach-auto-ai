@@ -1,13 +1,14 @@
 import React, { useState, useCallback } from 'react';
 import { X, Trophy, Star, Clock, ArrowLeft } from 'lucide-react';
 import { Course, Slide } from '@/types/course';
-import { MobilePreviewFrame } from '@/components/editor/blocks/MobilePreviewFrame';
 import { DesignSystemProvider } from './DesignSystemProvider';
 import { LessonMap } from './LessonMap';
+import { SlideView } from './SlideView';
 import { cn } from '@/lib/utils';
 import { playSound } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
 import { Block, BlockType } from '@/types/blocks';
+
 interface CoursePlayerProps {
   course: Course;
   onClose: () => void;
@@ -22,7 +23,6 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
   onClose,
   fullscreen = false,
 }) => {
-  // View state: map or lesson
   // View state: map or lesson
   const [currentView, setCurrentView] = useState<PlayerView>('map');
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
@@ -336,12 +336,14 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
   // Lesson player content
   const lessonContent = (
     <div 
-      className="h-full w-full flex flex-col overflow-hidden"
+      className="h-full w-full grid overflow-hidden"
       style={{
         backgroundColor: `hsl(var(--ds-background, var(--background)))`,
         fontFamily: `var(--ds-font-family, inherit)`,
-        borderRadius: 0,
-        paddingBottom: fullscreen && isTelegram ? 'calc(env(safe-area-inset-bottom, 0px) + 10%)' : undefined,
+        gridTemplateRows: fullscreen && isTelegram 
+          ? 'auto 40px 1fr' // telegram spacer + header + content
+          : '40px 1fr', // header + content
+        paddingBottom: fullscreen && isTelegram ? 'env(safe-area-inset-bottom, 0px)' : undefined,
       }}
     >
       {/* Top spacer with gray background for Telegram */}
@@ -422,31 +424,24 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
         </div>
       </div>
 
-      {/* Content + Bottom action - using MobilePreviewFrame with fillContainer for fullscreen */}
-      <div className="flex-1 min-h-0 flex flex-col">
-        {currentSlide && (
-          <MobilePreviewFrame
-            key={currentSlide.id}
-            block={slideToBlock(currentSlide)}
-            lessonTitle={currentLesson?.title}
-            blockIndex={currentSlideIndex}
-            totalBlocks={totalSlidesInLesson}
-            onContinue={() => {
-              if (isInteractiveSlide(currentSlide.type)) {
-                if (!answered) {
-                  setAnswered(true);
-                }
+      {/* Content + Bottom action - using SlideView directly */}
+      {currentSlide && (
+        <SlideView
+          key={currentSlide.id}
+          block={slideToBlock(currentSlide)}
+          designSystem={course.designSystem}
+          onContinue={() => {
+            if (isInteractiveSlide(currentSlide.type)) {
+              if (!answered) {
+                setAnswered(true);
               }
-              handleNext();
-            }}
-            designSystem={course.designSystem}
-            isMuted={false}
-            isReadOnly={true}
-            hideHeader={true}
-            fillContainer={true}
-          />
-        )}
-      </div>
+            }
+            handleNext();
+          }}
+          isMuted={false}
+          isReadOnly={true}
+        />
+      )}
     </div>
   );
 
