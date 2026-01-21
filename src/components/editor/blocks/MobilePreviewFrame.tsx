@@ -1110,28 +1110,100 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   }
 
   // fillContainer mode - fills parent 100% without zoom, for fullscreen/public view
+  // Uses absolute positioning to ensure button is always at bottom
   if (fillContainer) {
+    const NAV_HEIGHT = 64; // h-16 = 64px
+    const HEADER_HEIGHT = hideHeader ? 0 : 40; // h-10 = 40px
+    
     return (
       <div 
-        className="h-full w-full flex flex-col overflow-hidden"
+        className="relative h-full w-full overflow-hidden"
         style={{ 
           backgroundColor: `hsl(${ds.backgroundColor})`,
           fontFamily: ds.fontFamily,
         }}
       >
-        {/* Only show progress bar if not hidden */}
-        {!hideHeader && progressBar}
+        {/* Header/progress bar - absolute at top */}
+        {!hideHeader && (
+          <div 
+            className="absolute top-0 left-0 right-0 h-10 flex items-center justify-center px-4 border-b z-10"
+            style={{ 
+              backgroundColor: `hsl(${ds.mutedColor} / 0.3)`,
+              borderColor: `hsl(${ds.mutedColor})`,
+            }}
+          >
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(totalBlocks, 20) }).map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-full transition-all"
+                  style={{
+                    height: '6px',
+                    width: i === blockIndex ? '24px' : '8px',
+                    backgroundColor: i <= blockIndex 
+                      ? `hsl(${ds.primaryColor}${i < blockIndex ? ' / 0.5' : ''})` 
+                      : `hsl(${ds.mutedColor})`,
+                  }}
+                />
+              ))}
+              {totalBlocks > 20 && (
+                <span className="text-xs ml-1" style={{ color: `hsl(${ds.foregroundColor} / 0.6)` }}>
+                  +{totalBlocks - 20}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
         
-        {/* Content area - flex-1 with flex centering */}
-        <div className="flex-1 min-h-0 overflow-auto flex flex-col justify-center items-center px-4 py-4">
+        {/* Content area - absolute positioned between header and nav, centered */}
+        <div 
+          className="absolute left-0 right-0 overflow-auto flex flex-col justify-center items-center px-4 py-4"
+          style={{ 
+            top: `${HEADER_HEIGHT}px`,
+            bottom: `${NAV_HEIGHT}px`,
+          }}
+        >
           {renderContent()}
         </div>
         
-        {resultFeedback}
+        {/* Result feedback - above bottom nav */}
+        {answerState !== 'idle' && (
+          <div 
+            className="absolute left-0 right-0 px-4 py-3 text-center text-sm font-medium z-20"
+            style={{
+              bottom: `${NAV_HEIGHT}px`,
+              backgroundColor: answerState === 'correct' 
+                ? `hsl(${ds.successColor} / 0.95)` 
+                : answerState === 'partial'
+                  ? `hsl(45 93% 47% / 0.95)`
+                  : `hsl(${ds.destructiveColor} / 0.95)`,
+              color: 'white',
+            }}
+          >
+            <div className="flex items-center justify-center gap-2">
+              {answerState === 'correct' ? (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  <span>Правильно!</span>
+                </>
+              ) : answerState === 'partial' ? (
+                <>
+                  <AlertCircle className="w-4 h-4" />
+                  <span>Почти!</span>
+                </>
+              ) : (
+                <>
+                  <X className="w-4 h-4" />
+                  <span>Неправильно</span>
+                </>
+              )}
+            </div>
+          </div>
+        )}
         
-        {/* Bottom nav */}
+        {/* Bottom nav - absolute at bottom */}
         <div 
-          className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0 z-10"
+          className="absolute bottom-0 left-0 right-0 h-16 border-t flex items-center justify-center gap-3 px-4 z-10"
           style={{ 
             backgroundColor: `hsl(${ds.cardColor})`,
             borderColor: `hsl(${ds.mutedColor})`,
