@@ -125,9 +125,9 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
       case 'image_text':
         return (
-          <div className="flex-1 flex flex-col items-center justify-center p-4 gap-4 h-full">
+          <div className="flex-1 flex flex-col items-center justify-center p-4 gap-4 h-full min-h-0">
             {slide.imageUrl && (
-              <img src={slide.imageUrl} alt="" className="w-full rounded-2xl object-contain" />
+              <img src={slide.imageUrl} alt="" className="w-full rounded-2xl object-contain max-h-[60%]" />
             )}
             <p 
               className="text-sm text-center"

@@ -321,9 +321,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
       case 'image_text':
         return (
-          <div className="flex-1 flex flex-col items-center justify-center p-4 gap-4">
+          <div className="flex-1 flex flex-col items-center justify-center p-4 gap-4 h-full min-h-0">
             {block.imageUrl && (
-              <img src={block.imageUrl} alt="" className="w-full rounded-2xl object-contain" />
+              <img src={block.imageUrl} alt="" className="w-full rounded-2xl object-contain max-h-[60%]" />
             )}
             <p className="text-sm text-foreground text-center">{block.content || 'Описание к картинке...'}</p>
           </div>
