@@ -17,8 +17,7 @@ export type BlockType =
   | 'fill_blank'
   | 'matching'
   | 'ordering'
-  | 'slider'
-  | 'hotspot';
+  | 'slider';
 
 export interface BlockOption {
   id: string;
@@ -33,15 +32,6 @@ export interface MatchingPair {
   right: string;
 }
 
-export interface HotspotArea {
-  id: string;
-  x: number; // percentage
-  y: number; // percentage
-  width: number;
-  height: number;
-  label: string;
-  isCorrect: boolean;
-}
 
 export interface Block {
   id: string;
@@ -70,13 +60,11 @@ export interface Block {
   // Matching
   matchingPairs?: MatchingPair[];
   
-  // Hotspot
-  hotspotAreas?: HotspotArea[];
-  
   // Slider
   sliderMin?: number;
   sliderMax?: number;
   sliderCorrect?: number;
+  sliderCorrectMax?: number; // For range answer
   sliderStep?: number;
   
   // Ordering
@@ -242,16 +230,6 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     colorClass: 'text-primary',
     bgClass: 'bg-primary/10',
     description: 'Выбрать значение на шкале'
-  },
-  hotspot: {
-    type: 'hotspot',
-    icon: 'MousePointer2',
-    label: 'Hotspot',
-    labelRu: 'Точки на картинке',
-    category: 'interactive',
-    colorClass: 'text-destructive',
-    bgClass: 'bg-destructive/10',
-    description: 'Нажать на правильные области'
   },
 };
 

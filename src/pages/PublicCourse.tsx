@@ -162,7 +162,6 @@ const PublicCourse: React.FC = () => {
               explanation: s.explanation || undefined,
               blankWord: s.blank_word || undefined,
               matchingPairs: s.matching_pairs as Slide['matchingPairs'],
-              hotspotAreas: s.hotspot_areas as Slide['hotspotAreas'],
               sliderMin: s.slider_min || undefined,
               sliderMax: s.slider_max || undefined,
               sliderCorrect: s.slider_correct || undefined,

@@ -13,8 +13,7 @@ export type SlideType =
   | 'fill_blank'
   | 'matching'
   | 'ordering'
-  | 'slider'
-  | 'hotspot';
+  | 'slider';
 
 export interface SlideHint {
   id: string;
@@ -45,10 +44,10 @@ export interface Slide {
   hints?: SlideHint[];
   blankWord?: string;
   matchingPairs?: { id: string; left: string; right: string }[];
-  hotspotAreas?: { id: string; x: number; y: number; width: number; height: number; label: string; isCorrect: boolean }[];
   sliderMin?: number;
   sliderMax?: number;
   sliderCorrect?: number;
+  sliderCorrectMax?: number; // For range answer
   sliderStep?: number;
   orderingItems?: string[];
   correctOrder?: string[];
