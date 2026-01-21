@@ -609,8 +609,8 @@ const Editor: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile Preview - HIGHEST PRIORITY, always visible (order-3) */}
-        <div className="flex flex-col overflow-hidden bg-muted/30 flex-1 min-w-[280px] order-3" style={{ maxWidth: 'calc((100vh - 120px) * 9 / 16)' }}>
+        {/* Mobile Preview - HIGHEST PRIORITY, fixed width, never shrinks */}
+        <div className="flex flex-col overflow-hidden bg-muted/30 flex-shrink-0 order-3" style={{ width: 'calc((100vh - 120px) * 9 / 16)', minWidth: '280px' }}>
           {/* Preview header with mute button */}
           <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card">
             <span className="text-sm font-medium text-muted-foreground">Фаст вью</span>
