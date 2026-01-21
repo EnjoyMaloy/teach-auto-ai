@@ -520,7 +520,7 @@ const Editor: React.FC = () => {
         onBack={() => navigate('/')}
       />
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex w-full overflow-hidden">
         {/* Left: Lessons sidebar - hides first on resize, flexible width */}
         <div className="hidden xl:flex w-72 min-w-[200px] max-w-[320px] flex-1 flex-col border-r border-border bg-card order-1">
           <LessonsList
