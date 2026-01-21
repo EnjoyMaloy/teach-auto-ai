@@ -252,19 +252,13 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 group">
-                <span className="text-sm font-semibold text-foreground line-clamp-1 max-w-[200px]">
-                  {course.title}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={handleStartEditing}
-                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted"
-                >
-                  <Pencil className="w-3 h-3" />
-                </Button>
-              </div>
+              <span 
+                className="text-sm font-semibold text-foreground line-clamp-1 max-w-[300px] cursor-pointer hover:text-primary transition-colors"
+                onDoubleClick={handleStartEditing}
+                title="Двойной клик для редактирования"
+              >
+                {course.title}
+              </span>
             )}
           </nav>
 
