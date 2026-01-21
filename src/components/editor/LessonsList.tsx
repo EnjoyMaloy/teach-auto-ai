@@ -67,7 +67,10 @@ export const LessonsList: React.FC<LessonsListProps> = ({
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-        <h3 className="font-bold text-foreground">Уроки</h3>
+        <div>
+          <h3 className="font-bold text-foreground">Уроки</h3>
+          <p className="text-xs text-muted-foreground">{lessons.length} уроков • {totalMinutes} мин</p>
+        </div>
         <Button 
           variant="default" 
           size="sm"
@@ -119,15 +122,6 @@ export const LessonsList: React.FC<LessonsListProps> = ({
           </div>
         )}
       </div>
-
-      {/* Footer with total duration */}
-      {lessons.length > 0 && (
-        <div className="px-5 py-3 border-t border-border">
-          <p className="text-xs text-muted-foreground text-center">
-            Всего: {totalMinutes} мин
-          </p>
-        </div>
-      )}
     </div>
   );
 };
