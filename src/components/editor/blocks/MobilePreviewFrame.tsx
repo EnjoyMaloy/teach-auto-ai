@@ -325,7 +325,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             {block.imageUrl && (
               <img src={block.imageUrl} alt="" className="w-full rounded-2xl object-contain max-h-[60%]" />
             )}
-            <p className="text-sm text-foreground text-center">{block.content || 'Описание к картинке...'}</p>
+            <p className="text-base text-foreground text-center">{block.content || 'Описание к картинке...'}</p>
           </div>
         );
 

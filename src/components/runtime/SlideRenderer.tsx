@@ -130,7 +130,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
               <img src={slide.imageUrl} alt="" className="w-full rounded-2xl object-contain max-h-[60%]" />
             )}
             <p 
-              className="text-sm text-center"
+              className="text-base text-center"
               style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
             >
               {slide.content || 'Описание к картинке...'}
