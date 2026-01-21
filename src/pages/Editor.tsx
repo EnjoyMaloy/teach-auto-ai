@@ -121,8 +121,11 @@ const Editor: React.FC = () => {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  // Load or create course
+  // Load or create course - only once on mount
   useEffect(() => {
+    // Skip if course is already loaded for this courseId
+    if (course && course.id === courseId) return;
+    
     const loadCourse = async () => {
       if (!user) return;
       
@@ -155,7 +158,8 @@ const Editor: React.FC = () => {
     };
 
     loadCourse();
-  }, [courseId, user, fetchCourse, createCourse, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseId, user?.id]);
 
   const selectedLesson = course?.lessons.find(l => l.id === selectedLessonId);
   const blocks: Block[] = selectedLesson?.slides.map(slideToBlock) || [];
