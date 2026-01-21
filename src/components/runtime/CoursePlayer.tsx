@@ -23,8 +23,8 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
   fullscreen = false,
 }) => {
   // View state: map or lesson
-  // DEBUG: Start directly in lesson view to test button positioning
-  const [currentView, setCurrentView] = useState<PlayerView>('lesson');
+  // View state: map or lesson
+  const [currentView, setCurrentView] = useState<PlayerView>('map');
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);

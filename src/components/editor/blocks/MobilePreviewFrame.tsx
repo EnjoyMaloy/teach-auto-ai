@@ -1112,25 +1112,27 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   // fillContainer mode - fills parent 100% without zoom, for fullscreen/public view
   if (fillContainer) {
     return (
-      <div 
-        className="flex-1 w-full flex flex-col overflow-hidden min-h-0 relative"
-        style={{ 
-          backgroundColor: `hsl(${ds.backgroundColor})`,
-          fontFamily: ds.fontFamily,
-        }}
-      >
+      <>
         {progressBar}
         {/* Content area with padding for fixed bottom nav */}
-        <div className="flex-1 min-h-0 overflow-auto relative z-0 flex flex-col justify-center px-4 py-4 pb-20">
+        <div 
+          className="flex-1 min-h-0 overflow-auto flex flex-col justify-center px-4 py-4 pb-20"
+          style={{ 
+            backgroundColor: `hsl(${ds.backgroundColor})`,
+            fontFamily: ds.fontFamily,
+          }}
+        >
           {renderContent()}
         </div>
         {resultFeedback}
-        {/* Bottom nav fixed at bottom */}
+        {/* Bottom nav fixed to viewport bottom */}
         <div 
-          className="absolute bottom-0 left-0 right-0 h-16 border-t flex items-center justify-center gap-3 px-4 z-10"
+          className="fixed bottom-0 left-0 right-0 h-16 border-t flex items-center justify-center gap-3 px-4 z-50"
           style={{ 
             backgroundColor: `hsl(${ds.cardColor})`,
             borderColor: `hsl(${ds.mutedColor})`,
+            maxWidth: '420px',
+            margin: '0 auto',
           }}
         >
           {isInteractive && answerState !== 'idle' && (
@@ -1177,7 +1179,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ПРОДОЛЖИТЬ'}
           </button>
         </div>
-      </div>
+      </>
     );
   }
 
