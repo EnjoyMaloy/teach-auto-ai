@@ -278,6 +278,7 @@ export type Database = {
           created_at: string
           explanation: string | null
           explanation_correct: string | null
+          explanation_partial: string | null
           hints: Json | null
           hotspot_areas: Json | null
           id: string
@@ -306,6 +307,7 @@ export type Database = {
           created_at?: string
           explanation?: string | null
           explanation_correct?: string | null
+          explanation_partial?: string | null
           hints?: Json | null
           hotspot_areas?: Json | null
           id?: string
@@ -334,6 +336,7 @@ export type Database = {
           created_at?: string
           explanation?: string | null
           explanation_correct?: string | null
+          explanation_partial?: string | null
           hints?: Json | null
           hotspot_areas?: Json | null
           id?: string

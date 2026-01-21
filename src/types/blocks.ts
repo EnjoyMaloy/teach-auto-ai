@@ -61,6 +61,7 @@ export interface Block {
   options?: BlockOption[];
   correctAnswer?: string | string[] | boolean | number;
   explanation?: string; // For incorrect answers
+  explanationPartial?: string; // For partially correct answers (multiple choice)
   explanationCorrect?: string; // For correct answers
   
   // Fill blank
