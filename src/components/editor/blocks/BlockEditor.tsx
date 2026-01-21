@@ -301,6 +301,18 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
               <Plus className="w-4 h-4 mr-1.5" />
               Добавить вариант
             </Button>
+            
+            {/* Explanation field */}
+            <div className="space-y-2 pt-2 border-t border-border">
+              <Label className="text-foreground font-medium">Объяснение (при неправильном ответе)</Label>
+              <Textarea
+                value={block.explanation || ''}
+                onChange={(e) => onUpdate({ explanation: e.target.value })}
+                placeholder="Объясните, почему этот ответ правильный..."
+                className="rounded-xl resize-none"
+                rows={2}
+              />
+            </div>
           </div>
         )}
 

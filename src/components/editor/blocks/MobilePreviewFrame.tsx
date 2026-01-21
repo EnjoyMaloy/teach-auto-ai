@@ -873,17 +873,22 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
               : `hsl(${ds.destructiveColor})`,
           }}
         >
-          <div className="flex items-center justify-center gap-2">
-            {answerState === 'correct' ? (
-              <>
-                <Sparkles className="w-4 h-4" />
-                <span>Правильно!</span>
-              </>
-            ) : (
-              <>
-                <X className="w-4 h-4" />
-                <span>Неправильно</span>
-              </>
+          <div className="flex flex-col items-center gap-1">
+            <div className="flex items-center justify-center gap-2">
+              {answerState === 'correct' ? (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  <span>Правильно!</span>
+                </>
+              ) : (
+                <>
+                  <X className="w-4 h-4" />
+                  <span>Неправильно</span>
+                </>
+              )}
+            </div>
+            {answerState === 'incorrect' && block?.explanation && (
+              <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanation}</p>
             )}
           </div>
         </div>
