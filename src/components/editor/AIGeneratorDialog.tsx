@@ -412,12 +412,13 @@ ${JSON.stringify(researchData, null, 2)}
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange} modal={!isGenerating}>
       <DialogContent 
-        className="sm:max-w-[500px]"
+        className={cn("sm:max-w-[500px]", isGenerating && "[&>button]:hidden")}
         onPointerDownOutside={(e) => isGenerating && e.preventDefault()}
         onEscapeKeyDown={(e) => isGenerating && e.preventDefault()}
         onInteractOutside={(e) => isGenerating && e.preventDefault()}
+        onFocusOutside={(e) => isGenerating && e.preventDefault()}
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
