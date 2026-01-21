@@ -422,33 +422,31 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
       </div>
 
       {/* Content + Bottom action - using MobilePreviewFrame for consistent rendering */}
-      <div className="flex-1 flex flex-col overflow-hidden min-h-0">
-        {currentSlide && (
-          <MobilePreviewFrame
-            key={currentSlide.id}
-            block={slideToBlock(currentSlide)}
-            lessonTitle={currentLesson?.title}
-            blockIndex={currentSlideIndex}
-            totalBlocks={totalSlidesInLesson}
-            onContinue={() => {
-              // Track answer if interactive
-              if (isInteractiveSlide(currentSlide.type)) {
-                // MobilePreviewFrame handles its own answer checking internally
-                // We just need to track that the slide was answered
-                if (!answered) {
-                  setAnswered(true);
-                }
+      {currentSlide && (
+        <MobilePreviewFrame
+          key={currentSlide.id}
+          block={slideToBlock(currentSlide)}
+          lessonTitle={currentLesson?.title}
+          blockIndex={currentSlideIndex}
+          totalBlocks={totalSlidesInLesson}
+          onContinue={() => {
+            // Track answer if interactive
+            if (isInteractiveSlide(currentSlide.type)) {
+              // MobilePreviewFrame handles its own answer checking internally
+              // We just need to track that the slide was answered
+              if (!answered) {
+                setAnswered(true);
               }
-              handleNext();
-            }}
-            designSystem={course.designSystem}
-            isMuted={false}
-            isReadOnly={true}
-            embedded={true}
-            hideHeader={true}
-          />
-        )}
-      </div>
+            }
+            handleNext();
+          }}
+          designSystem={course.designSystem}
+          isMuted={false}
+          isReadOnly={true}
+          embedded={true}
+          hideHeader={true}
+        />
+      )}
     </div>
   );
 
