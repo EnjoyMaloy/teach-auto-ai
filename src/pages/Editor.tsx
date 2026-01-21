@@ -521,8 +521,8 @@ const Editor: React.FC = () => {
       />
 
       <div className="flex-1 flex w-full overflow-hidden">
-        {/* Left: Lessons sidebar - width adapts to content */}
-        <div className="hidden xl:flex w-fit min-w-[280px] max-w-[500px] flex-shrink-0 flex-col border-r border-border bg-card order-1">
+        {/* Left: Lessons sidebar - hides first on resize, flexible width */}
+        <div className="hidden xl:flex w-[540px] min-w-[400px] max-w-[600px] flex-1 flex-col border-r border-border bg-card order-1">
           <LessonsList
             lessons={course.lessons}
             selectedLessonId={selectedLessonId}
