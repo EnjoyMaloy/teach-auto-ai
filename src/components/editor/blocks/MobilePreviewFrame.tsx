@@ -402,72 +402,74 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
       case 'multiple_choice':
         return (
-          <div className="flex-1 flex flex-col p-4 overflow-auto relative z-0">
-            <p 
-              className="text-lg font-semibold mb-4 text-center"
-              style={{ color: `hsl(${ds.foregroundColor})` }}
-            >
-              {block.content || 'Вопрос?'}
-            </p>
-            <div className="space-y-2 flex-1 flex flex-col justify-center">
-              {(block.options || []).map((option) => {
-                const isSelected = selectedOptions.includes(option.id);
-                const showResult = answerState !== 'idle';
-                
-                let borderColor = `hsl(${ds.mutedColor})`;
-                let bgColor = `hsl(${ds.cardColor})`;
-                let textColor = `hsl(${ds.foregroundColor})`;
-                
-                if (showResult && option.isCorrect) {
-                  borderColor = `hsl(${ds.successColor})`;
-                  bgColor = `hsl(${ds.successColor} / 0.1)`;
-                  textColor = `hsl(${ds.successColor})`;
-                } else if (showResult && isSelected && !option.isCorrect) {
-                  borderColor = `hsl(${ds.destructiveColor})`;
-                  bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
-                  textColor = `hsl(${ds.destructiveColor})`;
-                } else if (!showResult && isSelected) {
-                  borderColor = `hsl(${ds.primaryColor})`;
-                  bgColor = `hsl(${ds.primaryColor} / 0.1)`;
-                  textColor = `hsl(${ds.primaryColor})`;
-                }
-                
-                return (
-                  <button
-                    key={option.id}
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (answerState !== 'idle') return;
-                      setSelectedOptions(prev => 
-                        prev.includes(option.id) 
-                          ? prev.filter(id => id !== option.id)
-                          : [...prev, option.id]
-                      );
-                    }}
-                    disabled={answerState !== 'idle'}
-                    className="w-full p-3 text-left transition-all text-sm border-2 flex items-center gap-2 cursor-pointer"
-                    style={{
-                      borderColor,
-                      backgroundColor: bgColor,
-                      color: textColor,
-                      borderRadius: ds.borderRadius,
-                    }}
-                  >
-                    <div 
-                      className="w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 pointer-events-none"
-                      style={{ 
-                        borderColor: 'currentColor',
-                        backgroundColor: isSelected ? 'currentColor' : 'transparent',
+          <div className="flex-1 flex flex-col items-center justify-center p-4 overflow-auto relative z-0 h-full min-h-0">
+            <div className="w-full">
+              <p 
+                className="text-lg font-semibold mb-4 text-center"
+                style={{ color: `hsl(${ds.foregroundColor})` }}
+              >
+                {block.content || 'Вопрос?'}
+              </p>
+              <div className="space-y-2">
+                {(block.options || []).map((option) => {
+                  const isSelected = selectedOptions.includes(option.id);
+                  const showResult = answerState !== 'idle';
+                  
+                  let borderColor = `hsl(${ds.mutedColor})`;
+                  let bgColor = `hsl(${ds.cardColor})`;
+                  let textColor = `hsl(${ds.foregroundColor})`;
+                  
+                  if (showResult && option.isCorrect) {
+                    borderColor = `hsl(${ds.successColor})`;
+                    bgColor = `hsl(${ds.successColor} / 0.1)`;
+                    textColor = `hsl(${ds.successColor})`;
+                  } else if (showResult && isSelected && !option.isCorrect) {
+                    borderColor = `hsl(${ds.destructiveColor})`;
+                    bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
+                    textColor = `hsl(${ds.destructiveColor})`;
+                  } else if (!showResult && isSelected) {
+                    borderColor = `hsl(${ds.primaryColor})`;
+                    bgColor = `hsl(${ds.primaryColor} / 0.1)`;
+                    textColor = `hsl(${ds.primaryColor})`;
+                  }
+                  
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (answerState !== 'idle') return;
+                        setSelectedOptions(prev => 
+                          prev.includes(option.id) 
+                            ? prev.filter(id => id !== option.id)
+                            : [...prev, option.id]
+                        );
+                      }}
+                      disabled={answerState !== 'idle'}
+                      className="w-full p-3 text-left transition-all text-sm border-2 flex items-center gap-2 cursor-pointer"
+                      style={{
+                        borderColor,
+                        backgroundColor: bgColor,
+                        color: textColor,
+                        borderRadius: ds.borderRadius,
                       }}
                     >
-                      {isSelected && <Check className="w-3 h-3" style={{ color: `hsl(${ds.cardColor})` }} />}
-                    </div>
-                    <span className="font-medium pointer-events-none">{option.text}</span>
-                  </button>
-                );
-              })}
+                      <div 
+                        className="w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 pointer-events-none"
+                        style={{ 
+                          borderColor: 'currentColor',
+                          backgroundColor: isSelected ? 'currentColor' : 'transparent',
+                        }}
+                      >
+                        {isSelected && <Check className="w-3 h-3" style={{ color: `hsl(${ds.cardColor})` }} />}
+                      </div>
+                      <span className="font-medium pointer-events-none">{option.text}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         );
@@ -501,44 +503,46 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         };
         
         return (
-          <div className="flex-1 flex flex-col p-4 relative z-0">
-            <p 
-              className="text-lg font-semibold mb-6 text-center flex-1 flex items-center justify-center"
-              style={{ color: `hsl(${ds.foregroundColor})` }}
-            >
-              {block.content || 'Утверждение верно?'}
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              <button 
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (answerState !== 'idle') return;
-                  setTrueFalseAnswer(true);
-                }}
-                disabled={answerState !== 'idle'}
-                className="p-4 flex flex-col items-center gap-2 border-2 transition-all cursor-pointer"
-                style={getTFButtonStyle(true)}
+          <div className="flex-1 flex flex-col items-center justify-center p-4 relative z-0 h-full min-h-0">
+            <div className="w-full">
+              <p 
+                className="text-lg font-semibold mb-6 text-center"
+                style={{ color: `hsl(${ds.foregroundColor})` }}
               >
-                <Check className="w-8 h-8" />
-                <span className="font-semibold">Да</span>
-              </button>
-              <button 
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (answerState !== 'idle') return;
-                  setTrueFalseAnswer(false);
-                }}
-                disabled={answerState !== 'idle'}
-                className="p-4 flex flex-col items-center gap-2 border-2 transition-all cursor-pointer"
-                style={getTFButtonStyle(false)}
-              >
-                <X className="w-8 h-8" />
-                <span className="font-semibold">Нет</span>
-              </button>
+                {block.content || 'Утверждение верно?'}
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <button 
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (answerState !== 'idle') return;
+                    setTrueFalseAnswer(true);
+                  }}
+                  disabled={answerState !== 'idle'}
+                  className="p-4 flex flex-col items-center gap-2 border-2 transition-all cursor-pointer"
+                  style={getTFButtonStyle(true)}
+                >
+                  <Check className="w-8 h-8" />
+                  <span className="font-semibold">Да</span>
+                </button>
+                <button 
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (answerState !== 'idle') return;
+                    setTrueFalseAnswer(false);
+                  }}
+                  disabled={answerState !== 'idle'}
+                  className="p-4 flex flex-col items-center gap-2 border-2 transition-all cursor-pointer"
+                  style={getTFButtonStyle(false)}
+                >
+                  <X className="w-8 h-8" />
+                  <span className="font-semibold">Нет</span>
+                </button>
+              </div>
             </div>
           </div>
         );
@@ -627,67 +631,69 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           .filter(r => !Object.values(matchingSelected.pairs).includes(r));
         
         return (
-          <div className="flex-1 flex flex-col p-4 overflow-auto">
-            <p className="text-lg font-semibold mb-4 text-center text-foreground">
-              {block.content || 'Соедините пары'}
-            </p>
-            <div className="space-y-2">
-              {(block.matchingPairs || []).map((pair) => {
-                const selectedRight = matchingSelected.pairs[pair.left];
-                const isCorrectPair = selectedRight === pair.right;
-                
-                return (
-                  <div key={pair.id} className="flex items-center gap-2">
-                    <button
-                      onClick={() => {
-                        if (answerState !== 'idle') return;
-                        setMatchingSelected(prev => ({ ...prev, left: pair.left }));
-                      }}
-                      className={cn(
-                        "flex-1 p-2.5 rounded-xl text-xs font-medium transition-all border-2",
-                        matchingSelected.left === pair.left && "border-primary bg-primary/10 text-primary",
-                        matchingSelected.left !== pair.left && "border-border bg-muted text-foreground",
-                        showMatchResult && isCorrectPair && "border-success bg-success/10 text-success",
-                        showMatchResult && selectedRight && !isCorrectPair && "border-destructive bg-destructive/10 text-destructive"
-                      )}
-                    >
-                      {pair.left}
-                    </button>
-                    <ChevronRight className="w-4 h-4 text-primary shrink-0" />
-                    <div className={cn(
-                      "flex-1 p-2.5 rounded-xl text-xs font-medium min-h-[36px] flex items-center justify-center",
-                      selectedRight ? "bg-primary/10 text-primary" : "bg-muted/50 text-muted-foreground border-2 border-dashed border-border",
-                      showMatchResult && isCorrectPair && "bg-success/10 text-success",
-                      showMatchResult && selectedRight && !isCorrectPair && "bg-destructive/10 text-destructive"
-                    )}>
-                      {selectedRight || '?'}
+          <div className="flex-1 flex flex-col items-center justify-center p-4 overflow-auto h-full min-h-0">
+            <div className="w-full">
+              <p className="text-lg font-semibold mb-4 text-center text-foreground">
+                {block.content || 'Соедините пары'}
+              </p>
+              <div className="space-y-2">
+                {(block.matchingPairs || []).map((pair) => {
+                  const selectedRight = matchingSelected.pairs[pair.left];
+                  const isCorrectPair = selectedRight === pair.right;
+                  
+                  return (
+                    <div key={pair.id} className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          if (answerState !== 'idle') return;
+                          setMatchingSelected(prev => ({ ...prev, left: pair.left }));
+                        }}
+                        className={cn(
+                          "flex-1 p-2.5 rounded-xl text-xs font-medium transition-all border-2",
+                          matchingSelected.left === pair.left && "border-primary bg-primary/10 text-primary",
+                          matchingSelected.left !== pair.left && "border-border bg-muted text-foreground",
+                          showMatchResult && isCorrectPair && "border-success bg-success/10 text-success",
+                          showMatchResult && selectedRight && !isCorrectPair && "border-destructive bg-destructive/10 text-destructive"
+                        )}
+                      >
+                        {pair.left}
+                      </button>
+                      <ChevronRight className="w-4 h-4 text-primary shrink-0" />
+                      <div className={cn(
+                        "flex-1 p-2.5 rounded-xl text-xs font-medium min-h-[36px] flex items-center justify-center",
+                        selectedRight ? "bg-primary/10 text-primary" : "bg-muted/50 text-muted-foreground border-2 border-dashed border-border",
+                        showMatchResult && isCorrectPair && "bg-success/10 text-success",
+                        showMatchResult && selectedRight && !isCorrectPair && "bg-destructive/10 text-destructive"
+                      )}>
+                        {selectedRight || '?'}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-            
-            {matchingSelected.left && !showMatchResult && (
-              <div className="mt-4 p-3 bg-muted/30 rounded-xl">
-                <p className="text-xs text-muted-foreground mb-2">Выберите пару для: <span className="text-primary font-medium">{matchingSelected.left}</span></p>
-                <div className="flex flex-wrap gap-2">
-                  {availableRights.map((right) => (
-                    <button
-                      key={right}
-                      onClick={() => {
-                        setMatchingSelected(prev => ({
-                          left: null,
-                          pairs: { ...prev.pairs, [prev.left!]: right }
-                        }));
-                      }}
-                      className="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-medium hover:bg-primary/20 transition-all"
-                    >
-                      {right}
-                    </button>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
-            )}
+              
+              {matchingSelected.left && !showMatchResult && (
+                <div className="mt-4 p-3 bg-muted/30 rounded-xl">
+                  <p className="text-xs text-muted-foreground mb-2">Выберите пару для: <span className="text-primary font-medium">{matchingSelected.left}</span></p>
+                  <div className="flex flex-wrap gap-2">
+                    {availableRights.map((right) => (
+                      <button
+                        key={right}
+                        onClick={() => {
+                          setMatchingSelected(prev => ({
+                            left: null,
+                            pairs: { ...prev.pairs, [prev.left!]: right }
+                          }));
+                        }}
+                        className="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-medium hover:bg-primary/20 transition-all"
+                      >
+                        {right}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         );
 
@@ -695,65 +701,67 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         const showOrderResult = answerState !== 'idle';
         
         return (
-          <div className="flex-1 flex flex-col p-4 overflow-auto">
-            <p className="text-lg font-semibold mb-4 text-center text-foreground">
-              {block.content || 'Расположите в порядке'}
-            </p>
-            <div className="space-y-2">
-              {orderingItems.map((item, idx) => {
-                const correctIdx = block.orderingItems?.indexOf(item) ?? -1;
-                const isCorrectPosition = correctIdx === idx;
-                
-                return (
-                  <div
-                    key={`${item}-${idx}`}
-                    className={cn(
-                      "flex items-center gap-3 p-3 rounded-xl border transition-all",
-                      showOrderResult && isCorrectPosition && "bg-success/10 border-success",
-                      showOrderResult && !isCorrectPosition && "bg-destructive/10 border-destructive",
-                      !showOrderResult && "bg-card border-border"
-                    )}
-                  >
-                    <span className={cn(
-                      "w-6 h-6 rounded-lg text-xs flex items-center justify-center font-bold",
-                      showOrderResult && isCorrectPosition && "bg-success text-success-foreground",
-                      showOrderResult && !isCorrectPosition && "bg-destructive text-destructive-foreground",
-                      !showOrderResult && "bg-primary text-primary-foreground"
-                    )}>
-                      {idx + 1}
-                    </span>
-                    <span className="text-sm text-foreground flex-1">{item}</span>
-                    {!showOrderResult && (
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => {
-                            if (idx === 0) return;
-                            const newItems = [...orderingItems];
-                            [newItems[idx - 1], newItems[idx]] = [newItems[idx], newItems[idx - 1]];
-                            setOrderingItems(newItems);
-                          }}
-                          disabled={idx === 0}
-                          className="w-6 h-6 rounded bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-30"
-                        >
-                          ↑
-                        </button>
-                        <button
-                          onClick={() => {
-                            if (idx === orderingItems.length - 1) return;
-                            const newItems = [...orderingItems];
-                            [newItems[idx], newItems[idx + 1]] = [newItems[idx + 1], newItems[idx]];
-                            setOrderingItems(newItems);
-                          }}
-                          disabled={idx === orderingItems.length - 1}
-                          className="w-6 h-6 rounded bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-30"
-                        >
-                          ↓
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+          <div className="flex-1 flex flex-col items-center justify-center p-4 overflow-auto h-full min-h-0">
+            <div className="w-full">
+              <p className="text-lg font-semibold mb-4 text-center text-foreground">
+                {block.content || 'Расположите в порядке'}
+              </p>
+              <div className="space-y-2">
+                {orderingItems.map((item, idx) => {
+                  const correctIdx = block.orderingItems?.indexOf(item) ?? -1;
+                  const isCorrectPosition = correctIdx === idx;
+                  
+                  return (
+                    <div
+                      key={`${item}-${idx}`}
+                      className={cn(
+                        "flex items-center gap-3 p-3 rounded-xl border transition-all",
+                        showOrderResult && isCorrectPosition && "bg-success/10 border-success",
+                        showOrderResult && !isCorrectPosition && "bg-destructive/10 border-destructive",
+                        !showOrderResult && "bg-card border-border"
+                      )}
+                    >
+                      <span className={cn(
+                        "w-6 h-6 rounded-lg text-xs flex items-center justify-center font-bold",
+                        showOrderResult && isCorrectPosition && "bg-success text-success-foreground",
+                        showOrderResult && !isCorrectPosition && "bg-destructive text-destructive-foreground",
+                        !showOrderResult && "bg-primary text-primary-foreground"
+                      )}>
+                        {idx + 1}
+                      </span>
+                      <span className="text-sm text-foreground flex-1">{item}</span>
+                      {!showOrderResult && (
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => {
+                              if (idx === 0) return;
+                              const newItems = [...orderingItems];
+                              [newItems[idx - 1], newItems[idx]] = [newItems[idx], newItems[idx - 1]];
+                              setOrderingItems(newItems);
+                            }}
+                            disabled={idx === 0}
+                            className="w-6 h-6 rounded bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-30"
+                          >
+                            ↑
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (idx === orderingItems.length - 1) return;
+                              const newItems = [...orderingItems];
+                              [newItems[idx], newItems[idx + 1]] = [newItems[idx + 1], newItems[idx]];
+                              setOrderingItems(newItems);
+                            }}
+                            disabled={idx === orderingItems.length - 1}
+                            className="w-6 h-6 rounded bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-30"
+                          >
+                            ↓
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         );
@@ -762,51 +770,53 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         const showHotspotResult = answerState !== 'idle';
         
         return (
-          <div className="flex-1 flex flex-col p-4 overflow-auto">
-            <p className="text-lg font-semibold mb-4 text-center text-foreground">
-              {block.content || 'Нажмите на правильные области'}
-            </p>
-            <div className="flex-1 relative bg-muted rounded-xl overflow-hidden border border-border min-h-[200px]">
-              {block.imageUrl ? (
-                <img src={block.imageUrl} alt="" className="w-full h-full object-contain" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-muted-foreground text-sm">Загрузите изображение</span>
-                </div>
-              )}
-              {(block.hotspotAreas || []).map((area) => {
-                const isClicked = clickedHotspots.includes(area.id);
-                
-                return (
-                  <button
-                    key={area.id}
-                    onClick={() => {
-                      if (answerState !== 'idle') return;
-                      setClickedHotspots(prev => 
-                        prev.includes(area.id)
-                          ? prev.filter(id => id !== area.id)
-                          : [...prev, area.id]
-                      );
-                    }}
-                    className={cn(
-                      "absolute rounded-lg transition-all",
-                      showHotspotResult && "border-2 border-success bg-success/30",
-                      !showHotspotResult && isClicked && "border-2 border-primary bg-primary/30",
-                      !showHotspotResult && !isClicked && "border-2 border-transparent hover:border-primary/50 hover:bg-primary/10"
-                    )}
-                    style={{
-                      left: `${area.x}%`,
-                      top: `${area.y}%`,
-                      width: `${area.width}%`,
-                      height: `${area.height}%`,
-                    }}
-                  />
-                );
-              })}
+          <div className="flex-1 flex flex-col items-center justify-center p-4 overflow-auto h-full min-h-0">
+            <div className="w-full">
+              <p className="text-lg font-semibold mb-4 text-center text-foreground">
+                {block.content || 'Нажмите на правильные области'}
+              </p>
+              <div className="relative bg-muted rounded-xl overflow-hidden border border-border min-h-[200px]">
+                {block.imageUrl ? (
+                  <img src={block.imageUrl} alt="" className="w-full h-full object-contain" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center min-h-[200px]">
+                    <span className="text-muted-foreground text-sm">Загрузите изображение</span>
+                  </div>
+                )}
+                {(block.hotspotAreas || []).map((area) => {
+                  const isClicked = clickedHotspots.includes(area.id);
+                  
+                  return (
+                    <button
+                      key={area.id}
+                      onClick={() => {
+                        if (answerState !== 'idle') return;
+                        setClickedHotspots(prev => 
+                          prev.includes(area.id)
+                            ? prev.filter(id => id !== area.id)
+                            : [...prev, area.id]
+                        );
+                      }}
+                      className={cn(
+                        "absolute rounded-lg transition-all",
+                        showHotspotResult && "border-2 border-success bg-success/30",
+                        !showHotspotResult && isClicked && "border-2 border-primary bg-primary/30",
+                        !showHotspotResult && !isClicked && "border-2 border-transparent hover:border-primary/50 hover:bg-primary/10"
+                      )}
+                      style={{
+                        left: `${area.x}%`,
+                        top: `${area.y}%`,
+                        width: `${area.width}%`,
+                        height: `${area.height}%`,
+                      }}
+                    />
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground text-center mt-2">
+                Выбрано: {clickedHotspots.length} / {block.hotspotAreas?.length || 0}
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground text-center mt-2">
-              Выбрано: {clickedHotspots.length} / {block.hotspotAreas?.length || 0}
-            </p>
           </div>
         );
 
