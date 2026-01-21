@@ -1037,7 +1037,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   if (embedded) {
     return (
       <div 
-        className="h-full w-full flex flex-col overflow-hidden"
+        className="flex-1 w-full flex flex-col overflow-hidden min-h-0"
         style={{ 
           backgroundColor: `hsl(${ds.backgroundColor})`,
           fontFamily: ds.fontFamily,
