@@ -61,6 +61,10 @@ interface MobilePreviewFrameProps {
   designSystem?: CourseDesignSystem;
   isMuted?: boolean;
   isReadOnly?: boolean;
+  /** If true, renders without the outer container/scaling - for embedding in CoursePlayer */
+  embedded?: boolean;
+  /** If true, hides the progress bar header - useful when parent component has its own */
+  hideHeader?: boolean;
 }
 
 type AnswerState = 'idle' | 'correct' | 'incorrect' | 'partial';
@@ -91,6 +95,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   designSystem,
   isMuted = false,
   isReadOnly = false,
+  embedded = false,
+  hideHeader = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   // Scale preview to fit container while maintaining fixed internal dimensions
@@ -890,6 +896,162 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     }
   };
 
+  // Content that can be shared between embedded and normal mode
+  const progressBar = !hideHeader && (
+    <div 
+      className="h-10 flex items-center justify-center px-4 border-b shrink-0"
+      style={{ 
+        backgroundColor: `hsl(${ds.mutedColor} / 0.3)`,
+        borderColor: `hsl(${ds.mutedColor})`,
+      }}
+    >
+      <div className="flex items-center gap-1">
+        {Array.from({ length: Math.min(totalBlocks, 20) }).map((_, i) => (
+          <div
+            key={i}
+            className="rounded-full transition-all"
+            style={{
+              height: '6px',
+              width: i === blockIndex ? '24px' : '8px',
+              backgroundColor: i <= blockIndex 
+                ? `hsl(${ds.primaryColor}${i < blockIndex ? ' / 0.5' : ''})` 
+                : `hsl(${ds.mutedColor})`,
+            }}
+          />
+        ))}
+        {totalBlocks > 20 && (
+          <span className="text-xs ml-1" style={{ color: `hsl(${ds.foregroundColor} / 0.6)` }}>
+            +{totalBlocks - 20}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+
+  const contentArea = (
+    <div className="flex-1 overflow-auto relative z-0">
+      {renderContent()}
+    </div>
+  );
+
+  const resultFeedback = answerState !== 'idle' && (
+    <div 
+      className="px-4 py-3 text-center text-sm font-medium shrink-0"
+      style={{
+        backgroundColor: answerState === 'correct' 
+          ? `hsl(${ds.successColor} / 0.1)` 
+          : answerState === 'partial'
+            ? `hsl(45 93% 47% / 0.1)` // Warning yellow
+            : `hsl(${ds.destructiveColor} / 0.1)`,
+        color: answerState === 'correct' 
+          ? `hsl(${ds.successColor})` 
+          : answerState === 'partial'
+            ? `hsl(45 93% 40%)` // Warning yellow darker
+            : `hsl(${ds.destructiveColor})`,
+      }}
+    >
+      <div className="flex flex-col items-center gap-1">
+        <div className="flex items-center justify-center gap-2">
+          {answerState === 'correct' ? (
+            <>
+              <Sparkles className="w-4 h-4" />
+              <span>Правильно!</span>
+            </>
+          ) : answerState === 'partial' ? (
+            <>
+              <AlertCircle className="w-4 h-4" />
+              <span>Почти!</span>
+            </>
+          ) : (
+            <>
+              <X className="w-4 h-4" />
+              <span>Неправильно</span>
+            </>
+          )}
+        </div>
+        {answerState === 'correct' && block?.explanationCorrect && (
+          <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanationCorrect}</p>
+        )}
+        {answerState === 'incorrect' && block?.explanation && (
+          <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanation}</p>
+        )}
+      </div>
+    </div>
+  );
+
+  const bottomNavigation = (
+    <div 
+      className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0 relative z-10"
+      style={{ 
+        backgroundColor: `hsl(${ds.cardColor})`,
+        borderColor: `hsl(${ds.mutedColor})`,
+      }}
+    >
+      {isInteractive && answerState !== 'idle' && (
+        <button
+          type="button"
+          onClick={resetState}
+          className={cn(
+            "h-11 px-4 flex items-center gap-2 border-2 font-bold uppercase tracking-wide",
+            pressAnimationClass
+          )}
+          style={{
+            borderColor: `hsl(${ds.mutedColor})`,
+            color: `hsl(${ds.foregroundColor})`,
+            borderRadius: getButtonRadius(),
+          }}
+        >
+          <RotateCcw className="w-4 h-4" />
+          ЗАНОВО
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (isInteractive && answerState === 'idle') {
+            checkAnswer();
+          } else {
+            handleContinue();
+          }
+        }}
+        className={cn(
+          "flex-1 h-11 max-w-md font-bold uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed",
+          pressAnimationClass
+        )}
+        disabled={isInteractive && answerState === 'idle' && !canCheck()}
+        style={{
+          backgroundColor: `hsl(${ds.primaryColor})`,
+          color: `hsl(${ds.primaryForeground})`,
+          borderRadius: getButtonRadius(),
+          ...getRaisedButtonStyle(ds.primaryColor),
+        }}
+      >
+        {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ПРОДОЛЖИТЬ'}
+      </button>
+    </div>
+  );
+
+  // Embedded mode - no outer container, no scaling, used in CoursePlayer
+  if (embedded) {
+    return (
+      <div 
+        className="h-full w-full flex flex-col overflow-hidden"
+        style={{ 
+          backgroundColor: `hsl(${ds.backgroundColor})`,
+          fontFamily: ds.fontFamily,
+        }}
+      >
+        {progressBar}
+        {contentArea}
+        {resultFeedback}
+        {bottomNavigation}
+      </div>
+    );
+  }
+
+  // Normal mode with phone frame styling and scaling
   return (
     <div 
       ref={containerRef}
@@ -911,139 +1073,10 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           zoom: previewScale,
         }}
       >
-      {/* Progress bar */}
-      <div 
-        className="h-10 flex items-center justify-center px-4 border-b shrink-0"
-        style={{ 
-          backgroundColor: `hsl(${ds.mutedColor} / 0.3)`,
-          borderColor: `hsl(${ds.mutedColor})`,
-        }}
-      >
-        <div className="flex items-center gap-1">
-          {Array.from({ length: Math.min(totalBlocks, 20) }).map((_, i) => (
-            <div
-              key={i}
-              className="rounded-full transition-all"
-              style={{
-                height: '6px',
-                width: i === blockIndex ? '24px' : '8px',
-                backgroundColor: i <= blockIndex 
-                  ? `hsl(${ds.primaryColor}${i < blockIndex ? ' / 0.5' : ''})` 
-                  : `hsl(${ds.mutedColor})`,
-              }}
-            />
-          ))}
-          {totalBlocks > 20 && (
-            <span className="text-xs ml-1" style={{ color: `hsl(${ds.foregroundColor} / 0.6)` }}>
-              +{totalBlocks - 20}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 overflow-auto relative z-0">
-        {renderContent()}
-      </div>
-
-      {/* Result feedback */}
-      {answerState !== 'idle' && (
-        <div 
-          className="px-4 py-3 text-center text-sm font-medium shrink-0"
-          style={{
-            backgroundColor: answerState === 'correct' 
-              ? `hsl(${ds.successColor} / 0.1)` 
-              : answerState === 'partial'
-                ? `hsl(45 93% 47% / 0.1)` // Warning yellow
-                : `hsl(${ds.destructiveColor} / 0.1)`,
-            color: answerState === 'correct' 
-              ? `hsl(${ds.successColor})` 
-              : answerState === 'partial'
-                ? `hsl(45 93% 40%)` // Warning yellow darker
-                : `hsl(${ds.destructiveColor})`,
-          }}
-        >
-          <div className="flex flex-col items-center gap-1">
-            <div className="flex items-center justify-center gap-2">
-              {answerState === 'correct' ? (
-                <>
-                  <Sparkles className="w-4 h-4" />
-                  <span>Правильно!</span>
-                </>
-              ) : answerState === 'partial' ? (
-                <>
-                  <AlertCircle className="w-4 h-4" />
-                  <span>Почти!</span>
-                </>
-              ) : (
-                <>
-                  <X className="w-4 h-4" />
-                  <span>Неправильно</span>
-                </>
-              )}
-            </div>
-            {answerState === 'correct' && block?.explanationCorrect && (
-              <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanationCorrect}</p>
-            )}
-            {answerState === 'incorrect' && block?.explanation && (
-              <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanation}</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Bottom navigation */}
-      <div 
-        className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0 relative z-10"
-        style={{ 
-          backgroundColor: `hsl(${ds.cardColor})`,
-          borderColor: `hsl(${ds.mutedColor})`,
-        }}
-      >
-        {isInteractive && answerState !== 'idle' && (
-          <button
-            type="button"
-            onClick={resetState}
-            className={cn(
-              "h-11 px-4 flex items-center gap-2 border-2 font-bold uppercase tracking-wide",
-              pressAnimationClass
-            )}
-            style={{
-              borderColor: `hsl(${ds.mutedColor})`,
-              color: `hsl(${ds.foregroundColor})`,
-              borderRadius: getButtonRadius(),
-            }}
-          >
-            <RotateCcw className="w-4 h-4" />
-            ЗАНОВО
-          </button>
-        )}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (isInteractive && answerState === 'idle') {
-              checkAnswer();
-            } else {
-              handleContinue();
-            }
-          }}
-          className={cn(
-            "flex-1 h-11 max-w-md font-bold uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed",
-            pressAnimationClass
-          )}
-          disabled={isInteractive && answerState === 'idle' && !canCheck()}
-          style={{
-            backgroundColor: `hsl(${ds.primaryColor})`,
-            color: `hsl(${ds.primaryForeground})`,
-            borderRadius: getButtonRadius(),
-            ...getRaisedButtonStyle(ds.primaryColor),
-          }}
-        >
-          {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ПРОДОЛЖИТЬ'}
-        </button>
-      </div>
+        {progressBar}
+        {contentArea}
+        {resultFeedback}
+        {bottomNavigation}
       </div>
     </div>
   );
