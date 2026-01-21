@@ -114,7 +114,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                     }
                   }}
                   placeholder="Введите заголовок..."
-                  className="text-lg font-bold rounded-xl"
+                  className="text-lg font-normal rounded-xl w-full"
                   maxLength={75}
                 />
                 <p className="text-xs text-muted-foreground text-right">{block.content.length}/75</p>
