@@ -1033,20 +1033,75 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     </div>
   );
 
-  // Embedded mode - no outer container, no scaling, used in CoursePlayer
+  // Embedded mode - fills parent container, used in CoursePlayer/PublicCourse
   if (embedded) {
     return (
       <div 
-        className="flex-1 w-full flex flex-col overflow-hidden min-h-0"
+        ref={containerRef}
+        className="flex-1 w-full flex flex-col min-h-0"
         style={{ 
           backgroundColor: `hsl(${ds.backgroundColor})`,
           fontFamily: ds.fontFamily,
         }}
       >
         {progressBar}
-        {contentArea}
+        {/* Content area - scrollable, content centered */}
+        <div className="flex-1 min-h-0 overflow-auto relative z-0 flex flex-col justify-center px-4 py-4">
+          {renderContent()}
+        </div>
         {resultFeedback}
-        {bottomNavigation}
+        {/* Bottom navigation - always at bottom with mt-auto as fallback */}
+        <div 
+          className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0 relative z-10 mt-auto"
+          style={{ 
+            backgroundColor: `hsl(${ds.cardColor})`,
+            borderColor: `hsl(${ds.mutedColor})`,
+          }}
+        >
+          {isInteractive && answerState !== 'idle' && (
+            <button
+              type="button"
+              onClick={resetState}
+              className={cn(
+                "h-11 px-4 flex items-center gap-2 border-2 font-bold uppercase tracking-wide",
+                pressAnimationClass
+              )}
+              style={{
+                borderColor: `hsl(${ds.mutedColor})`,
+                color: `hsl(${ds.foregroundColor})`,
+                borderRadius: getButtonRadius(),
+              }}
+            >
+              <RotateCcw className="w-4 h-4" />
+              ЗАНОВО
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (isInteractive && answerState === 'idle') {
+                checkAnswer();
+              } else {
+                handleContinue();
+              }
+            }}
+            className={cn(
+              "flex-1 h-11 max-w-md font-bold uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed",
+              pressAnimationClass
+            )}
+            disabled={isInteractive && answerState === 'idle' && !canCheck()}
+            style={{
+              backgroundColor: `hsl(${ds.primaryColor})`,
+              color: `hsl(${ds.primaryForeground})`,
+              borderRadius: getButtonRadius(),
+              ...getRaisedButtonStyle(ds.primaryColor),
+            }}
+          >
+            {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ПРОДОЛЖИТЬ'}
+          </button>
+        </div>
       </div>
     );
   }
