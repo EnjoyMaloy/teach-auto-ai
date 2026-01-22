@@ -124,23 +124,15 @@ const PublicCourse: React.FC = () => {
     );
   }
 
-  // Desktop/mobile web: show in a phone-like container
+  // Desktop: show in a phone-like container with proper scaling (no fullscreen)
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-muted/80">
-      <div 
-        className="w-full h-full max-w-[420px] md:h-[min(90vh,750px)] md:rounded-2xl md:shadow-2xl overflow-hidden"
-        style={{ 
-          background: 'white',
-          transform: 'translateZ(0)',
-        }}
-      >
-        <CoursePlayer 
-          courseId={courseId} 
-          mode="public" 
-          onClose={() => navigate('/')} 
-          fullscreen 
-        />
-      </div>
+      <CoursePlayer 
+        courseId={courseId} 
+        mode="public" 
+        onClose={() => navigate('/')} 
+        // No fullscreen prop - uses phone frame with proper scaling
+      />
     </div>
   );
 };
