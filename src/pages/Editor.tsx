@@ -469,7 +469,7 @@ const Editor: React.FC = () => {
   if (isPreviewMode) {
     return (
       <FullscreenPreview 
-        course={course} 
+        courseId={course.id} 
         onClose={() => setIsPreviewMode(false)}
         initialLessonId={selectedLessonId || undefined}
         initialBlockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
