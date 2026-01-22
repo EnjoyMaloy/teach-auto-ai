@@ -31,6 +31,9 @@ const PublicCourse: React.FC = () => {
   const [course, setCourse] = useState<Course | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Detect if running inside Telegram Mini App
+  const isTelegram = !!window.Telegram?.WebApp;
 
   // Initialize Telegram WebApp - just signal ready, no fullscreen
   useEffect(() => {
@@ -241,11 +244,29 @@ const PublicCourse: React.FC = () => {
     );
   }
 
-  // Universal mobile-like container for all platforms (Telegram, mobile web, desktop)
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-muted/80 md:bg-muted/80">
+  // For Telegram: true fullscreen, no container styling
+  // For desktop/mobile web: centered phone-like container
+  if (isTelegram) {
+    return (
       <div 
-        className="w-full h-full md:max-w-[420px] md:h-[min(90vh,750px)] md:rounded-2xl md:shadow-2xl overflow-hidden"
+        className="fixed inset-0 overflow-hidden"
+        style={{ 
+          background: 'white',
+          // Use dvh for proper mobile viewport height
+          height: '100dvh',
+          width: '100vw',
+        }}
+      >
+        <CoursePlayer course={course} onClose={() => navigate('/')} fullscreen />
+      </div>
+    );
+  }
+
+  // Desktop/mobile web: show in a phone-like container
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-muted/80">
+      <div 
+        className="w-full h-full max-w-[420px] md:h-[min(90vh,750px)] md:rounded-2xl md:shadow-2xl overflow-hidden"
         style={{ 
           background: 'white',
           transform: 'translateZ(0)',
