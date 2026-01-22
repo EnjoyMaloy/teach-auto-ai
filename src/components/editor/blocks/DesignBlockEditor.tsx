@@ -700,7 +700,7 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
 
   return (
     <div 
-      className="h-full flex flex-col p-4 overflow-auto"
+      className="h-full flex flex-col p-4 overflow-auto w-full"
       style={{ backgroundColor: `hsl(${ds.backgroundColor})` }}
     >
       <DndContext
@@ -712,7 +712,7 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
           items={subBlocks.map((sb) => sb.id)}
           strategy={verticalListSortingStrategy}
         >
-          <div className="flex-1 space-y-1">
+          <div className="flex-1 flex flex-col w-full space-y-1">
             {subBlocks.map((subBlock) => (
               <SortableSubBlockItem
                 key={subBlock.id}
