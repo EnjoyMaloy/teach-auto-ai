@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
   Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Play,
-  AlignLeft, AlignCenter, AlignRight,
+  AlignLeft, AlignCenter, AlignRight, AlignJustify,
   Highlighter, Underline, Waves,
   ChevronLeft,
   // Icons for icon selector
@@ -66,13 +66,14 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
           { value: 'left', icon: AlignLeft, label: 'Слева' },
           { value: 'center', icon: AlignCenter, label: 'По центру' },
           { value: 'right', icon: AlignRight, label: 'Справа' },
+          { value: 'justify', icon: AlignJustify, label: 'По ширине' },
         ].map(({ value, icon: Icon, label }) => (
           <button
             key={value}
-            onClick={() => onUpdate({ textAlign: value as 'left' | 'center' | 'right' })}
+            onClick={() => onUpdate({ textAlign: value as 'left' | 'center' | 'right' | 'justify' })}
             className={cn(
               "flex-1 p-2 rounded-lg transition-colors",
-              subBlock.textAlign === value 
+              (subBlock.textAlign === value || (!subBlock.textAlign && value === 'center'))
                 ? "bg-primary text-primary-foreground" 
                 : "bg-muted hover:bg-muted/80"
             )}
@@ -403,36 +404,6 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
                   </button>
                 ))}
               </div>
-            </div>
-            
-            {/* Text wrap mode */}
-            <div className="space-y-2">
-              <Label className="text-xs text-muted-foreground">Перенос текста</Label>
-              <div className="grid grid-cols-3 gap-1">
-                {[
-                  { value: 'standard', label: 'Стандарт' },
-                  { value: 'justify', label: 'По ширине' },
-                  { value: 'hyphenate', label: 'Дефисы' },
-                ].map(({ value, label }) => (
-                  <button
-                    key={value}
-                    onClick={() => onUpdate({ textWrapMode: value as 'standard' | 'justify' | 'hyphenate' })}
-                    className={cn(
-                      "py-1.5 px-2 rounded-lg text-xs transition-colors",
-                      (subBlock.textWrapMode === value || (!subBlock.textWrapMode && value === 'standard'))
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted hover:bg-muted/80"
-                    )}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-              <p className="text-[10px] text-muted-foreground">
-                {subBlock.textWrapMode === 'justify' && 'Ширина строк одинаковая за счёт пробелов между словами'}
-                {subBlock.textWrapMode === 'hyphenate' && 'Слова переносятся через дефисы, создавая ровный блок'}
-                {(!subBlock.textWrapMode || subBlock.textWrapMode === 'standard') && 'Обычный перенос по словам'}
-              </p>
             </div>
           </>
         )}
