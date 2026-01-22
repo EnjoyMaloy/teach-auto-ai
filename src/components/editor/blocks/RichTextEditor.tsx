@@ -174,7 +174,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   }, [isEditing, editor]);
 
-  // Dynamic styles for highlighting
+  // Dynamic styles for highlighting and text wrapping
+  const textWrapCss = textWrapMode === 'justify' 
+    ? 'text-align: justify;'
+    : textWrapMode === 'hyphenate'
+      ? 'text-align: justify; hyphens: auto; -webkit-hyphens: auto;'
+      : '';
+
   const dynamicStyles = `
     .rich-text-highlight {
       background-color: hsl(${highlightColor});
@@ -200,12 +206,15 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       text-decoration-color: hsl(${wavyColor});
       text-underline-offset: 4px;
     }
+    .ProseMirror p, .rich-text-readonly p {
+      ${textWrapCss}
+    }
   `;
 
   if (!isEditing) {
     return (
       <div 
-        className={cn(textSizeClass, textAlignClass, className)}
+        className={cn(textSizeClass, textAlignClass, 'rich-text-readonly', className)}
         style={{ color: textColor }}
       >
         <style>{dynamicStyles}</style>
