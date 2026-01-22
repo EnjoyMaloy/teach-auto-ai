@@ -83,16 +83,43 @@ interface GeneratedCourse {
 
 // Helper to extract and fix JSON from AI response
 const extractAndFixJson = (content: string): any => {
-  // First try to find JSON block
-  const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || 
-                    content.match(/```\s*([\s\S]*?)\s*```/) ||
-                    content.match(/(\{[\s\S]*\})/);
+  if (!content || typeof content !== 'string') {
+    console.error('extractAndFixJson received empty or invalid content:', content);
+    throw new Error('Пустой ответ от AI');
+  }
+
+  console.log('Attempting to parse content length:', content.length);
+  console.log('Content preview:', content.substring(0, 500));
+
+  // Multiple strategies to find JSON
+  let jsonStr = '';
   
-  if (!jsonMatch) {
-    throw new Error('JSON не найден в ответе');
+  // Strategy 1: Find JSON in code blocks
+  const codeBlockMatch = content.match(/```json\s*([\s\S]*?)\s*```/);
+  if (codeBlockMatch) {
+    jsonStr = codeBlockMatch[1];
   }
   
-  let jsonStr = jsonMatch[1] || jsonMatch[0];
+  // Strategy 2: Find any code block
+  if (!jsonStr) {
+    const anyBlockMatch = content.match(/```\s*([\s\S]*?)\s*```/);
+    if (anyBlockMatch) {
+      jsonStr = anyBlockMatch[1];
+    }
+  }
+  
+  // Strategy 3: Find JSON object pattern (greedy - find the largest match)
+  if (!jsonStr) {
+    const firstBrace = content.indexOf('{');
+    if (firstBrace !== -1) {
+      jsonStr = content.substring(firstBrace);
+    }
+  }
+  
+  if (!jsonStr || jsonStr.trim().length === 0) {
+    console.error('No JSON found in content. Full content:', content);
+    throw new Error('JSON не найден в ответе');
+  }
   
   // Clean up common issues
   jsonStr = jsonStr
@@ -100,6 +127,7 @@ const extractAndFixJson = (content: string): any => {
     .replace(/,\s*]/g, ']')  // Remove trailing commas before ]
     .replace(/[\x00-\x1F\x7F]/g, ' ')  // Remove control characters
     .replace(/\n\s*\.\.\.\s*\n/g, '\n')  // Remove ... ellipsis lines
+    .replace(/"\s*\n\s*"/g, '", "')  // Fix broken string arrays
     .trim();
   
   // Try to parse
@@ -107,16 +135,35 @@ const extractAndFixJson = (content: string): any => {
     return JSON.parse(jsonStr);
   } catch (e) {
     // If it fails, try to fix truncated JSON
-    console.warn('JSON parse failed, attempting fix...', e);
+    console.warn('JSON parse failed, attempting aggressive fix...', e);
+    console.log('Problematic JSON (first 1000 chars):', jsonStr.substring(0, 1000));
+    
+    // Try to find the last complete object/array
+    let fixedJson = jsonStr;
+    
+    // Remove incomplete trailing content
+    // Find patterns like: ,"incomplete  or {"incomplete  
+    const incompletePatterns = [
+      /,\s*"[^"]*$/,           // Trailing incomplete key
+      /,\s*\{[^}]*$/,          // Trailing incomplete object
+      /,\s*\[[^\]]*$/,         // Trailing incomplete array
+      /:\s*"[^"]*$/,           // Trailing incomplete value
+      /:\s*\{[^}]*$/,          // Trailing incomplete object value
+    ];
+    
+    for (const pattern of incompletePatterns) {
+      fixedJson = fixedJson.replace(pattern, '');
+    }
     
     // Count brackets to find imbalance
-    const openBraces = (jsonStr.match(/\{/g) || []).length;
-    const closeBraces = (jsonStr.match(/\}/g) || []).length;
-    const openBrackets = (jsonStr.match(/\[/g) || []).length;
-    const closeBrackets = (jsonStr.match(/\]/g) || []).length;
+    const openBraces = (fixedJson.match(/\{/g) || []).length;
+    const closeBraces = (fixedJson.match(/\}/g) || []).length;
+    const openBrackets = (fixedJson.match(/\[/g) || []).length;
+    const closeBrackets = (fixedJson.match(/\]/g) || []).length;
     
-    // Add missing closing brackets
-    let fixedJson = jsonStr;
+    console.log(`Bracket balance: { ${openBraces}/${closeBraces}, [ ${openBrackets}/${closeBrackets}`);
+    
+    // Add missing closing brackets in correct order
     for (let i = 0; i < openBrackets - closeBrackets; i++) {
       fixedJson += ']';
     }
@@ -124,25 +171,52 @@ const extractAndFixJson = (content: string): any => {
       fixedJson += '}';
     }
     
-    // Remove any trailing incomplete content after last complete slide/lesson
-    const lastCompleteObject = fixedJson.lastIndexOf('"}');
-    if (lastCompleteObject > 0) {
-      // Find the next closing bracket after this
-      const afterLast = fixedJson.substring(lastCompleteObject + 2);
-      const nextClose = afterLast.search(/[\]\}]/);
-      if (nextClose >= 0) {
-        fixedJson = fixedJson.substring(0, lastCompleteObject + 2 + nextClose + 1);
-        // Rebalance
-        const ob = (fixedJson.match(/\{/g) || []).length;
-        const cb = (fixedJson.match(/\}/g) || []).length;
-        const oB = (fixedJson.match(/\[/g) || []).length;
-        const cB = (fixedJson.match(/\]/g) || []).length;
-        for (let i = 0; i < oB - cB; i++) fixedJson += ']';
-        for (let i = 0; i < ob - cb; i++) fixedJson += '}';
+    try {
+      return JSON.parse(fixedJson);
+    } catch (e2) {
+      console.error('Aggressive fix also failed:', e2);
+      console.log('Final attempt JSON:', fixedJson.substring(fixedJson.length - 500));
+      
+      // Last resort: try to extract at least partial data
+      // Look for the lessons array specifically
+      const lessonsMatch = fixedJson.match(/"lessons"\s*:\s*\[([\s\S]*)/);
+      if (lessonsMatch) {
+        const lessonsContent = lessonsMatch[1];
+        // Find complete lesson objects
+        const lessonObjects: any[] = [];
+        let depth = 0;
+        let start = -1;
+        
+        for (let i = 0; i < lessonsContent.length; i++) {
+          const char = lessonsContent[i];
+          if (char === '{') {
+            if (depth === 0) start = i;
+            depth++;
+          } else if (char === '}') {
+            depth--;
+            if (depth === 0 && start !== -1) {
+              try {
+                const lessonStr = lessonsContent.substring(start, i + 1);
+                const lesson = JSON.parse(lessonStr);
+                lessonObjects.push(lesson);
+              } catch {}
+              start = -1;
+            }
+          }
+        }
+        
+        if (lessonObjects.length > 0) {
+          console.log(`Extracted ${lessonObjects.length} complete lessons from truncated response`);
+          return {
+            title: 'Сгенерированный курс',
+            description: '',
+            lessons: lessonObjects
+          };
+        }
       }
+      
+      throw new Error('Не удалось восстановить JSON после всех попыток');
     }
-    
-    return JSON.parse(fixedJson);
   }
 };
 
