@@ -110,6 +110,7 @@ const Editor: React.FC = () => {
   const [isLoadingCourse, setIsLoadingCourse] = useState(true);
   const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
+  const [selectedSubBlockId, setSelectedSubBlockId] = useState<string | null>(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [showBlockSelector, setShowBlockSelector] = useState(false);
   const [undoStack, setUndoStack] = useState<Course[]>([]);
@@ -657,6 +658,8 @@ const Editor: React.FC = () => {
               onUpdateBlock={handleUpdateBlock}
               designSystem={course.designSystem}
               isMuted={isPreviewMuted}
+              selectedSubBlockId={selectedSubBlockId}
+              onSelectSubBlock={setSelectedSubBlockId}
             />
           </div>
         </div>
@@ -668,6 +671,8 @@ const Editor: React.FC = () => {
               block={selectedBlock}
               onUpdate={handleUpdateBlock}
               onDelete={handleDeleteBlock}
+              selectedSubBlockId={selectedSubBlockId}
+              onSelectSubBlock={setSelectedSubBlockId}
             />
           ) : (
             <div className="h-full flex items-center justify-center p-8 text-center">

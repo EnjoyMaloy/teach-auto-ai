@@ -1,6 +1,7 @@
 import React from 'react';
 import { Block, BlockType, BLOCK_CONFIGS, BlockOption } from '@/types/blocks';
 import { SubBlock, SubBlockType, SUB_BLOCK_CONFIGS, createSubBlock } from '@/types/designBlock';
+import { SubBlockSettingsEditor } from './SubBlockSettingsEditor';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,12 +32,16 @@ interface BlockEditorProps {
   block: Block;
   onUpdate: (updates: Partial<Block>) => void;
   onDelete: () => void;
+  selectedSubBlockId?: string | null;
+  onSelectSubBlock?: (id: string | null) => void;
 }
 
 export const BlockEditor: React.FC<BlockEditorProps> = ({
   block,
   onUpdate,
   onDelete,
+  selectedSubBlockId,
+  onSelectSubBlock,
 }) => {
   const config = BLOCK_CONFIGS[block.type];
   
@@ -652,35 +657,49 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
           </div>
         )}
 
-
-        {/* Design block - sub-block selector list */}
+        {/* Design block - sub-block settings or add menu */}
         {block.type === 'design' && (
-          <div className="space-y-1">
-            <p className="text-xs font-medium text-muted-foreground px-1 mb-2">Добавить элемент:</p>
-            {Object.values(SUB_BLOCK_CONFIGS).map((config) => {
-              const IconComponent = subBlockIconMap[config.icon as keyof typeof subBlockIconMap];
-              return (
-                <button
-                  key={config.type}
-                  onClick={() => {
-                    const currentSubBlocks = block.subBlocks || [];
-                    const newSubBlock = createSubBlock(config.type, currentSubBlocks.length);
-                    onUpdate({ subBlocks: [...currentSubBlocks, newSubBlock] });
-                  }}
-                  className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg hover:bg-muted transition-colors text-left group"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    {IconComponent && <IconComponent className="w-4 h-4 text-primary" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">{config.labelRu}</p>
-                    <p className="text-xs text-muted-foreground truncate">{config.description}</p>
-                  </div>
-                  <Plus className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                </button>
-              );
-            })}
-          </div>
+          <>
+            {selectedSubBlockId && block.subBlocks?.find(sb => sb.id === selectedSubBlockId) ? (
+              <SubBlockSettingsEditor
+                subBlock={block.subBlocks.find(sb => sb.id === selectedSubBlockId)!}
+                onUpdate={(updates) => {
+                  const updatedSubBlocks = block.subBlocks?.map(sb =>
+                    sb.id === selectedSubBlockId ? { ...sb, ...updates } : sb
+                  );
+                  onUpdate({ subBlocks: updatedSubBlocks });
+                }}
+                onClose={() => onSelectSubBlock?.(null)}
+              />
+            ) : (
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-muted-foreground px-1 mb-2">Добавить элемент:</p>
+                {Object.values(SUB_BLOCK_CONFIGS).map((config) => {
+                  const IconComponent = subBlockIconMap[config.icon as keyof typeof subBlockIconMap];
+                  return (
+                    <button
+                      key={config.type}
+                      onClick={() => {
+                        const currentSubBlocks = block.subBlocks || [];
+                        const newSubBlock = createSubBlock(config.type, currentSubBlocks.length);
+                        onUpdate({ subBlocks: [...currentSubBlocks, newSubBlock] });
+                      }}
+                      className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg hover:bg-muted transition-colors text-left group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                        {IconComponent && <IconComponent className="w-4 h-4 text-primary" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground">{config.labelRu}</p>
+                        <p className="text-xs text-muted-foreground truncate">{config.description}</p>
+                      </div>
+                      <Plus className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
