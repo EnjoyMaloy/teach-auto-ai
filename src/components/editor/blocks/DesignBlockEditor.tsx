@@ -716,16 +716,16 @@ const SortableSubBlockItem: React.FC<{
     >
       {renderSubBlockContent()}
       
-      {/* Bottom controls - drag handle left, delete right */}
+      {/* Bottom controls - absolutely positioned, appear on hover */}
       {isEditing && (
-        <div className="flex justify-between items-center mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
           {/* Drag handle - bottom left */}
           <div
-            className="p-1.5 cursor-grab hover:bg-muted rounded-md transition-colors"
+            className="p-1 cursor-grab hover:bg-muted/80 rounded-md transition-colors pointer-events-auto bg-background/80 backdrop-blur-sm"
             {...attributes}
             {...listeners}
           >
-            <GripVertical className="w-4 h-4 text-muted-foreground" />
+            <GripVertical className="w-3.5 h-3.5 text-muted-foreground" />
           </div>
           
           {/* Delete button - bottom right */}
@@ -734,9 +734,9 @@ const SortableSubBlockItem: React.FC<{
               e.stopPropagation();
               onDelete();
             }}
-            className="p-1.5 hover:bg-destructive/10 rounded-md transition-colors"
+            className="p-1 hover:bg-destructive/10 rounded-md transition-colors pointer-events-auto bg-background/80 backdrop-blur-sm"
           >
-            <Trash2 className="w-4 h-4 text-destructive" />
+            <Trash2 className="w-3.5 h-3.5 text-destructive" />
           </button>
         </div>
       )}
