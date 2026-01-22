@@ -9,6 +9,8 @@ import { toast } from 'sonner';
 interface SubBlockAIChatProps {
   subBlock: SubBlock;
   onUpdate: (updates: Partial<SubBlock>) => void;
+  onAddBlocks?: (blocks: Partial<SubBlock>[]) => void;
+  onReplaceAllBlocks?: (blocks: Partial<SubBlock>[]) => void;
   onClose?: () => void;
 }
 
@@ -20,6 +22,8 @@ interface ChatMessage {
 export const SubBlockAIChat: React.FC<SubBlockAIChatProps> = ({
   subBlock,
   onUpdate,
+  onAddBlocks,
+  onReplaceAllBlocks,
   onClose,
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -72,8 +76,24 @@ export const SubBlockAIChat: React.FC<SubBlockAIChatProps> = ({
         content: data.message || 'Готово!' 
       }]);
 
-      // Apply updates if present
-      if (data.updates && Object.keys(data.updates).length > 0) {
+      // Handle different response types
+      if (data.newBlocks && Array.isArray(data.newBlocks) && data.newBlocks.length > 0) {
+        // AI suggested new blocks - add them with proper IDs and order
+        const blocksWithIds = data.newBlocks.map((block: Partial<SubBlock>, index: number) => ({
+          ...block,
+          id: crypto.randomUUID(),
+          order: index,
+        }));
+        
+        if (onReplaceAllBlocks) {
+          onReplaceAllBlocks(blocksWithIds);
+          toast.success(`Создано ${blocksWithIds.length} саб-блоков`);
+        } else if (onAddBlocks) {
+          onAddBlocks(blocksWithIds);
+          toast.success(`Добавлено ${blocksWithIds.length} саб-блоков`);
+        }
+      } else if (data.updates && Object.keys(data.updates).length > 0) {
+        // Apply updates to current block
         onUpdate(data.updates);
         toast.success('Изменения применены');
       }

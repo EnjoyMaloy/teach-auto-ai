@@ -53,12 +53,14 @@ interface SubBlockSettingsEditorProps {
   subBlock: SubBlock;
   onUpdate: (updates: Partial<SubBlock>) => void;
   onClose: () => void;
+  onReplaceAllBlocks?: (blocks: Partial<SubBlock>[]) => void;
 }
 
 export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
   subBlock,
   onUpdate,
   onClose,
+  onReplaceAllBlocks,
 }) => {
   const config = SUB_BLOCK_CONFIGS[subBlock.type];
   const IconComponent = subBlockIconMap[config.icon as keyof typeof subBlockIconMap];
@@ -855,6 +857,7 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
           <SubBlockAIChat
             subBlock={subBlock}
             onUpdate={onUpdate}
+            onReplaceAllBlocks={onReplaceAllBlocks}
           />
         </div>
       </div>

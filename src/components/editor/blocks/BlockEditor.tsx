@@ -670,6 +670,16 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                   onUpdate({ subBlocks: updatedSubBlocks });
                 }}
                 onClose={() => onSelectSubBlock?.(null)}
+                onReplaceAllBlocks={(newBlocks) => {
+                  // Replace all sub-blocks with AI-generated ones
+                  const blocksWithIds = newBlocks.map((block, index) => ({
+                    ...block,
+                    id: block.id || crypto.randomUUID(),
+                    order: index,
+                  })) as SubBlock[];
+                  onUpdate({ subBlocks: blocksWithIds });
+                  onSelectSubBlock?.(null);
+                }}
               />
             ) : (
               <div className="space-y-1">
