@@ -359,23 +359,48 @@ const SortableSubBlockItem: React.FC<{
         );
 
       case 'image':
+        // Image sizing: max aspect ratio 1:1 (height), can be wider up to 10:1
+        // If image is taller than square, it gets cropped and centered
         const imageSizeClass = {
-          small: 'max-w-[100px] max-h-[100px]',
-          medium: 'max-w-[200px] max-h-[200px]',
-          large: 'max-w-[300px] max-h-[300px]',
+          small: 'max-w-[100px]',
+          medium: 'max-w-[200px]',
+          large: 'max-w-[300px]',
           full: 'w-full',
         }[subBlock.imageSize || 'medium'];
 
         return (
           <div className={cn('flex', textAlignClass === 'text-center' ? 'justify-center' : textAlignClass === 'text-right' ? 'justify-end' : 'justify-start')}>
             {subBlock.imageUrl ? (
-              <img 
-                src={subBlock.imageUrl} 
-                alt="" 
-                className={cn('rounded-lg object-cover', imageSizeClass)}
-              />
+              <div 
+                className={cn('rounded-lg overflow-hidden', imageSizeClass)}
+                style={{ 
+                  // Max height equals width (1:1 aspect ratio max for height)
+                  // Width can be up to 10x height (10:1 ratio)
+                  aspectRatio: 'auto',
+                }}
+              >
+                <img 
+                  src={subBlock.imageUrl} 
+                  alt="" 
+                  className="w-full h-full object-cover object-center"
+                  onLoad={(e) => {
+                    const img = e.currentTarget;
+                    const parent = img.parentElement;
+                    if (parent && img.naturalHeight > img.naturalWidth) {
+                      // Portrait image - crop to square (max 1:1 height)
+                      parent.style.aspectRatio = '1/1';
+                    } else if (parent && img.naturalWidth / img.naturalHeight > 10) {
+                      // Ultra-wide image - limit to 10:1
+                      parent.style.aspectRatio = '10/1';
+                    } else if (parent) {
+                      // Normal aspect ratio - use natural
+                      parent.style.aspectRatio = `${img.naturalWidth}/${img.naturalHeight}`;
+                    }
+                  }}
+                />
+              </div>
             ) : isEditing ? (
-              <label className={cn('flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer', imageSizeClass, 'min-h-[100px]')}
+              <label className={cn('flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer', imageSizeClass, 'min-h-[100px] aspect-square')}
                 style={{ borderColor: `hsl(${ds.mutedColor})` }}
               >
                 <input
@@ -398,7 +423,7 @@ const SortableSubBlockItem: React.FC<{
               </label>
             ) : (
               <div 
-                className={cn('flex items-center justify-center rounded-lg', imageSizeClass, 'min-h-[100px]')}
+                className={cn('flex items-center justify-center rounded-lg aspect-square', imageSizeClass, 'min-h-[100px]')}
                 style={{ backgroundColor: `hsl(${ds.mutedColor})` }}
               >
                 <Image className="w-8 h-8" style={{ color: `hsl(${ds.foregroundColor} / 0.3)` }} />
