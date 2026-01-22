@@ -775,7 +775,7 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (!over || active.id === over.id) return;
+    if (!over || active.id === over.id || !onUpdateSubBlocks) return;
 
     const oldIndex = subBlocks.findIndex((sb) => sb.id === active.id);
     const newIndex = subBlocks.findIndex((sb) => sb.id === over.id);
@@ -789,24 +789,28 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
   };
 
   const handleAddSubBlock = (type: SubBlockType) => {
+    if (!onUpdateSubBlocks) return;
     const newSubBlock = createSubBlock(type, subBlocks.length + 1);
     onUpdateSubBlocks([...subBlocks, newSubBlock]);
     setShowTemplateSelector(false);
   };
 
   const handleSelectTemplate = (templateId: DesignTemplateId) => {
+    if (!onUpdateSubBlocks) return;
     const newSubBlocks = createSubBlocksFromTemplate(templateId);
     onUpdateSubBlocks(newSubBlocks);
     setShowTemplateSelector(false);
   };
 
   const handleUpdateSubBlock = (id: string, updates: Partial<SubBlock>) => {
+    if (!onUpdateSubBlocks) return;
     onUpdateSubBlocks(
       subBlocks.map((sb) => (sb.id === id ? { ...sb, ...updates } : sb))
     );
   };
 
   const handleDeleteSubBlock = (id: string) => {
+    if (!onUpdateSubBlocks) return;
     onUpdateSubBlocks(
       subBlocks.filter((sb) => sb.id !== id).map((sb, i) => ({ ...sb, order: i + 1 }))
     );
