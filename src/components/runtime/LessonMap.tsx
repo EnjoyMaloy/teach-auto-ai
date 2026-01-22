@@ -256,8 +256,11 @@ export const LessonMap: React.FC<LessonMapProps> = ({
           return (
             <div 
               key={lesson.id}
-              className="relative z-10 flex flex-col items-center"
-              style={{ marginLeft: `${offset}px` }}
+              className="relative flex flex-col items-center"
+              style={{ 
+                marginLeft: `${offset}px`,
+                zIndex: isPopupOpen ? 100 : 10,
+              }}
             >
               <button
                 onClick={() => handleCircleClick(lesson, index)}
