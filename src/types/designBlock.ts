@@ -54,6 +54,9 @@ export interface SubBlock {
   animationAutoplay?: boolean;
   animationLoop?: boolean;
   
+  // Text rotation
+  textRotation?: number;
+  
   // Styling
   textAlign?: 'left' | 'center' | 'right';
   textSize?: 'small' | 'medium' | 'large' | 'xlarge';

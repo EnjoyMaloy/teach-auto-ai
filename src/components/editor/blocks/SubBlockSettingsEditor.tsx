@@ -140,33 +140,73 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
     </div>
   );
 
-  const renderBackdropSelector = () => (
-    <div className="space-y-2">
-      <Label className="text-xs text-muted-foreground">Подложка</Label>
-      <div className="grid grid-cols-5 gap-1">
-        {[
-          { value: 'none', label: 'Нет' },
-          { value: 'light', label: 'Светлая' },
-          { value: 'dark', label: 'Тёмная' },
-          { value: 'primary', label: 'Акцент' },
-          { value: 'blur', label: 'Блюр' },
-        ].map(({ value, label }) => (
-          <button
-            key={value}
-            onClick={() => onUpdate({ backdrop: value as 'none' | 'light' | 'dark' | 'primary' | 'blur' })}
-            className={cn(
-              "py-1.5 px-1 rounded-lg text-xs transition-colors",
-              subBlock.backdrop === value 
-                ? "bg-primary text-primary-foreground" 
-                : "bg-muted hover:bg-muted/80"
-            )}
-          >
-            {label}
-          </button>
-        ))}
+  const renderBackdropSelector = () => {
+    const backdropOptions = [
+      { value: 'none', label: 'Нет' },
+      { value: 'light', label: 'Светлая' },
+      { value: 'dark', label: 'Тёмная' },
+      { value: 'primary', label: 'Акцент' },
+      { value: 'blur', label: 'Блюр' },
+    ];
+
+    return (
+      <div className="space-y-3">
+        <Label className="text-xs text-muted-foreground">Подложка</Label>
+        <div className="grid grid-cols-5 gap-1">
+          {backdropOptions.map(({ value, label }) => (
+            <button
+              key={value}
+              onClick={() => onUpdate({ backdrop: value as 'none' | 'light' | 'dark' | 'primary' | 'blur' })}
+              className={cn(
+                "py-1.5 px-1 rounded-lg text-xs transition-colors",
+                subBlock.backdrop === value 
+                  ? "bg-primary text-primary-foreground" 
+                  : "bg-muted hover:bg-muted/80"
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        
+        {/* Visual preview of all backdrops */}
+        <div className="grid grid-cols-5 gap-1.5">
+          {backdropOptions.map(({ value }) => {
+            const previewStyles: React.CSSProperties = {
+              none: {},
+              light: { backgroundColor: 'hsl(var(--muted))' },
+              dark: { backgroundColor: 'hsl(var(--foreground))' },
+              primary: { backgroundColor: 'hsl(var(--primary))' },
+              blur: { backgroundColor: 'hsl(var(--muted) / 0.6)', backdropFilter: 'blur(4px)' },
+            }[value] || {};
+            
+            const isSelected = subBlock.backdrop === value || (!subBlock.backdrop && value === 'none');
+            
+            return (
+              <button
+                key={value}
+                onClick={() => onUpdate({ backdrop: value as 'none' | 'light' | 'dark' | 'primary' | 'blur' })}
+                className={cn(
+                  "h-10 rounded-lg border-2 transition-all",
+                  isSelected ? "border-primary" : "border-transparent hover:border-border"
+                )}
+                style={previewStyles}
+              >
+                <div 
+                  className="w-full h-full flex items-center justify-center"
+                  style={{ 
+                    color: value === 'dark' ? 'white' : value === 'primary' ? 'white' : 'hsl(var(--foreground))'
+                  }}
+                >
+                  <span className="text-[8px] font-medium opacity-60">Aa</span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderDividerStyleSelector = () => (
     <div className="space-y-2">
@@ -328,7 +368,7 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
                         ? "bg-orange-500" 
                         : "bg-primary"
                   )}
-                  style={{ width: `${Math.max(0, ((subBlock.content || '').length / 45) * 100)}%` }}
+                  style={{ width: `${Math.max(0, 100 - ((subBlock.content || '').length / 45) * 100)}%` }}
                 />
               </div>
             </div>
@@ -343,6 +383,46 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
             {renderAlignmentSelector()}
             {renderTextSizeSelector()}
             {renderBackdropSelector()}
+            
+            {/* Text rotation */}
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Поворот</Label>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => onUpdate({ textRotation: -4 })}
+                  className={cn(
+                    "flex-1 py-2 px-3 rounded-lg text-sm transition-colors",
+                    subBlock.textRotation === -4
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted hover:bg-muted/80"
+                  )}
+                >
+                  −4°
+                </button>
+                <button
+                  onClick={() => onUpdate({ textRotation: 0 })}
+                  className={cn(
+                    "flex-1 py-2 px-3 rounded-lg text-sm transition-colors",
+                    subBlock.textRotation === 0 || !subBlock.textRotation
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted hover:bg-muted/80"
+                  )}
+                >
+                  0°
+                </button>
+                <button
+                  onClick={() => onUpdate({ textRotation: 4 })}
+                  className={cn(
+                    "flex-1 py-2 px-3 rounded-lg text-sm transition-colors",
+                    subBlock.textRotation === 4
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted hover:bg-muted/80"
+                  )}
+                >
+                  +4°
+                </button>
+              </div>
+            </div>
           </>
         )}
 
@@ -353,13 +433,15 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
               <Label className="text-xs text-muted-foreground">Поворот</Label>
               <div className="flex gap-1">
                 <button
-                  onClick={() => onUpdate({ imageRotation: (subBlock.imageRotation || 0) - 8 })}
+                  onClick={() => onUpdate({ imageRotation: -5 })}
                   className={cn(
                     "flex-1 py-2 px-3 rounded-lg text-sm transition-colors",
-                    "bg-muted hover:bg-muted/80"
+                    subBlock.imageRotation === -5
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted hover:bg-muted/80"
                   )}
                 >
-                  ↺ −8°
+                  −5°
                 </button>
                 <button
                   onClick={() => onUpdate({ imageRotation: 0 })}
@@ -373,20 +455,17 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
                   0°
                 </button>
                 <button
-                  onClick={() => onUpdate({ imageRotation: (subBlock.imageRotation || 0) + 8 })}
+                  onClick={() => onUpdate({ imageRotation: 5 })}
                   className={cn(
                     "flex-1 py-2 px-3 rounded-lg text-sm transition-colors",
-                    "bg-muted hover:bg-muted/80"
+                    subBlock.imageRotation === 5
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted hover:bg-muted/80"
                   )}
                 >
-                  +8° ↻
+                  +5°
                 </button>
               </div>
-              {subBlock.imageRotation !== 0 && subBlock.imageRotation && (
-                <p className="text-xs text-muted-foreground text-center">
-                  Текущий угол: {subBlock.imageRotation}°
-                </p>
-              )}
             </div>
           </>
         )}
