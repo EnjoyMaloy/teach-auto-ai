@@ -186,64 +186,58 @@ const SortableSubBlockItem: React.FC<{
         const MAX_HEADING_CHARS = 45;
 
         return (
-          <div className="w-full" dir="ltr">
-            <h2 
-              className={cn(headingSizeClass, fontWeightClass, textAlignClass, 'break-words whitespace-pre-wrap outline-none')}
-              style={{ color: `hsl(${ds.foregroundColor})`, direction: 'ltr', unicodeBidi: 'plaintext' }}
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              dir="ltr"
-              onFocus={() => {
-                setIsHeadingFocused(true);
-                if (onSelect) {
-                  onSelect();
-                }
-              }}
-              onBlur={(e) => {
-                setIsHeadingFocused(false);
-                // Clear any pending debounced update
-                if (updateTimeoutRef.current) {
-                  clearTimeout(updateTimeoutRef.current);
-                }
-                if (isEditing) {
-                  const text = e.currentTarget.textContent || '';
-                  const limitedText = text.slice(0, MAX_HEADING_CHARS);
-                  headingContentRef.current = limitedText;
-                  onUpdate({ content: limitedText });
-                }
-              }}
-              onInput={(e) => {
-                const text = e.currentTarget.textContent || '';
-                const limitedText = text.slice(0, MAX_HEADING_CHARS);
-                headingContentRef.current = limitedText;
-                
-                if (text.length > MAX_HEADING_CHARS) {
-                  const sel = window.getSelection();
-                  const cursorPos = sel?.anchorOffset || 0;
-                  
-                  e.currentTarget.textContent = limitedText;
-                  
-                  if (e.currentTarget.firstChild) {
-                    const range = document.createRange();
-                    range.setStart(e.currentTarget.firstChild, Math.min(cursorPos, MAX_HEADING_CHARS));
-                    range.collapse(true);
-                    sel?.removeAllRanges();
-                    sel?.addRange(range);
+          <div className="w-full">
+            {isEditing ? (
+              <textarea
+                value={subBlock.content || ''}
+                onChange={(e) => {
+                  const text = e.target.value.slice(0, MAX_HEADING_CHARS);
+                  headingContentRef.current = text;
+                  onUpdate({ content: text });
+                }}
+                onFocus={() => {
+                  setIsHeadingFocused(true);
+                  if (onSelect) {
+                    onSelect();
                   }
-                }
-                // Debounced update for real-time counter
-                debouncedHeadingUpdate(limitedText);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  e.currentTarget.blur();
-                }
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {subBlock.content || 'Заголовок'}
-            </h2>
+                }}
+                onBlur={() => setIsHeadingFocused(false)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    e.currentTarget.blur();
+                  }
+                }}
+                onClick={(e) => e.stopPropagation()}
+                placeholder="Заголовок"
+                maxLength={MAX_HEADING_CHARS}
+                rows={1}
+                className={cn(
+                  headingSizeClass, 
+                  fontWeightClass, 
+                  textAlignClass, 
+                  'w-full bg-transparent border-none outline-none resize-none overflow-hidden break-words'
+                )}
+                style={{ 
+                  color: `hsl(${ds.foregroundColor})`,
+                  height: 'auto',
+                  minHeight: '1.5em',
+                }}
+                ref={(el) => {
+                  if (el) {
+                    el.style.height = 'auto';
+                    el.style.height = el.scrollHeight + 'px';
+                  }
+                }}
+              />
+            ) : (
+              <h2 
+                className={cn(headingSizeClass, fontWeightClass, textAlignClass, 'break-words whitespace-pre-wrap')}
+                style={{ color: `hsl(${ds.foregroundColor})` }}
+              >
+                {subBlock.content || 'Заголовок'}
+              </h2>
+            )}
           </div>
         );
 
