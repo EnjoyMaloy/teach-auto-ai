@@ -574,41 +574,8 @@ const SortableSubBlockItem: React.FC<{
         };
 
         return (
-          <div className="w-full py-2 relative group">
+          <div className="w-full py-2">
             {renderDivider()}
-            {isEditing && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                <div 
-                  className="grid grid-cols-2 gap-1 p-2 rounded-lg shadow-lg border min-w-[240px]"
-                  style={{ 
-                    backgroundColor: `hsl(${ds.mutedColor})`,
-                    borderColor: `hsl(${ds.foregroundColor} / 0.1)`,
-                  }}
-                >
-                  {dividerOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onUpdate({ dividerStyle: option.value });
-                      }}
-                      className={cn(
-                        "px-3 py-1.5 text-xs rounded transition-colors text-center w-full",
-                        dividerStyle === option.value 
-                          ? "font-medium" 
-                          : "opacity-70 hover:opacity-100"
-                      )}
-                      style={{ 
-                        backgroundColor: dividerStyle === option.value ? `hsl(${ds.primaryColor})` : 'transparent',
-                        color: dividerStyle === option.value ? 'white' : `hsl(${ds.foregroundColor})`,
-                      }}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         );
 
