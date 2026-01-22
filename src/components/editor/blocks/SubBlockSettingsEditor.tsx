@@ -387,35 +387,10 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
             {renderTextSizeSelector()}
             {renderBackdropSelector()}
             
-            {/* Text formatting */}
-            <div className="space-y-2">
-              <Label className="text-xs text-muted-foreground">Форматирование</Label>
-              <div className="flex gap-1">
-                {[
-                  { value: 'bold', icon: Type, label: 'Жирный', style: 'font-bold' },
-                  { value: 'italic', icon: Type, label: 'Курсив', style: 'italic' },
-                  { value: 'marker', icon: Highlighter, label: 'Маркер' },
-                  { value: 'underline', icon: Underline, label: 'Подчёркивание' },
-                  { value: 'wavy', icon: Waves, label: 'Волна' },
-                ].map(({ value, icon: Icon, label, style }) => (
-                  <button
-                    key={value}
-                    onClick={() => {
-                      // Toggle formatting in the content (this is a hint - actual formatting is in RichTextEditor)
-                      // For now we just show the UI
-                    }}
-                    className={cn(
-                      "flex-1 p-2 rounded-lg transition-colors",
-                      "bg-muted hover:bg-muted/80"
-                    )}
-                    title={label}
-                  >
-                    <Icon className={cn("w-4 h-4 mx-auto", style)} />
-                  </button>
-                ))}
-              </div>
-              <p className="text-[10px] text-muted-foreground">
-                Выделите текст в редакторе и нажмите кнопку
+            {/* Text formatting hint */}
+            <div className="p-3 rounded-lg bg-muted/50 border border-border">
+              <p className="text-xs text-muted-foreground">
+                💡 Для форматирования текста (жирный, курсив, выделение) кликните на текст — появится панель инструментов
               </p>
             </div>
             
@@ -447,16 +422,17 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
           <>
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">Поворот</Label>
-              <div className="grid grid-cols-5 gap-1">
-                {[-5, -1, 0, 1, 5].map((angle) => (
+              <div className="grid grid-cols-9 gap-0.5">
+                {[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5].map((angle) => (
                   <button
                     key={angle}
                     onClick={() => onUpdate({ imageRotation: angle })}
                     className={cn(
-                      "py-2 px-2 rounded-lg text-sm transition-colors",
+                      "py-1.5 px-1 rounded-lg text-[10px] transition-colors",
                       (subBlock.imageRotation === angle || (!subBlock.imageRotation && angle === 0))
                         ? "bg-primary text-primary-foreground"
-                        : "bg-muted hover:bg-muted/80"
+                        : "bg-muted hover:bg-muted/80",
+                      angle === 0 && "col-span-1"
                     )}
                   >
                     {angle > 0 ? `+${angle}°` : angle === 0 ? '0°' : `${angle}°`}
