@@ -176,9 +176,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   // Dynamic styles for highlighting and text wrapping
   const textWrapCss = textWrapMode === 'justify' 
-    ? 'text-align: justify;'
+    ? 'text-align: justify; text-justify: inter-word;'
     : textWrapMode === 'hyphenate'
-      ? 'text-align: justify; hyphens: auto; -webkit-hyphens: auto;'
+      ? 'text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto; word-break: break-word;'
       : '';
 
   const dynamicStyles = `
@@ -206,15 +206,23 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       text-decoration-color: hsl(${wavyColor});
       text-underline-offset: 4px;
     }
-    .ProseMirror p, .rich-text-readonly p {
+    .rich-text-justify .ProseMirror,
+    .rich-text-justify .ProseMirror p,
+    .rich-text-justify > div,
+    .rich-text-justify > div p,
+    .rich-text-readonly.rich-text-justify,
+    .rich-text-readonly.rich-text-justify p,
+    .rich-text-readonly.rich-text-justify > div {
       ${textWrapCss}
     }
   `;
 
+  const justifyClass = (textWrapMode === 'justify' || textWrapMode === 'hyphenate') ? 'rich-text-justify' : '';
+
   if (!isEditing) {
     return (
       <div 
-        className={cn(textSizeClass, textAlignClass, 'rich-text-readonly', className)}
+        className={cn(textSizeClass, textAlignClass, 'rich-text-readonly', justifyClass, className)}
         style={{ color: textColor }}
       >
         <style>{dynamicStyles}</style>
@@ -225,7 +233,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   return (
     <div 
-      className={cn('rounded-lg transition-all', isFocused ? 'border border-border/50' : '', className)} 
+      className={cn('rounded-lg transition-all', justifyClass, isFocused ? 'border border-border/50' : '', className)}
       onClick={(e) => e.stopPropagation()}
       onFocus={() => {
         setIsFocused(true);
