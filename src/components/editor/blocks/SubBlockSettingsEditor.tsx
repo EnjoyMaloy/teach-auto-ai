@@ -763,15 +763,6 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
                 ))}
               </div>
             </div>
-
-            {/* Table data editor */}
-            <TableEditor
-              tableData={subBlock.tableData || [[{ id: '1', content: '' }, { id: '2', content: '' }]]}
-              tableStyle={subBlock.tableStyle || 'simple'}
-              tableTextSize={subBlock.tableTextSize || 'medium'}
-              textAlign={(subBlock.textAlign as 'left' | 'center' | 'right') || 'left'}
-              onUpdate={onUpdate}
-            />
           </>
         )}
       </div>
