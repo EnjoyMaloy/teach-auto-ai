@@ -36,7 +36,7 @@ import { RichTextEditor } from './RichTextEditor';
 import {
   Plus, Trash2, GripVertical, Upload,
   Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Layers, Play,
-  Highlighter, Underline, Waves, Link, ExternalLink
+  Link, ExternalLink
 } from 'lucide-react';
 import { AnimationBlock } from './AnimationBlock';
 
@@ -139,35 +139,6 @@ const SortableSubBlockItem: React.FC<{
     }
   };
 
-  // Highlight selector component
-  const HighlightSelector: React.FC<{ currentHighlight?: TextHighlightType }> = ({ currentHighlight }) => (
-    <div className="flex justify-center gap-1 mt-3 pt-2 border-t border-border/30">
-      <span className="text-[10px] text-muted-foreground mr-1 self-center">Выделение:</span>
-      {([
-        { type: 'none' as const, icon: null, title: 'Без выделения' },
-        { type: 'marker' as const, icon: Highlighter, title: 'Маркер' },
-        { type: 'underline' as const, icon: Underline, title: 'Подчёркивание' },
-        { type: 'wavy' as const, icon: Waves, title: 'Волнистая линия' },
-      ]).map(({ type, icon: Icon, title }) => (
-        <button
-          key={type}
-          onClick={(e) => {
-            e.stopPropagation();
-            onUpdate({ highlight: type });
-          }}
-          className={cn(
-            'w-7 h-7 rounded-md border-2 transition-all flex items-center justify-center',
-            (currentHighlight === type || (!currentHighlight && type === 'none'))
-              ? 'border-primary bg-primary/10'
-              : 'border-border hover:border-primary/50 bg-background'
-          )}
-          title={title}
-        >
-          {Icon ? <Icon className="w-3.5 h-3.5" /> : <span className="text-xs">—</span>}
-        </button>
-      ))}
-    </div>
-  );
 
   const renderSubBlockContent = () => {
     switch (subBlock.type) {
@@ -192,13 +163,18 @@ const SortableSubBlockItem: React.FC<{
         const MAX_HEADING_CHARS = 45;
 
         return (
-          <div className="w-full relative">
+          <div className="w-full">
             <h2 
-              className={cn(headingSizeClass, fontWeightClass, textAlignClass, 'break-words whitespace-pre-wrap')}
+              className={cn(headingSizeClass, fontWeightClass, textAlignClass, 'break-words whitespace-pre-wrap outline-none')}
               style={{ color: `hsl(${ds.foregroundColor})` }}
               contentEditable={isEditing}
               suppressContentEditableWarning
-              onFocus={() => setIsHeadingFocused(true)}
+              onFocus={() => {
+                setIsHeadingFocused(true);
+                if (onSelect) {
+                  onSelect();
+                }
+              }}
               onBlur={(e) => {
                 setIsHeadingFocused(false);
                 if (isEditing) {
@@ -210,13 +186,11 @@ const SortableSubBlockItem: React.FC<{
               onInput={(e) => {
                 const text = e.currentTarget.textContent || '';
                 if (text.length > MAX_HEADING_CHARS) {
-                  // Save cursor position
                   const sel = window.getSelection();
                   const cursorPos = sel?.anchorOffset || 0;
                   
                   e.currentTarget.textContent = text.slice(0, MAX_HEADING_CHARS);
                   
-                  // Restore cursor position
                   if (e.currentTarget.firstChild) {
                     const range = document.createRange();
                     range.setStart(e.currentTarget.firstChild, Math.min(cursorPos, MAX_HEADING_CHARS));
@@ -225,7 +199,6 @@ const SortableSubBlockItem: React.FC<{
                     sel?.addRange(range);
                   }
                 }
-                // Update counter display using component-level state
                 setHeadingCounter(MAX_HEADING_CHARS - (e.currentTarget.textContent || '').length);
               }}
               onKeyDown={(e) => {
@@ -238,16 +211,6 @@ const SortableSubBlockItem: React.FC<{
             >
               {subBlock.content || 'Заголовок'}
             </h2>
-            {isEditing && isHeadingFocused && (
-              <div 
-                className={cn(
-                  "absolute -bottom-5 right-0 text-xs",
-                  headingCounter <= 5 ? "text-destructive" : "text-muted-foreground"
-                )}
-              >
-                {headingCounter}
-              </div>
-            )}
           </div>
         );
 
@@ -291,76 +254,24 @@ const SortableSubBlockItem: React.FC<{
 
         return (
           <div style={backdropStyles as React.CSSProperties}>
-            {isEditing ? (
-              <>
-                <RichTextEditor
-                  content={subBlock.content || ''}
-                  onChange={(content) => onUpdate({ content })}
-                  placeholder="Текст абзаца..."
-                  textSize={subBlock.textSize || 'medium'}
-                  textAlign={subBlock.textAlign || 'center'}
-                  textColor={textColor}
-                  highlightColor={ds.highlightMarkerColor}
-                  underlineColor={ds.highlightUnderlineColor}
-                  wavyColor={ds.highlightWavyColor}
-                  isEditing={true}
-                  onFocusChange={setIsTextFocused}
-                />
-                
-                {/* Backdrop selector - only show when focused */}
-                {isTextFocused && (
-                  <div 
-                    className="flex justify-center gap-1 mt-2 animate-in fade-in duration-200"
-                    onMouseDown={(e) => e.preventDefault()} // Prevent blur
-                  >
-                    <span className="text-[10px] text-muted-foreground mr-1 self-center">Подложка:</span>
-                    {(['none', 'light', 'dark', 'primary', 'blur'] as const).map((backdrop) => (
-                      <button
-                        key={backdrop}
-                        type="button"
-                        onMouseDown={(e) => e.preventDefault()} // Prevent blur
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onUpdate({ backdrop });
-                        }}
-                        className={cn(
-                          'w-6 h-6 rounded-md border-2 transition-all text-[8px] font-medium',
-                          subBlock.backdrop === backdrop || (!subBlock.backdrop && backdrop === 'none')
-                            ? 'border-primary scale-110'
-                            : 'border-transparent hover:border-primary/50'
-                        )}
-                        style={{
-                          backgroundColor: backdrop === 'none' ? 'transparent' 
-                            : backdrop === 'light' ? `hsl(${ds.backdropLightColor})`
-                            : backdrop === 'dark' ? `hsl(${ds.backdropDarkColor})`
-                            : backdrop === 'primary' ? `hsl(${ds.backdropPrimaryColor})`
-                            : `hsl(${ds.backdropBlurColor})`,
-                        }}
-                        title={backdrop === 'none' ? 'Без подложки' 
-                          : backdrop === 'light' ? 'Светлая'
-                          : backdrop === 'dark' ? 'Тёмная'
-                          : backdrop === 'primary' ? 'Акцент'
-                          : 'Размытие'}
-                      >
-                        {backdrop === 'blur' && '⚪'}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </>
-            ) : (
-              <RichTextEditor
-                content={subBlock.content || 'Текст абзаца'}
-                onChange={() => {}}
-                textSize={subBlock.textSize || 'medium'}
-                textAlign={subBlock.textAlign || 'center'}
-                textColor={textColor}
-                highlightColor={ds.highlightMarkerColor}
-                underlineColor={ds.highlightUnderlineColor}
-                wavyColor={ds.highlightWavyColor}
-                isEditing={false}
-              />
-            )}
+            <RichTextEditor
+              content={subBlock.content || (isEditing ? '' : 'Текст абзаца')}
+              onChange={(content) => onUpdate({ content })}
+              placeholder="Текст абзаца..."
+              textSize={subBlock.textSize || 'medium'}
+              textAlign={subBlock.textAlign || 'center'}
+              textColor={textColor}
+              highlightColor={ds.highlightMarkerColor}
+              underlineColor={ds.highlightUnderlineColor}
+              wavyColor={ds.highlightWavyColor}
+              isEditing={isEditing}
+              onFocusChange={(focused) => {
+                setIsTextFocused(focused);
+                if (focused && onSelect) {
+                  onSelect();
+                }
+              }}
+            />
           </div>
         );
 
