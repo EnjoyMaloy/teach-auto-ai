@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useEditor, EditorContent, Editor } from '@tiptap/react';
+import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Highlight from '@tiptap/extension-highlight';
 import Underline from '@tiptap/extension-underline';
 import { Mark, mergeAttributes } from '@tiptap/core';
 import { cn } from '@/lib/utils';
-import { Highlighter, Underline as UnderlineIcon, Waves, X, Bold, Italic } from 'lucide-react';
 import DOMPurify from 'dompurify';
 
 // Configure DOMPurify to allow only safe formatting tags
@@ -58,120 +57,6 @@ const WavyUnderline = Mark.create({
     };
   },
 });
-
-// Toolbar component
-interface ToolbarProps {
-  editor: Editor | null;
-  highlightColor: string;
-  underlineColor: string;
-  wavyColor: string;
-}
-
-const Toolbar: React.FC<ToolbarProps> = ({ editor, highlightColor, underlineColor, wavyColor }) => {
-  if (!editor) return null;
-
-  return (
-    <div 
-      className="flex items-center gap-1 p-1.5 border-b border-border/50 bg-muted/30 rounded-t-lg flex-wrap"
-      onMouseDown={(e) => e.preventDefault()} // Prevent blur when clicking toolbar
-    >
-      {/* Bold */}
-      <button
-        onMouseDown={(e) => e.preventDefault()}
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        className={cn(
-          'w-7 h-7 rounded-md border transition-all flex items-center justify-center',
-          editor.isActive('bold')
-            ? 'border-primary bg-primary/20'
-            : 'border-border hover:border-primary/50 bg-background'
-        )}
-        title="Жирный (Ctrl+B)"
-        type="button"
-      >
-        <Bold className="w-3.5 h-3.5" />
-      </button>
-
-      {/* Italic */}
-      <button
-        onMouseDown={(e) => e.preventDefault()}
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        className={cn(
-          'w-7 h-7 rounded-md border transition-all flex items-center justify-center',
-          editor.isActive('italic')
-            ? 'border-primary bg-primary/20'
-            : 'border-border hover:border-primary/50 bg-background'
-        )}
-        title="Курсив (Ctrl+I)"
-        type="button"
-      >
-        <Italic className="w-3.5 h-3.5" />
-      </button>
-
-      <div className="w-px h-5 bg-border mx-1" />
-      
-      {/* Marker/Highlight */}
-      <button
-        onMouseDown={(e) => e.preventDefault()}
-        onClick={() => editor.chain().focus().toggleHighlight().run()}
-        className={cn(
-          'w-7 h-7 rounded-md border transition-all flex items-center justify-center',
-          editor.isActive('highlight')
-            ? 'border-primary bg-primary/20'
-            : 'border-border hover:border-primary/50 bg-background'
-        )}
-        title="Маркер"
-        type="button"
-      >
-        <Highlighter className="w-3.5 h-3.5" />
-      </button>
-      
-      {/* Underline */}
-      <button
-        onMouseDown={(e) => e.preventDefault()}
-        onClick={() => editor.chain().focus().toggleUnderline().run()}
-        className={cn(
-          'w-7 h-7 rounded-md border transition-all flex items-center justify-center',
-          editor.isActive('underline')
-            ? 'border-primary bg-primary/20'
-            : 'border-border hover:border-primary/50 bg-background'
-        )}
-        title="Подчёркивание"
-        type="button"
-      >
-        <UnderlineIcon className="w-3.5 h-3.5" />
-      </button>
-      
-      {/* Wavy underline */}
-      <button
-        onMouseDown={(e) => e.preventDefault()}
-        onClick={() => editor.chain().focus().toggleWavyUnderline().run()}
-        className={cn(
-          'w-7 h-7 rounded-md border transition-all flex items-center justify-center',
-          editor.isActive('wavyUnderline')
-            ? 'border-primary bg-primary/20'
-            : 'border-border hover:border-primary/50 bg-background'
-        )}
-        title="Волнистая линия"
-        type="button"
-      >
-        <Waves className="w-3.5 h-3.5" />
-      </button>
-
-      <div className="w-px h-5 bg-border mx-1" />
-
-      {/* Clear formatting */}
-      <button
-        onMouseDown={(e) => e.preventDefault()}
-        onClick={() => editor.chain().focus().unsetAllMarks().run()}
-        className="w-7 h-7 rounded-md border border-border hover:border-destructive/50 bg-background transition-all flex items-center justify-center"
-        title="Убрать форматирование"
-        type="button"
-      >
-        <X className="w-3.5 h-3.5 text-muted-foreground" />
-      </button>
-    </div>
-  );
-};
 
 interface RichTextEditorProps {
   content: string;
@@ -334,14 +219,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       }}
     >
       <style>{dynamicStyles}</style>
-      {isFocused && (
-        <Toolbar 
-          editor={editor} 
-          highlightColor={highlightColor}
-          underlineColor={underlineColor}
-          wavyColor={wavyColor}
-        />
-      )}
       <EditorContent editor={editor} />
     </div>
   );
