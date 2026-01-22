@@ -118,46 +118,45 @@ const SYSTEM_PROMPT = `Ты — ИИ-ассистент для редактир�
 Если это просто вопрос — верни только message без newBlocks.
 Верни ТОЛЬКО валидный JSON без markdown-обёртки.`;
 
-// Generate image using Lovable AI gateway
-async function generateImage(description: string): Promise<string | null> {
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  if (!LOVABLE_API_KEY) {
-    console.error("LOVABLE_API_KEY not configured");
-    return null;
-  }
-
+// Generate image using Gemini API
+async function generateImage(description: string, apiKey: string): Promise<string | null> {
   try {
     console.log("Generating image for:", description);
     
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image-preview",
-        messages: [
-          {
-            role: "user",
-            content: `Generate a clean, professional illustration for an educational slide: ${description}. Style: modern, minimal, suitable for mobile app. No text on image.`
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `Generate a clean, professional illustration for an educational mobile app slide: ${description}. Style: modern, minimal, vibrant colors, no text on image.`
+            }]
+          }],
+          generationConfig: {
+            responseModalities: ["image", "text"]
           }
-        ],
-        modalities: ["image", "text"]
-      })
-    });
+        })
+      }
+    );
 
     if (!response.ok) {
-      console.error("Image generation failed:", response.status);
+      const errorText = await response.text();
+      console.error("Image generation failed:", response.status, errorText);
       return null;
     }
 
     const data = await response.json();
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    const parts = data.candidates?.[0]?.content?.parts || [];
     
-    if (imageUrl) {
-      console.log("Image generated successfully");
-      return imageUrl;
+    for (const part of parts) {
+      if (part.inlineData?.mimeType?.startsWith('image/')) {
+        const base64 = part.inlineData.data;
+        const mimeType = part.inlineData.mimeType;
+        console.log("Image generated successfully");
+        return `data:${mimeType};base64,${base64}`;
+      }
     }
     
     return null;
@@ -248,7 +247,7 @@ serve(async (req) => {
       for (const block of result.newBlocks) {
         if (block.type === 'image' && block.imageDescription && !block.imageUrl) {
           console.log("Found image block needing generation:", block.imageDescription);
-          const imageUrl = await generateImage(block.imageDescription);
+          const imageUrl = await generateImage(block.imageDescription, GEMINI_API_KEY);
           if (imageUrl) {
             block.imageUrl = imageUrl;
           }
