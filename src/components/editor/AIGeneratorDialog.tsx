@@ -400,7 +400,7 @@ ${JSON.stringify(researchData, null, 2)}
               console.log(`  Slide ${slideIdx + 1}: type=${slide.type}, hasImageUrl=${!!slide.imageUrl}, hasImageDescription=${!!slide.imageDescription}`);
               
               // Generate images for image_text slides that don't have imageUrl
-              if (slide.type === 'image_text' && !slide.imageUrl && slidesToIllustrate.length < 8) {
+              if (slide.type === 'image_text' && !slide.imageUrl) {
                 slidesToIllustrate.push({
                   lessonIdx,
                   slideIdx,
