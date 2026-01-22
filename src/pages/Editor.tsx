@@ -23,7 +23,7 @@ import { useCourses } from '@/hooks/useCourses';
 import { EditorHeader } from '@/components/editor/EditorHeader';
 import { LessonsList } from '@/components/editor/LessonsList';
 
-import { FullscreenPreview } from '@/components/editor/FullscreenPreview';
+import { CoursePlayer } from '@/components/runtime/CoursePlayer';
 
 import { 
   BlockPreview, 
@@ -468,8 +468,9 @@ const Editor: React.FC = () => {
 
   if (isPreviewMode) {
     return (
-      <FullscreenPreview 
-        courseId={course.id} 
+      <CoursePlayer 
+        courseId={course.id}
+        mode="preview"
         onClose={() => setIsPreviewMode(false)}
         initialLessonId={selectedLessonId || undefined}
         initialBlockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
