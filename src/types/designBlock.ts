@@ -14,6 +14,20 @@ export type SubBlockType =
 // Text highlight types
 export type TextHighlightType = 'none' | 'marker' | 'underline' | 'wavy';
 
+// Background types for sub-blocks
+export type SubBlockBackgroundType = 'none' | 'color' | 'gradient' | 'image';
+
+// Gradient directions
+export type GradientDirection = 
+  | 'to-t' 
+  | 'to-tr' 
+  | 'to-r' 
+  | 'to-br' 
+  | 'to-b' 
+  | 'to-bl' 
+  | 'to-l' 
+  | 'to-tl';
+
 // Sub-block interface
 export interface SubBlock {
   id: string;
@@ -61,6 +75,15 @@ export interface SubBlock {
   
   // Text highlighting
   highlight?: TextHighlightType;
+  
+  // Background styling
+  backgroundType?: SubBlockBackgroundType;
+  backgroundColor?: string;
+  gradientColors?: string[];
+  gradientDirection?: GradientDirection;
+  backgroundImageUrl?: string;
+  backgroundImageOpacity?: number;
+  backgroundOverlay?: 'none' | 'light' | 'dark';
 }
 
 // Sub-block configuration for the selector
@@ -186,6 +209,39 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
   },
 ];
 
+// Gradient presets
+export interface GradientPreset {
+  id: string;
+  name: string;
+  nameRu: string;
+  colors: string[];
+  direction: GradientDirection;
+}
+
+export const GRADIENT_PRESETS: GradientPreset[] = [
+  { id: 'sunset', name: 'Sunset', nameRu: 'Закат', colors: ['#f97316', '#ec4899'], direction: 'to-r' },
+  { id: 'ocean', name: 'Ocean', nameRu: 'Океан', colors: ['#06b6d4', '#3b82f6'], direction: 'to-r' },
+  { id: 'forest', name: 'Forest', nameRu: 'Лес', colors: ['#22c55e', '#14b8a6'], direction: 'to-r' },
+  { id: 'lavender', name: 'Lavender', nameRu: 'Лаванда', colors: ['#a855f7', '#6366f1'], direction: 'to-r' },
+  { id: 'fire', name: 'Fire', nameRu: 'Огонь', colors: ['#ef4444', '#f97316'], direction: 'to-t' },
+  { id: 'night', name: 'Night', nameRu: 'Ночь', colors: ['#1e293b', '#475569'], direction: 'to-b' },
+];
+
+// Helper to generate CSS gradient
+export const generateGradientCSS = (colors: string[], direction: GradientDirection): string => {
+  const dirMap: Record<GradientDirection, string> = {
+    'to-t': 'to top',
+    'to-tr': 'to top right',
+    'to-r': 'to right',
+    'to-br': 'to bottom right',
+    'to-b': 'to bottom',
+    'to-bl': 'to bottom left',
+    'to-l': 'to left',
+    'to-tl': 'to top left',
+  };
+  return `linear-gradient(${dirMap[direction]}, ${colors.join(', ')})`;
+};
+
 // Helper to create a new sub-block
 export const createSubBlock = (type: SubBlockType, order: number): SubBlock => ({
   id: crypto.randomUUID(),
@@ -193,6 +249,7 @@ export const createSubBlock = (type: SubBlockType, order: number): SubBlock => (
   order,
   textAlign: 'center',
   padding: 'medium',
+  backgroundType: 'none',
   ...(type === 'heading' ? { content: 'Заголовок', textSize: 'large' as const, fontWeight: 'bold' as const } : {}),
   ...(type === 'text' ? { content: 'Текст абзаца', textSize: 'medium' as const } : {}),
   ...(type === 'image' ? { imageSize: 'medium' as const } : {}),
