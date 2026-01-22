@@ -29,6 +29,7 @@ export interface SubBlock {
   // Image specific
   imageUrl?: string;
   imageSize?: 'small' | 'medium' | 'large' | 'full';
+  imageRotation?: number; // degrees, e.g. -15, 0, 15
   
   // Button specific
   buttonLabel?: string;
