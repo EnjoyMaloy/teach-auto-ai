@@ -14,6 +14,9 @@ export type SubBlockType =
 // Text highlight types
 export type TextHighlightType = 'none' | 'marker' | 'underline' | 'wavy';
 
+// Divider style types
+export type DividerStyleType = 'thin' | 'medium' | 'bold' | 'dashed' | 'dotted' | 'wavy';
+
 // Sub-block interface
 export interface SubBlock {
   id: string;
@@ -61,6 +64,9 @@ export interface SubBlock {
   
   // Text highlighting
   highlight?: TextHighlightType;
+  
+  // Divider specific
+  dividerStyle?: DividerStyleType;
 }
 
 // Sub-block configuration for the selector
