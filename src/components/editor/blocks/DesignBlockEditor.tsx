@@ -179,23 +179,32 @@ const SortableSubBlockItem: React.FC<{
         const headingHighlightStyles = getHighlightStyles(subBlock.highlight);
 
         return (
-          <div>
+          <div className="w-full">
             {isEditing ? (
-              <input
-                type="text"
+              <textarea
                 value={subBlock.content || ''}
                 onChange={(e) => onUpdate({ content: e.target.value })}
                 placeholder="Заголовок..."
+                rows={1}
                 className={cn(
-                  'w-full bg-transparent outline-none',
+                  'w-full bg-transparent outline-none resize-none overflow-hidden',
                   headingSizeClass, fontWeightClass, textAlignClass
                 )}
-                style={{ color: `hsl(${ds.foregroundColor})` }}
+                style={{ 
+                  color: `hsl(${ds.foregroundColor})`,
+                  minHeight: '1.5em',
+                  lineHeight: '1.3',
+                }}
                 onClick={(e) => e.stopPropagation()}
+                onInput={(e) => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = 'auto';
+                  target.style.height = target.scrollHeight + 'px';
+                }}
               />
             ) : (
               <h2 
-                className={cn(headingSizeClass, fontWeightClass, textAlignClass)}
+                className={cn(headingSizeClass, fontWeightClass, textAlignClass, 'break-words')}
                 style={{ color: `hsl(${ds.foregroundColor})` }}
               >
                 {subBlock.content || 'Заголовок'}
@@ -507,13 +516,16 @@ const SortableSubBlockItem: React.FC<{
     }
   };
 
+  // Badge and divider don't need extra padding
+  const skipPadding = subBlock.type === 'badge' || subBlock.type === 'divider';
+
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={cn(
-        'relative group',
-        paddingClass,
+        'relative group w-full',
+        !skipPadding && paddingClass,
         isDragging && 'opacity-50 z-50',
         isEditing && 'hover:bg-primary/5 rounded-lg transition-colors'
       )}
