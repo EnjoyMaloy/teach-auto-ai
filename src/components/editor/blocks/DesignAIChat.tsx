@@ -215,7 +215,7 @@ export const DesignAIChat: React.FC<DesignAIChatProps> = ({
                   'text-xs p-2.5 rounded-lg max-w-[90%]',
                   msg.role === 'user'
                     ? 'ml-auto bg-primary text-primary-foreground'
-                    : 'bg-foreground text-background'
+                    : 'bg-foreground/80 text-background'
                 )}
               >
                 {msg.content}
