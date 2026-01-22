@@ -314,19 +314,22 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
             
             {/* Explanation fields */}
             <div className="space-y-3 pt-3 border-t border-border">
-              <div className="space-y-2">
-                <Label className="text-foreground font-medium flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-success" />
-                  Объяснение почему это правильный ответ
-                </Label>
-                <Textarea
-                  value={block.explanationCorrect || ''}
-                  onChange={(e) => onUpdate({ explanationCorrect: e.target.value })}
-                  placeholder="Объясните, почему этот ответ правильный..."
-                  className="rounded-xl resize-none placeholder:text-muted-foreground/50"
-                  rows={2}
-                />
-              </div>
+              {/* Для single_choice показываем объяснение для правильного ответа */}
+              {block.type === 'single_choice' && (
+                <div className="space-y-2">
+                  <Label className="text-foreground font-medium flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-success" />
+                    Объяснение почему это правильный ответ
+                  </Label>
+                  <Textarea
+                    value={block.explanationCorrect || ''}
+                    onChange={(e) => onUpdate({ explanationCorrect: e.target.value })}
+                    placeholder="Объясните, почему этот ответ правильный..."
+                    className="rounded-xl resize-none placeholder:text-muted-foreground/50"
+                    rows={2}
+                  />
+                </div>
+              )}
               
               <div className="space-y-2">
                 <Label className="text-foreground font-medium flex items-center gap-2">

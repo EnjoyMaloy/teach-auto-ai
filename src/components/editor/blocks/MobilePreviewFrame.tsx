@@ -972,8 +972,12 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             </>
           )}
         </div>
-        {answerState === 'correct' && block?.explanationCorrect && (
+        {/* Для multiple_choice не показываем explanationCorrect */}
+        {answerState === 'correct' && block?.type !== 'multiple_choice' && block?.explanationCorrect && (
           <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanationCorrect}</p>
+        )}
+        {answerState === 'correct' && block?.type === 'multiple_choice' && block?.explanation && (
+          <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanation}</p>
         )}
         {answerState === 'incorrect' && block?.explanation && (
           <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanation}</p>
