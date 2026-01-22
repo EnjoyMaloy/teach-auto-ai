@@ -184,7 +184,7 @@ export const DesignAIChat: React.FC<DesignAIChatProps> = ({
       {isExpanded && (
         <div className="flex flex-col">
           {/* Messages area */}
-          <div className="max-h-64 overflow-y-auto px-3 pb-2 space-y-2">
+          <div className="max-h-96 overflow-y-auto px-3 pb-2 space-y-2">
             {messages.length === 0 && (
               <div className="text-center py-3">
                 <p className="text-xs text-muted-foreground mb-2">
