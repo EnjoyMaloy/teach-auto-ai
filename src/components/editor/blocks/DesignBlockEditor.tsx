@@ -49,16 +49,20 @@ interface DesignBlockEditorProps {
   onUpdateSubBlocks: (subBlocks: SubBlock[]) => void;
   designSystem?: CourseDesignSystem;
   isEditing?: boolean;
+  selectedSubBlockId?: string | null;
+  onSelectSubBlock?: (id: string | null) => void;
 }
 
 // Sortable sub-block item for the preview
 const SortableSubBlockItem: React.FC<{
   subBlock: SubBlock;
   isEditing: boolean;
+  isSelected?: boolean;
+  onSelect?: () => void;
   onUpdate: (updates: Partial<SubBlock>) => void;
   onDelete: () => void;
   designSystem?: CourseDesignSystem;
-}> = ({ subBlock, isEditing, onUpdate, onDelete, designSystem }) => {
+}> = ({ subBlock, isEditing, isSelected, onSelect, onUpdate, onDelete, designSystem }) => {
   // Component state - always called unconditionally at top level
   const [isTextFocused, setIsTextFocused] = useState(false);
   const [isHeadingFocused, setIsHeadingFocused] = useState(false);
@@ -708,11 +712,16 @@ const SortableSubBlockItem: React.FC<{
       ref={setNodeRef}
       style={style}
       className={cn(
-        'relative group w-full',
+        'relative group w-full cursor-pointer',
         !skipPadding && paddingClass,
         isDragging && 'opacity-50 z-50',
-        isEditing && 'hover:bg-primary/5 rounded-lg transition-colors'
+        isEditing && 'hover:bg-primary/5 rounded-lg transition-colors',
+        isSelected && 'ring-2 ring-primary ring-offset-2 rounded-lg'
       )}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect?.();
+      }}
     >
       {renderSubBlockContent()}
       
@@ -828,6 +837,8 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
   onUpdateSubBlocks,
   designSystem,
   isEditing = true,
+  selectedSubBlockId,
+  onSelectSubBlock,
 }) => {
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [showTemplateSelector, setShowTemplateSelector] = useState(subBlocks.length === 0);
@@ -912,6 +923,12 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
     <div 
       className="h-full flex flex-col p-4 overflow-auto w-full"
       style={{ backgroundColor: `hsl(${ds.backgroundColor})` }}
+      onClick={() => {
+        // Deselect when clicking empty space
+        if (isEditing) {
+          onSelectSubBlock?.(null);
+        }
+      }}
     >
       <DndContext
         sensors={sensors}
@@ -928,6 +945,8 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
                 key={subBlock.id}
                 subBlock={subBlock}
                 isEditing={isEditing}
+                isSelected={selectedSubBlockId === subBlock.id}
+                onSelect={() => onSelectSubBlock?.(subBlock.id)}
                 onUpdate={(updates) => handleUpdateSubBlock(subBlock.id, updates)}
                 onDelete={() => handleDeleteSubBlock(subBlock.id)}
                 designSystem={designSystem}

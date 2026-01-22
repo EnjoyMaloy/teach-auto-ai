@@ -67,6 +67,10 @@ interface MobilePreviewFrameProps {
   hideHeader?: boolean;
   /** If true, fills the container 100% without zoom scaling - for fullscreen/public view */
   fillContainer?: boolean;
+  /** Selected sub-block ID for design blocks */
+  selectedSubBlockId?: string | null;
+  /** Callback when sub-block is selected */
+  onSelectSubBlock?: (id: string | null) => void;
 }
 
 type AnswerState = 'idle' | 'correct' | 'incorrect' | 'partial';
@@ -100,6 +104,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   embedded = false,
   hideHeader = false,
   fillContainer = false,
+  selectedSubBlockId,
+  onSelectSubBlock,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   // Scale preview to fit container while maintaining fixed internal dimensions
@@ -414,6 +420,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             onUpdateSubBlocks={isReadOnly ? undefined : (subBlocks) => onUpdateBlock?.({ subBlocks })}
             designSystem={designSystem}
             isEditing={!isReadOnly}
+            selectedSubBlockId={selectedSubBlockId}
+            onSelectSubBlock={onSelectSubBlock}
           />
         );
 
