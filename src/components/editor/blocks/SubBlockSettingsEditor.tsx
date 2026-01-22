@@ -7,10 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { BadgeEditor } from './BadgeEditor';
 import { TableEditor } from './TableEditor';
+import { useTextEditor } from './TextEditorContext';
 import {
   Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Play,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
-  Highlighter, Underline, Waves,
+  Highlighter, Underline, Waves, Bold, Italic,
   ChevronLeft,
   // Icons for icon selector
   Star, Heart, CheckCircle, XCircle, AlertCircle,
@@ -60,6 +61,83 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
 }) => {
   const config = SUB_BLOCK_CONFIGS[subBlock.type];
   const IconComponent = subBlockIconMap[config.icon as keyof typeof subBlockIconMap];
+  const { activeEditor } = useTextEditor();
+
+  // Text formatting toolbar component
+  const TextFormattingToolbar = () => {
+    if (!activeEditor) {
+      return (
+        <div className="p-3 rounded-lg bg-muted/50 border border-border">
+          <p className="text-xs text-muted-foreground">
+            💡 Кликните на текст слева, чтобы активировать форматирование
+          </p>
+        </div>
+      );
+    }
+
+    const formatButtons = [
+      {
+        icon: Bold,
+        label: 'Жирный',
+        action: () => activeEditor.chain().focus().toggleBold().run(),
+        isActive: activeEditor.isActive('bold'),
+      },
+      {
+        icon: Italic,
+        label: 'Курсив',
+        action: () => activeEditor.chain().focus().toggleItalic().run(),
+        isActive: activeEditor.isActive('italic'),
+      },
+      {
+        icon: Highlighter,
+        label: 'Маркер',
+        action: () => activeEditor.chain().focus().toggleHighlight().run(),
+        isActive: activeEditor.isActive('highlight'),
+      },
+      {
+        icon: Underline,
+        label: 'Подчёркивание',
+        action: () => activeEditor.chain().focus().toggleUnderline().run(),
+        isActive: activeEditor.isActive('underline'),
+      },
+      {
+        icon: Waves,
+        label: 'Волна',
+        action: () => activeEditor.chain().focus().toggleWavyUnderline().run(),
+        isActive: activeEditor.isActive('wavyUnderline'),
+      },
+    ];
+
+    return (
+      <div className="space-y-2">
+        <Label className="text-xs text-muted-foreground">Форматирование</Label>
+        <div className="flex gap-1">
+          {formatButtons.map(({ icon: Icon, label, action, isActive }) => (
+            <button
+              key={label}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                action();
+              }}
+              className={cn(
+                "flex-1 p-2 rounded-lg transition-colors",
+                isActive
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted hover:bg-muted/80"
+              )}
+              title={label}
+            >
+              <Icon className="w-4 h-4 mx-auto" />
+            </button>
+          ))}
+        </div>
+        <p className="text-[10px] text-muted-foreground">
+          Выделите текст слева и нажмите кнопку
+        </p>
+      </div>
+    );
+  };
 
   // Alignment selector with optional justify option
   const renderAlignmentSelector = (includeJustify = true) => (
@@ -388,12 +466,8 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
             {renderTextSizeSelector()}
             {renderBackdropSelector()}
             
-            {/* Text formatting hint */}
-            <div className="p-3 rounded-lg bg-muted/50 border border-border">
-              <p className="text-xs text-muted-foreground">
-                💡 Выделите текст в редакторе слева, затем используйте появившуюся панель для форматирования (жирный, курсив, маркер, подчёркивание, волна)
-              </p>
-            </div>
+            {/* Text formatting toolbar */}
+            <TextFormattingToolbar />
             
             {/* Text rotation - slider */}
             <div className="space-y-3">
