@@ -30,8 +30,10 @@ const dbSlideToSlide = (row: any): Slide => ({
   sliderStep: row.slider_step,
   orderingItems: row.ordering_items as string[] | undefined,
   correctOrder: row.correct_order as string[] | undefined,
+  subBlocks: row.sub_blocks as any[] | undefined,
   backgroundColor: row.background_color,
   textColor: row.text_color,
+  textSize: row.text_size as 'small' | 'medium' | 'large' | 'xlarge' | undefined,
   createdAt: new Date(row.created_at),
   updatedAt: new Date(row.updated_at),
 });
@@ -337,8 +339,10 @@ export const useCourses = () => {
             slider_step: slide.sliderStep,
             ordering_items: slide.orderingItems as any,
             correct_order: slide.correctOrder as any,
+            sub_blocks: slide.subBlocks as any,
             background_color: slide.backgroundColor,
             text_color: slide.textColor,
+            text_size: slide.textSize,
             updated_at: new Date().toISOString(),
           };
 
