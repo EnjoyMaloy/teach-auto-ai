@@ -642,7 +642,13 @@ const SortableSubBlockItem: React.FC<{
         };
         
         return (
-          <div className={cn('w-full rounded-lg overflow-hidden', tBorder)} onClick={(e) => e.stopPropagation()}>
+          <div 
+            className={cn('w-full rounded-lg overflow-hidden', tBorder)} 
+            onClick={(e) => {
+              e.stopPropagation();
+              if (isEditing && onSelect) onSelect();
+            }}
+          >
             <table className="w-full">
               <tbody className={tStyle !== 'simple' ? 'divide-y divide-border' : ''}>
                 {tData.map((row, ri) => (
