@@ -59,6 +59,8 @@ const SortableSubBlockItem: React.FC<{
   designSystem?: CourseDesignSystem;
 }> = ({ subBlock, isEditing, onUpdate, onDelete, designSystem }) => {
   const [isTextFocused, setIsTextFocused] = useState(false);
+  // Heading character counter state (always called, unconditionally)
+  const [headingCounter, setHeadingCounter] = useState(29 - (subBlock.content || '').length);
   const {
     attributes,
     listeners,
@@ -180,8 +182,6 @@ const SortableSubBlockItem: React.FC<{
 
         // Limit heading to 29 characters
         const MAX_HEADING_CHARS = 29;
-        const [headingLength, setHeadingLength] = React.useState((subBlock.content || '').length);
-        const remainingChars = MAX_HEADING_CHARS - headingLength;
 
         return (
           <div className="w-full relative">
@@ -215,8 +215,8 @@ const SortableSubBlockItem: React.FC<{
                     sel?.addRange(range);
                   }
                 }
-                // Update counter only (not the state)
-                setHeadingLength((e.currentTarget.textContent || '').length);
+                // Update counter display using component-level state
+                setHeadingCounter(MAX_HEADING_CHARS - (e.currentTarget.textContent || '').length);
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -232,10 +232,10 @@ const SortableSubBlockItem: React.FC<{
               <div 
                 className={cn(
                   "absolute -bottom-5 right-0 text-xs",
-                  remainingChars <= 5 ? "text-destructive" : "text-muted-foreground"
+                  headingCounter <= 5 ? "text-destructive" : "text-muted-foreground"
                 )}
               >
-                {remainingChars}
+                {headingCounter}
               </div>
             )}
           </div>
