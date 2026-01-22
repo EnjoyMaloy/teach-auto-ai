@@ -650,19 +650,31 @@ const SortableSubBlockItem: React.FC<{
                     {row.map((cell, ci) => (
                       <td key={cell.id} className={cn('p-1', ri === 0 && 'font-medium bg-muted/50', tStyle === 'bordered' && 'border-r border-border last:border-r-0')}>
                         {isEditing ? (
-                          <input
-                            type="text"
+                          <textarea
                             value={cell.content}
                             onChange={(e) => handleCellChange(ri, ci, e.target.value)}
                             placeholder={ri === 0 ? 'Заголовок' : 'Ячейка'}
+                            rows={1}
                             className={cn(
-                              'w-full bg-transparent border-none outline-none px-1 py-0.5 rounded',
-                              'focus:bg-muted/50 transition-colors',
+                              'w-full bg-transparent border-none outline-none px-1 py-0.5 rounded resize-none',
+                              'focus:bg-muted/50 transition-colors overflow-hidden',
                               tSize, tAlign
                             )}
+                            style={{ minHeight: '1.5em' }}
+                            onInput={(e) => {
+                              const target = e.currentTarget;
+                              target.style.height = 'auto';
+                              target.style.height = target.scrollHeight + 'px';
+                            }}
+                            ref={(el) => {
+                              if (el) {
+                                el.style.height = 'auto';
+                                el.style.height = el.scrollHeight + 'px';
+                              }
+                            }}
                           />
                         ) : (
-                          <span className={cn(tSize, tAlign, 'block px-1 py-0.5')}>
+                          <span className={cn(tSize, tAlign, 'block px-1 py-0.5 whitespace-pre-wrap break-words')}>
                             {cell.content || '—'}
                           </span>
                         )}
