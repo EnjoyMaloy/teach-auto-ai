@@ -452,7 +452,9 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
     );
   };
 
-  // Fullscreen mode (Telegram / public link)
+  // Fullscreen mode (Telegram / public link on mobile)
+  console.log('CoursePlayer render:', { mode, fullscreen, courseId });
+  
   if (fullscreen) {
     return (
       <DesignSystemProvider config={course.designSystem}>
