@@ -392,9 +392,14 @@ ${JSON.stringify(researchData, null, 2)}
           // Find ALL slides that need images (image_text type), limit to 8
           const slidesToIllustrate: { lessonIdx: number; slideIdx: number; description: string }[] = [];
           
+          // Log all slide types for debugging
+          console.log('=== Analyzing slides for image generation ===');
           courseData.lessons.forEach((lesson, lessonIdx) => {
+            console.log(`Lesson ${lessonIdx + 1}: ${lesson.title}`);
             lesson.slides.forEach((slide, slideIdx) => {
-              // Generate images for image_text slides that have imageDescription
+              console.log(`  Slide ${slideIdx + 1}: type=${slide.type}, hasImageUrl=${!!slide.imageUrl}, hasImageDescription=${!!slide.imageDescription}`);
+              
+              // Generate images for image_text slides that don't have imageUrl
               if (slide.type === 'image_text' && !slide.imageUrl && slidesToIllustrate.length < 8) {
                 slidesToIllustrate.push({
                   lessonIdx,
@@ -402,10 +407,12 @@ ${JSON.stringify(researchData, null, 2)}
                   // Use imageDescription if available, otherwise fall back to content
                   description: slide.imageDescription || slide.content || lesson.title
                 });
+                console.log(`    -> Added to illustration queue with description: ${(slide.imageDescription || slide.content || '').substring(0, 50)}...`);
               }
             });
           });
 
+          console.log(`Total slides to illustrate: ${slidesToIllustrate.length}`);
           const totalImages = slidesToIllustrate.length;
           
           if (totalImages === 0) {
