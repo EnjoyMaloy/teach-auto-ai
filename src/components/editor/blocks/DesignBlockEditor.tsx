@@ -36,7 +36,7 @@ import { RichTextEditor } from './RichTextEditor';
 import {
   Plus, Trash2, GripVertical, Upload,
   Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Layers, Play,
-  Link, ExternalLink
+  ExternalLink
 } from 'lucide-react';
 import { AnimationBlock } from './AnimationBlock';
 
@@ -67,7 +67,6 @@ const SortableSubBlockItem: React.FC<{
   const [isTextFocused, setIsTextFocused] = useState(false);
   const [isHeadingFocused, setIsHeadingFocused] = useState(false);
   const [headingCounter, setHeadingCounter] = useState(45 - (subBlock.content || '').length);
-  const [isButtonUrlVisible, setIsButtonUrlVisible] = useState(false);
   
   const {
     attributes,
@@ -374,52 +373,21 @@ const SortableSubBlockItem: React.FC<{
         return (
           <div className={cn('flex flex-col gap-2', textAlignClass === 'text-center' ? 'items-center' : textAlignClass === 'text-right' ? 'items-end' : 'items-start')}>
             {isEditing ? (
-              <>
-                <input
-                  type="text"
-                  value={subBlock.buttonLabel || ''}
-                  onChange={(e) => onUpdate({ buttonLabel: e.target.value })}
-                  placeholder="Текст кнопки..."
-                  className="px-4 py-2 rounded-lg text-center font-medium outline-none"
-                  style={{ ...buttonVariantStyles, borderRadius: ds.borderRadius }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsButtonUrlVisible(true);
-                  }}
-                  onBlur={(e) => {
-                    // Hide URL input if clicking outside both inputs
-                    const relatedTarget = e.relatedTarget as HTMLElement;
-                    if (!relatedTarget?.closest('.button-url-input')) {
-                      setIsButtonUrlVisible(false);
-                    }
-                  }}
-                />
-                {isButtonUrlVisible && (
-                  <div className="flex items-center gap-2 w-full max-w-[250px] button-url-input">
-                    <Link className="w-4 h-4 flex-shrink-0" style={{ color: `hsl(${ds.foregroundColor} / 0.5)` }} />
-                    <input
-                      type="url"
-                      value={subBlock.buttonUrl || ''}
-                      onChange={(e) => onUpdate({ buttonUrl: e.target.value })}
-                      placeholder="https://example.com"
-                      className="flex-1 px-2 py-1 text-sm rounded border outline-none transition-colors duration-200 focus:border-primary"
-                      style={{ 
-                        borderColor: `hsl(${ds.mutedColor})`,
-                        backgroundColor: 'transparent',
-                        color: `hsl(${ds.foregroundColor})`,
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                      onBlur={(e) => {
-                        const relatedTarget = e.relatedTarget as HTMLElement;
-                        if (!relatedTarget?.closest('.button-url-input') && relatedTarget?.tagName !== 'INPUT') {
-                          setIsButtonUrlVisible(false);
-                        }
-                      }}
-                      autoFocus
-                    />
-                  </div>
-                )}
-              </>
+              <input
+                type="text"
+                value={subBlock.buttonLabel || ''}
+                onChange={(e) => onUpdate({ buttonLabel: e.target.value })}
+                placeholder="Текст кнопки..."
+                className="px-4 py-2 rounded-lg text-center font-medium outline-none"
+                style={{ ...buttonVariantStyles, borderRadius: ds.borderRadius }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onSelect) onSelect();
+                }}
+                onFocus={() => {
+                  if (onSelect) onSelect();
+                }}
+              />
             ) : (
               <button
                 className={cn(
