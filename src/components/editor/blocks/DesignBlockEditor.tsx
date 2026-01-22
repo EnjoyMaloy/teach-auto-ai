@@ -178,22 +178,21 @@ const SortableSubBlockItem: React.FC<{
 
         const headingHighlightStyles = getHighlightStyles(subBlock.highlight);
 
-        // Limit heading to 2 lines max
-        const MAX_HEADING_LINES = 2;
-        const APPROX_CHARS_PER_LINE = 30; // Approximate chars per line for mobile width
-        const MAX_HEADING_CHARS = MAX_HEADING_LINES * APPROX_CHARS_PER_LINE;
+        // Limit heading to 29 characters
+        const MAX_HEADING_CHARS = 29;
+        const currentLength = (subBlock.content || '').length;
+        const remainingChars = MAX_HEADING_CHARS - currentLength;
 
         return (
-          <div className="w-full">
+          <div className="w-full relative">
             <h2 
-              className={cn(headingSizeClass, fontWeightClass, textAlignClass, 'break-words whitespace-pre-wrap line-clamp-2')}
+              className={cn(headingSizeClass, fontWeightClass, textAlignClass, 'break-words whitespace-pre-wrap')}
               style={{ color: `hsl(${ds.foregroundColor})` }}
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={(e) => {
                 if (isEditing) {
                   const text = e.currentTarget.textContent || '';
-                  // Limit to max chars for ~2 lines
                   const limitedText = text.slice(0, MAX_HEADING_CHARS);
                   onUpdate({ content: limitedText });
                   if (text.length > MAX_HEADING_CHARS) {
@@ -213,6 +212,8 @@ const SortableSubBlockItem: React.FC<{
                   sel?.removeAllRanges();
                   sel?.addRange(range);
                 }
+                // Trigger update for counter
+                onUpdate({ content: e.currentTarget.textContent || '' });
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -224,6 +225,16 @@ const SortableSubBlockItem: React.FC<{
             >
               {subBlock.content || 'Заголовок'}
             </h2>
+            {isEditing && (
+              <div 
+                className={cn(
+                  "absolute -bottom-5 right-0 text-xs",
+                  remainingChars <= 5 ? "text-destructive" : "text-muted-foreground"
+                )}
+              >
+                {remainingChars}
+              </div>
+            )}
           </div>
         );
 
