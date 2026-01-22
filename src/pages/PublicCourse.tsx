@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { CoursePlayer } from '@/components/runtime/CoursePlayer';
+import { useParams } from 'react-router-dom';
+import { CoursePlayerV2 } from '@/components/runtime/CoursePlayerV2';
 
 // Extend Window interface for Telegram WebApp
 declare global {
@@ -9,12 +9,6 @@ declare global {
       WebApp?: {
         ready: () => void;
         expand: () => void;
-        isExpanded?: boolean;
-        initData?: string;
-        initDataUnsafe?: {
-          start_param?: string;
-        };
-        requestFullscreen?: () => void;
         disableVerticalSwipes?: () => void;
       };
     };
@@ -23,31 +17,17 @@ declare global {
 
 const PublicCourse: React.FC = () => {
   const { courseId } = useParams();
-  const navigate = useNavigate();
   
-  // Detect if running inside Telegram Mini App
-  const isTelegram = !!window.Telegram?.WebApp;
-
   // Initialize Telegram WebApp
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
-      
-      // Expand to full height
-      if (tg.expand) {
-        tg.expand();
-      }
-      
-      // Disable vertical swipes to prevent accidental closing
-      if (tg.disableVerticalSwipes) {
-        tg.disableVerticalSwipes();
-      }
+      tg.expand?.();
+      tg.disableVerticalSwipes?.();
     }
     
-    // Prevent overscroll on iOS
     document.body.style.overscrollBehavior = 'none';
-    
     return () => {
       document.body.style.overscrollBehavior = '';
     };
@@ -72,63 +52,23 @@ const PublicCourse: React.FC = () => {
     );
   }
 
-  // For Telegram: true fullscreen with safe areas
-  if (isTelegram) {
-    return (
-      <div 
-        className="fixed inset-0 overflow-hidden tg-fullscreen tg-no-bounce"
-        style={{ 
-          background: 'var(--tg-theme-bg-color, white)',
-          height: '100dvh',
-          width: '100dvw',
-          paddingTop: 'env(safe-area-inset-top, 0px)',
-          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-          paddingLeft: 'env(safe-area-inset-left, 0px)',
-          paddingRight: 'env(safe-area-inset-right, 0px)',
-          touchAction: 'pan-x pan-y',
-          WebkitOverflowScrolling: 'touch',
-        }}
-      >
-        <CoursePlayer 
-          courseId={courseId} 
-          mode="public" 
-          onClose={() => navigate('/')} 
-          fullscreen 
-        />
-      </div>
-    );
-  }
-
-  // Mobile web (not Telegram): also fullscreen
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  if (isMobile) {
-    return (
-      <div 
-        className="fixed inset-0 overflow-hidden"
-        style={{ 
-          background: 'white',
-          height: '100dvh',
-          width: '100vw',
-        }}
-      >
-        <CoursePlayer 
-          courseId={courseId} 
-          mode="public" 
-          onClose={() => navigate('/')} 
-          fullscreen 
-        />
-      </div>
-    );
-  }
-
-  // Desktop: CoursePlayer handles its own phone frame layout
+  // Fullscreen player - skip map, go directly to first lesson
   return (
-    <CoursePlayer 
-      courseId={courseId} 
-      mode="public" 
-      onClose={() => navigate('/')} 
-      // No fullscreen prop - uses phone frame with proper scaling
-    />
+    <div 
+      className="fixed inset-0 overflow-hidden"
+      style={{ 
+        height: '100dvh',
+        width: '100dvw',
+        paddingTop: 'env(safe-area-inset-top, 0px)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+      }}
+    >
+      <CoursePlayerV2 
+        courseId={courseId} 
+        mode="published" 
+        skipMap={true}
+      />
+    </div>
   );
 };
 
