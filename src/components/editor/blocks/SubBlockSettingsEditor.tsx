@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { BadgeEditor } from './BadgeEditor';
+import { TableEditor } from './TableEditor';
 import {
   Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Play,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
@@ -18,7 +19,7 @@ import {
 } from 'lucide-react';
 
 const subBlockIconMap = {
-  Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Play
+  Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Play, Table: Heading
 };
 
 // 20 universal icons for sub-block selection
@@ -59,7 +60,8 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
   const config = SUB_BLOCK_CONFIGS[subBlock.type];
   const IconComponent = subBlockIconMap[config.icon as keyof typeof subBlockIconMap];
 
-  const renderAlignmentSelector = () => (
+  // Alignment selector with optional justify option
+  const renderAlignmentSelector = (includeJustify = true) => (
     <div className="space-y-2">
       <Label className="text-xs text-muted-foreground">Выравнивание</Label>
       <div className="flex gap-1">
@@ -67,7 +69,7 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
           { value: 'left', icon: AlignLeft, label: 'Слева' },
           { value: 'center', icon: AlignCenter, label: 'По центру' },
           { value: 'right', icon: AlignRight, label: 'Справа' },
-          { value: 'justify', icon: AlignJustify, label: 'По ширине' },
+          ...(includeJustify ? [{ value: 'justify', icon: AlignJustify, label: 'По ширине' }] : []),
         ].map(({ value, icon: Icon, label }) => (
           <button
             key={value}
@@ -87,32 +89,31 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
     </div>
   );
 
-  const renderTextSizeSelector = () => (
-    <div className="space-y-2">
-      <Label className="text-xs text-muted-foreground">Размер текста</Label>
-      <div className="flex gap-1">
-        {[
-          { value: 'small', label: 'S' },
-          { value: 'medium', label: 'M' },
-          { value: 'large', label: 'L' },
-          { value: 'xlarge', label: 'XL' },
-        ].map(({ value, label }) => (
-          <button
-            key={value}
-            onClick={() => onUpdate({ textSize: value as 'small' | 'medium' | 'large' | 'xlarge' })}
-            className={cn(
-              "flex-1 py-1.5 px-2 rounded-lg text-sm font-medium transition-colors",
-              subBlock.textSize === value 
-                ? "bg-primary text-primary-foreground" 
-                : "bg-muted hover:bg-muted/80"
-            )}
-          >
-            {label}
-          </button>
-        ))}
+  // Text size selector - can specify which sizes to show
+  const renderTextSizeSelector = (sizes: Array<'small' | 'medium' | 'large' | 'xlarge'> = ['small', 'medium', 'large', 'xlarge']) => {
+    const sizeLabels = { small: 'S', medium: 'M', large: 'L', xlarge: 'XL' };
+    return (
+      <div className="space-y-2">
+        <Label className="text-xs text-muted-foreground">Размер текста</Label>
+        <div className="flex gap-1">
+          {sizes.map((value) => (
+            <button
+              key={value}
+              onClick={() => onUpdate({ textSize: value })}
+              className={cn(
+                "flex-1 py-1.5 px-2 rounded-lg text-sm font-medium transition-colors",
+                subBlock.textSize === value 
+                  ? "bg-primary text-primary-foreground" 
+                  : "bg-muted hover:bg-muted/80"
+              )}
+            >
+              {sizeLabels[value]}
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderHighlightSelector = () => (
     <div className="space-y-2">
@@ -374,8 +375,8 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
                 />
               </div>
             </div>
-            {renderAlignmentSelector()}
-            {renderTextSizeSelector()}
+            {renderAlignmentSelector(false)}
+            {renderTextSizeSelector(['large', 'xlarge'])}
           </>
         )}
 
@@ -385,6 +386,38 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
             {renderAlignmentSelector()}
             {renderTextSizeSelector()}
             {renderBackdropSelector()}
+            
+            {/* Text formatting */}
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Форматирование</Label>
+              <div className="flex gap-1">
+                {[
+                  { value: 'bold', icon: Type, label: 'Жирный', style: 'font-bold' },
+                  { value: 'italic', icon: Type, label: 'Курсив', style: 'italic' },
+                  { value: 'marker', icon: Highlighter, label: 'Маркер' },
+                  { value: 'underline', icon: Underline, label: 'Подчёркивание' },
+                  { value: 'wavy', icon: Waves, label: 'Волна' },
+                ].map(({ value, icon: Icon, label, style }) => (
+                  <button
+                    key={value}
+                    onClick={() => {
+                      // Toggle formatting in the content (this is a hint - actual formatting is in RichTextEditor)
+                      // For now we just show the UI
+                    }}
+                    className={cn(
+                      "flex-1 p-2 rounded-lg transition-colors",
+                      "bg-muted hover:bg-muted/80"
+                    )}
+                    title={label}
+                  >
+                    <Icon className={cn("w-4 h-4 mx-auto", style)} />
+                  </button>
+                ))}
+              </div>
+              <p className="text-[10px] text-muted-foreground">
+                Выделите текст в редакторе и нажмите кнопку
+              </p>
+            </div>
             
             {/* Text rotation */}
             <div className="space-y-2">
@@ -414,40 +447,21 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
           <>
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">Поворот</Label>
-              <div className="flex gap-1">
-                <button
-                  onClick={() => onUpdate({ imageRotation: -5 })}
-                  className={cn(
-                    "flex-1 py-2 px-3 rounded-lg text-sm transition-colors",
-                    subBlock.imageRotation === -5
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted hover:bg-muted/80"
-                  )}
-                >
-                  −5°
-                </button>
-                <button
-                  onClick={() => onUpdate({ imageRotation: 0 })}
-                  className={cn(
-                    "flex-1 py-2 px-3 rounded-lg text-sm transition-colors",
-                    subBlock.imageRotation === 0 || !subBlock.imageRotation
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted hover:bg-muted/80"
-                  )}
-                >
-                  0°
-                </button>
-                <button
-                  onClick={() => onUpdate({ imageRotation: 5 })}
-                  className={cn(
-                    "flex-1 py-2 px-3 rounded-lg text-sm transition-colors",
-                    subBlock.imageRotation === 5
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted hover:bg-muted/80"
-                  )}
-                >
-                  +5°
-                </button>
+              <div className="grid grid-cols-5 gap-1">
+                {[-5, -1, 0, 1, 5].map((angle) => (
+                  <button
+                    key={angle}
+                    onClick={() => onUpdate({ imageRotation: angle })}
+                    className={cn(
+                      "py-2 px-2 rounded-lg text-sm transition-colors",
+                      (subBlock.imageRotation === angle || (!subBlock.imageRotation && angle === 0))
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted hover:bg-muted/80"
+                    )}
+                  >
+                    {angle > 0 ? `+${angle}°` : angle === 0 ? '0°' : `${angle}°`}
+                  </button>
+                ))}
               </div>
             </div>
           </>
@@ -480,7 +494,7 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
         {/* Icon settings */}
         {subBlock.type === 'icon' && (
           <>
-            {renderAlignmentSelector()}
+            {renderAlignmentSelector(false)}
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">Иконка</Label>
               <div className="grid grid-cols-5 gap-1.5">
@@ -529,7 +543,7 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
         {/* Badge settings */}
         {subBlock.type === 'badge' && (
           <>
-            {renderAlignmentSelector()}
+            {renderAlignmentSelector(false)}
             {renderBadgeSizeSelector()}
             {renderBadgeVariantSelector()}
             
@@ -638,6 +652,72 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
                 ))}
               </div>
             </div>
+          </>
+        )}
+
+        {/* Table settings */}
+        {subBlock.type === 'table' && (
+          <>
+            {renderAlignmentSelector(false)}
+            
+            {/* Table style */}
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Стиль таблицы</Label>
+              <div className="flex gap-1">
+                {[
+                  { value: 'simple', label: 'Простой' },
+                  { value: 'striped', label: 'Полосы' },
+                  { value: 'bordered', label: 'Рамки' },
+                ].map(({ value, label }) => (
+                  <button
+                    key={value}
+                    onClick={() => onUpdate({ tableStyle: value as 'simple' | 'striped' | 'bordered' })}
+                    className={cn(
+                      "flex-1 py-1.5 px-2 rounded-lg text-xs transition-colors",
+                      (subBlock.tableStyle === value || (!subBlock.tableStyle && value === 'simple'))
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted hover:bg-muted/80"
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Table text size */}
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Размер текста</Label>
+              <div className="flex gap-1">
+                {[
+                  { value: 'small', label: 'S' },
+                  { value: 'medium', label: 'M' },
+                  { value: 'large', label: 'L' },
+                ].map(({ value, label }) => (
+                  <button
+                    key={value}
+                    onClick={() => onUpdate({ tableTextSize: value as 'small' | 'medium' | 'large' })}
+                    className={cn(
+                      "flex-1 py-1.5 px-2 rounded-lg text-sm font-medium transition-colors",
+                      (subBlock.tableTextSize === value || (!subBlock.tableTextSize && value === 'medium'))
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted hover:bg-muted/80"
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Table data editor */}
+            <TableEditor
+              tableData={subBlock.tableData || [[{ id: '1', content: '' }, { id: '2', content: '' }]]}
+              tableStyle={subBlock.tableStyle || 'simple'}
+              tableTextSize={subBlock.tableTextSize || 'medium'}
+              textAlign={(subBlock.textAlign as 'left' | 'center' | 'right') || 'left'}
+              onUpdate={onUpdate}
+            />
           </>
         )}
       </div>

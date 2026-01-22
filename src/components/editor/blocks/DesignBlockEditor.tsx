@@ -612,6 +612,31 @@ const SortableSubBlockItem: React.FC<{
           </div>
         );
 
+      case 'table':
+        const tData = subBlock.tableData || [[{ id: '1', content: '' }]];
+        const tStyle = subBlock.tableStyle || 'simple';
+        const tSize = { small: 'text-xs', medium: 'text-sm', large: 'text-base' }[subBlock.tableTextSize || 'medium'];
+        const tAlign = { left: 'text-left', center: 'text-center', right: 'text-right' }[subBlock.textAlign as 'left'|'center'|'right' || 'left'];
+        const tBorder = tStyle === 'bordered' ? 'border border-border' : '';
+        
+        return (
+          <div className={cn('w-full rounded-lg overflow-hidden', tBorder)}>
+            <table className="w-full">
+              <tbody className={tStyle !== 'simple' ? 'divide-y divide-border' : ''}>
+                {tData.map((row, ri) => (
+                  <tr key={ri} className={tStyle === 'striped' && ri % 2 === 1 ? 'bg-muted/30' : ''}>
+                    {row.map((cell) => (
+                      <td key={cell.id} className={cn('p-2', tSize, tAlign, ri === 0 && 'font-medium bg-muted/50', tStyle === 'bordered' && 'border-r border-border last:border-r-0')}>
+                        {cell.content || '—'}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+
       default:
         return null;
     }
