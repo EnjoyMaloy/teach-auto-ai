@@ -9,7 +9,7 @@ import { BadgeEditor } from './BadgeEditor';
 import { TableEditor } from './TableEditor';
 import { useTextEditor } from './TextEditorContext';
 import {
-  Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Play,
+  Heading, Type, Image, MousePointerClick, Minus, Plus, Sparkles, Tag, Play,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
   Highlighter, Underline, Waves, Bold, Italic,
   ChevronLeft,
@@ -761,6 +761,89 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
                     {label}
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* Row/column controls */}
+            <div className="space-y-3">
+              {/* Row controls */}
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">
+                  Строки: {(subBlock.tableData || [[]]).length}/5
+                </span>
+                <div className="flex gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const data = subBlock.tableData || [[{ id: '1', content: '' }]];
+                      if (data.length <= 1) return;
+                      onUpdate({ tableData: data.slice(0, -1) });
+                    }}
+                    disabled={(subBlock.tableData || [[]]).length <= 1}
+                    className="h-7 w-7 p-0"
+                  >
+                    <Minus className="w-3 h-3" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const data = subBlock.tableData || [[{ id: '1', content: '' }]];
+                      if (data.length >= 5) return;
+                      const cols = data[0]?.length || 2;
+                      const newRow = Array.from({ length: cols }, () => ({
+                        id: crypto.randomUUID(),
+                        content: '',
+                      }));
+                      onUpdate({ tableData: [...data, newRow] });
+                    }}
+                    disabled={(subBlock.tableData || [[]]).length >= 5}
+                    className="h-7 w-7 p-0"
+                  >
+                    <Plus className="w-3 h-3" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Column controls */}
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">
+                  Столбцы: {(subBlock.tableData?.[0] || []).length}/4
+                </span>
+                <div className="flex gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const data = subBlock.tableData || [[{ id: '1', content: '' }]];
+                      if ((data[0]?.length || 1) <= 1) return;
+                      const newData = data.map(row => row.slice(0, -1));
+                      onUpdate({ tableData: newData });
+                    }}
+                    disabled={(subBlock.tableData?.[0] || []).length <= 1}
+                    className="h-7 w-7 p-0"
+                  >
+                    <Minus className="w-3 h-3" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const data = subBlock.tableData || [[{ id: '1', content: '' }]];
+                      if ((data[0]?.length || 1) >= 4) return;
+                      const newData = data.map(row => [
+                        ...row,
+                        { id: crypto.randomUUID(), content: '' },
+                      ]);
+                      onUpdate({ tableData: newData });
+                    }}
+                    disabled={(subBlock.tableData?.[0] || []).length >= 4}
+                    className="h-7 w-7 p-0"
+                  >
+                    <Plus className="w-3 h-3" />
+                  </Button>
+                </div>
               </div>
             </div>
           </>
