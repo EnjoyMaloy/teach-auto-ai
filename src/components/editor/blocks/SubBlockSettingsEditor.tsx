@@ -429,8 +429,8 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
                 ))}
               </div>
               <p className="text-[10px] text-muted-foreground">
-                {subBlock.textWrapMode === 'justify' && 'Текст выравнивается по обоим краям'}
-                {subBlock.textWrapMode === 'hyphenate' && 'Слова переносятся через дефисы'}
+                {subBlock.textWrapMode === 'justify' && 'Ширина строк одинаковая за счёт пробелов между словами'}
+                {subBlock.textWrapMode === 'hyphenate' && 'Слова переносятся через дефисы, создавая ровный блок'}
                 {(!subBlock.textWrapMode || subBlock.textWrapMode === 'standard') && 'Обычный перенос по словам'}
               </p>
             </div>
