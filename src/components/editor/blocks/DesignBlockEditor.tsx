@@ -659,7 +659,20 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
     foregroundColor: designSystem?.foregroundColor || '240 10% 4%',
   };
 
-  if (showTemplateSelector && subBlocks.length === 0) {
+  // In read-only mode with no content, show empty state (not template selector)
+  if (subBlocks.length === 0 && !isEditing) {
+    return (
+      <div 
+        className="h-full flex flex-col items-center justify-center p-6"
+        style={{ backgroundColor: `hsl(${ds.backgroundColor})` }}
+      >
+        <p className="text-muted-foreground text-sm">Нет контента</p>
+      </div>
+    );
+  }
+
+  // In editing mode with no content, show template selector
+  if (showTemplateSelector && subBlocks.length === 0 && isEditing) {
     return (
       <div 
         className="h-full flex flex-col items-center justify-center p-6"
