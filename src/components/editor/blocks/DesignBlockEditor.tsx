@@ -58,9 +58,10 @@ const SortableSubBlockItem: React.FC<{
   onDelete: () => void;
   designSystem?: CourseDesignSystem;
 }> = ({ subBlock, isEditing, onUpdate, onDelete, designSystem }) => {
+  // Component state - always called unconditionally at top level
   const [isTextFocused, setIsTextFocused] = useState(false);
-  // Heading character counter state (always called, unconditionally)
   const [headingCounter, setHeadingCounter] = useState(29 - (subBlock.content || '').length);
+  
   const {
     attributes,
     listeners,
