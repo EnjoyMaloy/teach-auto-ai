@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
 import { BadgeEditor } from './BadgeEditor';
 import { TableEditor } from './TableEditor';
 import {
@@ -420,24 +421,25 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
         {/* Image settings */}
         {subBlock.type === 'image' && (
           <>
-            <div className="space-y-2">
-              <Label className="text-xs text-muted-foreground">Поворот</Label>
-              <div className="grid grid-cols-9 gap-0.5">
-                {[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5].map((angle) => (
-                  <button
-                    key={angle}
-                    onClick={() => onUpdate({ imageRotation: angle })}
-                    className={cn(
-                      "py-1.5 px-1 rounded-lg text-[10px] transition-colors",
-                      (subBlock.imageRotation === angle || (!subBlock.imageRotation && angle === 0))
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted hover:bg-muted/80",
-                      angle === 0 && "col-span-1"
-                    )}
-                  >
-                    {angle > 0 ? `+${angle}°` : angle === 0 ? '0°' : `${angle}°`}
-                  </button>
-                ))}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-muted-foreground">Поворот</Label>
+                <span className="text-xs font-medium">
+                  {(subBlock.imageRotation || 0) > 0 ? `+${subBlock.imageRotation}°` : `${subBlock.imageRotation || 0}°`}
+                </span>
+              </div>
+              <Slider
+                value={[subBlock.imageRotation || 0]}
+                onValueChange={(value) => onUpdate({ imageRotation: value[0] })}
+                min={-5}
+                max={5}
+                step={1}
+                className="w-full"
+              />
+              <div className="flex justify-between text-[10px] text-muted-foreground">
+                <span>-5°</span>
+                <span>0°</span>
+                <span>+5°</span>
               </div>
             </div>
           </>
