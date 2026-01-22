@@ -423,6 +423,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         onOpenChange={setShowPublishDialog}
         courseId={course.id}
         courseTitle={course.title}
+        course={course}
         isLinkAccessible={(course as any).isLinkAccessible || false}
         isPublished={course.isPublished}
         moderationStatus={(course as any).moderationStatus || null}

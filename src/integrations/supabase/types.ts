@@ -267,6 +267,160 @@ export type Database = {
         }
         Relationships: []
       }
+      published_lessons: {
+        Row: {
+          course_id: string
+          cover_image: string | null
+          created_at: string
+          description: string | null
+          estimated_minutes: number | null
+          icon: string | null
+          id: string
+          order: number
+          original_lesson_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          course_id: string
+          cover_image?: string | null
+          created_at?: string
+          description?: string | null
+          estimated_minutes?: number | null
+          icon?: string | null
+          id?: string
+          order?: number
+          original_lesson_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string
+          cover_image?: string | null
+          created_at?: string
+          description?: string | null
+          estimated_minutes?: number | null
+          icon?: string | null
+          id?: string
+          order?: number
+          original_lesson_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "published_lessons_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      published_slides: {
+        Row: {
+          audio_url: string | null
+          background_color: string | null
+          blank_word: string | null
+          content: string
+          correct_answer: Json | null
+          correct_order: Json | null
+          created_at: string
+          explanation: string | null
+          explanation_correct: string | null
+          explanation_partial: string | null
+          hints: Json | null
+          id: string
+          image_url: string | null
+          matching_pairs: Json | null
+          options: Json | null
+          order: number
+          ordering_items: Json | null
+          original_slide_id: string
+          published_lesson_id: string
+          slider_correct: number | null
+          slider_max: number | null
+          slider_min: number | null
+          slider_step: number | null
+          sub_blocks: Json | null
+          text_color: string | null
+          text_size: string | null
+          type: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          background_color?: string | null
+          blank_word?: string | null
+          content?: string
+          correct_answer?: Json | null
+          correct_order?: Json | null
+          created_at?: string
+          explanation?: string | null
+          explanation_correct?: string | null
+          explanation_partial?: string | null
+          hints?: Json | null
+          id?: string
+          image_url?: string | null
+          matching_pairs?: Json | null
+          options?: Json | null
+          order?: number
+          ordering_items?: Json | null
+          original_slide_id: string
+          published_lesson_id: string
+          slider_correct?: number | null
+          slider_max?: number | null
+          slider_min?: number | null
+          slider_step?: number | null
+          sub_blocks?: Json | null
+          text_color?: string | null
+          text_size?: string | null
+          type: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          background_color?: string | null
+          blank_word?: string | null
+          content?: string
+          correct_answer?: Json | null
+          correct_order?: Json | null
+          created_at?: string
+          explanation?: string | null
+          explanation_correct?: string | null
+          explanation_partial?: string | null
+          hints?: Json | null
+          id?: string
+          image_url?: string | null
+          matching_pairs?: Json | null
+          options?: Json | null
+          order?: number
+          ordering_items?: Json | null
+          original_slide_id?: string
+          published_lesson_id?: string
+          slider_correct?: number | null
+          slider_max?: number | null
+          slider_min?: number | null
+          slider_step?: number | null
+          sub_blocks?: Json | null
+          text_color?: string | null
+          text_size?: string | null
+          type?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "published_slides_published_lesson_id_fkey"
+            columns: ["published_lesson_id"]
+            isOneToOne: false
+            referencedRelation: "published_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       slides: {
         Row: {
           audio_url: string | null
