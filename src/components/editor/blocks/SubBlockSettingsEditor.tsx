@@ -386,42 +386,53 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
             
             {/* Text rotation */}
             <div className="space-y-2">
-              <Label className="text-xs text-muted-foreground">Поворот</Label>
-              <div className="flex gap-1">
-                <button
-                  onClick={() => onUpdate({ textRotation: -4 })}
-                  className={cn(
-                    "flex-1 py-2 px-3 rounded-lg text-sm transition-colors",
-                    subBlock.textRotation === -4
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted hover:bg-muted/80"
-                  )}
-                >
-                  −4°
-                </button>
-                <button
-                  onClick={() => onUpdate({ textRotation: 0 })}
-                  className={cn(
-                    "flex-1 py-2 px-3 rounded-lg text-sm transition-colors",
-                    subBlock.textRotation === 0 || !subBlock.textRotation
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted hover:bg-muted/80"
-                  )}
-                >
-                  0°
-                </button>
-                <button
-                  onClick={() => onUpdate({ textRotation: 4 })}
-                  className={cn(
-                    "flex-1 py-2 px-3 rounded-lg text-sm transition-colors",
-                    subBlock.textRotation === 4
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted hover:bg-muted/80"
-                  )}
-                >
-                  +4°
-                </button>
+              <Label className="text-xs text-muted-foreground">Наклон</Label>
+              <div className="grid grid-cols-7 gap-1">
+                {[-3, -2, -1, 0, 1, 2, 3].map((angle) => (
+                  <button
+                    key={angle}
+                    onClick={() => onUpdate({ textRotation: angle })}
+                    className={cn(
+                      "py-1.5 px-1 rounded-lg text-xs transition-colors",
+                      (subBlock.textRotation === angle || (!subBlock.textRotation && angle === 0))
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted hover:bg-muted/80"
+                    )}
+                  >
+                    {angle > 0 ? `+${angle}°` : angle === 0 ? '0°' : `${angle}°`}
+                  </button>
+                ))}
               </div>
+            </div>
+            
+            {/* Text wrap mode */}
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Перенос текста</Label>
+              <div className="grid grid-cols-3 gap-1">
+                {[
+                  { value: 'standard', label: 'Стандарт' },
+                  { value: 'justify', label: 'По ширине' },
+                  { value: 'hyphenate', label: 'Дефисы' },
+                ].map(({ value, label }) => (
+                  <button
+                    key={value}
+                    onClick={() => onUpdate({ textWrapMode: value as 'standard' | 'justify' | 'hyphenate' })}
+                    className={cn(
+                      "py-1.5 px-2 rounded-lg text-xs transition-colors",
+                      (subBlock.textWrapMode === value || (!subBlock.textWrapMode && value === 'standard'))
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted hover:bg-muted/80"
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-[10px] text-muted-foreground">
+                {subBlock.textWrapMode === 'justify' && 'Текст выравнивается по обоим краям'}
+                {subBlock.textWrapMode === 'hyphenate' && 'Слова переносятся через дефисы'}
+                {(!subBlock.textWrapMode || subBlock.textWrapMode === 'standard') && 'Обычный перенос по словам'}
+              </p>
             </div>
           </>
         )}

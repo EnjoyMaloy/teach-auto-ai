@@ -71,6 +71,7 @@ interface RichTextEditorProps {
   isEditing?: boolean;
   className?: string;
   onFocusChange?: (focused: boolean) => void;
+  textWrapMode?: 'standard' | 'justify' | 'hyphenate';
 }
 
 export const RichTextEditor: React.FC<RichTextEditorProps> = ({
@@ -86,6 +87,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   isEditing = true,
   className,
   onFocusChange,
+  textWrapMode = 'standard',
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const textSizeClass = {
@@ -100,6 +102,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     center: 'text-center',
     right: 'text-right',
   }[textAlign];
+
+  // Text wrap mode styles
+  const textWrapClass = {
+    standard: '',
+    justify: 'text-justify',
+    hyphenate: 'hyphens-auto',
+  }[textWrapMode];
 
   const editor = useEditor({
     extensions: [
@@ -141,7 +150,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         class: cn(
           'outline-none min-h-[60px] px-1 py-2',
           textSizeClass,
-          textAlignClass
+          textAlignClass,
+          textWrapClass
         ),
         style: `color: ${textColor}`,
       },
