@@ -76,7 +76,8 @@ export const RichTextToolbar: React.FC<RichTextToolbarProps> = ({
             <TooltipTrigger asChild>
               <button
                 type="button"
-                onClick={(e) => {
+                onMouseDown={(e) => {
+                  // Prevent blur and keep text selection
                   e.preventDefault();
                   e.stopPropagation();
                   action();

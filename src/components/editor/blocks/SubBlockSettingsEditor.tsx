@@ -391,7 +391,7 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
             {/* Text formatting hint */}
             <div className="p-3 rounded-lg bg-muted/50 border border-border">
               <p className="text-xs text-muted-foreground">
-                💡 Для форматирования текста (жирный, курсив, выделение) кликните на текст — появится панель инструментов
+                💡 Выделите текст в редакторе слева, затем используйте появившуюся панель для форматирования (жирный, курсив, маркер, подчёркивание, волна)
               </p>
             </div>
             
