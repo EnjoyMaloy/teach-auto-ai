@@ -271,35 +271,45 @@ ${JSON.stringify(researchData, null, 2)}
           message: 'Иллюстрации не требуются'
         });
       } else {
-        // Generate images in parallel (batch of 3 at a time to avoid rate limits)
+        // Generate images in parallel (batch of 2 at a time to avoid rate limits)
         let imagesGenerated = 0;
         let imageErrors = 0;
         
         // Process in smaller batches to avoid rate limits
-        const batchSize = 3;
+        const batchSize = 2;
         for (let i = 0; i < slidesToIllustrate.length; i += batchSize) {
           const batch = slidesToIllustrate.slice(i, i + batchSize);
           
-          const imagePromises = batch.map(async ({ lessonIdx, slideIdx, description }) => {
-            try {
-              // Use the detailed imageDescription for generation
-              const imageUrl = await generateImageForSlide(description, prompt);
-              if (imageUrl) {
-                courseData.lessons[lessonIdx].slides[slideIdx].imageUrl = imageUrl;
-                imagesGenerated++;
-                updateStep('images', { message: `Создано ${imagesGenerated} из ${totalImages} изображений...` });
-              } else {
+          try {
+            const imagePromises = batch.map(async ({ lessonIdx, slideIdx, description }) => {
+              try {
+                // Use the detailed imageDescription for generation
+                const imageUrl = await generateImageForSlide(description, prompt);
+                if (imageUrl) {
+                  courseData.lessons[lessonIdx].slides[slideIdx].imageUrl = imageUrl;
+                  imagesGenerated++;
+                  updateStep('images', { message: `Создано ${imagesGenerated} из ${totalImages} изображений...` });
+                } else {
+                  imageErrors++;
+                }
+                return imageUrl;
+              } catch (err) {
+                console.error('Image generation error:', err);
                 imageErrors++;
+                return null;
               }
-              return imageUrl;
-            } catch (err) {
-              console.error('Image generation error:', err);
-              imageErrors++;
-              return null;
-            }
-          });
+            });
 
-          await Promise.all(imagePromises);
+            await Promise.all(imagePromises);
+          } catch (batchError) {
+            console.error('Batch image generation error:', batchError);
+            imageErrors += batch.length;
+          }
+          
+          // Small delay between batches to avoid rate limits
+          if (i + batchSize < slidesToIllustrate.length) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
         }
 
         // Mark images step as completed (with warning if some failed)
