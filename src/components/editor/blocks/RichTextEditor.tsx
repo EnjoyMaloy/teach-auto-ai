@@ -245,6 +245,19 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       }}
     >
       <style>{dynamicStyles}</style>
+      
+      {/* Formatting toolbar - shown when focused */}
+      {showToolbar && isFocused && (
+        <div className="mb-2">
+          <RichTextToolbar 
+            editor={editor}
+            highlightColor={highlightColor}
+            underlineColor={underlineColor}
+            wavyColor={wavyColor}
+          />
+        </div>
+      )}
+      
       <EditorContent editor={editor} />
     </div>
   );
