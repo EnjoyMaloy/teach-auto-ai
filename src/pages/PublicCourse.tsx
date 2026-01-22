@@ -34,11 +34,23 @@ const PublicCourse: React.FC = () => {
     if (tg) {
       tg.ready();
       
+      // Expand to full height
+      if (tg.expand) {
+        tg.expand();
+      }
+      
       // Disable vertical swipes to prevent accidental closing
       if (tg.disableVerticalSwipes) {
         tg.disableVerticalSwipes();
       }
     }
+    
+    // Prevent overscroll on iOS
+    document.body.style.overscrollBehavior = 'none';
+    
+    return () => {
+      document.body.style.overscrollBehavior = '';
+    };
   }, []);
 
   // Validate courseId
@@ -60,11 +72,42 @@ const PublicCourse: React.FC = () => {
     );
   }
 
-  // For Telegram: true fullscreen
+  // For Telegram: true fullscreen with safe areas
   if (isTelegram) {
     return (
       <div 
-        className="fixed inset-0 overflow-hidden"
+        className="fixed inset-0 overflow-hidden flex flex-col tg-fullscreen tg-no-bounce"
+        style={{ 
+          background: 'var(--tg-theme-bg-color, white)',
+          // Use dynamic viewport height for mobile
+          height: '100dvh',
+          width: '100dvw',
+          // Telegram safe areas for notch/home indicator
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          paddingLeft: 'env(safe-area-inset-left, 0px)',
+          paddingRight: 'env(safe-area-inset-right, 0px)',
+          // Prevent iOS bounce
+          touchAction: 'pan-x pan-y',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        <CoursePlayer 
+          courseId={courseId} 
+          mode="public" 
+          onClose={() => navigate('/')} 
+          fullscreen 
+        />
+      </div>
+    );
+  }
+
+  // Mobile web (not Telegram): also fullscreen
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  if (isMobile) {
+    return (
+      <div 
+        className="fixed inset-0 overflow-hidden flex flex-col"
         style={{ 
           background: 'white',
           height: '100dvh',
