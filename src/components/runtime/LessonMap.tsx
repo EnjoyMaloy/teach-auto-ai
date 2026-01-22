@@ -138,7 +138,8 @@ export const LessonMap: React.FC<LessonMapProps> = ({
     const status = getLessonStatus(lesson, index);
     if (status === 'locked') return;
     
-    setSelectedPopupId(selectedPopupId === lesson.id ? null : lesson.id);
+    // Directly start the lesson
+    onSelectLesson(lesson.id, index);
   };
 
   const handleStartLesson = (lessonId: string, index: number) => {

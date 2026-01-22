@@ -464,7 +464,10 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
             backgroundColor: `hsl(var(--ds-background, var(--background)))`,
           }}
         >
-          {renderContent()}
+          {/* Wrap content in flex-1 to fill remaining space */}
+          <div className="flex-1 min-h-0 flex flex-col">
+            {renderContent()}
+          </div>
         </div>
       </DesignSystemProvider>
     );
@@ -521,7 +524,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
     <div className="fixed inset-0 bg-muted/80 flex items-center justify-center p-4">
       <DesignSystemProvider config={course.designSystem}>
         <div 
-          className="h-[calc(100vh-80px)] w-[calc((100vh-80px)*9/16)] max-w-[420px] rounded-[2.5rem] overflow-hidden border-4 border-foreground/10 shadow-2xl"
+          className="h-[calc(100vh-80px)] w-[calc((100vh-80px)*9/16)] max-w-[420px] rounded-[2.5rem] overflow-hidden border-4 border-foreground/10 shadow-2xl flex flex-col"
           style={{
             backgroundColor: `hsl(var(--ds-background, var(--background)))`,
           }}
