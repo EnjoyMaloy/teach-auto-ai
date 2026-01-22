@@ -97,9 +97,9 @@ export const SUB_BLOCK_CONFIGS: Record<SubBlockType, SubBlockConfig> = {
   button: {
     type: 'button',
     icon: 'MousePointerClick',
-    label: 'Button',
-    labelRu: 'Кнопка',
-    description: 'Интерактивная кнопка',
+    label: 'Link Button',
+    labelRu: 'Кнопка с ссылкой',
+    description: 'Кнопка с внешней ссылкой',
   },
   divider: {
     type: 'divider',
