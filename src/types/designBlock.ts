@@ -9,7 +9,8 @@ export type SubBlockType =
   | 'divider'
   | 'icon'
   | 'badge'
-  | 'animation';
+  | 'animation'
+  | 'table';
 
 // Text highlight types
 export type TextHighlightType = 'none' | 'marker' | 'underline' | 'wavy';
@@ -87,6 +88,17 @@ export interface SubBlock {
   
   // Divider specific
   dividerStyle?: DividerStyleType;
+  
+  // Table specific
+  tableData?: TableCell[][];
+  tableStyle?: 'simple' | 'striped' | 'bordered';
+  tableTextSize?: 'small' | 'medium' | 'large';
+}
+
+// Table cell interface
+export interface TableCell {
+  id: string;
+  content: string;
 }
 
 // Sub-block configuration for the selector
@@ -154,6 +166,13 @@ export const SUB_BLOCK_CONFIGS: Record<SubBlockType, SubBlockConfig> = {
     label: 'Animation',
     labelRu: 'Анимация',
     description: 'Lottie/Rive анимация',
+  },
+  table: {
+    type: 'table',
+    icon: 'Table',
+    label: 'Table',
+    labelRu: 'Таблица',
+    description: 'Таблица данных',
   },
 };
 
@@ -232,6 +251,15 @@ export const createSubBlock = (type: SubBlockType, order: number): SubBlock => (
   } : {}),
   ...(type === 'icon' ? { iconName: 'Star', iconSize: 'medium' as const } : {}),
   ...(type === 'animation' ? { animationSize: 'medium' as const, animationAutoplay: true, animationLoop: true } : {}),
+  ...(type === 'table' ? { 
+    tableData: [
+      [{ id: crypto.randomUUID(), content: 'Заголовок 1' }, { id: crypto.randomUUID(), content: 'Заголовок 2' }],
+      [{ id: crypto.randomUUID(), content: 'Ячейка 1' }, { id: crypto.randomUUID(), content: 'Ячейка 2' }],
+    ],
+    tableStyle: 'simple' as const,
+    tableTextSize: 'medium' as const,
+    textAlign: 'left' as const,
+  } : {}),
 });
 
 // Helper to create sub-blocks from template
