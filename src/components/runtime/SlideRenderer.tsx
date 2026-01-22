@@ -678,8 +678,9 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
         ? 'Частично верно' 
         : 'Неправильно';
 
+    // Для multiple_choice не показываем explanationCorrect - только explanation
     const explanation = answerState === 'correct'
-      ? slide?.explanationCorrect || slide?.explanation
+      ? (slide?.type === 'multiple_choice' ? slide?.explanation : (slide?.explanationCorrect || slide?.explanation))
       : answerState === 'partial'
         ? slide?.explanationPartial || slide?.explanation
         : slide?.explanation;
