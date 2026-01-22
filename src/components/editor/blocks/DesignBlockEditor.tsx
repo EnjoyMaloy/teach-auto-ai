@@ -24,7 +24,11 @@ import {
   createSubBlock,
   createSubBlocksFromTemplate,
   DesignTemplateId,
-  TextHighlightType
+  TextHighlightType,
+  SubBlockBackgroundType,
+  GradientDirection,
+  GRADIENT_PRESETS,
+  generateGradientCSS
 } from '@/types/designBlock';
 import { DEFAULT_DESIGN_BLOCK_SETTINGS } from '@/types/designSystem';
 import { CourseDesignSystem } from '@/types/course';
@@ -35,7 +39,7 @@ import { RichTextEditor } from './RichTextEditor';
 import {
   Plus, Trash2, GripVertical, Upload,
   Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Layers, Play,
-  Highlighter, Underline, Waves
+  Highlighter, Underline, Waves, Palette, ImageIcon
 } from 'lucide-react';
 import { AnimationBlock } from './AnimationBlock';
 
@@ -128,6 +132,121 @@ const SortableSubBlockItem: React.FC<{
         return {};
     }
   };
+
+  // Get background style for sub-block
+  const getBackgroundStyle = (): React.CSSProperties => {
+    const bgType = subBlock.backgroundType || 'none';
+    
+    switch (bgType) {
+      case 'color':
+        return {
+          backgroundColor: subBlock.backgroundColor || `hsl(${ds.primaryColor} / 0.1)`,
+        };
+      case 'gradient':
+        if (subBlock.gradientColors && subBlock.gradientColors.length >= 2) {
+          return {
+            background: generateGradientCSS(subBlock.gradientColors, subBlock.gradientDirection || 'to-r'),
+          };
+        }
+        return {};
+      case 'image':
+        if (subBlock.backgroundImageUrl) {
+          return {
+            backgroundImage: `url(${subBlock.backgroundImageUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          };
+        }
+        return {};
+      default:
+        return {};
+    }
+  };
+
+  // Background selector component
+  const BackgroundSelector: React.FC = () => (
+    <div className="flex flex-col gap-2 mt-3 pt-2 border-t border-border/30">
+      <div className="flex items-center gap-2">
+        <span className="text-[10px] text-muted-foreground">Фон:</span>
+        <div className="flex gap-1">
+          {([
+            { type: 'none' as const, icon: null, title: 'Без фона' },
+            { type: 'color' as const, icon: Palette, title: 'Цвет' },
+            { type: 'gradient' as const, icon: Layers, title: 'Градиент' },
+            { type: 'image' as const, icon: ImageIcon, title: 'Картинка' },
+          ] as const).map(({ type, icon: Icon, title }) => (
+            <button
+              key={type}
+              onClick={(e) => {
+                e.stopPropagation();
+                onUpdate({ backgroundType: type });
+              }}
+              className={cn(
+                'w-7 h-7 rounded-md border-2 transition-all flex items-center justify-center',
+                (subBlock.backgroundType === type || (!subBlock.backgroundType && type === 'none'))
+                  ? 'border-primary bg-primary/10'
+                  : 'border-border hover:border-primary/50 bg-background'
+              )}
+              title={title}
+            >
+              {Icon ? <Icon className="w-3.5 h-3.5" /> : <span className="text-xs">—</span>}
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      {/* Gradient presets */}
+      {subBlock.backgroundType === 'gradient' && (
+        <div className="flex flex-wrap gap-1 mt-1">
+          {GRADIENT_PRESETS.map((preset) => (
+            <button
+              key={preset.id}
+              onClick={(e) => {
+                e.stopPropagation();
+                onUpdate({
+                  gradientColors: preset.colors,
+                  gradientDirection: preset.direction,
+                });
+              }}
+              className={cn(
+                'w-8 h-8 rounded-md border-2 transition-all',
+                subBlock.gradientColors?.[0] === preset.colors[0]
+                  ? 'border-primary scale-110'
+                  : 'border-transparent hover:border-primary/50'
+              )}
+              style={{
+                background: generateGradientCSS(preset.colors, preset.direction),
+              }}
+              title={preset.nameRu}
+            />
+          ))}
+        </div>
+      )}
+      
+      {/* Background image upload */}
+      {subBlock.backgroundType === 'image' && (
+        <label className="flex items-center gap-2 cursor-pointer text-xs text-muted-foreground hover:text-foreground transition-colors">
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                  onUpdate({ backgroundImageUrl: event.target?.result as string });
+                };
+                reader.readAsDataURL(file);
+              }
+            }}
+          />
+          <Upload className="w-4 h-4" />
+          {subBlock.backgroundImageUrl ? 'Заменить изображение' : 'Загрузить изображение'}
+        </label>
+      )}
+    </div>
+  );
 
   // Highlight selector component
   const HighlightSelector: React.FC<{ currentHighlight?: TextHighlightType }> = ({ currentHighlight }) => (
@@ -507,13 +626,20 @@ const SortableSubBlockItem: React.FC<{
     }
   };
 
+  const backgroundStyle = getBackgroundStyle();
+  const hasBackground = subBlock.backgroundType && subBlock.backgroundType !== 'none';
+
   return (
     <div
       ref={setNodeRef}
-      style={style}
+      style={{
+        ...style,
+        ...backgroundStyle,
+        ...(hasBackground ? { borderRadius: '12px', padding: '12px' } : {}),
+      }}
       className={cn(
         'relative group',
-        paddingClass,
+        !hasBackground && paddingClass,
         isDragging && 'opacity-50 z-50',
         isEditing && 'hover:bg-primary/5 rounded-lg transition-colors'
       )}
@@ -543,6 +669,13 @@ const SortableSubBlockItem: React.FC<{
       )}
       
       {renderSubBlockContent()}
+      
+      {/* Background selector - show on hover in editing mode */}
+      {isEditing && (
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+          <BackgroundSelector />
+        </div>
+      )}
     </div>
   );
 };
