@@ -36,12 +36,25 @@ import { RichTextEditor } from './RichTextEditor';
 import {
   Plus, Trash2, GripVertical, Upload,
   Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Layers, Play,
-  ExternalLink
+  ExternalLink,
+  // Icons for icon sub-block
+  Star, Heart, CheckCircle, XCircle, AlertCircle,
+  Zap, Target, Trophy, Gift, Crown,
+  Flame, Rocket, Lightbulb, ThumbsUp, ThumbsDown,
+  Eye, Music, Camera, Book, Bookmark
 } from 'lucide-react';
 import { AnimationBlock } from './AnimationBlock';
 
 const iconMap = {
   Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Layers, Play
+};
+
+// Icon map for dynamic icon rendering in sub-blocks
+const subBlockIconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
+  Sparkles, Star, Heart, CheckCircle, XCircle, AlertCircle,
+  Zap, Target, Trophy, Gift, Crown,
+  Flame, Rocket, Lightbulb, ThumbsUp, ThumbsDown,
+  Eye, Music, Camera, Book, Bookmark
 };
 
 interface DesignBlockEditorProps {
@@ -493,13 +506,20 @@ const SortableSubBlockItem: React.FC<{
 
       case 'icon':
         const iconSizeClass = {
-          small: 'w-6 h-6',
           medium: 'w-10 h-10',
           large: 'w-16 h-16',
         }[subBlock.iconSize || 'medium'];
 
+        const IconComponent = subBlockIconMap[subBlock.iconName || 'Sparkles'] || Sparkles;
+
         return (
-          <div className={cn('flex', textAlignClass === 'text-center' ? 'justify-center' : textAlignClass === 'text-right' ? 'justify-end' : 'justify-start')}>
+          <div 
+            className={cn('flex', textAlignClass === 'text-center' ? 'justify-center' : textAlignClass === 'text-right' ? 'justify-end' : 'justify-start')}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (isEditing && onSelect) onSelect();
+            }}
+          >
             <div 
               className={cn('rounded-full flex items-center justify-center', iconSizeClass)}
               style={{ 
@@ -507,38 +527,60 @@ const SortableSubBlockItem: React.FC<{
                 padding: '0.75rem'
               }}
             >
-              <Sparkles className={iconSizeClass} style={{ color: `hsl(${ds.primaryColor})` }} />
+              <IconComponent className={iconSizeClass} style={{ color: `hsl(${ds.primaryColor})` }} />
             </div>
           </div>
         );
 
       case 'badge':
+        const badgeVariant = subBlock.badgeVariant || 'oval';
+        const badgeSize = subBlock.badgeSize || 'medium';
+        
+        // Size classes
+        const badgeSizeClasses = {
+          small: 'px-2 py-0.5 text-[10px]',
+          medium: 'px-3 py-1 text-xs',
+          large: 'px-4 py-1.5 text-sm',
+        }[badgeSize];
+        
+        // Variant styles - shape and style based, not color
+        const badgeVariantClasses = {
+          square: 'rounded-md',
+          oval: 'rounded-full',
+          contrast: 'rounded-lg',
+          pastel: 'rounded-xl',
+        }[badgeVariant];
+        
         const badgeVariantStyles = {
-          default: {
-            backgroundColor: `hsl(${ds.primaryColor} / 0.1)`,
+          square: {
+            backgroundColor: `hsl(${ds.primaryColor})`,
+            color: 'white',
+          },
+          oval: {
+            backgroundColor: `hsl(${ds.primaryColor} / 0.15)`,
             color: `hsl(${ds.primaryColor})`,
           },
-          success: {
-            backgroundColor: `hsl(${ds.successColor} / 0.1)`,
-            color: `hsl(${ds.successColor})`,
+          contrast: {
+            backgroundColor: `hsl(${ds.foregroundColor})`,
+            color: `hsl(${ds.mutedColor})`,
           },
-          warning: {
-            backgroundColor: 'hsl(45 93% 47% / 0.1)',
-            color: 'hsl(45 93% 47%)',
+          pastel: {
+            backgroundColor: `hsl(${ds.primaryColor} / 0.08)`,
+            color: `hsl(${ds.primaryColor} / 0.9)`,
+            border: `1px solid hsl(${ds.primaryColor} / 0.2)`,
           },
-          destructive: {
-            backgroundColor: 'hsl(0 84% 60% / 0.1)',
-            color: 'hsl(0 84% 60%)',
-          },
-        }[subBlock.badgeVariant || 'default'];
+        }[badgeVariant];
 
         return (
           <div className={cn('flex', textAlignClass === 'text-center' ? 'justify-center' : textAlignClass === 'text-right' ? 'justify-end' : 'justify-start')}>
             <span
-              className="px-3 py-1 rounded-full text-xs font-medium inline-block"
+              className={cn('font-medium inline-block', badgeSizeClasses, badgeVariantClasses)}
               style={badgeVariantStyles}
               contentEditable={isEditing}
               suppressContentEditableWarning
+              onFocus={() => {
+                if (isEditing && onSelect) onSelect();
+              }}
               onBlur={(e) => {
                 if (isEditing) {
                   onUpdate({ badgeText: e.currentTarget.textContent || '' });
