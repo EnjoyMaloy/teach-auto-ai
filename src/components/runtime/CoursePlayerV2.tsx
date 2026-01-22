@@ -202,11 +202,10 @@ export const CoursePlayerV2: React.FC<CoursePlayerV2Props> = ({
     return (
       <LessonMap
         lessons={course.lessons}
-        completedLessonIds={completedLessons}
+        completedLessons={completedLessons}
         currentLessonId={currentLesson?.id}
         onSelectLesson={handleSelectLesson}
         displayType={course.lessonsDisplayType}
-        designSystem={course.designSystem}
       />
     );
   }
