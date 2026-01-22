@@ -17,6 +17,17 @@ export type TextHighlightType = 'none' | 'marker' | 'underline' | 'wavy';
 // Divider style types
 export type DividerStyleType = 'thin' | 'medium' | 'bold' | 'dashed' | 'dotted' | 'wavy';
 
+// Badge icon types
+export type BadgeIconType = 'none' | 'emoji' | 'lucide' | 'custom';
+
+// Badge item for multiple badges
+export interface BadgeItem {
+  id: string;
+  text: string;
+  iconType: BadgeIconType;
+  iconValue?: string; // emoji character, lucide icon name, or custom image URL
+}
+
 // Sub-block interface
 export interface SubBlock {
   id: string;
@@ -45,6 +56,10 @@ export interface SubBlock {
   badgeText?: string;
   badgeVariant?: 'square' | 'oval' | 'contrast' | 'pastel';
   badgeSize?: 'small' | 'medium' | 'large';
+  
+  // Multiple badges support
+  badges?: BadgeItem[];
+  badgeLayout?: 'horizontal' | 'vertical';
   
   // Animation (Rive/Lottie) specific
   animationUrl?: string;
@@ -208,7 +223,13 @@ export const createSubBlock = (type: SubBlockType, order: number): SubBlock => (
   ...(type === 'text' ? { content: 'Текст абзаца', textSize: 'medium' as const } : {}),
   ...(type === 'image' ? { imageSize: 'medium' as const } : {}),
   ...(type === 'button' ? { buttonLabel: 'Кнопка', buttonVariant: 'primary' as const } : {}),
-  ...(type === 'badge' ? { badgeText: 'Бейдж', badgeVariant: 'oval' as const, badgeSize: 'medium' as const } : {}),
+  ...(type === 'badge' ? { 
+    badgeText: 'Бейдж', 
+    badgeVariant: 'oval' as const, 
+    badgeSize: 'medium' as const,
+    badges: [{ id: crypto.randomUUID(), text: 'Бейдж', iconType: 'none' as const }],
+    badgeLayout: 'horizontal' as const,
+  } : {}),
   ...(type === 'icon' ? { iconName: 'Star', iconSize: 'medium' as const } : {}),
   ...(type === 'animation' ? { animationSize: 'medium' as const, animationAutoplay: true, animationLoop: true } : {}),
 });

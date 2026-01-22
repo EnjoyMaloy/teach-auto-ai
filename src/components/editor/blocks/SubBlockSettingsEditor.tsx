@@ -1,9 +1,10 @@
 import React from 'react';
-import { SubBlock, SubBlockType, SUB_BLOCK_CONFIGS, TextHighlightType, DividerStyleType } from '@/types/designBlock';
+import { SubBlock, SubBlockType, SUB_BLOCK_CONFIGS, TextHighlightType, DividerStyleType, BadgeItem } from '@/types/designBlock';
 import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { BadgeEditor } from './BadgeEditor';
 import {
   Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Play,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
@@ -531,6 +532,14 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
             {renderAlignmentSelector()}
             {renderBadgeSizeSelector()}
             {renderBadgeVariantSelector()}
+            
+            {/* Multiple badges editor */}
+            <BadgeEditor
+              badges={subBlock.badges || [{ id: crypto.randomUUID(), text: subBlock.badgeText || 'Бейдж', iconType: 'none' }]}
+              layout={subBlock.badgeLayout || 'horizontal'}
+              onBadgesChange={(badges) => onUpdate({ badges })}
+              onLayoutChange={(badgeLayout) => onUpdate({ badgeLayout })}
+            />
           </>
         )}
 

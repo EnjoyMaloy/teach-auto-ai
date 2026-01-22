@@ -538,15 +538,17 @@ const SortableSubBlockItem: React.FC<{
       case 'badge':
         const badgeVariant = subBlock.badgeVariant || 'oval';
         const badgeSize = subBlock.badgeSize || 'medium';
+        const badgeLayout = subBlock.badgeLayout || 'horizontal';
+        const badges = subBlock.badges || [{ id: '1', text: subBlock.badgeText || 'Бейдж', iconType: 'none' as const }];
         
         // Size classes
         const badgeSizeClasses = {
-          small: 'px-2 py-0.5 text-[10px]',
-          medium: 'px-3 py-1 text-xs',
-          large: 'px-4 py-1.5 text-sm',
+          small: 'px-2 py-0.5 text-[10px] gap-1',
+          medium: 'px-3 py-1 text-xs gap-1.5',
+          large: 'px-4 py-1.5 text-sm gap-2',
         }[badgeSize];
         
-        // Variant styles - shape and style based, not color
+        // Variant styles
         const badgeVariantClasses = {
           square: 'rounded-md',
           oval: 'rounded-full',
@@ -555,50 +557,37 @@ const SortableSubBlockItem: React.FC<{
         }[badgeVariant];
         
         const badgeVariantStyles = {
-          square: {
-            backgroundColor: `hsl(${ds.primaryColor})`,
-            color: 'white',
-          },
-          oval: {
-            backgroundColor: `hsl(${ds.primaryColor} / 0.15)`,
-            color: `hsl(${ds.primaryColor})`,
-          },
-          contrast: {
-            backgroundColor: `hsl(${ds.foregroundColor})`,
-            color: `hsl(${ds.mutedColor})`,
-          },
-          pastel: {
-            backgroundColor: `hsl(${ds.primaryColor} / 0.08)`,
-            color: `hsl(${ds.primaryColor} / 0.9)`,
-            border: `1px solid hsl(${ds.primaryColor} / 0.2)`,
-          },
+          square: { backgroundColor: `hsl(${ds.primaryColor})`, color: 'white' },
+          oval: { backgroundColor: `hsl(${ds.primaryColor} / 0.15)`, color: `hsl(${ds.primaryColor})` },
+          contrast: { backgroundColor: `hsl(${ds.foregroundColor})`, color: `hsl(${ds.mutedColor})` },
+          pastel: { backgroundColor: `hsl(${ds.primaryColor} / 0.08)`, color: `hsl(${ds.primaryColor} / 0.9)`, border: `1px solid hsl(${ds.primaryColor} / 0.2)` },
         }[badgeVariant];
 
+        const renderBadgeIcon = (badge: typeof badges[0]) => {
+          if (badge.iconType === 'none' || !badge.iconValue) return null;
+          if (badge.iconType === 'emoji') return <span>{badge.iconValue}</span>;
+          if (badge.iconType === 'custom' && badge.iconValue) {
+            return <img src={badge.iconValue} alt="" className="w-3 h-3 object-contain" />;
+          }
+          return null;
+        };
+
         return (
-          <div className={cn('flex', textAlignClass === 'text-center' ? 'justify-center' : textAlignClass === 'text-right' ? 'justify-end' : 'justify-start')}>
-            <span
-              className={cn('font-medium inline-block', badgeSizeClasses, badgeVariantClasses)}
-              style={badgeVariantStyles}
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onFocus={() => {
-                if (isEditing && onSelect) onSelect();
-              }}
-              onBlur={(e) => {
-                if (isEditing) {
-                  onUpdate({ badgeText: e.currentTarget.textContent || '' });
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  e.currentTarget.blur();
-                }
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {subBlock.badgeText || 'Бейдж'}
-            </span>
+          <div className={cn(
+            'flex gap-1.5',
+            badgeLayout === 'vertical' ? 'flex-col items-start' : 'flex-wrap',
+            textAlignClass === 'text-center' ? 'justify-center' : textAlignClass === 'text-right' ? 'justify-end' : 'justify-start'
+          )}>
+            {badges.map((badge) => (
+              <span
+                key={badge.id}
+                className={cn('font-medium inline-flex items-center', badgeSizeClasses, badgeVariantClasses)}
+                style={badgeVariantStyles}
+              >
+                {renderBadgeIcon(badge)}
+                {badge.text}
+              </span>
+            ))}
           </div>
         );
 
