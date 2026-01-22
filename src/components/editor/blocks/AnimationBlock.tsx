@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Play, Film } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { RiveAnimation } from './RiveAnimation';
 import { LottieAnimation } from './LottieAnimation';
 
@@ -38,7 +37,6 @@ export const AnimationBlock: React.FC<AnimationBlockProps> = ({
   onUpdate,
   designSystem,
 }) => {
-  const [showTypeSelector, setShowTypeSelector] = useState(!src && !animationType);
 
   const ds = {
     primaryColor: designSystem?.primaryColor || '262 83% 58%',
@@ -68,44 +66,17 @@ export const AnimationBlock: React.FC<AnimationBlockProps> = ({
   // If we have a src but no type, try to detect it
   const effectiveType = animationType || (src ? detectAnimationType(src) : undefined);
 
-  // If no animation and editing, show type selector
-  if (!src && isEditing && showTypeSelector) {
+  // If no animation, show placeholder
+  if (!src) {
     return (
       <div
-        className={cn('flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-6', sizeClasses[size])}
+        className={cn('flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-6', sizeClasses[size])}
         style={{ borderColor: `hsl(${ds.mutedColor})` }}
       >
-        <span className="text-sm font-medium" style={{ color: `hsl(${ds.foregroundColor})` }}>
-          Выберите формат анимации
+        <Play className="w-8 h-8" style={{ color: `hsl(${ds.foregroundColor} / 0.3)` }} />
+        <span className="text-xs text-muted-foreground text-center">
+          {isEditing ? 'Выберите формат и загрузите файл →' : 'Нет анимации'}
         </span>
-        <div className="flex gap-3">
-          <Button
-            variant="outline"
-            className="flex flex-col h-auto py-4 px-6 gap-2"
-            onClick={(e) => {
-              e.stopPropagation();
-              onUpdate?.({ animationType: 'lottie' });
-              setShowTypeSelector(false);
-            }}
-          >
-            <Film className="w-8 h-8" style={{ color: `hsl(${ds.primaryColor})` }} />
-            <span className="text-xs font-medium">Lottie</span>
-            <span className="text-[10px] text-muted-foreground">.json</span>
-          </Button>
-          <Button
-            variant="outline"
-            className="flex flex-col h-auto py-4 px-6 gap-2"
-            onClick={(e) => {
-              e.stopPropagation();
-              onUpdate?.({ animationType: 'rive' });
-              setShowTypeSelector(false);
-            }}
-          >
-            <Play className="w-8 h-8" style={{ color: `hsl(${ds.primaryColor})` }} />
-            <span className="text-xs font-medium">Rive</span>
-            <span className="text-[10px] text-muted-foreground">.riv</span>
-          </Button>
-        </div>
       </div>
     );
   }
@@ -140,46 +111,6 @@ export const AnimationBlock: React.FC<AnimationBlockProps> = ({
         }}
         designSystem={designSystem}
       />
-    );
-  }
-
-  // Default: show type selector if editing, placeholder if not
-  if (isEditing) {
-    return (
-      <div
-        className={cn('flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-6', sizeClasses[size])}
-        style={{ borderColor: `hsl(${ds.mutedColor})` }}
-      >
-        <span className="text-sm font-medium" style={{ color: `hsl(${ds.foregroundColor})` }}>
-          Выберите формат анимации
-        </span>
-        <div className="flex gap-3">
-          <Button
-            variant="outline"
-            className="flex flex-col h-auto py-4 px-6 gap-2"
-            onClick={(e) => {
-              e.stopPropagation();
-              onUpdate?.({ animationType: 'lottie' });
-            }}
-          >
-            <Film className="w-8 h-8" style={{ color: `hsl(${ds.primaryColor})` }} />
-            <span className="text-xs font-medium">Lottie</span>
-            <span className="text-[10px] text-muted-foreground">.json</span>
-          </Button>
-          <Button
-            variant="outline"
-            className="flex flex-col h-auto py-4 px-6 gap-2"
-            onClick={(e) => {
-              e.stopPropagation();
-              onUpdate?.({ animationType: 'rive' });
-            }}
-          >
-            <Play className="w-8 h-8" style={{ color: `hsl(${ds.primaryColor})` }} />
-            <span className="text-xs font-medium">Rive</span>
-            <span className="text-[10px] text-muted-foreground">.riv</span>
-          </Button>
-        </div>
-      </div>
     );
   }
 

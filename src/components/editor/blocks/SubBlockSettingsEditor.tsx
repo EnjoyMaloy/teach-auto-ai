@@ -8,12 +8,41 @@ import {
   Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Play,
   AlignLeft, AlignCenter, AlignRight,
   Highlighter, Underline, Waves,
-  ChevronLeft
+  ChevronLeft,
+  // Icons for icon selector
+  Star, Heart, CheckCircle, XCircle, AlertCircle,
+  Zap, Target, Trophy, Gift, Crown,
+  Flame, Rocket, Lightbulb, ThumbsUp, ThumbsDown,
+  Eye, Music, Camera, Book, Bookmark
 } from 'lucide-react';
 
 const subBlockIconMap = {
   Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Play
 };
+
+// 20 universal icons for sub-block selection
+const ICON_OPTIONS = [
+  { name: 'Sparkles', icon: Sparkles },
+  { name: 'Star', icon: Star },
+  { name: 'Heart', icon: Heart },
+  { name: 'CheckCircle', icon: CheckCircle },
+  { name: 'XCircle', icon: XCircle },
+  { name: 'AlertCircle', icon: AlertCircle },
+  { name: 'Zap', icon: Zap },
+  { name: 'Target', icon: Target },
+  { name: 'Trophy', icon: Trophy },
+  { name: 'Gift', icon: Gift },
+  { name: 'Crown', icon: Crown },
+  { name: 'Flame', icon: Flame },
+  { name: 'Rocket', icon: Rocket },
+  { name: 'Lightbulb', icon: Lightbulb },
+  { name: 'ThumbsUp', icon: ThumbsUp },
+  { name: 'ThumbsDown', icon: ThumbsDown },
+  { name: 'Eye', icon: Eye },
+  { name: 'Music', icon: Music },
+  { name: 'Camera', icon: Camera },
+  { name: 'Book', icon: Book },
+];
 
 interface SubBlockSettingsEditorProps {
   subBlock: SubBlock;
@@ -200,17 +229,43 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
       <Label className="text-xs text-muted-foreground">Стиль бейджа</Label>
       <div className="grid grid-cols-2 gap-1">
         {[
-          { value: 'default', label: 'Обычный' },
-          { value: 'success', label: 'Успех' },
-          { value: 'warning', label: 'Внимание' },
-          { value: 'destructive', label: 'Ошибка' },
+          { value: 'square', label: 'Квадрат' },
+          { value: 'oval', label: 'Овал' },
+          { value: 'contrast', label: 'Контраст' },
+          { value: 'pastel', label: 'Пастель' },
         ].map(({ value, label }) => (
           <button
             key={value}
-            onClick={() => onUpdate({ badgeVariant: value as 'default' | 'success' | 'warning' | 'destructive' })}
+            onClick={() => onUpdate({ badgeVariant: value as 'square' | 'oval' | 'contrast' | 'pastel' })}
             className={cn(
               "py-2 px-3 rounded-lg text-sm transition-colors",
-              subBlock.badgeVariant === value 
+              (subBlock.badgeVariant === value || (!subBlock.badgeVariant && value === 'oval'))
+                ? "bg-primary text-primary-foreground" 
+                : "bg-muted hover:bg-muted/80"
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderBadgeSizeSelector = () => (
+    <div className="space-y-2">
+      <Label className="text-xs text-muted-foreground">Размер</Label>
+      <div className="flex gap-1">
+        {[
+          { value: 'small', label: 'S' },
+          { value: 'medium', label: 'M' },
+          { value: 'large', label: 'L' },
+        ].map(({ value, label }) => (
+          <button
+            key={value}
+            onClick={() => onUpdate({ badgeSize: value as 'small' | 'medium' | 'large' })}
+            className={cn(
+              "flex-1 py-1.5 px-2 rounded-lg text-sm font-medium transition-colors",
+              (subBlock.badgeSize === value || (!subBlock.badgeSize && value === 'medium'))
                 ? "bg-primary text-primary-foreground" 
                 : "bg-muted hover:bg-muted/80"
             )}
@@ -298,13 +353,13 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
               <Label className="text-xs text-muted-foreground">Поворот</Label>
               <div className="flex gap-1">
                 <button
-                  onClick={() => onUpdate({ imageRotation: (subBlock.imageRotation || 0) - 15 })}
+                  onClick={() => onUpdate({ imageRotation: (subBlock.imageRotation || 0) - 8 })}
                   className={cn(
                     "flex-1 py-2 px-3 rounded-lg text-sm transition-colors",
                     "bg-muted hover:bg-muted/80"
                   )}
                 >
-                  ↺ −15°
+                  ↺ −8°
                 </button>
                 <button
                   onClick={() => onUpdate({ imageRotation: 0 })}
@@ -318,13 +373,13 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
                   0°
                 </button>
                 <button
-                  onClick={() => onUpdate({ imageRotation: (subBlock.imageRotation || 0) + 15 })}
+                  onClick={() => onUpdate({ imageRotation: (subBlock.imageRotation || 0) + 8 })}
                   className={cn(
                     "flex-1 py-2 px-3 rounded-lg text-sm transition-colors",
                     "bg-muted hover:bg-muted/80"
                   )}
                 >
-                  +15° ↻
+                  +8° ↻
                 </button>
               </div>
               {subBlock.imageRotation !== 0 && subBlock.imageRotation && (
@@ -365,19 +420,38 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
           <>
             {renderAlignmentSelector()}
             <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Иконка</Label>
+              <div className="grid grid-cols-5 gap-1.5">
+                {ICON_OPTIONS.map(({ name, icon: IconComponent }) => (
+                  <button
+                    key={name}
+                    onClick={() => onUpdate({ iconName: name })}
+                    className={cn(
+                      "p-2 rounded-lg transition-colors flex items-center justify-center",
+                      (subBlock.iconName === name || (!subBlock.iconName && name === 'Sparkles'))
+                        ? "bg-primary text-primary-foreground" 
+                        : "bg-muted hover:bg-muted/80"
+                    )}
+                    title={name}
+                  >
+                    <IconComponent className="w-4 h-4" />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">Размер</Label>
               <div className="flex gap-1">
                 {[
-                  { value: 'small', label: 'S' },
                   { value: 'medium', label: 'M' },
                   { value: 'large', label: 'L' },
                 ].map(({ value, label }) => (
                   <button
                     key={value}
-                    onClick={() => onUpdate({ iconSize: value as 'small' | 'medium' | 'large' })}
+                    onClick={() => onUpdate({ iconSize: value as 'medium' | 'large' })}
                     className={cn(
                       "flex-1 py-1.5 px-2 rounded-lg text-sm font-medium transition-colors",
-                      subBlock.iconSize === value 
+                      (subBlock.iconSize === value || (!subBlock.iconSize && value === 'medium'))
                         ? "bg-primary text-primary-foreground" 
                         : "bg-muted hover:bg-muted/80"
                     )}
@@ -394,6 +468,7 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
         {subBlock.type === 'badge' && (
           <>
             {renderAlignmentSelector()}
+            {renderBadgeSizeSelector()}
             {renderBadgeVariantSelector()}
           </>
         )}
@@ -402,21 +477,88 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
         {subBlock.type === 'animation' && (
           <>
             {renderAlignmentSelector()}
+            
+            {/* Animation format selector */}
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Формат анимации</Label>
+              <div className="flex gap-1">
+                {[
+                  { value: 'lottie', label: 'Lottie (.json)' },
+                  { value: 'rive', label: 'Rive (.riv)' },
+                ].map(({ value, label }) => (
+                  <button
+                    key={value}
+                    onClick={() => onUpdate({ animationType: value as 'lottie' | 'rive' })}
+                    className={cn(
+                      "flex-1 py-2 px-3 rounded-lg text-xs transition-colors",
+                      (subBlock.animationType === value || (!subBlock.animationType && value === 'lottie'))
+                        ? "bg-primary text-primary-foreground" 
+                        : "bg-muted hover:bg-muted/80"
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Animation file upload */}
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Файл анимации</Label>
+              <div className="flex flex-col gap-2">
+                <label className="flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 border-dashed border-border hover:border-primary/50 cursor-pointer transition-colors">
+                  <input
+                    type="file"
+                    accept={subBlock.animationType === 'rive' ? '.riv' : '.json'}
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          onUpdate({ animationUrl: event.target?.result as string });
+                        };
+                        if (subBlock.animationType === 'rive') {
+                          reader.readAsDataURL(file);
+                        } else {
+                          reader.readAsText(file);
+                        }
+                      }
+                    }}
+                  />
+                  <span className="text-xs text-muted-foreground">
+                    {subBlock.animationUrl ? 'Заменить файл' : 'Загрузить файл'}
+                  </span>
+                </label>
+                {subBlock.animationUrl && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => onUpdate({ animationUrl: undefined })}
+                  >
+                    Удалить анимацию
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Size selector */}
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">Размер</Label>
-              <div className="flex gap-1">
+              <div className="grid grid-cols-4 gap-1">
                 {[
                   { value: 'small', label: 'S' },
                   { value: 'medium', label: 'M' },
                   { value: 'large', label: 'L' },
-                  { value: 'full', label: 'Во всю ширину' },
+                  { value: 'full', label: '100%' },
                 ].map(({ value, label }) => (
                   <button
                     key={value}
                     onClick={() => onUpdate({ animationSize: value as 'small' | 'medium' | 'large' | 'full' })}
                     className={cn(
-                      "flex-1 py-1.5 px-2 rounded-lg text-xs transition-colors",
-                      subBlock.animationSize === value 
+                      "py-1.5 px-2 rounded-lg text-xs transition-colors",
+                      (subBlock.animationSize === value || (!subBlock.animationSize && value === 'medium'))
                         ? "bg-primary text-primary-foreground" 
                         : "bg-muted hover:bg-muted/80"
                     )}

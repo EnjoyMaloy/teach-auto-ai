@@ -38,12 +38,13 @@ export interface SubBlock {
   
   // Icon specific
   iconName?: string;
-  iconSize?: 'small' | 'medium' | 'large';
+  iconSize?: 'medium' | 'large';
   iconColor?: string;
   
   // Badge specific
   badgeText?: string;
-  badgeVariant?: 'default' | 'success' | 'warning' | 'destructive';
+  badgeVariant?: 'square' | 'oval' | 'contrast' | 'pastel';
+  badgeSize?: 'small' | 'medium' | 'large';
   
   // Animation (Rive/Lottie) specific
   animationUrl?: string;
@@ -156,7 +157,7 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
     nameRu: 'Hero-секция',
     description: 'Большой заголовок с подзаголовком и кнопкой',
     subBlocks: [
-      { type: 'badge', order: 1, badgeText: 'Новинка', badgeVariant: 'default', textAlign: 'center' },
+      { type: 'badge', order: 1, badgeText: 'Новинка', badgeVariant: 'oval', textAlign: 'center' },
       { type: 'heading', order: 2, content: 'Добро пожаловать!', textAlign: 'center', textSize: 'xlarge', fontWeight: 'bold' },
       { type: 'text', order: 3, content: 'Описание вашего курса или урока', textAlign: 'center', textSize: 'medium' },
       { type: 'button', order: 4, buttonLabel: 'Начать', buttonVariant: 'primary', textAlign: 'center' },
@@ -204,7 +205,7 @@ export const createSubBlock = (type: SubBlockType, order: number): SubBlock => (
   ...(type === 'text' ? { content: 'Текст абзаца', textSize: 'medium' as const } : {}),
   ...(type === 'image' ? { imageSize: 'medium' as const } : {}),
   ...(type === 'button' ? { buttonLabel: 'Кнопка', buttonVariant: 'primary' as const } : {}),
-  ...(type === 'badge' ? { badgeText: 'Бейдж', badgeVariant: 'default' as const } : {}),
+  ...(type === 'badge' ? { badgeText: 'Бейдж', badgeVariant: 'oval' as const, badgeSize: 'medium' as const } : {}),
   ...(type === 'icon' ? { iconName: 'Star', iconSize: 'medium' as const } : {}),
   ...(type === 'animation' ? { animationSize: 'medium' as const, animationAutoplay: true, animationLoop: true } : {}),
 });
