@@ -118,23 +118,34 @@ const SYSTEM_PROMPT = `Ты — ИИ-ассистент для редактир�
 Если это просто вопрос — верни только message без newBlocks.
 Верни ТОЛЬКО валидный JSON без markdown-обёртки.`;
 
-// Generate image using Gemini API
+// Generate image using Gemini API (same model as generate-image function)
 async function generateImage(description: string, apiKey: string): Promise<string | null> {
   try {
     console.log("Generating image for:", description);
     
+    const imagePrompt = `${description}
+
+Style requirements:
+- High quality, detailed illustration
+- Modern, clean, professional style
+- NO text, words, letters, or labels on the image
+- Suitable for mobile educational app
+- Vibrant colors, engaging composition`;
+
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          instances: [{
-            prompt: `Professional illustration for educational mobile app: ${description}. Style: modern, clean, minimal, vibrant colors, no text.`
+          contents: [{
+            parts: [{ text: imagePrompt }]
           }],
-          parameters: {
-            sampleCount: 1,
-            aspectRatio: "9:16"
+          generationConfig: {
+            imageConfig: {
+              aspectRatio: "9:16",
+              imageSize: "1K"
+            }
           }
         })
       }
@@ -147,25 +158,18 @@ async function generateImage(description: string, apiKey: string): Promise<strin
     }
 
     const data = await response.json();
-    
-    // Imagen API returns predictions array
-    const predictions = data.predictions || [];
-    if (predictions.length > 0 && predictions[0].bytesBase64Encoded) {
-      console.log("Image generated successfully");
-      return `data:image/png;base64,${predictions[0].bytesBase64Encoded}`;
-    }
-    
-    // Fallback: check for inline data format
     const parts = data.candidates?.[0]?.content?.parts || [];
+    
     for (const part of parts) {
       if (part.inlineData?.mimeType?.startsWith('image/')) {
         const base64 = part.inlineData.data;
         const mimeType = part.inlineData.mimeType;
-        console.log("Image generated successfully (inline)");
+        console.log("Image generated successfully");
         return `data:${mimeType};base64,${base64}`;
       }
     }
     
+    console.log("No image in response");
     return null;
   } catch (error) {
     console.error("Image generation error:", error);
