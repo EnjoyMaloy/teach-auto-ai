@@ -103,12 +103,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     right: 'text-right',
   }[textAlign];
 
-  // Text wrap mode styles
+  // Text wrap mode classes
+  // justify: adjusts word spacing to fill line width
+  // hyphenate: justify + hyphenation for word breaks
   const textWrapClass = {
     standard: '',
     justify: 'text-justify',
-    hyphenate: 'hyphens-auto',
-  }[textWrapMode];
+    hyphenate: 'text-justify [hyphens:auto] [-webkit-hyphens:auto]',
+  }[textWrapMode] || '';
 
   const editor = useEditor({
     extensions: [
