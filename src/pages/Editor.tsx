@@ -23,7 +23,7 @@ import { useCourses } from '@/hooks/useCourses';
 import { EditorHeader } from '@/components/editor/EditorHeader';
 import { LessonsList } from '@/components/editor/LessonsList';
 
-import { CoursePlayer } from '@/components/runtime/CoursePlayer';
+import { SimplePlayer } from '@/components/runtime/SimplePlayer';
 
 import { 
   BlockPreview, 
@@ -34,7 +34,7 @@ import {
 import { SortableBlockItem } from '@/components/editor/SortableBlockItem';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Loader2, Plus, Smartphone, Volume2, VolumeX } from 'lucide-react';
+import { Loader2, Plus, Smartphone, Volume2, VolumeX, X } from 'lucide-react';
 
 // Adapter: Convert Slide to Block for the new editor
 const slideToBlock = (slide: Slide): Block => ({
@@ -468,13 +468,32 @@ const Editor: React.FC = () => {
 
   if (isPreviewMode) {
     return (
-      <CoursePlayer 
-        courseId={course.id}
-        mode="preview"
-        onClose={() => setIsPreviewMode(false)}
-        initialLessonId={selectedLessonId || undefined}
-        initialBlockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
-      />
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        {/* Close button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsPreviewMode(false)}
+          className="absolute top-4 right-4 z-20 bg-card/90 hover:bg-card border border-border shadow-lg"
+        >
+          <X className="w-5 h-5" />
+        </Button>
+
+        {/* Info badge */}
+        <div className="absolute top-4 left-4 z-20 bg-card/90 border border-border shadow-lg rounded-full px-3 py-1.5 text-xs text-muted-foreground">
+          Сохранённая версия
+        </div>
+
+        {/* Phone frame with SimplePlayer */}
+        <div 
+          className="h-[calc(100vh-80px)] w-[calc((100vh-80px)*9/16)] max-w-full rounded-[2.5rem] overflow-hidden flex flex-col border-4 border-foreground/20 shadow-2xl bg-background"
+        >
+          <SimplePlayer 
+            courseId={course.id}
+            onClose={() => setIsPreviewMode(false)}
+          />
+        </div>
+      </div>
     );
   }
 

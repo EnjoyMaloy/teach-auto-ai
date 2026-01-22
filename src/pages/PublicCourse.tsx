@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { CoursePlayer } from '@/components/runtime/CoursePlayer';
+import { SimplePlayer } from '@/components/runtime/SimplePlayer';
 
 // Extend Window interface for Telegram WebApp
 declare global {
@@ -72,7 +72,7 @@ const PublicCourse: React.FC = () => {
     );
   }
 
-  // For Telegram: true fullscreen with safe areas
+  // For Telegram: fullscreen with safe areas
   if (isTelegram) {
     return (
       <div 
@@ -89,17 +89,15 @@ const PublicCourse: React.FC = () => {
           WebkitOverflowScrolling: 'touch',
         }}
       >
-        <CoursePlayer 
+        <SimplePlayer 
           courseId={courseId} 
-          mode="public" 
           onClose={() => navigate('/')} 
-          fullscreen 
         />
       </div>
     );
   }
 
-  // Mobile web (not Telegram): also fullscreen
+  // Mobile web: fullscreen
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   if (isMobile) {
     return (
@@ -111,24 +109,26 @@ const PublicCourse: React.FC = () => {
           width: '100vw',
         }}
       >
-        <CoursePlayer 
+        <SimplePlayer 
           courseId={courseId} 
-          mode="public" 
           onClose={() => navigate('/')} 
-          fullscreen 
         />
       </div>
     );
   }
 
-  // Desktop: CoursePlayer handles its own phone frame layout
+  // Desktop: phone frame centered on screen
   return (
-    <CoursePlayer 
-      courseId={courseId} 
-      mode="public" 
-      onClose={() => navigate('/')} 
-      // No fullscreen prop - uses phone frame with proper scaling
-    />
+    <div className="fixed inset-0 bg-muted/80 flex items-center justify-center p-4">
+      <div 
+        className="h-[calc(100vh-80px)] w-[calc((100vh-80px)*9/16)] max-w-[420px] rounded-[2.5rem] overflow-hidden border-4 border-foreground/10 shadow-2xl bg-background"
+      >
+        <SimplePlayer 
+          courseId={courseId} 
+          onClose={() => navigate('/')} 
+        />
+      </div>
+    </div>
   );
 };
 
