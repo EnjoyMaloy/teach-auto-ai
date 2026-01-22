@@ -294,7 +294,45 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
         {/* Image settings */}
         {subBlock.type === 'image' && (
           <>
-            {renderAlignmentSelector()}
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Поворот</Label>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => onUpdate({ imageRotation: (subBlock.imageRotation || 0) - 15 })}
+                  className={cn(
+                    "flex-1 py-2 px-3 rounded-lg text-sm transition-colors",
+                    "bg-muted hover:bg-muted/80"
+                  )}
+                >
+                  ↺ −15°
+                </button>
+                <button
+                  onClick={() => onUpdate({ imageRotation: 0 })}
+                  className={cn(
+                    "flex-1 py-2 px-3 rounded-lg text-sm transition-colors",
+                    subBlock.imageRotation === 0 || !subBlock.imageRotation
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted hover:bg-muted/80"
+                  )}
+                >
+                  0°
+                </button>
+                <button
+                  onClick={() => onUpdate({ imageRotation: (subBlock.imageRotation || 0) + 15 })}
+                  className={cn(
+                    "flex-1 py-2 px-3 rounded-lg text-sm transition-colors",
+                    "bg-muted hover:bg-muted/80"
+                  )}
+                >
+                  +15° ↻
+                </button>
+              </div>
+              {subBlock.imageRotation !== 0 && subBlock.imageRotation && (
+                <p className="text-xs text-muted-foreground text-center">
+                  Текущий угол: {subBlock.imageRotation}°
+                </p>
+              )}
+            </div>
           </>
         )}
 

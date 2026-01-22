@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -66,7 +66,18 @@ const SortableSubBlockItem: React.FC<{
   // Component state - always called unconditionally at top level
   const [isTextFocused, setIsTextFocused] = useState(false);
   const [isHeadingFocused, setIsHeadingFocused] = useState(false);
-  const [headingCounter, setHeadingCounter] = useState(45 - (subBlock.content || '').length);
+  const headingContentRef = useRef(subBlock.content || '');
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Debounced update for heading content
+  const debouncedHeadingUpdate = useCallback((content: string) => {
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+    }
+    updateTimeoutRef.current = setTimeout(() => {
+      onUpdate({ content });
+    }, 150);
+  }, [onUpdate]);
   
   const {
     attributes,
@@ -176,15 +187,21 @@ const SortableSubBlockItem: React.FC<{
               }}
               onBlur={(e) => {
                 setIsHeadingFocused(false);
+                // Clear any pending debounced update
+                if (updateTimeoutRef.current) {
+                  clearTimeout(updateTimeoutRef.current);
+                }
                 if (isEditing) {
                   const text = e.currentTarget.textContent || '';
                   const limitedText = text.slice(0, MAX_HEADING_CHARS);
+                  headingContentRef.current = limitedText;
                   onUpdate({ content: limitedText });
                 }
               }}
               onInput={(e) => {
                 const text = e.currentTarget.textContent || '';
                 const limitedText = text.slice(0, MAX_HEADING_CHARS);
+                headingContentRef.current = limitedText;
                 
                 if (text.length > MAX_HEADING_CHARS) {
                   const sel = window.getSelection();
@@ -200,8 +217,8 @@ const SortableSubBlockItem: React.FC<{
                     sel?.addRange(range);
                   }
                 }
-                // Update content in real-time for the sidebar counter
-                onUpdate({ content: limitedText });
+                // Debounced update for real-time counter
+                debouncedHeadingUpdate(limitedText);
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -280,12 +297,21 @@ const SortableSubBlockItem: React.FC<{
       case 'image':
         // Image scales to full width (same as text backdrop) with aspect ratio constraints
         // Max height = width (1:1), can be wider up to 10:1
+        const imageRotation = subBlock.imageRotation || 0;
+        
         return (
-          <div className="w-full">
+          <div className="w-full overflow-visible">
             {subBlock.imageUrl ? (
               <div 
-                className="w-full rounded-lg overflow-hidden"
-                style={{ aspectRatio: 'auto' }}
+                className="w-full rounded-lg overflow-hidden transition-transform duration-300"
+                style={{ 
+                  aspectRatio: 'auto',
+                  transform: imageRotation ? `rotate(${imageRotation}deg)` : undefined,
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (isEditing && onSelect) onSelect();
+                }}
               >
                 <img 
                   src={subBlock.imageUrl} 
@@ -311,6 +337,10 @@ const SortableSubBlockItem: React.FC<{
               <label 
                 className="w-full flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer min-h-[100px] aspect-[3/1]"
                 style={{ borderColor: `hsl(${ds.mutedColor})` }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onSelect) onSelect();
+                }}
               >
                 <input
                   type="file"
