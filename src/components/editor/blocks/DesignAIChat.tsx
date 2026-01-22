@@ -212,10 +212,10 @@ export const DesignAIChat: React.FC<DesignAIChatProps> = ({
               <div
                 key={`${msg.timestamp}-${i}`}
                 className={cn(
-                  'text-xs p-2.5 rounded-lg max-w-[90%]',
+                  'text-sm p-3 rounded-xl max-w-[90%]',
                   msg.role === 'user'
                     ? 'ml-auto bg-primary text-primary-foreground'
-                    : 'bg-foreground/80 text-background'
+                    : 'bg-muted-foreground text-primary-foreground'
                 )}
               >
                 {msg.content}
