@@ -1,75 +1,223 @@
-import React, { useState } from 'react';
-import { Check, X, Lightbulb, ArrowRight } from 'lucide-react';
-import { Slide } from '@/types/course';
-import { Button } from '@/components/ui/button';
+/**
+ * SlideRenderer - рендерит один слайд с полной интерактивностью
+ * Единственный компонент для отображения слайда
+ * Используется и в редакторе, и в публичной версии
+ */
+
+import React, { useState, useEffect } from 'react';
+import { Slide, CourseDesignSystem } from '@/types/course';
 import { cn } from '@/lib/utils';
+import { Play, Volume2, Check, X } from 'lucide-react';
+import { AudioPlayer } from '@/components/editor/blocks/AudioPlayer';
+import { DesignBlockEditor } from '@/components/editor/blocks/DesignBlockEditor';
+import { playSound, SoundConfig } from '@/lib/sounds';
+import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
 
 interface SlideRendererProps {
-  slide: Slide;
-  onAnswer?: (isCorrect: boolean) => void;
-  onNext?: () => void;
-  onCheck?: () => void;
-  showResult?: boolean;
-  hideActions?: boolean;
+  slide: Slide | null;
+  designSystem?: CourseDesignSystem;
+  onContinue?: () => void;
+  isMuted?: boolean;
+  showProgress?: boolean;
+  currentIndex?: number;
+  totalCount?: number;
 }
+
+type AnswerState = 'idle' | 'correct' | 'incorrect' | 'partial';
+
+// Дефолтные значения дизайн-системы
+const DEFAULT_DS = {
+  primaryColor: '262 83% 58%',
+  primaryForeground: '0 0% 100%',
+  backgroundColor: '0 0% 100%',
+  foregroundColor: '240 10% 4%',
+  cardColor: '0 0% 100%',
+  mutedColor: '240 5% 96%',
+  successColor: '142 71% 45%',
+  destructiveColor: '0 84% 60%',
+  fontFamily: 'Inter, system-ui, sans-serif',
+  headingFontFamily: 'Inter, system-ui, sans-serif',
+  borderRadius: '0.75rem',
+  buttonStyle: 'rounded' as const,
+  buttonDepth: 'raised' as const,
+};
 
 export const SlideRenderer: React.FC<SlideRendererProps> = ({
   slide,
-  onAnswer,
-  onNext,
-  showResult = false,
-  hideActions = false,
+  designSystem,
+  onContinue,
+  isMuted = false,
+  showProgress = true,
+  currentIndex = 0,
+  totalCount = 1,
 }) => {
+  // Мержим дизайн-систему с дефолтами
+  const ds = { ...DEFAULT_DS, ...designSystem };
+  
+  // Звуковые настройки
+  const soundConfig: SoundConfig = {
+    enabled: !isMuted && (designSystem?.sound?.enabled !== false),
+    theme: designSystem?.sound?.theme ?? DEFAULT_SOUND_SETTINGS.theme,
+    volume: designSystem?.sound?.volume ?? DEFAULT_SOUND_SETTINGS.volume,
+  };
+
+  // Состояние для интерактивных блоков
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  const [textAnswer, setTextAnswer] = useState('');
-  const [answered, setAnswered] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
+  const [trueFalseAnswer, setTrueFalseAnswer] = useState<boolean | null>(null);
+  const [sliderValue, setSliderValue] = useState<number>(50);
+  const [fillBlankInput, setFillBlankInput] = useState('');
+  const [answerState, setAnswerState] = useState<AnswerState>('idle');
+  const [matchingSelected, setMatchingSelected] = useState<{ left: string | null; pairs: Record<string, string> }>({ left: null, pairs: {} });
+  const [shuffledRights, setShuffledRights] = useState<string[]>([]);
+  const [orderingItems, setOrderingItems] = useState<string[]>([]);
 
-  const handleOptionClick = (optionId: string) => {
-    if (answered) return;
+  // Сброс состояния при смене слайда
+  useEffect(() => {
+    console.log('[SlideRenderer] Slide changed:', slide?.id, slide?.type);
+    setSelectedOptions([]);
+    setTrueFalseAnswer(null);
+    setSliderValue(slide?.sliderMin || 0);
+    setFillBlankInput('');
+    setAnswerState('idle');
+    setMatchingSelected({ left: null, pairs: {} });
     
-    if (slide.type === 'single_choice' || slide.type === 'true_false') {
-      setSelectedOptions([optionId]);
-    } else if (slide.type === 'multiple_choice') {
-      setSelectedOptions(prev => 
-        prev.includes(optionId) 
-          ? prev.filter(id => id !== optionId)
-          : [...prev, optionId]
-      );
+    if (slide?.matchingPairs) {
+      setShuffledRights([...slide.matchingPairs.map(p => p.right)].sort(() => Math.random() - 0.5));
     }
-  };
+    if (slide?.orderingItems) {
+      setOrderingItems([...slide.orderingItems].sort(() => Math.random() - 0.5));
+    }
+  }, [slide?.id]);
 
+  // Проверка ответа
   const checkAnswer = () => {
-    let correct = false;
-    
-    if (slide.type === 'single_choice') {
-      correct = selectedOptions[0] === slide.correctAnswer;
-    } else if (slide.type === 'multiple_choice') {
-      const correctAnswers = slide.correctAnswer as string[];
-      correct = selectedOptions.length === correctAnswers.length &&
-        selectedOptions.every(id => correctAnswers.includes(id));
-    } else if (slide.type === 'true_false') {
-      const isTrue = selectedOptions[0] === 'true';
-      correct = isTrue === slide.correctAnswer;
-    } else if (slide.type === 'fill_blank') {
-      correct = textAnswer.toLowerCase().trim() === (slide.correctAnswer as string).toLowerCase();
+    if (!slide) return;
+
+    let isCorrect = false;
+
+    switch (slide.type) {
+      case 'single_choice': {
+        const correctOption = slide.options?.find(o => o.isCorrect);
+        isCorrect = selectedOptions.length === 1 && selectedOptions[0] === correctOption?.id;
+        break;
+      }
+      case 'multiple_choice': {
+        const correctIds = slide.options?.filter(o => o.isCorrect).map(o => o.id) || [];
+        const allCorrectSelected = correctIds.every(id => selectedOptions.includes(id));
+        const noIncorrectSelected = selectedOptions.every(id => correctIds.includes(id));
+        
+        if (allCorrectSelected && noIncorrectSelected) {
+          isCorrect = true;
+        } else if (noIncorrectSelected && selectedOptions.length > 0 && selectedOptions.length < correctIds.length) {
+          setAnswerState('partial');
+          playSound('incorrect', soundConfig);
+          return;
+        }
+        break;
+      }
+      case 'true_false':
+        isCorrect = trueFalseAnswer === slide.correctAnswer;
+        break;
+      case 'fill_blank':
+        isCorrect = fillBlankInput.toLowerCase().trim() === (slide.blankWord || '').toLowerCase().trim();
+        break;
+      case 'slider': {
+        const tolerance = ((slide.sliderMax || 100) - (slide.sliderMin || 0)) * 0.05;
+        isCorrect = Math.abs(sliderValue - (slide.sliderCorrect || 50)) <= tolerance;
+        break;
+      }
+      case 'matching': {
+        const allPairsCorrect = slide.matchingPairs?.every(pair => 
+          matchingSelected.pairs[pair.left] === pair.right
+        ) || false;
+        isCorrect = allPairsCorrect && Object.keys(matchingSelected.pairs).length === (slide.matchingPairs?.length || 0);
+        break;
+      }
+      case 'ordering':
+        isCorrect = JSON.stringify(orderingItems) === JSON.stringify(slide.orderingItems);
+        break;
     }
-    
-    setIsCorrect(correct);
-    setAnswered(true);
-    onAnswer?.(correct);
+
+    setAnswerState(isCorrect ? 'correct' : 'incorrect');
+    playSound(isCorrect ? 'correct' : 'incorrect', soundConfig);
   };
 
+  // Можно ли проверить ответ
+  const canCheck = (): boolean => {
+    if (!slide) return false;
+    
+    switch (slide.type) {
+      case 'single_choice':
+      case 'multiple_choice':
+        return selectedOptions.length > 0;
+      case 'true_false':
+        return trueFalseAnswer !== null;
+      case 'fill_blank':
+        return fillBlankInput.trim().length > 0;
+      case 'slider':
+        return true;
+      case 'matching':
+        return Object.keys(matchingSelected.pairs).length > 0;
+      case 'ordering':
+        return orderingItems.length > 0;
+      default:
+        return false;
+    }
+  };
+
+  // Кнопки
+  const isRaised = ds.buttonDepth !== 'flat';
+  const getButtonRadius = () => {
+    if (ds.buttonStyle === 'pill') return '9999px';
+    if (ds.buttonStyle === 'square') return '0';
+    return ds.borderRadius;
+  };
+
+  const getRaisedButtonStyle = (baseColor: string) => {
+    if (!isRaised) return {};
+    return {
+      boxShadow: `0 4px 0 0 hsl(${baseColor} / 0.4), 0 6px 12px -2px hsl(${baseColor} / 0.25)`,
+    };
+  };
+
+  const pressAnimationClass = isRaised ? 'btn-raised' : 'btn-flat';
+  const isInteractive = ['single_choice', 'multiple_choice', 'true_false', 'fillblank', 'slider', 'matching', 'ordering'].includes(slide?.type || '');
+
+  // Пустой слайд
+  if (!slide) {
+    return (
+      <div 
+        className="h-full w-full flex items-center justify-center"
+        style={{ backgroundColor: `hsl(${ds.backgroundColor})` }}
+      >
+        <div className="text-center px-8">
+          <div 
+            className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
+            style={{ backgroundColor: `hsl(${ds.mutedColor})` }}
+          >
+            <Play className="w-8 h-8" style={{ color: `hsl(${ds.foregroundColor} / 0.5)` }} />
+          </div>
+          <p style={{ color: `hsl(${ds.foregroundColor} / 0.5)` }} className="text-sm">
+            Выберите блок
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Рендер контента в зависимости от типа
   const renderContent = () => {
+    console.log('[SlideRenderer] Rendering slide type:', slide.type, 'subBlocks:', slide.subBlocks?.length);
+    
     switch (slide.type) {
       case 'heading':
         return (
           <div className="h-full flex items-center justify-center p-8">
             <h1 
-              className="text-3xl font-bold text-center leading-tight"
+              className="text-4xl font-bold text-center leading-tight"
               style={{ 
-                color: `hsl(var(--ds-foreground, var(--foreground)))`,
-                fontFamily: `var(--ds-heading-font-family, inherit)`,
+                color: `hsl(${ds.foregroundColor})`,
+                fontFamily: ds.headingFontFamily,
               }}
             >
               {slide.content || 'Заголовок'}
@@ -77,49 +225,76 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
           </div>
         );
 
-      case 'text':
+      case 'text': {
+        const textSizeClass = {
+          small: 'text-sm',
+          medium: 'text-base',
+          large: 'text-xl',
+          xlarge: 'text-2xl',
+        }[slide.textSize || 'medium'];
+        
         return (
           <div className="h-full flex items-center justify-center p-8">
             <p 
-              className="text-base leading-relaxed text-center"
-              style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
+              className={cn('leading-relaxed text-center', textSizeClass)}
+              style={{ color: `hsl(${ds.foregroundColor})` }}
             >
-              {slide.content}
+              {slide.content || 'Текст...'}
             </p>
           </div>
         );
+      }
 
-      case 'video':
+      case 'video': {
+        const getYouTubeId = (url: string) => {
+          if (!url) return null;
+          const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+          const match = url.match(regExp);
+          return match && match[2].length === 11 ? match[2] : null;
+        };
+        
+        const videoId = slide.videoUrl ? getYouTubeId(slide.videoUrl) : null;
+        
         return (
           <div className="h-full w-full flex items-center justify-center overflow-hidden bg-black">
-            {slide.videoUrl ? (
+            {videoId ? (
+              <iframe
+                src={`https://www.youtube.com/embed/${videoId}`}
+                className="w-full h-full"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : slide.videoUrl ? (
               <video src={slide.videoUrl} controls className="w-full h-full object-contain" playsInline />
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center text-white/60">
-                <span className="text-sm">Загрузите видео</span>
+              <div className="flex flex-col items-center justify-center text-white/60">
+                <Play className="w-16 h-16 mb-4" />
+                <p className="text-sm">Видео не загружено</p>
               </div>
             )}
           </div>
         );
+      }
 
       case 'audio':
-        return (
+        return slide.audioUrl ? (
+          <AudioPlayer
+            audioUrl={slide.audioUrl}
+            audioName={slide.content}
+            primaryColor={ds.primaryColor}
+            foregroundColor={ds.foregroundColor}
+            mutedColor={ds.mutedColor}
+          />
+        ) : (
           <div className="h-full flex flex-col items-center justify-center p-6 gap-4">
             <div 
               className="w-20 h-20 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: `hsl(var(--ds-muted, var(--muted)))` }}
+              style={{ backgroundColor: `hsl(${ds.mutedColor})` }}
             >
-              <span className="text-2xl">🎵</span>
+              <Volume2 className="w-10 h-10" style={{ color: `hsl(${ds.foregroundColor} / 0.4)` }} />
             </div>
-            <p 
-              className="text-center font-medium"
-              style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
-            >
-              {slide.content || 'Аудио'}
-            </p>
-            {slide.audioUrl && (
-              <audio src={slide.audioUrl} controls className="w-full max-w-xs" />
-            )}
+            <p style={{ color: `hsl(${ds.foregroundColor} / 0.5)` }}>Аудио не загружено</p>
           </div>
         );
 
@@ -129,77 +304,139 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
             {slide.imageUrl && (
               <img src={slide.imageUrl} alt="" className="w-full rounded-2xl object-contain max-h-[60%]" />
             )}
-            <p 
-              className="text-lg text-center"
-              style={{ color: `hsl(var(--ds-foreground, var(--foreground)))` }}
-            >
-              {slide.content || 'Описание к картинке...'}
+            <p className="text-lg text-center" style={{ color: `hsl(${ds.foregroundColor})` }}>
+              {slide.content || 'Описание...'}
             </p>
           </div>
+        );
+
+      case 'design':
+        console.log('[SlideRenderer] Rendering design block with subBlocks:', slide.subBlocks);
+        return (
+          <DesignBlockEditor
+            subBlocks={slide.subBlocks || []}
+            onUpdateSubBlocks={undefined}
+            designSystem={designSystem}
+            isEditing={false}
+          />
         );
 
       case 'single_choice':
       case 'multiple_choice':
         return (
-          <div className="space-y-4">
-            <p className="text-base font-medium text-center text-foreground">{slide.content}</p>
-            <div className="space-y-2">
-              {slide.options?.map(option => {
-                const isSelected = selectedOptions.includes(option.id);
-                const showCorrect = answered && option.isCorrect;
-                const showIncorrect = answered && isSelected && !option.isCorrect;
-                
-                return (
-                  <button
-                    key={option.id}
-                    onClick={() => handleOptionClick(option.id)}
-                    disabled={answered}
-                    className={cn(
-                      'w-full p-3 rounded-lg border-2 text-left transition-all duration-200 flex items-center justify-between text-sm',
-                      !answered && isSelected && 'border-primary bg-primary/10',
-                      !answered && !isSelected && 'border-border hover:border-primary/50',
-                      showCorrect && 'border-success bg-success/10',
-                      showIncorrect && 'border-destructive bg-destructive/10'
-                    )}
-                  >
-                    <span className="font-medium">{option.text}</span>
-                    {showCorrect && <Check className="w-4 h-4 text-success" />}
-                    {showIncorrect && <X className="w-4 h-4 text-destructive" />}
-                  </button>
-                );
-              })}
+          <div className="flex-1 flex flex-col items-center justify-center p-4 overflow-auto h-full min-h-0">
+            <div className="w-full">
+              <p 
+                className="text-lg font-semibold mb-4 text-center"
+                style={{ color: `hsl(${ds.foregroundColor})` }}
+              >
+                {slide.content || 'Вопрос?'}
+              </p>
+              <div className="space-y-2">
+                {(slide.options || []).map((option) => {
+                  const isSelected = selectedOptions.includes(option.id);
+                  const showResult = answerState !== 'idle';
+                  
+                  let borderColor = `hsl(${ds.mutedColor})`;
+                  let bgColor = `hsl(${ds.cardColor})`;
+                  let textColor = `hsl(${ds.foregroundColor})`;
+                  
+                  if (showResult && option.isCorrect) {
+                    borderColor = `hsl(${ds.successColor})`;
+                    bgColor = `hsl(${ds.successColor} / 0.1)`;
+                    textColor = `hsl(${ds.successColor})`;
+                  } else if (showResult && isSelected && !option.isCorrect) {
+                    borderColor = `hsl(${ds.destructiveColor})`;
+                    bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
+                    textColor = `hsl(${ds.destructiveColor})`;
+                  } else if (!showResult && isSelected) {
+                    borderColor = `hsl(${ds.primaryColor})`;
+                    bgColor = `hsl(${ds.primaryColor} / 0.1)`;
+                    textColor = `hsl(${ds.primaryColor})`;
+                  }
+                  
+                  return (
+                    <button
+                      key={option.id}
+                      onClick={() => {
+                        if (answerState !== 'idle') return;
+                        if (slide.type === 'single_choice') {
+                          setSelectedOptions([option.id]);
+                        } else {
+                          setSelectedOptions(prev => 
+                            prev.includes(option.id) 
+                              ? prev.filter(id => id !== option.id)
+                              : [...prev, option.id]
+                          );
+                        }
+                      }}
+                      disabled={answerState !== 'idle'}
+                      className="w-full p-3 text-left transition-all text-sm border-2"
+                      style={{
+                        borderColor,
+                        backgroundColor: bgColor,
+                        color: textColor,
+                        borderRadius: ds.borderRadius,
+                      }}
+                    >
+                      {option.text}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         );
 
       case 'true_false':
         return (
-          <div className="space-y-4">
-            <p className="text-base font-medium text-center text-foreground">{slide.content}</p>
-            <div className="flex gap-3 justify-center">
-              {[
-                { id: 'true', label: 'Верно' },
-                { id: 'false', label: 'Неверно' },
-              ].map(option => {
-                const isSelected = selectedOptions.includes(option.id);
-                const correctValue = slide.correctAnswer ? 'true' : 'false';
-                const showCorrect = answered && option.id === correctValue;
-                const showIncorrect = answered && isSelected && option.id !== correctValue;
+          <div className="flex-1 flex flex-col items-center justify-center p-4 h-full min-h-0">
+            <p 
+              className="text-lg font-semibold mb-6 text-center"
+              style={{ color: `hsl(${ds.foregroundColor})` }}
+            >
+              {slide.content || 'Верно или неверно?'}
+            </p>
+            <div className="flex gap-4">
+              {[true, false].map((value) => {
+                const isSelected = trueFalseAnswer === value;
+                const showResult = answerState !== 'idle';
+                const isCorrect = slide.correctAnswer === value;
+                
+                let borderColor = `hsl(${ds.mutedColor})`;
+                let bgColor = `hsl(${ds.cardColor})`;
+                
+                if (showResult && isCorrect) {
+                  borderColor = `hsl(${ds.successColor})`;
+                  bgColor = `hsl(${ds.successColor} / 0.1)`;
+                } else if (showResult && isSelected && !isCorrect) {
+                  borderColor = `hsl(${ds.destructiveColor})`;
+                  bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
+                } else if (!showResult && isSelected) {
+                  borderColor = `hsl(${ds.primaryColor})`;
+                  bgColor = `hsl(${ds.primaryColor} / 0.1)`;
+                }
                 
                 return (
                   <button
-                    key={option.id}
-                    onClick={() => handleOptionClick(option.id)}
-                    disabled={answered}
-                    className={cn(
-                      'flex-1 max-w-[140px] p-3 rounded-lg border-2 font-medium transition-all duration-200 text-sm',
-                      !answered && isSelected && 'border-primary bg-primary/10',
-                      !answered && !isSelected && 'border-border hover:border-primary/50',
-                      showCorrect && 'border-success bg-success/10',
-                      showIncorrect && 'border-destructive bg-destructive/10'
-                    )}
+                    key={String(value)}
+                    onClick={() => answerState === 'idle' && setTrueFalseAnswer(value)}
+                    disabled={answerState !== 'idle'}
+                    className="w-24 h-24 flex flex-col items-center justify-center border-2 transition-all"
+                    style={{
+                      borderColor,
+                      backgroundColor: bgColor,
+                      borderRadius: ds.borderRadius,
+                    }}
                   >
-                    {option.label}
+                    {value ? (
+                      <Check className="w-8 h-8" style={{ color: `hsl(${ds.successColor})` }} />
+                    ) : (
+                      <X className="w-8 h-8" style={{ color: `hsl(${ds.destructiveColor})` }} />
+                    )}
+                    <span className="text-sm mt-2" style={{ color: `hsl(${ds.foregroundColor})` }}>
+                      {value ? 'Верно' : 'Неверно'}
+                    </span>
                   </button>
                 );
               })}
@@ -207,56 +444,63 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
           </div>
         );
 
-      case 'fill_blank':
-        const parts = slide.content.split('___');
+      case 'fill_blank': {
+        const parts = (slide.content || '').split('___');
         return (
-          <div className="space-y-4">
-            <p className="text-base font-medium text-center text-foreground">
-              {parts[0]}
-              <span className="inline-block mx-1">
+          <div className="flex-1 flex flex-col items-center justify-center p-4 h-full min-h-0">
+            <div className="text-center">
+              <p className="text-lg mb-4" style={{ color: `hsl(${ds.foregroundColor})` }}>
+                {parts[0]}
                 <input
                   type="text"
-                  value={textAnswer}
-                  onChange={(e) => setTextAnswer(e.target.value)}
-                  disabled={answered}
-                  className={cn(
-                    'border-b-2 px-2 py-0.5 text-center outline-none bg-transparent min-w-[80px] text-sm',
-                    !answered && 'border-primary',
-                    answered && isCorrect && 'border-success text-success',
-                    answered && !isCorrect && 'border-destructive text-destructive'
-                  )}
+                  value={fillBlankInput}
+                  onChange={(e) => setFillBlankInput(e.target.value)}
+                  disabled={answerState !== 'idle'}
+                  className="mx-2 px-3 py-1 border-b-2 bg-transparent text-center w-32 outline-none"
+                  style={{
+                    borderColor: answerState === 'correct' 
+                      ? `hsl(${ds.successColor})` 
+                      : answerState === 'incorrect'
+                        ? `hsl(${ds.destructiveColor})`
+                        : `hsl(${ds.primaryColor})`,
+                    color: `hsl(${ds.foregroundColor})`,
+                  }}
                   placeholder="..."
                 />
-              </span>
-              {parts[1]}
-            </p>
-            {answered && !isCorrect && (
-              <p className="text-center text-xs text-muted-foreground">
-                Правильный ответ: <strong className="text-success">{slide.blankWord || slide.correctAnswer as string}</strong>
+                {parts[1]}
               </p>
-            )}
+            </div>
           </div>
         );
+      }
 
       case 'slider':
         return (
-          <div className="space-y-4 py-4">
-            <p className="text-base font-medium text-center text-foreground">{slide.content || 'Выберите значение'}</p>
-            <div className="w-full">
+          <div className="flex-1 flex flex-col items-center justify-center p-4 h-full min-h-0">
+            <p 
+              className="text-lg font-semibold mb-6 text-center"
+              style={{ color: `hsl(${ds.foregroundColor})` }}
+            >
+              {slide.content || 'Выберите значение'}
+            </p>
+            <div className="w-full max-w-xs">
               <input
                 type="range"
                 min={slide.sliderMin || 0}
                 max={slide.sliderMax || 100}
                 step={slide.sliderStep || 1}
-                value={textAnswer || slide.sliderMin || 0}
-                onChange={(e) => setTextAnswer(e.target.value)}
-                disabled={answered}
-                className="w-full accent-primary"
+                value={sliderValue}
+                onChange={(e) => setSliderValue(Number(e.target.value))}
+                disabled={answerState !== 'idle'}
+                className="w-full"
               />
-              <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                <span>{slide.sliderMin || 0}</span>
-                <span className="font-bold text-primary">{textAnswer || slide.sliderMin || 0}</span>
-                <span>{slide.sliderMax || 100}</span>
+              <div className="text-center mt-4">
+                <span 
+                  className="text-3xl font-bold"
+                  style={{ color: `hsl(${ds.primaryColor})` }}
+                >
+                  {sliderValue}
+                </span>
               </div>
             </div>
           </div>
@@ -264,91 +508,280 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
       case 'matching':
         return (
-          <div className="space-y-4">
-            <p className="text-base font-medium text-center text-foreground">{slide.content || 'Соедините пары'}</p>
-            <div className="space-y-2 w-full">
-              {slide.matchingPairs?.map((pair) => (
-                <div key={pair.id} className="flex items-center gap-2">
-                  <div className="flex-1 p-2 bg-muted rounded-lg text-xs font-medium">
-                    {pair.left}
-                  </div>
-                  <span className="text-primary text-xs">→</span>
-                  <div className="flex-1 p-2 bg-primary/10 rounded-lg text-xs font-medium text-primary">
-                    {pair.right}
-                  </div>
-                </div>
-              ))}
+          <div className="flex-1 flex flex-col p-4 overflow-auto h-full min-h-0">
+            <p 
+              className="text-lg font-semibold mb-4 text-center"
+              style={{ color: `hsl(${ds.foregroundColor})` }}
+            >
+              {slide.content || 'Соедините пары'}
+            </p>
+            <div className="flex gap-4">
+              <div className="flex-1 space-y-2">
+                {(slide.matchingPairs || []).map((pair) => {
+                  const isSelected = matchingSelected.left === pair.left;
+                  const isMatched = pair.left in matchingSelected.pairs;
+                  
+                  return (
+                    <button
+                      key={pair.id}
+                      onClick={() => {
+                        if (answerState !== 'idle' || isMatched) return;
+                        setMatchingSelected(prev => ({ ...prev, left: pair.left }));
+                      }}
+                      disabled={answerState !== 'idle' || isMatched}
+                      className="w-full p-3 text-left border-2 transition-all text-sm"
+                      style={{
+                        borderColor: isMatched 
+                          ? `hsl(${ds.successColor})` 
+                          : isSelected 
+                            ? `hsl(${ds.primaryColor})` 
+                            : `hsl(${ds.mutedColor})`,
+                        backgroundColor: isMatched 
+                          ? `hsl(${ds.successColor} / 0.1)` 
+                          : `hsl(${ds.cardColor})`,
+                        borderRadius: ds.borderRadius,
+                        color: `hsl(${ds.foregroundColor})`,
+                      }}
+                    >
+                      {pair.left}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="flex-1 space-y-2">
+                {shuffledRights.map((right, idx) => {
+                  const isUsed = Object.values(matchingSelected.pairs).includes(right);
+                  
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        if (answerState !== 'idle' || !matchingSelected.left || isUsed) return;
+                        setMatchingSelected(prev => ({
+                          left: null,
+                          pairs: { ...prev.pairs, [prev.left!]: right },
+                        }));
+                      }}
+                      disabled={answerState !== 'idle' || !matchingSelected.left || isUsed}
+                      className="w-full p-3 text-left border-2 transition-all text-sm"
+                      style={{
+                        borderColor: isUsed ? `hsl(${ds.successColor})` : `hsl(${ds.mutedColor})`,
+                        backgroundColor: isUsed ? `hsl(${ds.successColor} / 0.1)` : `hsl(${ds.cardColor})`,
+                        borderRadius: ds.borderRadius,
+                        color: `hsl(${ds.foregroundColor})`,
+                        opacity: isUsed ? 0.6 : 1,
+                      }}
+                    >
+                      {right}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         );
 
       case 'ordering':
         return (
-          <div className="space-y-4">
-            <p className="text-base font-medium text-center text-foreground">{slide.content || 'Расположите в порядке'}</p>
-            <div className="space-y-1.5 w-full">
-              {slide.orderingItems?.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-2 p-2 bg-card border border-border rounded-lg">
-                  <span className="w-5 h-5 rounded bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold shrink-0">
+          <div className="flex-1 flex flex-col p-4 overflow-auto h-full min-h-0">
+            <p 
+              className="text-lg font-semibold mb-4 text-center"
+              style={{ color: `hsl(${ds.foregroundColor})` }}
+            >
+              {slide.content || 'Расположите в правильном порядке'}
+            </p>
+            <div className="space-y-2">
+              {orderingItems.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center gap-2 p-3 border-2"
+                  style={{
+                    borderColor: `hsl(${ds.mutedColor})`,
+                    backgroundColor: `hsl(${ds.cardColor})`,
+                    borderRadius: ds.borderRadius,
+                  }}
+                >
+                  <span 
+                    className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                    style={{ 
+                      backgroundColor: `hsl(${ds.primaryColor})`,
+                      color: `hsl(${ds.primaryForeground})`,
+                    }}
+                  >
                     {idx + 1}
                   </span>
-                  <span className="text-xs">{item}</span>
+                  <span style={{ color: `hsl(${ds.foregroundColor})` }}>{item}</span>
+                  {answerState === 'idle' && (
+                    <div className="ml-auto flex gap-1">
+                      <button
+                        onClick={() => {
+                          if (idx === 0) return;
+                          const newItems = [...orderingItems];
+                          [newItems[idx], newItems[idx - 1]] = [newItems[idx - 1], newItems[idx]];
+                          setOrderingItems(newItems);
+                        }}
+                        className="p-1 text-xs"
+                        disabled={idx === 0}
+                      >
+                        ↑
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (idx === orderingItems.length - 1) return;
+                          const newItems = [...orderingItems];
+                          [newItems[idx], newItems[idx + 1]] = [newItems[idx + 1], newItems[idx]];
+                          setOrderingItems(newItems);
+                        }}
+                        className="p-1 text-xs"
+                        disabled={idx === orderingItems.length - 1}
+                      >
+                        ↓
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
         );
 
-
       default:
         return (
-          <div className="text-center py-4">
-            <p className="text-muted-foreground text-sm">Тип блока не поддерживается</p>
+          <div className="h-full flex items-center justify-center">
+            <p style={{ color: `hsl(${ds.foregroundColor} / 0.5)` }}>
+              Неизвестный тип блока: {slide.type}
+            </p>
           </div>
         );
     }
   };
 
-  const needsCheck = ['single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'slider'].includes(slide.type);
-  const canCheck = (selectedOptions.length > 0 || textAnswer.trim() !== '') && !answered;
+  // Фидбек после ответа
+  const renderFeedback = () => {
+    if (answerState === 'idle') return null;
 
-  return (
-    <div className="w-full h-full flex flex-col overflow-hidden">
-      <div className="flex-1 overflow-auto">
-        {renderContent()}
+    const bgColor = answerState === 'correct' 
+      ? `hsl(${ds.successColor} / 0.1)`
+      : answerState === 'partial'
+        ? `hsl(142 71% 45% / 0.1)`
+        : `hsl(${ds.destructiveColor} / 0.1)`;
+    
+    const textColor = answerState === 'correct'
+      ? `hsl(${ds.successColor})`
+      : answerState === 'partial'
+        ? `hsl(142 71% 45%)`
+        : `hsl(${ds.destructiveColor})`;
 
-        {/* Explanation */}
-        {answered && slide.explanation && (
-          <div className="mx-4 mb-4 p-3 rounded-lg bg-primary/5 flex items-start gap-2 animate-fade-up">
-            <Lightbulb className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-medium text-primary text-xs mb-0.5">Объяснение</p>
-              <p className="text-xs text-foreground">{slide.explanation}</p>
-            </div>
-          </div>
+    const title = answerState === 'correct' 
+      ? 'Правильно!' 
+      : answerState === 'partial' 
+        ? 'Частично верно' 
+        : 'Неправильно';
+
+    const explanation = answerState === 'correct'
+      ? slide?.explanationCorrect || slide?.explanation
+      : answerState === 'partial'
+        ? slide?.explanationPartial || slide?.explanation
+        : slide?.explanation;
+
+    return (
+      <div 
+        className="px-4 py-3 border-t"
+        style={{ 
+          backgroundColor: bgColor,
+          borderColor: textColor,
+        }}
+      >
+        <div className="flex items-center gap-2 mb-1">
+          {answerState === 'correct' ? (
+            <Check className="w-5 h-5" style={{ color: textColor }} />
+          ) : (
+            <X className="w-5 h-5" style={{ color: textColor }} />
+          )}
+          <span className="font-semibold" style={{ color: textColor }}>{title}</span>
+        </div>
+        {explanation && (
+          <p className="text-sm" style={{ color: textColor }}>{explanation}</p>
         )}
       </div>
+    );
+  };
 
-      {/* Actions - only show if not hidden */}
-      {!hideActions && (
-        <div className="mt-4 flex justify-center gap-3">
-          {needsCheck && !answered && (
-            <Button onClick={checkAnswer} disabled={!canCheck} size="sm" className="font-bold uppercase tracking-wide">
-              ПРОВЕРИТЬ
-            </Button>
-          )}
-          {(answered || !needsCheck) && (
-            <Button onClick={onNext} size="sm" className="animate-bounce-subtle font-bold uppercase tracking-wide">
-              ДАЛЕЕ
-              <ArrowRight className="w-4 h-4 ml-1" />
-            </Button>
-          )}
+  // Прогресс бар
+  const progress = totalCount > 0 ? ((currentIndex + 1) / totalCount) * 100 : 0;
+
+  return (
+    <div 
+      className="h-full w-full flex flex-col overflow-hidden"
+      style={{ 
+        backgroundColor: slide.backgroundColor ? `hsl(${slide.backgroundColor})` : `hsl(${ds.backgroundColor})`,
+        fontFamily: ds.fontFamily,
+      }}
+    >
+      {/* Прогресс бар */}
+      {showProgress && (
+        <div 
+          className="h-1 w-full flex-shrink-0"
+          style={{ backgroundColor: `hsl(${ds.mutedColor})` }}
+        >
+          <div 
+            className="h-full transition-all duration-300"
+            style={{ 
+              width: `${progress}%`,
+              backgroundColor: `hsl(${ds.primaryColor})`,
+            }}
+          />
         </div>
       )}
+
+      {/* Контент */}
+      <div className="flex-1 min-h-0 overflow-auto">
+        {renderContent()}
+      </div>
+
+      {/* Фидбек */}
+      {renderFeedback()}
+
+      {/* Нижняя навигация */}
+      <div 
+        className="p-4 border-t flex-shrink-0"
+        style={{ borderColor: `hsl(${ds.mutedColor})` }}
+      >
+        {isInteractive && answerState === 'idle' ? (
+          <button
+            onClick={checkAnswer}
+            disabled={!canCheck()}
+            className={cn(
+              "w-full h-12 font-bold uppercase tracking-wide transition-all",
+              pressAnimationClass
+            )}
+            style={{
+              backgroundColor: canCheck() ? `hsl(${ds.primaryColor})` : `hsl(${ds.mutedColor})`,
+              color: canCheck() ? `hsl(${ds.primaryForeground})` : `hsl(${ds.foregroundColor} / 0.5)`,
+              borderRadius: getButtonRadius(),
+              ...(canCheck() ? getRaisedButtonStyle(ds.primaryColor) : {}),
+            }}
+          >
+            ПРОВЕРИТЬ
+          </button>
+        ) : (
+          <button
+            onClick={() => {
+              playSound('swipe', soundConfig);
+              onContinue?.();
+            }}
+            className={cn("w-full h-12 font-bold uppercase tracking-wide", pressAnimationClass)}
+            style={{
+              backgroundColor: `hsl(${ds.primaryColor})`,
+              color: `hsl(${ds.primaryForeground})`,
+              borderRadius: getButtonRadius(),
+              ...getRaisedButtonStyle(ds.primaryColor),
+            }}
+          >
+            ПРОДОЛЖИТЬ
+          </button>
+        )}
+      </div>
     </div>
   );
-}
-
-// Export helper to check if slide needs checking
-export const slideNeedsCheck = (slideType: string) => 
-  ['single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'slider'].includes(slideType);
+};
