@@ -180,8 +180,8 @@ const SortableSubBlockItem: React.FC<{
 
         // Limit heading to 29 characters
         const MAX_HEADING_CHARS = 29;
-        const currentLength = (subBlock.content || '').length;
-        const remainingChars = MAX_HEADING_CHARS - currentLength;
+        const [headingLength, setHeadingLength] = React.useState((subBlock.content || '').length);
+        const remainingChars = MAX_HEADING_CHARS - headingLength;
 
         return (
           <div className="w-full relative">
@@ -195,25 +195,28 @@ const SortableSubBlockItem: React.FC<{
                   const text = e.currentTarget.textContent || '';
                   const limitedText = text.slice(0, MAX_HEADING_CHARS);
                   onUpdate({ content: limitedText });
-                  if (text.length > MAX_HEADING_CHARS) {
-                    e.currentTarget.textContent = limitedText;
-                  }
                 }
               }}
               onInput={(e) => {
                 const text = e.currentTarget.textContent || '';
                 if (text.length > MAX_HEADING_CHARS) {
-                  e.currentTarget.textContent = text.slice(0, MAX_HEADING_CHARS);
-                  // Move cursor to end
-                  const range = document.createRange();
+                  // Save cursor position
                   const sel = window.getSelection();
-                  range.selectNodeContents(e.currentTarget);
-                  range.collapse(false);
-                  sel?.removeAllRanges();
-                  sel?.addRange(range);
+                  const cursorPos = sel?.anchorOffset || 0;
+                  
+                  e.currentTarget.textContent = text.slice(0, MAX_HEADING_CHARS);
+                  
+                  // Restore cursor position
+                  if (e.currentTarget.firstChild) {
+                    const range = document.createRange();
+                    range.setStart(e.currentTarget.firstChild, Math.min(cursorPos, MAX_HEADING_CHARS));
+                    range.collapse(true);
+                    sel?.removeAllRanges();
+                    sel?.addRange(range);
+                  }
                 }
-                // Trigger update for counter
-                onUpdate({ content: e.currentTarget.textContent || '' });
+                // Update counter only (not the state)
+                setHeadingLength((e.currentTarget.textContent || '').length);
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
