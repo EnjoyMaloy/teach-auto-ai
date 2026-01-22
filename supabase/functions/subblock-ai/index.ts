@@ -39,16 +39,41 @@ serve(async (req) => {
   }
 
   try {
-    const { message, currentSubBlock, allSubBlocks } = await req.json();
+    const { message, currentSubBlock, allSubBlocks, conversationHistory } = await req.json();
     
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     if (!GEMINI_API_KEY) {
       throw new Error("GEMINI_API_KEY is not configured");
     }
 
-    const userContext = currentSubBlock 
-      ? `Текущий саб-блок (тип: ${currentSubBlock.type}): ${JSON.stringify(currentSubBlock)}\n\nЗапрос пользователя: ${message}`
-      : `Все саб-блоки: ${JSON.stringify(allSubBlocks || [])}\n\nЗапрос пользователя: ${message}`;
+    // Build context based on what we have
+    let userContext = '';
+    if (currentSubBlock) {
+      userContext = `Текущий саб-блок (тип: ${currentSubBlock.type}): ${JSON.stringify(currentSubBlock)}\n\nЗапрос пользователя: ${message}`;
+    } else if (allSubBlocks && allSubBlocks.length > 0) {
+      userContext = `Текущие саб-блоки на слайде: ${JSON.stringify(allSubBlocks)}\n\nЗапрос пользователя: ${message}`;
+    } else {
+      userContext = `Слайд пустой. Создай саб-блоки по запросу.\n\nЗапрос пользователя: ${message}`;
+    }
+
+    // Build conversation with history
+    const contents = [
+      { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
+      { role: "model", parts: [{ text: "Понял. Готов помочь с дизайном слайдов. Жду запрос." }] },
+    ];
+
+    // Add conversation history if available
+    if (conversationHistory && Array.isArray(conversationHistory)) {
+      for (const msg of conversationHistory) {
+        contents.push({
+          role: msg.role === 'user' ? 'user' : 'model',
+          parts: [{ text: msg.content }]
+        });
+      }
+    }
+
+    // Add current message
+    contents.push({ role: "user", parts: [{ text: userContext }] });
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
@@ -56,14 +81,10 @@ serve(async (req) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [
-            { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
-            { role: "model", parts: [{ text: "Понял. Готов помочь с саб-блоками. Жду запрос." }] },
-            { role: "user", parts: [{ text: userContext }] }
-          ],
+          contents,
           generationConfig: {
             temperature: 0.7,
-            maxOutputTokens: 2048,
+            maxOutputTokens: 4096,
           }
         }),
       }

@@ -852,14 +852,6 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
           </>
         )}
 
-        {/* AI Chat - always visible at the bottom */}
-        <div className="pt-4 border-t border-border mt-4">
-          <SubBlockAIChat
-            subBlock={subBlock}
-            onUpdate={onUpdate}
-            onReplaceAllBlocks={onReplaceAllBlocks}
-          />
-        </div>
       </div>
     </div>
   );

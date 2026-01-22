@@ -2,6 +2,7 @@ import React from 'react';
 import { Block, BlockType, BLOCK_CONFIGS, BlockOption } from '@/types/blocks';
 import { SubBlock, SubBlockType, SUB_BLOCK_CONFIGS, createSubBlock } from '@/types/designBlock';
 import { SubBlockSettingsEditor } from './SubBlockSettingsEditor';
+import { DesignAIChat } from './DesignAIChat';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -709,6 +710,17 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                 })}
               </div>
             )}
+            
+            {/* AI Chat - always visible at the bottom for design blocks */}
+            <div className="pt-4 border-t border-border mt-4">
+              <DesignAIChat
+                blockId={block.id}
+                subBlocks={block.subBlocks || []}
+                onReplaceAllBlocks={(newBlocks) => {
+                  onUpdate({ subBlocks: newBlocks });
+                }}
+              />
+            </div>
           </>
         )}
       </div>
