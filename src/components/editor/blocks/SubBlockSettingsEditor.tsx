@@ -524,7 +524,7 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
         {/* Button settings */}
         {subBlock.type === 'button' && (
           <>
-            {renderAlignmentSelector()}
+            {renderAlignmentSelector(false)}
             {renderButtonVariantSelector()}
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">Ссылка</Label>
