@@ -417,7 +417,8 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
   };
 
   // Main content based on view mode
-  const renderContent = () => {
+  // useEmbedded: true for phone frame (preview/desktop public), false for fullscreen
+  const renderContent = (useEmbedded: boolean = false) => {
     if (viewMode === 'completed') {
       return renderCompletionContent();
     }
@@ -433,14 +434,15 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
           designSystem={course.designSystem}
           isMuted={false}
           isReadOnly={true}
-          fillContainer={fullscreen} // Use fillContainer with absolute positioning for fullscreen
+          embedded={useEmbedded}
+          fillContainer={!useEmbedded && fullscreen}
         />
       );
     }
     
     // Map view
     return (
-      <div className="h-full overflow-auto">
+      <div className="h-full overflow-auto flex flex-col">
         <LessonMap
           lessons={course.lessons}
           displayType={displayType}
@@ -453,8 +455,6 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
   };
 
   // Fullscreen mode (Telegram / public link on mobile)
-  console.log('CoursePlayer render:', { mode, fullscreen, courseId });
-  
   if (fullscreen) {
     return (
       <DesignSystemProvider config={course.designSystem}>
@@ -466,7 +466,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
         >
           {/* Wrap content in flex-1 to fill remaining space */}
           <div className="flex-1 min-h-0 flex flex-col">
-            {renderContent()}
+            {renderContent(false)}
           </div>
         </div>
       </DesignSystemProvider>
@@ -511,7 +511,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
               backgroundColor: `hsl(var(--ds-background, var(--background)))`,
             }}
           >
-            {renderContent()}
+            {renderContent(true)}
           </div>
         </DesignSystemProvider>
       </div>
@@ -529,32 +529,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
             backgroundColor: `hsl(var(--ds-background, var(--background)))`,
           }}
         >
-          {/* Re-render content with embedded mode for phone frame */}
-          {viewMode === 'completed' ? (
-            renderCompletionContent()
-          ) : viewMode === 'lesson' ? (
-            <MobilePreviewFrame
-              block={currentBlock}
-              lessonTitle={currentLesson?.title}
-              blockIndex={currentBlockIndex}
-              totalBlocks={blocks.length}
-              onContinue={handleContinue}
-              designSystem={course.designSystem}
-              isMuted={false}
-              isReadOnly={true}
-              embedded // Use embedded mode for phone frame
-            />
-          ) : (
-            <div className="h-full overflow-auto">
-              <LessonMap
-                lessons={course.lessons}
-                displayType={displayType}
-                completedLessons={completedLessons}
-                currentLessonId={currentLesson?.id}
-                onSelectLesson={handleSelectLesson}
-              />
-            </div>
-          )}
+          {renderContent(true)}
         </div>
       </DesignSystemProvider>
     </div>
