@@ -186,12 +186,13 @@ const SortableSubBlockItem: React.FC<{
         const MAX_HEADING_CHARS = 45;
 
         return (
-          <div className="w-full">
+          <div className="w-full" dir="ltr">
             <h2 
               className={cn(headingSizeClass, fontWeightClass, textAlignClass, 'break-words whitespace-pre-wrap outline-none')}
-              style={{ color: `hsl(${ds.foregroundColor})` }}
+              style={{ color: `hsl(${ds.foregroundColor})`, direction: 'ltr', unicodeBidi: 'plaintext' }}
               contentEditable={isEditing}
               suppressContentEditableWarning
+              dir="ltr"
               onFocus={() => {
                 setIsHeadingFocused(true);
                 if (onSelect) {
@@ -284,8 +285,16 @@ const SortableSubBlockItem: React.FC<{
           ? 'hsl(0 0% 100%)' 
           : `hsl(${ds.foregroundColor} / 0.8)`;
 
+        const textRotation = subBlock.textRotation || 0;
+
         return (
-          <div style={backdropStyles as React.CSSProperties}>
+          <div 
+            style={{
+              ...backdropStyles as React.CSSProperties,
+              transform: textRotation ? `rotate(${textRotation}deg)` : undefined,
+              transition: 'transform 0.3s ease',
+            }}
+          >
             <RichTextEditor
               content={subBlock.content || (isEditing ? '' : 'Текст абзаца')}
               onChange={(content) => onUpdate({ content })}
