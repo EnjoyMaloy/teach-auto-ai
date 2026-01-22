@@ -770,8 +770,33 @@ const TemplateSelector: React.FC<{
 const SubBlockSelector: React.FC<{
   onSelectType: (type: SubBlockType) => void;
   onClose: () => void;
-}> = ({ onSelectType, onClose }) => {
+  inline?: boolean;
+}> = ({ onSelectType, onClose, inline = false }) => {
   const types = Object.values(SUB_BLOCK_CONFIGS);
+  
+  if (inline) {
+    return (
+      <div className="flex flex-col gap-1 py-2 border-t border-border mt-4">
+        <p className="text-xs text-muted-foreground mb-2 px-1">Добавить элемент:</p>
+        {types.map((config) => {
+          const IconComponent = iconMap[config.icon as keyof typeof iconMap];
+          return (
+            <button
+              key={config.type}
+              onClick={() => {
+                onSelectType(config.type);
+                onClose();
+              }}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-muted transition-colors text-left w-full"
+            >
+              {IconComponent && <IconComponent className="w-4 h-4 text-primary flex-shrink-0" />}
+              <span className="text-sm">{config.labelRu}</span>
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
   
   return (
     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card border border-border rounded-xl shadow-lg p-3 z-50 min-w-[260px]">
@@ -911,35 +936,15 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
         </SortableContext>
       </DndContext>
 
-      {/* Add sub-block button */}
+      {/* Add sub-block list */}
       {isEditing && (
-        <div className="relative flex justify-center mt-4">
-          {showAddMenu && (
-            <>
-              {/* Backdrop to close menu */}
-              <div 
-                className="fixed inset-0 z-40" 
-                onClick={() => setShowAddMenu(false)}
-              />
-              <SubBlockSelector
-                onSelectType={(type) => {
-                  handleAddSubBlock(type);
-                  setShowAddMenu(false);
-                }}
-                onClose={() => setShowAddMenu(false)}
-              />
-            </>
-          )}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowAddMenu(!showAddMenu)}
-            className="rounded-full relative z-50"
-          >
-            <Plus className="w-4 h-4 mr-1" />
-            Добавить
-          </Button>
-        </div>
+        <SubBlockSelector
+          onSelectType={(type) => {
+            handleAddSubBlock(type);
+          }}
+          onClose={() => {}}
+          inline
+        />
       )}
     </div>
   );
