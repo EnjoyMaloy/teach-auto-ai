@@ -95,15 +95,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     xlarge: 'text-xl',
   }[textSize];
 
-  // Text alignment class - includes justify
-  const textAlignClass = {
+  const isJustified = textAlign === 'justify';
+  
+  // For justify, we use custom CSS instead of Tailwind class
+  const textAlignClass = isJustified ? '' : {
     left: 'text-left',
     center: 'text-center',
     right: 'text-right',
-    justify: 'text-justify',
-  }[textAlign];
-
-  const isJustified = textAlign === 'justify';
+  }[textAlign] || 'text-left';
 
   const editor = useEditor({
     extensions: [
@@ -167,10 +166,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   }, [isEditing, editor]);
 
   // Dynamic styles for highlighting and justify
-  const justifyCss = isJustified 
-    ? 'text-align: justify !important; text-justify: inter-word;'
-    : '';
-
   const dynamicStyles = `
     .rich-text-highlight {
       background-color: hsl(${highlightColor});
@@ -196,36 +191,44 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       text-decoration-color: hsl(${wavyColor});
       text-underline-offset: 4px;
     }
-    .rich-text-justify,
-    .rich-text-justify .ProseMirror,
-    .rich-text-justify .ProseMirror p,
-    .rich-text-justify > div,
-    .rich-text-justify > div > *,
-    .rich-text-readonly.rich-text-justify,
-    .rich-text-readonly.rich-text-justify > div,
-    .rich-text-readonly.rich-text-justify > div > * {
-      ${justifyCss}
+    ${isJustified ? `
+    .rich-text-editor-wrapper,
+    .rich-text-editor-wrapper .ProseMirror,
+    .rich-text-editor-wrapper .ProseMirror p,
+    .rich-text-editor-wrapper > div,
+    .rich-text-readonly-wrapper,
+    .rich-text-readonly-wrapper > div,
+    .rich-text-readonly-wrapper > div > * {
+      text-align: justify !important;
+      text-justify: inter-word !important;
+      word-spacing: 0.05em;
     }
+    ` : ''}
   `;
-
-  const justifyClass = isJustified ? 'rich-text-justify' : '';
 
   if (!isEditing) {
     return (
       <div 
-        className={cn(textSizeClass, textAlignClass, 'rich-text-readonly', justifyClass, className)}
-        style={{ color: textColor }}
+        className={cn(textSizeClass, textAlignClass, 'rich-text-readonly-wrapper w-full', className)}
+        style={{ 
+          color: textColor,
+          ...(isJustified ? { textAlign: 'justify', textJustify: 'inter-word' } : {})
+        }}
       >
         <style>{dynamicStyles}</style>
-        <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(content || placeholder) }} />
+        <div 
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(content || placeholder) }}
+          style={isJustified ? { textAlign: 'justify', textJustify: 'inter-word' } : {}}
+        />
       </div>
     );
   }
 
   return (
     <div 
-      className={cn('rounded-lg transition-all', justifyClass, isFocused ? 'border border-border/50' : '', className)}
+      className={cn('rounded-lg transition-all rich-text-editor-wrapper w-full', textAlignClass, isFocused ? 'border border-border/50' : '', className)}
       onClick={(e) => e.stopPropagation()}
+      style={isJustified ? { textAlign: 'justify', textJustify: 'inter-word' } : {}}
       onFocus={() => {
         setIsFocused(true);
         onFocusChange?.(true);
