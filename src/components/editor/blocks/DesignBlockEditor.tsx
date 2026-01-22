@@ -359,25 +359,14 @@ const SortableSubBlockItem: React.FC<{
         );
 
       case 'image':
-        // Image sizing: max aspect ratio 1:1 (height), can be wider up to 10:1
-        // If image is taller than square, it gets cropped and centered
-        const imageSizeClass = {
-          small: 'max-w-[100px]',
-          medium: 'max-w-[200px]',
-          large: 'max-w-[300px]',
-          full: 'w-full',
-        }[subBlock.imageSize || 'medium'];
-
+        // Image scales to full width (same as text backdrop) with aspect ratio constraints
+        // Max height = width (1:1), can be wider up to 10:1
         return (
-          <div className={cn('flex', textAlignClass === 'text-center' ? 'justify-center' : textAlignClass === 'text-right' ? 'justify-end' : 'justify-start')}>
+          <div className="w-full">
             {subBlock.imageUrl ? (
               <div 
-                className={cn('rounded-lg overflow-hidden', imageSizeClass)}
-                style={{ 
-                  // Max height equals width (1:1 aspect ratio max for height)
-                  // Width can be up to 10x height (10:1 ratio)
-                  aspectRatio: 'auto',
-                }}
+                className="w-full rounded-lg overflow-hidden"
+                style={{ aspectRatio: 'auto' }}
               >
                 <img 
                   src={subBlock.imageUrl} 
@@ -400,7 +389,8 @@ const SortableSubBlockItem: React.FC<{
                 />
               </div>
             ) : isEditing ? (
-              <label className={cn('flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer', imageSizeClass, 'min-h-[100px] aspect-square')}
+              <label 
+                className="w-full flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer min-h-[100px] aspect-[3/1]"
                 style={{ borderColor: `hsl(${ds.mutedColor})` }}
               >
                 <input
@@ -423,7 +413,7 @@ const SortableSubBlockItem: React.FC<{
               </label>
             ) : (
               <div 
-                className={cn('flex items-center justify-center rounded-lg aspect-square', imageSizeClass, 'min-h-[100px]')}
+                className="w-full flex items-center justify-center rounded-lg aspect-[3/1] min-h-[60px]"
                 style={{ backgroundColor: `hsl(${ds.mutedColor})` }}
               >
                 <Image className="w-8 h-8" style={{ color: `hsl(${ds.foregroundColor} / 0.3)` }} />
