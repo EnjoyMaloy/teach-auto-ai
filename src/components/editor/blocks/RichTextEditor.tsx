@@ -63,7 +63,7 @@ interface RichTextEditorProps {
   onChange: (content: string) => void;
   placeholder?: string;
   textSize?: 'small' | 'medium' | 'large' | 'xlarge';
-  textAlign?: 'left' | 'center' | 'right';
+  textAlign?: 'left' | 'center' | 'right' | 'justify';
   textColor?: string;
   highlightColor?: string;
   underlineColor?: string;
@@ -71,7 +71,6 @@ interface RichTextEditorProps {
   isEditing?: boolean;
   className?: string;
   onFocusChange?: (focused: boolean) => void;
-  textWrapMode?: 'standard' | 'justify' | 'hyphenate';
 }
 
 export const RichTextEditor: React.FC<RichTextEditorProps> = ({
@@ -87,7 +86,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   isEditing = true,
   className,
   onFocusChange,
-  textWrapMode = 'standard',
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const textSizeClass = {
@@ -97,25 +95,15 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     xlarge: 'text-xl',
   }[textSize];
 
-  // Text alignment - ignored when using justify/hyphenate modes
-  const effectiveTextAlign = (textWrapMode === 'justify' || textWrapMode === 'hyphenate') 
-    ? 'left' // justify handles alignment
-    : textAlign;
-
+  // Text alignment class - includes justify
   const textAlignClass = {
     left: 'text-left',
     center: 'text-center',
     right: 'text-right',
-  }[effectiveTextAlign];
+    justify: 'text-justify',
+  }[textAlign];
 
-  // Text wrap mode classes
-  // justify: adjusts word spacing to fill line width
-  // hyphenate: justify + hyphenation for word breaks
-  const textWrapClass = {
-    standard: '',
-    justify: '!text-justify',
-    hyphenate: '!text-justify [hyphens:auto] [-webkit-hyphens:auto]',
-  }[textWrapMode] || '';
+  const isJustified = textAlign === 'justify';
 
   const editor = useEditor({
     extensions: [
@@ -157,8 +145,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         class: cn(
           'outline-none min-h-[60px] px-1 py-2',
           textSizeClass,
-          textAlignClass,
-          textWrapClass
+          textAlignClass
         ),
         style: `color: ${textColor}`,
       },
@@ -179,12 +166,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   }, [isEditing, editor]);
 
-  // Dynamic styles for highlighting and text wrapping
-  const textWrapCss = textWrapMode === 'justify' 
-    ? 'text-align: justify; text-justify: inter-word;'
-    : textWrapMode === 'hyphenate'
-      ? 'text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto; word-break: break-word;'
-      : '';
+  // Dynamic styles for highlighting and justify
+  const justifyCss = isJustified 
+    ? 'text-align: justify !important; text-justify: inter-word;'
+    : '';
 
   const dynamicStyles = `
     .rich-text-highlight {
@@ -219,11 +204,11 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     .rich-text-readonly.rich-text-justify,
     .rich-text-readonly.rich-text-justify > div,
     .rich-text-readonly.rich-text-justify > div > * {
-      ${textWrapCss}
+      ${justifyCss}
     }
   `;
 
-  const justifyClass = (textWrapMode === 'justify' || textWrapMode === 'hyphenate') ? 'rich-text-justify' : '';
+  const justifyClass = isJustified ? 'rich-text-justify' : '';
 
   if (!isEditing) {
     return (

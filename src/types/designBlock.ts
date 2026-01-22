@@ -57,11 +57,8 @@ export interface SubBlock {
   // Text rotation
   textRotation?: number;
   
-  // Text wrap mode
-  textWrapMode?: 'standard' | 'justify' | 'hyphenate';
-  
   // Styling
-  textAlign?: 'left' | 'center' | 'right';
+  textAlign?: 'left' | 'center' | 'right' | 'justify';
   textSize?: 'small' | 'medium' | 'large' | 'xlarge';
   fontWeight?: 'normal' | 'medium' | 'semibold' | 'bold';
   padding?: 'none' | 'small' | 'medium' | 'large';

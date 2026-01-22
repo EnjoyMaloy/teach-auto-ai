@@ -300,7 +300,6 @@ const SortableSubBlockItem: React.FC<{
               underlineColor={ds.highlightUnderlineColor}
               wavyColor={ds.highlightWavyColor}
               isEditing={isEditing}
-              textWrapMode={subBlock.textWrapMode || 'standard'}
               onFocusChange={(focused) => {
                 setIsTextFocused(focused);
                 if (focused && onSelect) {
