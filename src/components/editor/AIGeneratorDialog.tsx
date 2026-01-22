@@ -97,16 +97,24 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
   };
 
   const generateImageForSlide = async (slideContent: string, coursePrompt: string): Promise<string | null> => {
+    // Create a timeout promise (30 seconds max per image)
+    const timeoutPromise = new Promise<null>((_, reject) => {
+      setTimeout(() => reject(new Error('Image generation timeout')), 30000);
+    });
+
     try {
-      const response = await supabase.functions.invoke('generate-image', {
+      const fetchPromise = supabase.functions.invoke('generate-image', {
         body: { 
           prompt: coursePrompt,
           slideContext: slideContent
         },
       });
 
-      if (response.error) {
-        console.error('Image generation error:', response.error);
+      // Race between the actual request and the timeout
+      const response = await Promise.race([fetchPromise, timeoutPromise]);
+
+      if (!response || response.error) {
+        console.error('Image generation error:', response?.error);
         return null;
       }
 
