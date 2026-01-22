@@ -185,11 +185,13 @@ const SortableSubBlockItem: React.FC<{
               }}
               onInput={(e) => {
                 const text = e.currentTarget.textContent || '';
+                const limitedText = text.slice(0, MAX_HEADING_CHARS);
+                
                 if (text.length > MAX_HEADING_CHARS) {
                   const sel = window.getSelection();
                   const cursorPos = sel?.anchorOffset || 0;
                   
-                  e.currentTarget.textContent = text.slice(0, MAX_HEADING_CHARS);
+                  e.currentTarget.textContent = limitedText;
                   
                   if (e.currentTarget.firstChild) {
                     const range = document.createRange();
@@ -199,7 +201,8 @@ const SortableSubBlockItem: React.FC<{
                     sel?.addRange(range);
                   }
                 }
-                setHeadingCounter(MAX_HEADING_CHARS - (e.currentTarget.textContent || '').length);
+                // Update content in real-time for the sidebar counter
+                onUpdate({ content: limitedText });
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
