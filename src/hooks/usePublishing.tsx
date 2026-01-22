@@ -121,6 +121,8 @@ export const usePublishing = () => {
    */
   const fetchPublishedCourse = async (courseId: string): Promise<Course | null> => {
     try {
+      console.log('fetchPublishedCourse: Starting fetch for', courseId);
+      
       // Fetch course metadata
       const { data: courseData, error: courseError } = await supabase
         .from('courses')
@@ -128,8 +130,16 @@ export const usePublishing = () => {
         .eq('id', courseId)
         .single();
 
-      if (courseError) throw courseError;
-      if (!courseData) return null;
+      if (courseError) {
+        console.error('fetchPublishedCourse: Course error', courseError);
+        throw courseError;
+      }
+      if (!courseData) {
+        console.log('fetchPublishedCourse: No course data');
+        return null;
+      }
+
+      console.log('fetchPublishedCourse: Course loaded, fetching published lessons');
 
       // Fetch published lessons
       const { data: lessonsData, error: lessonsError } = await supabase
@@ -138,12 +148,18 @@ export const usePublishing = () => {
         .eq('course_id', courseId)
         .order('order', { ascending: true });
 
-      if (lessonsError) throw lessonsError;
+      if (lessonsError) {
+        console.error('fetchPublishedCourse: Lessons error', lessonsError);
+        throw lessonsError;
+      }
 
       // If no published lessons, return null (not published yet)
       if (!lessonsData || lessonsData.length === 0) {
+        console.log('fetchPublishedCourse: No published lessons');
         return null;
       }
+
+      console.log('fetchPublishedCourse: Found', lessonsData.length, 'published lessons');
 
       // Fetch published slides
       const lessonIds = lessonsData.map(l => l.id);
@@ -153,7 +169,12 @@ export const usePublishing = () => {
         .in('published_lesson_id', lessonIds)
         .order('order', { ascending: true });
 
-      if (slidesError) throw slidesError;
+      if (slidesError) {
+        console.error('fetchPublishedCourse: Slides error', slidesError);
+        throw slidesError;
+      }
+
+      console.log('fetchPublishedCourse: Found', slidesData?.length || 0, 'published slides');
 
       // Build lessons with slides
       const lessons: Lesson[] = lessonsData.map(lesson => ({
@@ -221,9 +242,10 @@ export const usePublishing = () => {
         updatedAt: new Date(courseData.updated_at),
       };
 
+      console.log('fetchPublishedCourse: Successfully built course with', lessons.length, 'lessons');
       return course;
     } catch (error) {
-      console.error('Error fetching published course:', error);
+      console.error('fetchPublishedCourse: Error:', error);
       return null;
     }
   };
