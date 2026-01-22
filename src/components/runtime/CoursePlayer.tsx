@@ -47,8 +47,10 @@ const slideToBlock = (slide: Slide): Block => ({
   sliderStep: slide.sliderStep,
   orderingItems: slide.orderingItems,
   correctOrder: slide.correctOrder,
+  subBlocks: slide.subBlocks,
   backgroundColor: slide.backgroundColor,
   textColor: slide.textColor,
+  textSize: slide.textSize,
   createdAt: slide.createdAt,
   updatedAt: slide.updatedAt,
 });
