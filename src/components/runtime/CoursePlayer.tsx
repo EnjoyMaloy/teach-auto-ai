@@ -69,7 +69,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [currentBlockIndex, setCurrentBlockIndex] = useState(initialBlockIndex);
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
-  const [viewMode, setViewMode] = useState<ViewMode>('map');
+  const [viewMode, setViewMode] = useState<ViewMode>('map'); // Start with map
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [totalAnswers, setTotalAnswers] = useState(0);
 
@@ -433,7 +433,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
           designSystem={course.designSystem}
           isMuted={false}
           isReadOnly={true}
-          embedded={fullscreen} // Use embedded mode for fullscreen to fill container
+          fillContainer={fullscreen} // Use fillContainer with absolute positioning for fullscreen
         />
       );
     }
@@ -515,17 +515,43 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
     );
   }
 
-  // Public mode on desktop - phone frame without control buttons
+  // Public mode on desktop - phone frame with embedded content (no control buttons)
+  // The frame has fixed height, so MobilePreviewFrame will use embedded mode
   return (
     <div className="fixed inset-0 bg-muted/80 flex items-center justify-center p-4">
       <DesignSystemProvider config={course.designSystem}>
         <div 
-          className="h-[calc(100vh-80px)] w-[calc((100vh-80px)*9/16)] max-w-[420px] rounded-[2.5rem] overflow-hidden flex flex-col border-4 border-foreground/10 shadow-2xl"
+          className="h-[calc(100vh-80px)] w-[calc((100vh-80px)*9/16)] max-w-[420px] rounded-[2.5rem] overflow-hidden border-4 border-foreground/10 shadow-2xl"
           style={{
             backgroundColor: `hsl(var(--ds-background, var(--background)))`,
           }}
         >
-          {renderContent()}
+          {/* Re-render content with embedded mode for phone frame */}
+          {viewMode === 'completed' ? (
+            renderCompletionContent()
+          ) : viewMode === 'lesson' ? (
+            <MobilePreviewFrame
+              block={currentBlock}
+              lessonTitle={currentLesson?.title}
+              blockIndex={currentBlockIndex}
+              totalBlocks={blocks.length}
+              onContinue={handleContinue}
+              designSystem={course.designSystem}
+              isMuted={false}
+              isReadOnly={true}
+              embedded // Use embedded mode for phone frame
+            />
+          ) : (
+            <div className="h-full overflow-auto">
+              <LessonMap
+                lessons={course.lessons}
+                displayType={displayType}
+                completedLessons={completedLessons}
+                currentLessonId={currentLesson?.id}
+                onSelectLesson={handleSelectLesson}
+              />
+            </div>
+          )}
         </div>
       </DesignSystemProvider>
     </div>

@@ -1037,6 +1037,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   );
 
   // Embedded mode - fills parent container, used in CoursePlayer/PublicCourse
+  // Uses same flex pattern as tested in LayoutTest
   if (embedded) {
     return (
       <div 
@@ -1048,14 +1049,14 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         }}
       >
         {progressBar}
-        {/* Content area - takes remaining space, scrollable, content centered */}
-        <div className="flex-1 min-h-0 overflow-auto relative z-0 flex flex-col justify-center px-4 py-4">
+        {/* Content area - flex-1 to fill space, min-h-0 for scroll, centered */}
+        <div className="flex-1 min-h-0 overflow-auto flex flex-col justify-center items-center px-4 py-4">
           {renderContent()}
         </div>
         {resultFeedback}
-        {/* Bottom navigation - always at bottom with mt-auto as fallback */}
+        {/* Bottom navigation - shrink-0 to stay fixed at bottom */}
         <div 
-          className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0 relative z-10 mt-auto"
+          className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0"
           style={{ 
             backgroundColor: `hsl(${ds.cardColor})`,
             borderColor: `hsl(${ds.mutedColor})`,
