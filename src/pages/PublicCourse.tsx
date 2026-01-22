@@ -124,16 +124,14 @@ const PublicCourse: React.FC = () => {
     );
   }
 
-  // Desktop: show in a phone-like container with proper scaling (no fullscreen)
+  // Desktop: CoursePlayer handles its own phone frame layout
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-muted/80">
-      <CoursePlayer 
-        courseId={courseId} 
-        mode="public" 
-        onClose={() => navigate('/')} 
-        // No fullscreen prop - uses phone frame with proper scaling
-      />
-    </div>
+    <CoursePlayer 
+      courseId={courseId} 
+      mode="public" 
+      onClose={() => navigate('/')} 
+      // No fullscreen prop - uses phone frame with proper scaling
+    />
   );
 };
 

@@ -468,21 +468,21 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
     );
   }
 
-  // Preview mode - with phone frame and controls
-  return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      {/* Close button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={handleClose}
-        className="absolute top-4 right-4 z-20 bg-card/90 hover:bg-card border border-border shadow-lg"
-      >
-        <X className="w-5 h-5" />
-      </Button>
+  // Preview mode (editor) - with phone frame and control buttons
+  if (mode === 'preview') {
+    return (
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        {/* Close button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleClose}
+          className="absolute top-4 right-4 z-20 bg-card/90 hover:bg-card border border-border shadow-lg"
+        >
+          <X className="w-5 h-5" />
+        </Button>
 
-      {/* Refresh button - reload from DB (only in preview mode) */}
-      {mode === 'preview' && (
+        {/* Refresh button - reload from DB */}
         <Button
           variant="ghost"
           size="icon"
@@ -492,19 +492,33 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
         >
           <RefreshCw className="w-4 h-4" />
         </Button>
-      )}
 
-      {/* Info badge (only in preview mode) */}
-      {mode === 'preview' && (
+        {/* Info badge */}
         <div className="absolute top-4 left-4 z-20 bg-card/90 border border-border shadow-lg rounded-full px-3 py-1.5 text-xs text-muted-foreground">
           Сохранённая версия
         </div>
-      )}
 
-      {/* Phone frame */}
+        {/* Phone frame */}
+        <DesignSystemProvider config={course.designSystem}>
+          <div 
+            className="h-[calc(100vh-80px)] w-[calc((100vh-80px)*9/16)] max-w-full rounded-[2.5rem] overflow-hidden flex flex-col border-4 border-foreground/20 shadow-2xl"
+            style={{
+              backgroundColor: `hsl(var(--ds-background, var(--background)))`,
+            }}
+          >
+            {renderContent()}
+          </div>
+        </DesignSystemProvider>
+      </div>
+    );
+  }
+
+  // Public mode on desktop - phone frame without control buttons
+  return (
+    <div className="fixed inset-0 bg-muted/80 flex items-center justify-center p-4">
       <DesignSystemProvider config={course.designSystem}>
         <div 
-          className="h-[calc(100vh-80px)] w-[calc((100vh-80px)*9/16)] max-w-full rounded-[2.5rem] overflow-hidden flex flex-col border-4 border-foreground/20 shadow-2xl"
+          className="h-[calc(100vh-80px)] w-[calc((100vh-80px)*9/16)] max-w-[420px] rounded-[2.5rem] overflow-hidden flex flex-col border-4 border-foreground/10 shadow-2xl"
           style={{
             backgroundColor: `hsl(var(--ds-background, var(--background)))`,
           }}
