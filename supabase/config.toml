@@ -1,1 +1,4 @@
 project_id = "meisahpkysqibnjyvubh"
+
+[functions.subblock-ai]
+verify_jwt = false

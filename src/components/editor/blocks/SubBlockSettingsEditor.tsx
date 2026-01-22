@@ -8,6 +8,7 @@ import { Slider } from '@/components/ui/slider';
 import { BadgeEditor } from './BadgeEditor';
 import { TableEditor } from './TableEditor';
 import { useTextEditor } from './TextEditorContext';
+import { SubBlockAIChat } from './SubBlockAIChat';
 import {
   Heading, Type, Image, MousePointerClick, Minus, Plus, Sparkles, Tag, Play,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
@@ -848,6 +849,14 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
             </div>
           </>
         )}
+
+        {/* AI Chat - always visible at the bottom */}
+        <div className="pt-4 border-t border-border mt-4">
+          <SubBlockAIChat
+            subBlock={subBlock}
+            onUpdate={onUpdate}
+          />
+        </div>
       </div>
     </div>
   );
