@@ -632,15 +632,40 @@ const SortableSubBlockItem: React.FC<{
         const tAlign = { left: 'text-left', center: 'text-center', right: 'text-right' }[subBlock.textAlign as 'left'|'center'|'right' || 'left'];
         const tBorder = tStyle === 'bordered' ? 'border border-border' : '';
         
+        const handleCellChange = (rowIndex: number, cellIndex: number, newContent: string) => {
+          const newData = tData.map((row, ri) => 
+            ri === rowIndex 
+              ? row.map((cell, ci) => ci === cellIndex ? { ...cell, content: newContent } : cell)
+              : row
+          );
+          onUpdate({ tableData: newData });
+        };
+        
         return (
-          <div className={cn('w-full rounded-lg overflow-hidden', tBorder)}>
+          <div className={cn('w-full rounded-lg overflow-hidden', tBorder)} onClick={(e) => e.stopPropagation()}>
             <table className="w-full">
               <tbody className={tStyle !== 'simple' ? 'divide-y divide-border' : ''}>
                 {tData.map((row, ri) => (
                   <tr key={ri} className={tStyle === 'striped' && ri % 2 === 1 ? 'bg-muted/30' : ''}>
-                    {row.map((cell) => (
-                      <td key={cell.id} className={cn('p-2', tSize, tAlign, ri === 0 && 'font-medium bg-muted/50', tStyle === 'bordered' && 'border-r border-border last:border-r-0')}>
-                        {cell.content || '—'}
+                    {row.map((cell, ci) => (
+                      <td key={cell.id} className={cn('p-1', ri === 0 && 'font-medium bg-muted/50', tStyle === 'bordered' && 'border-r border-border last:border-r-0')}>
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={cell.content}
+                            onChange={(e) => handleCellChange(ri, ci, e.target.value)}
+                            placeholder={ri === 0 ? 'Заголовок' : 'Ячейка'}
+                            className={cn(
+                              'w-full bg-transparent border-none outline-none px-1 py-0.5 rounded',
+                              'focus:bg-muted/50 transition-colors',
+                              tSize, tAlign
+                            )}
+                          />
+                        ) : (
+                          <span className={cn(tSize, tAlign, 'block px-1 py-0.5')}>
+                            {cell.content || '—'}
+                          </span>
+                        )}
                       </td>
                     ))}
                   </tr>
