@@ -243,12 +243,11 @@ const PublicCourse: React.FC = () => {
 
   // Universal mobile-like container for all platforms (Telegram, mobile web, desktop)
   return (
-    <div className="fixed inset-0 bg-muted/80 flex items-center justify-center">
+    <div className="fixed inset-0 flex items-center justify-center bg-muted/80 md:bg-muted/80">
       <div 
-        className="w-full h-full max-w-[420px] md:h-[min(90vh,750px)] md:rounded-2xl md:shadow-2xl overflow-hidden"
+        className="w-full h-full md:max-w-[420px] md:h-[min(90vh,750px)] md:rounded-2xl md:shadow-2xl overflow-hidden"
         style={{ 
           background: 'white',
-          // Create new stacking context so fixed children are contained
           transform: 'translateZ(0)',
         }}
       >
