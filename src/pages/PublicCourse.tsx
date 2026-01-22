@@ -76,18 +76,15 @@ const PublicCourse: React.FC = () => {
   if (isTelegram) {
     return (
       <div 
-        className="fixed inset-0 overflow-hidden flex flex-col tg-fullscreen tg-no-bounce"
+        className="fixed inset-0 overflow-hidden tg-fullscreen tg-no-bounce"
         style={{ 
           background: 'var(--tg-theme-bg-color, white)',
-          // Use dynamic viewport height for mobile
           height: '100dvh',
           width: '100dvw',
-          // Telegram safe areas for notch/home indicator
           paddingTop: 'env(safe-area-inset-top, 0px)',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
           paddingLeft: 'env(safe-area-inset-left, 0px)',
           paddingRight: 'env(safe-area-inset-right, 0px)',
-          // Prevent iOS bounce
           touchAction: 'pan-x pan-y',
           WebkitOverflowScrolling: 'touch',
         }}
@@ -107,7 +104,7 @@ const PublicCourse: React.FC = () => {
   if (isMobile) {
     return (
       <div 
-        className="fixed inset-0 overflow-hidden flex flex-col"
+        className="fixed inset-0 overflow-hidden"
         style={{ 
           background: 'white',
           height: '100dvh',

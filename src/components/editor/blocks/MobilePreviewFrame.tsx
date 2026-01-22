@@ -1041,14 +1041,14 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     return (
       <div 
         ref={containerRef}
-        className="flex-1 w-full flex flex-col min-h-0"
+        className="h-full w-full flex flex-col"
         style={{ 
           backgroundColor: `hsl(${ds.backgroundColor})`,
           fontFamily: ds.fontFamily,
         }}
       >
         {progressBar}
-        {/* Content area - scrollable, content centered */}
+        {/* Content area - takes remaining space, scrollable, content centered */}
         <div className="flex-1 min-h-0 overflow-auto relative z-0 flex flex-col justify-center px-4 py-4">
           {renderContent()}
         </div>

@@ -459,7 +459,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
     return (
       <DesignSystemProvider config={course.designSystem}>
         <div 
-          className="h-full w-full"
+          className="h-full w-full flex flex-col"
           style={{
             backgroundColor: `hsl(var(--ds-background, var(--background)))`,
           }}
