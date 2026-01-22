@@ -10,6 +10,7 @@ import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
 import { Block, BlockType } from '@/types/blocks';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import { usePublishing } from '@/hooks/usePublishing';
 
 interface CoursePlayerProps {
   /** Course ID to load from database */
@@ -75,6 +76,8 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [totalAnswers, setTotalAnswers] = useState(0);
 
+  const { fetchPublishedCourse } = usePublishing();
+
   // Load course from database
   const loadCourse = async () => {
     setIsLoading(true);
@@ -83,6 +86,22 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
     try {
       console.log('CoursePlayer: Loading course', courseId, 'mode:', mode);
       
+      // In public mode, try to load published version first
+      if (mode === 'public') {
+        const publishedCourse = await fetchPublishedCourse(courseId);
+        if (publishedCourse) {
+          setCourse(publishedCourse);
+          console.log('CoursePlayer: Published course loaded successfully');
+          setIsLoading(false);
+          return;
+        }
+        // If no published version, show error
+        setError('Курс ещё не опубликован');
+        setIsLoading(false);
+        return;
+      }
+      
+      // In preview mode, load draft version
       // Fetch course
       const { data: courseData, error: courseError } = await supabase
         .from('courses')

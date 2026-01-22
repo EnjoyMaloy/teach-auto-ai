@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, Check, Globe, Bot, ExternalLink, Loader2, MessageCircle, BookOpen, AlertCircle, CheckCircle } from 'lucide-react';
+import { Copy, Check, Globe, Bot, ExternalLink, Loader2, MessageCircle, BookOpen, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -14,12 +14,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Course } from '@/types/course';
+import { usePublishing } from '@/hooks/usePublishing';
 
 interface PublishDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   courseId: string;
   courseTitle: string;
+  course?: Course;
   isLinkAccessible?: boolean;
   isPublished?: boolean;
   moderationStatus?: string | null;
@@ -32,6 +35,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
   onOpenChange,
   courseId,
   courseTitle,
+  course,
   isLinkAccessible = false,
   isPublished = false,
   moderationStatus = null,
@@ -46,6 +50,16 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
   const [botUsername, setBotUsername] = useState<string | null>(null);
   const [botLink, setBotLink] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [hasPublished, setHasPublished] = useState(false);
+  
+  const { isPublishing, publishCourse, hasPublishedVersion } = usePublishing();
+
+  // Check if course has published version
+  useEffect(() => {
+    if (open && courseId) {
+      hasPublishedVersion(courseId).then(setHasPublished);
+    }
+  }, [open, courseId]);
 
   const publishedUrl = 'https://teach-auto-ai.lovable.app';
   const webUrl = `${publishedUrl}/course/${courseId}`;
@@ -241,31 +255,78 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
             </div>
 
             {isLinkAccessible && (
-              <div className="space-y-2">
-                <Label>Ссылка на курс</Label>
-                <div className="flex gap-2">
-                  <Input
-                    value={webUrl}
-                    readOnly
-                    className="bg-muted font-mono text-sm"
-                  />
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={handleCopyLink}
-                    className="shrink-0"
-                  >
-                    {copied ? (
-                      <Check className="w-4 h-4 text-emerald-600" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </Button>
+              <div className="space-y-3">
+                {/* Update button */}
+                <div className="p-3 rounded-lg border bg-blue-50 border-blue-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-sm">
+                        {hasPublished ? 'Обновить публичную версию' : 'Опубликовать курс'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {hasPublished 
+                          ? 'Применить изменения из редактора' 
+                          : 'Сделать курс доступным по ссылке'}
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={async () => {
+                        if (course) {
+                          const success = await publishCourse(course);
+                          if (success) {
+                            setHasPublished(true);
+                            onUpdate?.();
+                          }
+                        }
+                      }}
+                      disabled={isPublishing || !course}
+                    >
+                      {isPublishing ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <>
+                          <RefreshCw className="w-4 h-4 mr-1" />
+                          {hasPublished ? 'Обновить' : 'Опубликовать'}
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
-                <Button className="w-full mt-2" onClick={() => window.open(previewUrl, '_blank')}>
+
+                <div className="space-y-2">
+                  <Label>Ссылка на курс</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={webUrl}
+                      readOnly
+                      className="bg-muted font-mono text-sm"
+                    />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handleCopyLink}
+                      className="shrink-0"
+                    >
+                      {copied ? (
+                        <Check className="w-4 h-4 text-emerald-600" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+                
+                <Button className="w-full" onClick={() => window.open(previewUrl, '_blank')}>
                   <ExternalLink className="w-4 h-4 mr-2" />
                   Открыть в новой вкладке
                 </Button>
+
+                {!hasPublished && (
+                  <p className="text-xs text-amber-600 text-center">
+                    ⚠️ Курс ещё не опубликован. Нажмите "Опубликовать" чтобы сделать его видимым.
+                  </p>
+                )}
               </div>
             )}
           </TabsContent>
