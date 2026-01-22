@@ -60,7 +60,7 @@ const SortableSubBlockItem: React.FC<{
 }> = ({ subBlock, isEditing, onUpdate, onDelete, designSystem }) => {
   // Component state - always called unconditionally at top level
   const [isTextFocused, setIsTextFocused] = useState(false);
-  const [headingCounter, setHeadingCounter] = useState(29 - (subBlock.content || '').length);
+  const [headingCounter, setHeadingCounter] = useState(35 - (subBlock.content || '').length);
   
   const {
     attributes,
@@ -181,8 +181,8 @@ const SortableSubBlockItem: React.FC<{
 
         const headingHighlightStyles = getHighlightStyles(subBlock.highlight);
 
-        // Limit heading to 29 characters
-        const MAX_HEADING_CHARS = 29;
+        // Limit heading to 35 characters
+        const MAX_HEADING_CHARS = 35;
 
         return (
           <div className="w-full relative">
