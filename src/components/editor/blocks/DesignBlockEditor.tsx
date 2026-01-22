@@ -178,17 +178,40 @@ const SortableSubBlockItem: React.FC<{
 
         const headingHighlightStyles = getHighlightStyles(subBlock.highlight);
 
-        // Just render as non-editable h2 that wraps properly - editing happens inline
+        // Limit heading to 2 lines max
+        const MAX_HEADING_LINES = 2;
+        const APPROX_CHARS_PER_LINE = 30; // Approximate chars per line for mobile width
+        const MAX_HEADING_CHARS = MAX_HEADING_LINES * APPROX_CHARS_PER_LINE;
+
         return (
           <div className="w-full">
             <h2 
-              className={cn(headingSizeClass, fontWeightClass, textAlignClass, 'break-words whitespace-pre-wrap')}
+              className={cn(headingSizeClass, fontWeightClass, textAlignClass, 'break-words whitespace-pre-wrap line-clamp-2')}
               style={{ color: `hsl(${ds.foregroundColor})` }}
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={(e) => {
                 if (isEditing) {
-                  onUpdate({ content: e.currentTarget.textContent || '' });
+                  const text = e.currentTarget.textContent || '';
+                  // Limit to max chars for ~2 lines
+                  const limitedText = text.slice(0, MAX_HEADING_CHARS);
+                  onUpdate({ content: limitedText });
+                  if (text.length > MAX_HEADING_CHARS) {
+                    e.currentTarget.textContent = limitedText;
+                  }
+                }
+              }}
+              onInput={(e) => {
+                const text = e.currentTarget.textContent || '';
+                if (text.length > MAX_HEADING_CHARS) {
+                  e.currentTarget.textContent = text.slice(0, MAX_HEADING_CHARS);
+                  // Move cursor to end
+                  const range = document.createRange();
+                  const sel = window.getSelection();
+                  range.selectNodeContents(e.currentTarget);
+                  range.collapse(false);
+                  sel?.removeAllRanges();
+                  sel?.addRange(range);
                 }
               }}
               onKeyDown={(e) => {
