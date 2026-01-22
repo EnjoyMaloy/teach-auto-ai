@@ -35,7 +35,7 @@ import { RichTextEditor } from './RichTextEditor';
 import {
   Plus, Trash2, GripVertical, Upload,
   Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Layers, Play,
-  Highlighter, Underline, Waves
+  Highlighter, Underline, Waves, Link, ExternalLink
 } from 'lucide-react';
 import { AnimationBlock } from './AnimationBlock';
 
@@ -443,24 +443,55 @@ const SortableSubBlockItem: React.FC<{
           },
         }[subBlock.buttonVariant || 'primary'];
 
+        const hasExternalLink = !!subBlock.buttonUrl?.trim();
+
+        const handleButtonClick = () => {
+          if (hasExternalLink && !isEditing) {
+            window.open(subBlock.buttonUrl, '_blank', 'noopener,noreferrer');
+          }
+        };
+
         return (
-          <div className={cn('flex', textAlignClass === 'text-center' ? 'justify-center' : textAlignClass === 'text-right' ? 'justify-end' : 'justify-start')}>
+          <div className={cn('flex flex-col gap-2', textAlignClass === 'text-center' ? 'items-center' : textAlignClass === 'text-right' ? 'items-end' : 'items-start')}>
             {isEditing ? (
-              <input
-                type="text"
-                value={subBlock.buttonLabel || ''}
-                onChange={(e) => onUpdate({ buttonLabel: e.target.value })}
-                placeholder="Текст кнопки..."
-                className="px-4 py-2 rounded-lg text-center font-medium outline-none"
-                style={{ ...buttonVariantStyles, borderRadius: ds.borderRadius }}
-                onClick={(e) => e.stopPropagation()}
-              />
+              <>
+                <input
+                  type="text"
+                  value={subBlock.buttonLabel || ''}
+                  onChange={(e) => onUpdate({ buttonLabel: e.target.value })}
+                  placeholder="Текст кнопки..."
+                  className="px-4 py-2 rounded-lg text-center font-medium outline-none"
+                  style={{ ...buttonVariantStyles, borderRadius: ds.borderRadius }}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <div className="flex items-center gap-2 w-full max-w-[250px]">
+                  <Link className="w-4 h-4 flex-shrink-0" style={{ color: `hsl(${ds.foregroundColor} / 0.5)` }} />
+                  <input
+                    type="url"
+                    value={subBlock.buttonUrl || ''}
+                    onChange={(e) => onUpdate({ buttonUrl: e.target.value })}
+                    placeholder="https://example.com"
+                    className="flex-1 px-2 py-1 text-sm rounded border outline-none"
+                    style={{ 
+                      borderColor: `hsl(${ds.mutedColor})`,
+                      backgroundColor: 'transparent',
+                      color: `hsl(${ds.foregroundColor})`,
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
+              </>
             ) : (
               <button
-                className="px-4 py-2 rounded-lg font-medium"
+                className={cn(
+                  "px-4 py-2 rounded-lg font-medium inline-flex items-center gap-1.5",
+                  hasExternalLink && "cursor-pointer hover:opacity-90 transition-opacity"
+                )}
                 style={{ ...buttonVariantStyles, borderRadius: ds.borderRadius }}
+                onClick={handleButtonClick}
               >
                 {subBlock.buttonLabel || 'Кнопка'}
+                {hasExternalLink && <ExternalLink className="w-3.5 h-3.5" />}
               </button>
             )}
           </div>
