@@ -253,7 +253,7 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">Символов осталось</span>
                 <span className={cn(
-                  "text-lg font-semibold",
+                  "text-lg font-semibold tabular-nums",
                   (45 - (subBlock.content || '').length) <= 5 
                     ? "text-destructive" 
                     : (45 - (subBlock.content || '').length) <= 15 
@@ -266,7 +266,7 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
               <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
                 <div 
                   className={cn(
-                    "h-full transition-all duration-300 rounded-full",
+                    "h-full transition-all duration-150 rounded-full",
                     (45 - (subBlock.content || '').length) <= 5 
                       ? "bg-destructive" 
                       : (45 - (subBlock.content || '').length) <= 15 
@@ -279,7 +279,6 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
             </div>
             {renderAlignmentSelector()}
             {renderTextSizeSelector()}
-            {renderHighlightSelector()}
           </>
         )}
 
