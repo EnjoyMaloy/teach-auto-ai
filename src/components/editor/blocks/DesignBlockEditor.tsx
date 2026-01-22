@@ -24,7 +24,8 @@ import {
   createSubBlock,
   createSubBlocksFromTemplate,
   DesignTemplateId,
-  TextHighlightType
+  TextHighlightType,
+  DividerStyleType
 } from '@/types/designBlock';
 import { DEFAULT_DESIGN_BLOCK_SETTINGS } from '@/types/designSystem';
 import { CourseDesignSystem } from '@/types/course';
@@ -518,9 +519,93 @@ const SortableSubBlockItem: React.FC<{
         );
 
       case 'divider':
+        const dividerStyle = subBlock.dividerStyle || 'thin';
+        
+        const dividerStyles: Record<DividerStyleType, React.CSSProperties> = {
+          thin: { borderTopWidth: '1px', borderStyle: 'solid' },
+          medium: { borderTopWidth: '2px', borderStyle: 'solid' },
+          bold: { borderTopWidth: '4px', borderStyle: 'solid' },
+          dashed: { borderTopWidth: '2px', borderStyle: 'dashed' },
+          dotted: { borderTopWidth: '2px', borderStyle: 'dotted' },
+          wavy: {}, // handled separately with SVG
+        };
+
+        const dividerOptions: { value: DividerStyleType; label: string }[] = [
+          { value: 'thin', label: 'Тонкий' },
+          { value: 'medium', label: 'Средний' },
+          { value: 'bold', label: 'Жирный' },
+          { value: 'dashed', label: 'Прерывистый' },
+          { value: 'dotted', label: 'Точечный' },
+          { value: 'wavy', label: 'Волнистый' },
+        ];
+
+        const renderDivider = () => {
+          if (dividerStyle === 'wavy') {
+            return (
+              <svg 
+                width="100%" 
+                height="8" 
+                viewBox="0 0 100 8" 
+                preserveAspectRatio="none"
+                style={{ display: 'block' }}
+              >
+                <path 
+                  d="M0 4 Q 5 0, 10 4 T 20 4 T 30 4 T 40 4 T 50 4 T 60 4 T 70 4 T 80 4 T 90 4 T 100 4" 
+                  fill="none" 
+                  stroke={`hsl(${ds.mutedColor})`}
+                  strokeWidth="2"
+                />
+              </svg>
+            );
+          }
+          return (
+            <hr 
+              className="w-full border-0"
+              style={{ 
+                ...dividerStyles[dividerStyle],
+                borderColor: `hsl(${ds.mutedColor})`,
+              }} 
+            />
+          );
+        };
+
         return (
-          <div className="w-full py-2">
-            <hr style={{ borderColor: `hsl(${ds.mutedColor})` }} />
+          <div className="w-full py-2 relative group">
+            {renderDivider()}
+            {isEditing && (
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                <div 
+                  className="flex gap-1 p-1.5 rounded-lg shadow-lg border"
+                  style={{ 
+                    backgroundColor: `hsl(${ds.mutedColor})`,
+                    borderColor: `hsl(${ds.foregroundColor} / 0.1)`,
+                  }}
+                >
+                  {dividerOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onUpdate({ dividerStyle: option.value });
+                      }}
+                      className={cn(
+                        "px-2 py-1 text-xs rounded transition-colors",
+                        dividerStyle === option.value 
+                          ? "font-medium" 
+                          : "opacity-70 hover:opacity-100"
+                      )}
+                      style={{ 
+                        backgroundColor: dividerStyle === option.value ? `hsl(${ds.primaryColor})` : 'transparent',
+                        color: dividerStyle === option.value ? 'white' : `hsl(${ds.foregroundColor})`,
+                      }}
+                      title={option.label}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         );
 
