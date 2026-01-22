@@ -97,6 +97,8 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
     }
   };
 
+  const isDesignBlock = block.type === 'design';
+  
   return (
     <div className="h-full flex flex-col bg-card overflow-hidden">
       {/* Header */}
@@ -659,7 +661,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
         )}
 
         {/* Design block - sub-block settings or add menu */}
-        {block.type === 'design' && (
+        {isDesignBlock && (
           <>
             {selectedSubBlockId && block.subBlocks?.find(sb => sb.id === selectedSubBlockId) ? (
               <SubBlockSettingsEditor
@@ -710,20 +712,22 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
                 })}
               </div>
             )}
-            
-            {/* AI Chat - always visible at the bottom for design blocks */}
-            <div className="pt-4 border-t border-border mt-4">
-              <DesignAIChat
-                blockId={block.id}
-                subBlocks={block.subBlocks || []}
-                onReplaceAllBlocks={(newBlocks) => {
-                  onUpdate({ subBlocks: newBlocks });
-                }}
-              />
-            </div>
           </>
         )}
       </div>
+      
+      {/* AI Chat - pinned at bottom for design blocks */}
+      {isDesignBlock && (
+        <div className="flex-shrink-0">
+          <DesignAIChat
+            blockId={block.id}
+            subBlocks={block.subBlocks || []}
+            onReplaceAllBlocks={(newBlocks) => {
+              onUpdate({ subBlocks: newBlocks });
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -3,7 +3,7 @@ import { SubBlock } from '@/types/designBlock';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { Send, Loader2, Sparkles, Trash2 } from 'lucide-react';
+import { Send, Loader2, Sparkles, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface DesignAIChatProps {
@@ -20,6 +20,8 @@ interface ChatMessage {
 
 // Store chat history per block
 const chatHistoryStore: Record<string, ChatMessage[]> = {};
+// Store expanded state per block
+const expandedStateStore: Record<string, boolean> = {};
 
 export const DesignAIChat: React.FC<DesignAIChatProps> = ({
   blockId,
@@ -31,6 +33,9 @@ export const DesignAIChat: React.FC<DesignAIChatProps> = ({
   );
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(() => 
+    expandedStateStore[blockId] ?? true
+  );
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Save to store when messages change
@@ -38,14 +43,22 @@ export const DesignAIChat: React.FC<DesignAIChatProps> = ({
     chatHistoryStore[blockId] = messages;
   }, [messages, blockId]);
 
+  // Save expanded state
+  useEffect(() => {
+    expandedStateStore[blockId] = isExpanded;
+  }, [isExpanded, blockId]);
+
   // Load history when blockId changes
   useEffect(() => {
     setMessages(chatHistoryStore[blockId] || []);
+    setIsExpanded(expandedStateStore[blockId] ?? true);
   }, [blockId]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (isExpanded) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isExpanded]);
 
   const clearHistory = () => {
     setMessages([]);
@@ -102,15 +115,12 @@ export const DesignAIChat: React.FC<DesignAIChatProps> = ({
       if (data.newBlocks && Array.isArray(data.newBlocks) && data.newBlocks.length > 0) {
         const blocksWithIds = data.newBlocks.map((block: Partial<SubBlock>, index: number) => ({
           ...block,
-          id: crypto.randomUUID(),
+          id: block.id || crypto.randomUUID(),
           order: index,
         })) as SubBlock[];
         
         onReplaceAllBlocks(blocksWithIds);
-        toast.success(`Создано ${blocksWithIds.length} элементов`);
-      } else if (data.updates && Object.keys(data.updates).length > 0) {
-        // If there are updates but no target block specified, apply to all text/heading blocks
-        toast.info('Укажите конкретный блок для изменения');
+        toast.success(`Обновлено ${blocksWithIds.length} элементов`);
       }
 
     } catch (error) {
@@ -134,97 +144,120 @@ export const DesignAIChat: React.FC<DesignAIChatProps> = ({
   };
 
   return (
-    <div className="rounded-xl border border-primary/20 bg-gradient-to-b from-primary/5 to-transparent overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-border/50">
+    <div className="flex flex-col bg-gradient-to-t from-primary/5 to-transparent border-t border-primary/20">
+      {/* Collapsed header - always visible */}
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors"
+      >
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-primary" />
           <span className="text-sm font-medium">ИИ-дизайнер</span>
+          {messages.length > 0 && (
+            <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+              {messages.length}
+            </span>
+          )}
         </div>
-        {messages.length > 0 && (
-          <button
-            onClick={clearHistory}
-            className="p-1 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-            title="Очистить историю"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        )}
-      </div>
+        <div className="flex items-center gap-2">
+          {messages.length > 0 && isExpanded && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                clearHistory();
+              }}
+              className="p-1 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              title="Очистить историю"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          )}
+          {isExpanded ? (
+            <ChevronDown className="w-4 h-4 text-muted-foreground" />
+          ) : (
+            <ChevronUp className="w-4 h-4 text-muted-foreground" />
+          )}
+        </div>
+      </button>
 
-      {/* Messages */}
-      <div className="max-h-64 overflow-y-auto p-2 space-y-2">
-        {messages.length === 0 && (
-          <div className="text-center py-4">
-            <p className="text-xs text-muted-foreground mb-3">
-              Опишите, какой слайд хотите создать:
-            </p>
-            <div className="space-y-1">
-              {[
-                'Сделай слайд про DeFi с таблицей сравнения',
-                'Добавь заголовок и 3 пункта преимуществ',
-                'Создай карточку с иконкой и описанием',
-              ].map((example, i) => (
-                <button
-                  key={i}
-                  onClick={() => setInput(example)}
-                  className="block w-full text-xs text-primary/80 hover:text-primary py-1.5 px-2 rounded hover:bg-primary/5 transition-colors text-left"
-                >
-                  "{example}"
-                </button>
-              ))}
+      {/* Expanded content */}
+      {isExpanded && (
+        <div className="flex flex-col">
+          {/* Messages area */}
+          <div className="max-h-64 overflow-y-auto px-3 pb-2 space-y-2">
+            {messages.length === 0 && (
+              <div className="text-center py-3">
+                <p className="text-xs text-muted-foreground mb-2">
+                  Опишите, что хотите создать:
+                </p>
+                <div className="space-y-1">
+                  {[
+                    'Структурируй этот текст красиво',
+                    'Добавь заголовок и 3 пункта',
+                    'Сделай таблицу сравнения',
+                  ].map((example, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setInput(example)}
+                      className="block w-full text-xs text-primary/70 hover:text-primary py-1.5 px-2 rounded hover:bg-primary/5 transition-colors text-left"
+                    >
+                      "{example}"
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {messages.map((msg, i) => (
+              <div
+                key={`${msg.timestamp}-${i}`}
+                className={cn(
+                  'text-xs p-2.5 rounded-lg max-w-[90%]',
+                  msg.role === 'user'
+                    ? 'ml-auto bg-primary text-primary-foreground'
+                    : 'bg-muted'
+                )}
+              >
+                {msg.content}
+              </div>
+            ))}
+            
+            {isLoading && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground p-2">
+                <Loader2 className="w-3 h-3 animate-spin" />
+                Генерирую...
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input area */}
+          <div className="px-3 pb-3">
+            <div className="flex gap-2">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Опишите изменения..."
+                className="min-h-[44px] max-h-24 text-sm resize-none rounded-xl"
+                rows={1}
+              />
+              <Button
+                size="icon"
+                onClick={sendMessage}
+                disabled={!input.trim() || isLoading}
+                className="h-11 w-11 flex-shrink-0 rounded-xl"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+              </Button>
             </div>
           </div>
-        )}
-        
-        {messages.map((msg, i) => (
-          <div
-            key={`${msg.timestamp}-${i}`}
-            className={cn(
-              'text-xs p-2.5 rounded-lg max-w-[95%]',
-              msg.role === 'user'
-                ? 'ml-auto bg-primary text-primary-foreground'
-                : 'bg-muted'
-            )}
-          >
-            {msg.content}
-          </div>
-        ))}
-        
-        {isLoading && (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground p-2">
-            <Loader2 className="w-3 h-3 animate-spin" />
-            Генерирую дизайн...
-          </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input */}
-      <div className="p-2 border-t border-border/50">
-        <div className="flex gap-2">
-          <Textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Опишите, что создать или изменить..."
-            className="min-h-[40px] max-h-24 text-xs resize-none"
-            rows={1}
-          />
-          <Button
-            size="icon"
-            onClick={sendMessage}
-            disabled={!input.trim() || isLoading}
-            className="h-10 w-10 flex-shrink-0"
-          >
-            {isLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Send className="w-4 h-4" />
-            )}
-          </Button>
         </div>
-      </div>
+      )}
     </div>
   );
 };
