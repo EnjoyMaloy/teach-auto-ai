@@ -774,8 +774,8 @@ const SubBlockSelector: React.FC<{
   const types = Object.values(SUB_BLOCK_CONFIGS);
   
   return (
-    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card border border-border rounded-xl shadow-lg p-2 z-50 min-w-[200px]">
-      <div className="grid grid-cols-2 gap-1">
+    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card border border-border rounded-xl shadow-lg p-3 z-50 min-w-[260px]">
+      <div className="grid grid-cols-2 gap-1.5">
         {types.map((config) => {
           const IconComponent = iconMap[config.icon as keyof typeof iconMap];
           return (
@@ -785,10 +785,10 @@ const SubBlockSelector: React.FC<{
                 onSelectType(config.type);
                 onClose();
               }}
-              className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted transition-colors text-left"
+              className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-muted transition-colors text-left"
             >
-              {IconComponent && <IconComponent className="w-4 h-4 text-primary" />}
-              <span className="text-xs font-medium">{config.labelRu}</span>
+              {IconComponent && <IconComponent className="w-5 h-5 text-primary flex-shrink-0" />}
+              <span className="text-sm font-medium">{config.labelRu}</span>
             </button>
           );
         })}
