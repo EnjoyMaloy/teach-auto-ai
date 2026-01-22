@@ -124,18 +124,17 @@ async function generateImage(description: string, apiKey: string): Promise<strin
     console.log("Generating image for:", description);
     
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `Generate a clean, professional illustration for an educational mobile app slide: ${description}. Style: modern, minimal, vibrant colors, no text on image.`
-            }]
+          instances: [{
+            prompt: `Professional illustration for educational mobile app: ${description}. Style: modern, clean, minimal, vibrant colors, no text.`
           }],
-          generationConfig: {
-            responseModalities: ["image", "text"]
+          parameters: {
+            sampleCount: 1,
+            aspectRatio: "9:16"
           }
         })
       }
@@ -148,13 +147,21 @@ async function generateImage(description: string, apiKey: string): Promise<strin
     }
 
     const data = await response.json();
-    const parts = data.candidates?.[0]?.content?.parts || [];
     
+    // Imagen API returns predictions array
+    const predictions = data.predictions || [];
+    if (predictions.length > 0 && predictions[0].bytesBase64Encoded) {
+      console.log("Image generated successfully");
+      return `data:image/png;base64,${predictions[0].bytesBase64Encoded}`;
+    }
+    
+    // Fallback: check for inline data format
+    const parts = data.candidates?.[0]?.content?.parts || [];
     for (const part of parts) {
       if (part.inlineData?.mimeType?.startsWith('image/')) {
         const base64 = part.inlineData.data;
         const mimeType = part.inlineData.mimeType;
-        console.log("Image generated successfully");
+        console.log("Image generated successfully (inline)");
         return `data:${mimeType};base64,${base64}`;
       }
     }
