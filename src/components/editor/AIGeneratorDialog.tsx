@@ -9,6 +9,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { Course, Lesson, Slide, SlideType } from '@/types/course';
 import { 
@@ -79,6 +81,71 @@ interface GeneratedCourse {
   lessons: GeneratedLesson[];
 }
 
+// Helper to extract and fix JSON from AI response
+const extractAndFixJson = (content: string): any => {
+  // First try to find JSON block
+  const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || 
+                    content.match(/```\s*([\s\S]*?)\s*```/) ||
+                    content.match(/(\{[\s\S]*\})/);
+  
+  if (!jsonMatch) {
+    throw new Error('JSON не найден в ответе');
+  }
+  
+  let jsonStr = jsonMatch[1] || jsonMatch[0];
+  
+  // Clean up common issues
+  jsonStr = jsonStr
+    .replace(/,\s*}/g, '}')  // Remove trailing commas before }
+    .replace(/,\s*]/g, ']')  // Remove trailing commas before ]
+    .replace(/[\x00-\x1F\x7F]/g, ' ')  // Remove control characters
+    .replace(/\n\s*\.\.\.\s*\n/g, '\n')  // Remove ... ellipsis lines
+    .trim();
+  
+  // Try to parse
+  try {
+    return JSON.parse(jsonStr);
+  } catch (e) {
+    // If it fails, try to fix truncated JSON
+    console.warn('JSON parse failed, attempting fix...', e);
+    
+    // Count brackets to find imbalance
+    const openBraces = (jsonStr.match(/\{/g) || []).length;
+    const closeBraces = (jsonStr.match(/\}/g) || []).length;
+    const openBrackets = (jsonStr.match(/\[/g) || []).length;
+    const closeBrackets = (jsonStr.match(/\]/g) || []).length;
+    
+    // Add missing closing brackets
+    let fixedJson = jsonStr;
+    for (let i = 0; i < openBrackets - closeBrackets; i++) {
+      fixedJson += ']';
+    }
+    for (let i = 0; i < openBraces - closeBraces; i++) {
+      fixedJson += '}';
+    }
+    
+    // Remove any trailing incomplete content after last complete slide/lesson
+    const lastCompleteObject = fixedJson.lastIndexOf('"}');
+    if (lastCompleteObject > 0) {
+      // Find the next closing bracket after this
+      const afterLast = fixedJson.substring(lastCompleteObject + 2);
+      const nextClose = afterLast.search(/[\]\}]/);
+      if (nextClose >= 0) {
+        fixedJson = fixedJson.substring(0, lastCompleteObject + 2 + nextClose + 1);
+        // Rebalance
+        const ob = (fixedJson.match(/\{/g) || []).length;
+        const cb = (fixedJson.match(/\}/g) || []).length;
+        const oB = (fixedJson.match(/\[/g) || []).length;
+        const cB = (fixedJson.match(/\]/g) || []).length;
+        for (let i = 0; i < oB - cB; i++) fixedJson += ']';
+        for (let i = 0; i < ob - cb; i++) fixedJson += '}';
+      }
+    }
+    
+    return JSON.parse(fixedJson);
+  }
+};
+
 export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
   open,
   onOpenChange,
@@ -89,6 +156,7 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [steps, setSteps] = useState<GenerationStep[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [skipImages, setSkipImages] = useState(false);
 
   const updateStep = (stepId: string, updates: Partial<GenerationStep>) => {
     setSteps(prev => prev.map(step => 
@@ -157,10 +225,7 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
       let researchData: any = {};
       try {
         const content = researchResponse.data?.content || '';
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          researchData = JSON.parse(jsonMatch[0]);
-        }
+        researchData = extractAndFixJson(content);
       } catch (e) {
         console.log('Research parse warning:', e);
       }
@@ -193,10 +258,7 @@ ${JSON.stringify(researchData, null, 2)}
       let structureData: any = {};
       try {
         const content = structureResponse.data?.content || '';
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          structureData = JSON.parse(jsonMatch[0]);
-        }
+        structureData = extractAndFixJson(content);
       } catch (e) {
         console.log('Structure parse warning:', e);
       }
@@ -232,15 +294,11 @@ ${JSON.stringify(researchData, null, 2)}
 
       updateStep('content', { status: 'completed', message: 'Контент создан' });
 
-      // Parse course data
+      // Parse course data with robust JSON fixing
       let courseData: GeneratedCourse;
       try {
         const content = generateResponse.data?.content || '';
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-          throw new Error('Не удалось найти JSON в ответе');
-        }
-        courseData = JSON.parse(jsonMatch[0]);
+        courseData = extractAndFixJson(content);
       } catch (parseError) {
         console.error('Parse error:', parseError);
         throw new Error('Не удалось распознать структуру курса');
@@ -250,99 +308,103 @@ ${JSON.stringify(researchData, null, 2)}
         throw new Error('Курс не содержит уроков');
       }
 
-      // Step 4: Generate images for all image_text slides (max 8)
-      updateStep('images', { status: 'active', message: 'Генерирую иллюстрации...' });
+      // Step 4: Generate images for all image_text slides (max 8) - or skip if user chose fast mode
+      if (skipImages) {
+        updateStep('images', { status: 'completed', message: 'Пропущено (быстрый режим)' });
+      } else {
+        updateStep('images', { status: 'active', message: 'Генерирую иллюстрации...' });
 
-      try {
-        // Find ALL slides that need images (image_text type), limit to 8
-        const slidesToIllustrate: { lessonIdx: number; slideIdx: number; description: string }[] = [];
-        
-        courseData.lessons.forEach((lesson, lessonIdx) => {
-          lesson.slides.forEach((slide, slideIdx) => {
-            // Generate images for image_text slides that have imageDescription
-            if (slide.type === 'image_text' && !slide.imageUrl && slidesToIllustrate.length < 8) {
-              slidesToIllustrate.push({
-                lessonIdx,
-                slideIdx,
-                // Use imageDescription if available, otherwise fall back to content
-                description: slide.imageDescription || slide.content || lesson.title
-              });
-            }
-          });
-        });
-
-        const totalImages = slidesToIllustrate.length;
-        
-        if (totalImages === 0) {
-          updateStep('images', { 
-            status: 'completed', 
-            message: 'Иллюстрации не требуются'
-          });
-        } else {
-          // Generate images in parallel (batch of 2 at a time to avoid rate limits)
-          let imagesGenerated = 0;
-          let imageErrors = 0;
+        try {
+          // Find ALL slides that need images (image_text type), limit to 8
+          const slidesToIllustrate: { lessonIdx: number; slideIdx: number; description: string }[] = [];
           
-          // Process in smaller batches to avoid rate limits
-          const batchSize = 2;
-          for (let i = 0; i < slidesToIllustrate.length; i += batchSize) {
-            const batch = slidesToIllustrate.slice(i, i + batchSize);
-            
-            try {
-              const imagePromises = batch.map(async ({ lessonIdx, slideIdx, description }) => {
-                try {
-                  // Use the detailed imageDescription for generation
-                  const imageUrl = await generateImageForSlide(description, prompt);
-                  if (imageUrl) {
-                    courseData.lessons[lessonIdx].slides[slideIdx].imageUrl = imageUrl;
-                    imagesGenerated++;
-                    updateStep('images', { message: `Создано ${imagesGenerated} из ${totalImages} изображений...` });
-                  } else {
-                    imageErrors++;
-                  }
-                  return imageUrl;
-                } catch (err) {
-                  console.error('Image generation error:', err);
-                  imageErrors++;
-                  return null;
-                }
-              });
+          courseData.lessons.forEach((lesson, lessonIdx) => {
+            lesson.slides.forEach((slide, slideIdx) => {
+              // Generate images for image_text slides that have imageDescription
+              if (slide.type === 'image_text' && !slide.imageUrl && slidesToIllustrate.length < 8) {
+                slidesToIllustrate.push({
+                  lessonIdx,
+                  slideIdx,
+                  // Use imageDescription if available, otherwise fall back to content
+                  description: slide.imageDescription || slide.content || lesson.title
+                });
+              }
+            });
+          });
 
-              await Promise.all(imagePromises);
-            } catch (batchError) {
-              console.error('Batch image generation error:', batchError);
-              imageErrors += batch.length;
-            }
-            
-            // Small delay between batches to avoid rate limits
-            if (i + batchSize < slidesToIllustrate.length) {
-              await new Promise(resolve => setTimeout(resolve, 500));
-            }
-          }
-
-          // Mark images step as completed (with warning if some failed)
-          if (imagesGenerated > 0) {
+          const totalImages = slidesToIllustrate.length;
+          
+          if (totalImages === 0) {
             updateStep('images', { 
               status: 'completed', 
-              message: imageErrors > 0 
-                ? `${imagesGenerated} из ${totalImages} иллюстраций (${imageErrors} не удалось)`
-                : `${imagesGenerated} иллюстраций создано`
+              message: 'Иллюстрации не требуются'
             });
           } else {
-            // All images failed - still continue but show warning
-            updateStep('images', { 
-              status: 'completed', 
-              message: 'Не удалось создать иллюстрации (можно добавить позже)'
-            });
+            // Generate images in parallel (batch of 2 at a time to avoid rate limits)
+            let imagesGenerated = 0;
+            let imageErrors = 0;
+            
+            // Process in smaller batches to avoid rate limits
+            const batchSize = 2;
+            for (let i = 0; i < slidesToIllustrate.length; i += batchSize) {
+              const batch = slidesToIllustrate.slice(i, i + batchSize);
+              
+              try {
+                const imagePromises = batch.map(async ({ lessonIdx, slideIdx, description }) => {
+                  try {
+                    // Use the detailed imageDescription for generation
+                    const imageUrl = await generateImageForSlide(description, prompt);
+                    if (imageUrl) {
+                      courseData.lessons[lessonIdx].slides[slideIdx].imageUrl = imageUrl;
+                      imagesGenerated++;
+                      updateStep('images', { message: `Создано ${imagesGenerated} из ${totalImages} изображений...` });
+                    } else {
+                      imageErrors++;
+                    }
+                    return imageUrl;
+                  } catch (err) {
+                    console.error('Image generation error:', err);
+                    imageErrors++;
+                    return null;
+                  }
+                });
+
+                await Promise.all(imagePromises);
+              } catch (batchError) {
+                console.error('Batch image generation error:', batchError);
+                imageErrors += batch.length;
+              }
+              
+              // Small delay between batches to avoid rate limits
+              if (i + batchSize < slidesToIllustrate.length) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+              }
+            }
+
+            // Mark images step as completed (with warning if some failed)
+            if (imagesGenerated > 0) {
+              updateStep('images', { 
+                status: 'completed', 
+                message: imageErrors > 0 
+                  ? `${imagesGenerated} из ${totalImages} иллюстраций (${imageErrors} не удалось)`
+                  : `${imagesGenerated} иллюстраций создано`
+              });
+            } else {
+              // All images failed - still continue but show warning
+              updateStep('images', { 
+                status: 'completed', 
+                message: 'Не удалось создать иллюстрации (можно добавить позже)'
+              });
+            }
           }
+        } catch (imageStepError) {
+          console.error('Image generation step failed:', imageStepError);
+          // Ensure step is marked as completed even on total failure
+          updateStep('images', { 
+            status: 'completed', 
+            message: 'Пропущено (ошибка генерации)'
+          });
         }
-      } catch (imageStepError) {
-        console.error('Image generation step failed:', imageStepError);
-        // Ensure step is marked as completed even on total failure
-        updateStep('images', { 
-          status: 'completed', 
-          message: 'Пропущено (ошибка генерации)'
-        });
       }
 
       // Convert to our Lesson/Slide format
@@ -498,6 +560,20 @@ ${JSON.stringify(researchData, null, 2)}
                   onChange={(e) => setPrompt(e.target.value)}
                   className="min-h-[120px] resize-none"
                 />
+              </div>
+
+              <div className="flex items-center gap-2 py-2">
+                <Checkbox 
+                  id="skipImages" 
+                  checked={skipImages}
+                  onCheckedChange={(checked) => setSkipImages(checked === true)}
+                />
+                <Label 
+                  htmlFor="skipImages" 
+                  className="text-sm text-muted-foreground cursor-pointer"
+                >
+                  Быстрый режим (без иллюстраций)
+                </Label>
               </div>
 
               <div className="flex justify-end gap-2">
