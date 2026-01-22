@@ -14,7 +14,7 @@ import {
   CircleDot, CheckSquare, ToggleLeft, PenLine,
   Link2, ListOrdered, SlidersHorizontal, MousePointer2,
   Lightbulb, Layers, CheckCircle, XCircle, AlertCircle,
-  MousePointerClick, Minus, Sparkles, Tag
+  MousePointerClick, Minus, Sparkles, Tag, RotateCcw
 } from 'lucide-react';
 
 const iconMap = {
@@ -104,8 +104,46 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
             <p className="text-xs text-muted-foreground">{config.description}</p>
           </div>
         </div>
-        <Button variant="ghost" size="icon" onClick={onDelete} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl">
-          <Trash2 className="w-4 h-4" />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => {
+            // Reset block content based on type
+            const resetData: Partial<Block> = {
+              content: '',
+              imageUrl: undefined,
+              videoUrl: undefined,
+              audioUrl: undefined,
+              options: block.type === 'single_choice' || block.type === 'multiple_choice' 
+                ? [{ id: crypto.randomUUID(), text: 'Вариант 1', isCorrect: false }]
+                : block.type === 'true_false'
+                ? [
+                    { id: crypto.randomUUID(), text: 'Верно', isCorrect: true },
+                    { id: crypto.randomUUID(), text: 'Неверно', isCorrect: false },
+                  ]
+                : undefined,
+              correctAnswer: undefined,
+              explanation: undefined,
+              explanationCorrect: undefined,
+              explanationPartial: undefined,
+              blankWord: undefined,
+              matchingPairs: block.type === 'matching' 
+                ? [{ id: crypto.randomUUID(), left: '', right: '' }]
+                : undefined,
+              orderingItems: block.type === 'ordering' ? [''] : undefined,
+              correctOrder: undefined,
+              sliderMin: block.type === 'slider' ? 0 : undefined,
+              sliderMax: block.type === 'slider' ? 100 : undefined,
+              sliderCorrect: block.type === 'slider' ? 50 : undefined,
+              sliderStep: block.type === 'slider' ? 1 : undefined,
+              subBlocks: block.type === 'design' ? [] : undefined,
+            };
+            onUpdate(resetData);
+          }}
+          className="text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl"
+          title="Сбросить контент"
+        >
+          <RotateCcw className="w-4 h-4" />
         </Button>
       </div>
 
