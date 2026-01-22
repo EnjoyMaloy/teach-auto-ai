@@ -248,10 +248,38 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
         {/* Heading settings */}
         {subBlock.type === 'heading' && (
           <>
+            {/* Character counter */}
+            <div className="p-3 rounded-lg bg-muted/50 border border-border">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Символов осталось</span>
+                <span className={cn(
+                  "text-lg font-semibold",
+                  (45 - (subBlock.content || '').length) <= 5 
+                    ? "text-destructive" 
+                    : (45 - (subBlock.content || '').length) <= 15 
+                      ? "text-orange-500" 
+                      : "text-primary"
+                )}>
+                  {45 - (subBlock.content || '').length}
+                </span>
+              </div>
+              <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className={cn(
+                    "h-full transition-all duration-300 rounded-full",
+                    (45 - (subBlock.content || '').length) <= 5 
+                      ? "bg-destructive" 
+                      : (45 - (subBlock.content || '').length) <= 15 
+                        ? "bg-orange-500" 
+                        : "bg-primary"
+                  )}
+                  style={{ width: `${Math.max(0, ((subBlock.content || '').length / 45) * 100)}%` }}
+                />
+              </div>
+            </div>
             {renderAlignmentSelector()}
             {renderTextSizeSelector()}
             {renderHighlightSelector()}
-            {renderBackdropSelector()}
           </>
         )}
 
@@ -260,7 +288,6 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
           <>
             {renderAlignmentSelector()}
             {renderTextSizeSelector()}
-            {renderHighlightSelector()}
             {renderBackdropSelector()}
           </>
         )}
