@@ -291,7 +291,9 @@ export type Database = {
           slider_max: number | null
           slider_min: number | null
           slider_step: number | null
+          sub_blocks: Json | null
           text_color: string | null
+          text_size: string | null
           type: string
           updated_at: string
           video_url: string | null
@@ -319,7 +321,9 @@ export type Database = {
           slider_max?: number | null
           slider_min?: number | null
           slider_step?: number | null
+          sub_blocks?: Json | null
           text_color?: string | null
+          text_size?: string | null
           type: string
           updated_at?: string
           video_url?: string | null
@@ -347,7 +351,9 @@ export type Database = {
           slider_max?: number | null
           slider_min?: number | null
           slider_step?: number | null
+          sub_blocks?: Json | null
           text_color?: string | null
+          text_size?: string | null
           type?: string
           updated_at?: string
           video_url?: string | null
