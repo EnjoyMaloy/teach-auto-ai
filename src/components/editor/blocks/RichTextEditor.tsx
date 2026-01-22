@@ -97,19 +97,24 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     xlarge: 'text-xl',
   }[textSize];
 
+  // Text alignment - ignored when using justify/hyphenate modes
+  const effectiveTextAlign = (textWrapMode === 'justify' || textWrapMode === 'hyphenate') 
+    ? 'left' // justify handles alignment
+    : textAlign;
+
   const textAlignClass = {
     left: 'text-left',
     center: 'text-center',
     right: 'text-right',
-  }[textAlign];
+  }[effectiveTextAlign];
 
   // Text wrap mode classes
   // justify: adjusts word spacing to fill line width
   // hyphenate: justify + hyphenation for word breaks
   const textWrapClass = {
     standard: '',
-    justify: 'text-justify',
-    hyphenate: 'text-justify [hyphens:auto] [-webkit-hyphens:auto]',
+    justify: '!text-justify',
+    hyphenate: '!text-justify [hyphens:auto] [-webkit-hyphens:auto]',
   }[textWrapMode] || '';
 
   const editor = useEditor({
@@ -206,13 +211,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       text-decoration-color: hsl(${wavyColor});
       text-underline-offset: 4px;
     }
+    .rich-text-justify,
     .rich-text-justify .ProseMirror,
     .rich-text-justify .ProseMirror p,
     .rich-text-justify > div,
-    .rich-text-justify > div p,
+    .rich-text-justify > div > *,
     .rich-text-readonly.rich-text-justify,
-    .rich-text-readonly.rich-text-justify p,
-    .rich-text-readonly.rich-text-justify > div {
+    .rich-text-readonly.rich-text-justify > div,
+    .rich-text-readonly.rich-text-justify > div > * {
       ${textWrapCss}
     }
   `;
