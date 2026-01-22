@@ -31,6 +31,7 @@ import {
   MobilePreviewFrame, 
   BlockEditor 
 } from '@/components/editor/blocks';
+import { TextEditorProvider } from '@/components/editor/blocks/TextEditorContext';
 import { SortableBlockItem } from '@/components/editor/SortableBlockItem';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -486,6 +487,7 @@ const Editor: React.FC = () => {
   };
 
   return (
+    <TextEditorProvider>
     <div className="h-screen flex flex-col bg-background">
       <EditorHeader
         course={course}
@@ -699,6 +701,7 @@ const Editor: React.FC = () => {
       )}
 
     </div>
+    </TextEditorProvider>
   );
 };
 

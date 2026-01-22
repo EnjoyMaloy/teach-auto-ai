@@ -6,7 +6,7 @@ import Underline from '@tiptap/extension-underline';
 import { Mark, mergeAttributes } from '@tiptap/core';
 import { cn } from '@/lib/utils';
 import DOMPurify from 'dompurify';
-import { RichTextToolbar } from './RichTextToolbar';
+import { useTextEditor } from './TextEditorContext';
 
 // Configure DOMPurify to allow only safe formatting tags
 const DOMPURIFY_CONFIG = {
@@ -91,6 +91,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   onFocusChange,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
+  const { setActiveEditor } = useTextEditor();
   const textSizeClass = {
     small: 'text-sm',
     medium: 'text-base',
@@ -234,30 +235,19 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       style={isJustified ? { textAlign: 'justify', textJustify: 'inter-word' } : {}}
       onFocus={() => {
         setIsFocused(true);
+        setActiveEditor(editor);
         onFocusChange?.(true);
       }}
       onBlur={(e) => {
         // Only blur if focus moves outside this component
         if (!e.currentTarget.contains(e.relatedTarget)) {
           setIsFocused(false);
+          // Don't clear editor immediately - let sidebar use it
           onFocusChange?.(false);
         }
       }}
     >
       <style>{dynamicStyles}</style>
-      
-      {/* Formatting toolbar - shown when focused */}
-      {showToolbar && isFocused && (
-        <div className="mb-2">
-          <RichTextToolbar 
-            editor={editor}
-            highlightColor={highlightColor}
-            underlineColor={underlineColor}
-            wavyColor={wavyColor}
-          />
-        </div>
-      )}
-      
       <EditorContent editor={editor} />
     </div>
   );
