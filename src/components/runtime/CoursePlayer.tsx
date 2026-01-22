@@ -433,6 +433,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
           designSystem={course.designSystem}
           isMuted={false}
           isReadOnly={true}
+          embedded={fullscreen} // Use embedded mode for fullscreen to fill container
         />
       );
     }

@@ -397,3 +397,25 @@
 .btn-flat:active {
   transform: scale(0.95) !important;
 }
+
+/* Telegram Mini App optimizations */
+@supports (padding: env(safe-area-inset-top)) {
+  .tg-safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  .tg-safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Full-height container for Telegram */
+.tg-fullscreen {
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+}
+
+/* Prevent overscroll bounce on iOS */
+.tg-no-bounce {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
