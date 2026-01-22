@@ -60,6 +60,7 @@ const SortableSubBlockItem: React.FC<{
 }> = ({ subBlock, isEditing, onUpdate, onDelete, designSystem }) => {
   // Component state - always called unconditionally at top level
   const [isTextFocused, setIsTextFocused] = useState(false);
+  const [isHeadingFocused, setIsHeadingFocused] = useState(false);
   const [headingCounter, setHeadingCounter] = useState(45 - (subBlock.content || '').length);
   
   const {
@@ -191,7 +192,9 @@ const SortableSubBlockItem: React.FC<{
               style={{ color: `hsl(${ds.foregroundColor})` }}
               contentEditable={isEditing}
               suppressContentEditableWarning
+              onFocus={() => setIsHeadingFocused(true)}
               onBlur={(e) => {
+                setIsHeadingFocused(false);
                 if (isEditing) {
                   const text = e.currentTarget.textContent || '';
                   const limitedText = text.slice(0, MAX_HEADING_CHARS);
@@ -229,7 +232,7 @@ const SortableSubBlockItem: React.FC<{
             >
               {subBlock.content || 'Заголовок'}
             </h2>
-            {isEditing && (
+            {isEditing && isHeadingFocused && (
               <div 
                 className={cn(
                   "absolute -bottom-5 right-0 text-xs",
