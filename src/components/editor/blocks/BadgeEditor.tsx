@@ -9,7 +9,12 @@ import {
   Smile, ImageIcon, X,
   Star, Heart, CheckCircle, Zap, Target, Trophy, 
   Gift, Crown, Flame, Rocket, Lightbulb, ThumbsUp,
-  LayoutList, LayoutGrid
+  LayoutList, LayoutGrid,
+  // Extended icons for AI-generated badges
+  BookOpen, Brain, Puzzle, GraduationCap, Award, Gem, Shield, Lock, Unlock,
+  Clock, Calendar, MapPin, Mail, User, Users, Settings, Search, Home,
+  ArrowRight, ChevronRight, Edit, Download, Share, Link, FileText, Folder,
+  Database, Cloud, Code, Bell, MessageCircle, Send, Eye, AlertCircle
 } from 'lucide-react';
 import {
   Popover,
@@ -24,7 +29,7 @@ const EMOJI_OPTIONS = [
   '📌', '🔔', '💬', '📚', '🎓', '💪', '🌈', '🔮',
 ];
 
-// Lucide icons for badges
+// Lucide icons for badges (extended set for AI compatibility)
 const LUCIDE_ICON_OPTIONS = [
   { name: 'Star', icon: Star },
   { name: 'Heart', icon: Heart },
@@ -38,6 +43,31 @@ const LUCIDE_ICON_OPTIONS = [
   { name: 'Rocket', icon: Rocket },
   { name: 'Lightbulb', icon: Lightbulb },
   { name: 'ThumbsUp', icon: ThumbsUp },
+  // Extended icons
+  { name: 'BookOpen', icon: BookOpen },
+  { name: 'Brain', icon: Brain },
+  { name: 'Puzzle', icon: Puzzle },
+  { name: 'GraduationCap', icon: GraduationCap },
+  { name: 'Award', icon: Award },
+  { name: 'Gem', icon: Gem },
+  { name: 'Shield', icon: Shield },
+  { name: 'Eye', icon: Eye },
+  { name: 'Clock', icon: Clock },
+  { name: 'Calendar', icon: Calendar },
+  { name: 'MapPin', icon: MapPin },
+  { name: 'Mail', icon: Mail },
+  { name: 'User', icon: User },
+  { name: 'Users', icon: Users },
+  { name: 'Settings', icon: Settings },
+  { name: 'Search', icon: Search },
+  { name: 'Home', icon: Home },
+  { name: 'Bell', icon: Bell },
+  { name: 'MessageCircle', icon: MessageCircle },
+  { name: 'FileText', icon: FileText },
+  { name: 'Database', icon: Database },
+  { name: 'Cloud', icon: Cloud },
+  { name: 'Code', icon: Code },
+  { name: 'AlertCircle', icon: AlertCircle },
 ];
 
 interface BadgeEditorProps {

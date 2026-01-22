@@ -37,11 +37,16 @@ import {
   Plus, Trash2, GripVertical, Upload,
   Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Layers, Play,
   ExternalLink,
-  // Icons for icon sub-block
+  // Icons for icon sub-block and badges
   Star, Heart, CheckCircle, XCircle, AlertCircle,
   Zap, Target, Trophy, Gift, Crown,
   Flame, Rocket, Lightbulb, ThumbsUp, ThumbsDown,
-  Eye, Music, Camera, Book, Bookmark
+  Eye, Music, Camera, Book, Bookmark,
+  // Extended icons for AI-generated badges
+  BookOpen, Brain, Puzzle, GraduationCap, Award, Gem, Shield, Lock, Unlock,
+  Clock, Calendar, MapPin, Mail, Phone, User, Users, Settings, Search, Home,
+  ArrowRight, ChevronRight, Edit, Download, Share, Link, FileText, Folder,
+  Database, Cloud, Code, Terminal, Cpu, Smartphone, Bell, MessageCircle, Send
 } from 'lucide-react';
 import { AnimationBlock } from './AnimationBlock';
 
@@ -49,12 +54,17 @@ const iconMap = {
   Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Layers, Play
 };
 
-// Icon map for dynamic icon rendering in sub-blocks
+// Icon map for dynamic icon rendering in sub-blocks (extended set)
 const subBlockIconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
   Sparkles, Star, Heart, CheckCircle, XCircle, AlertCircle,
   Zap, Target, Trophy, Gift, Crown,
   Flame, Rocket, Lightbulb, ThumbsUp, ThumbsDown,
-  Eye, Music, Camera, Book, Bookmark
+  Eye, Music, Camera, Book, Bookmark,
+  // Extended icons for AI compatibility
+  BookOpen, Brain, Puzzle, GraduationCap, Award, Gem, Shield, Lock, Unlock,
+  Clock, Calendar, MapPin, Mail, Phone, User, Users, Settings, Search, Home,
+  ArrowRight, ChevronRight, Edit, Download, Share, Link, FileText, Folder,
+  Database, Cloud, Code, Terminal, Cpu, Smartphone, Bell, MessageCircle, Send
 };
 
 interface DesignBlockEditorProps {
@@ -567,10 +577,8 @@ const SortableSubBlockItem: React.FC<{
           pastel: { backgroundColor: `hsl(${ds.primaryColor} / 0.08)`, color: `hsl(${ds.primaryColor} / 0.9)`, border: `1px solid hsl(${ds.primaryColor} / 0.2)` },
         }[badgeVariant];
 
-        // Lucide icons map for badge
-        const badgeLucideIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-          Star, Heart, CheckCircle, Zap, Target, Trophy, Gift, Crown, Flame, Rocket, Lightbulb, ThumbsUp
-        };
+        // Use the global subBlockIconMap for badge icons (includes all AI-supported icons)
+        const badgeLucideIcons = subBlockIconMap;
 
         const renderBadgeIcon = (badge: typeof badges[0]) => {
           if (badge.iconType === 'none' || !badge.iconValue) return null;
