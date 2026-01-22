@@ -395,24 +395,26 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
               </p>
             </div>
             
-            {/* Text rotation */}
-            <div className="space-y-2">
-              <Label className="text-xs text-muted-foreground">Наклон</Label>
-              <div className="grid grid-cols-7 gap-1">
-                {[-3, -2, -1, 0, 1, 2, 3].map((angle) => (
-                  <button
-                    key={angle}
-                    onClick={() => onUpdate({ textRotation: angle })}
-                    className={cn(
-                      "py-1.5 px-1 rounded-lg text-xs transition-colors",
-                      (subBlock.textRotation === angle || (!subBlock.textRotation && angle === 0))
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted hover:bg-muted/80"
-                    )}
-                  >
-                    {angle > 0 ? `+${angle}°` : angle === 0 ? '0°' : `${angle}°`}
-                  </button>
-                ))}
+            {/* Text rotation - slider */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-muted-foreground">Наклон</Label>
+                <span className="text-xs font-medium">
+                  {(subBlock.textRotation || 0) > 0 ? `+${subBlock.textRotation}°` : `${subBlock.textRotation || 0}°`}
+                </span>
+              </div>
+              <Slider
+                value={[subBlock.textRotation || 0]}
+                onValueChange={(value) => onUpdate({ textRotation: value[0] })}
+                min={-5}
+                max={5}
+                step={1}
+                className="w-full"
+              />
+              <div className="flex justify-between text-[10px] text-muted-foreground">
+                <span>-5°</span>
+                <span>0°</span>
+                <span>+5°</span>
               </div>
             </div>
           </>
