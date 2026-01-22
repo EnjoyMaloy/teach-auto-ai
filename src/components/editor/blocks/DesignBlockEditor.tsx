@@ -575,7 +575,7 @@ const SortableSubBlockItem: React.FC<{
             {isEditing && (
               <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity z-50">
                 <div 
-                  className="grid grid-cols-2 gap-1 p-2 rounded-lg shadow-lg border"
+                  className="grid grid-cols-2 gap-1 p-2 rounded-lg shadow-lg border min-w-[200px]"
                   style={{ 
                     backgroundColor: `hsl(${ds.mutedColor})`,
                     borderColor: `hsl(${ds.foregroundColor} / 0.1)`,
@@ -589,7 +589,7 @@ const SortableSubBlockItem: React.FC<{
                         onUpdate({ dividerStyle: option.value });
                       }}
                       className={cn(
-                        "px-4 py-1.5 text-xs rounded transition-colors text-center",
+                        "px-3 py-1.5 text-xs rounded transition-colors text-center w-full",
                         dividerStyle === option.value 
                           ? "font-medium" 
                           : "opacity-70 hover:opacity-100"
