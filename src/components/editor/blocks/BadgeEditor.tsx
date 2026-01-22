@@ -219,16 +219,19 @@ export const BadgeEditor: React.FC<BadgeEditorProps> = ({
                     <div className="flex gap-1">
                       {[
                         { type: 'none' as const, label: 'Без' },
-                        { type: 'emoji' as const, label: '😀', icon: Smile },
+                        { type: 'emoji' as const, label: '😀' },
                         { type: 'lucide' as const, label: 'Иконки' },
-                        { type: 'custom' as const, label: 'Своя', icon: ImageIcon },
-                      ].map(({ type, label, icon: Icon }) => (
+                        { type: 'custom' as const, label: 'Своя' },
+                      ].map(({ type, label }) => (
                         <button
                           key={type}
                           onClick={() => {
                             if (type === 'none') {
                               updateBadge(badge.id, { iconType: 'none', iconValue: undefined });
                               setActiveIconPicker(null);
+                            } else {
+                              // Just switch tab, don't close
+                              updateBadge(badge.id, { iconType: type });
                             }
                           }}
                           className={cn(

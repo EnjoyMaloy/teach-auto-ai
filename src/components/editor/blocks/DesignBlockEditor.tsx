@@ -539,7 +539,11 @@ const SortableSubBlockItem: React.FC<{
         const badgeVariant = subBlock.badgeVariant || 'oval';
         const badgeSize = subBlock.badgeSize || 'medium';
         const badgeLayout = subBlock.badgeLayout || 'horizontal';
-        const badges = subBlock.badges || [{ id: '1', text: subBlock.badgeText || 'Бейдж', iconType: 'none' as const }];
+        // Handle empty array or undefined
+        const rawBadges = subBlock.badges;
+        const badges = (rawBadges && rawBadges.length > 0) 
+          ? rawBadges 
+          : [{ id: '1', text: subBlock.badgeText || 'Бейдж', iconType: 'none' as const }];
         
         // Size classes
         const badgeSizeClasses = {
@@ -563,9 +567,18 @@ const SortableSubBlockItem: React.FC<{
           pastel: { backgroundColor: `hsl(${ds.primaryColor} / 0.08)`, color: `hsl(${ds.primaryColor} / 0.9)`, border: `1px solid hsl(${ds.primaryColor} / 0.2)` },
         }[badgeVariant];
 
+        // Lucide icons map for badge
+        const badgeLucideIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+          Star, Heart, CheckCircle, Zap, Target, Trophy, Gift, Crown, Flame, Rocket, Lightbulb, ThumbsUp
+        };
+
         const renderBadgeIcon = (badge: typeof badges[0]) => {
           if (badge.iconType === 'none' || !badge.iconValue) return null;
           if (badge.iconType === 'emoji') return <span>{badge.iconValue}</span>;
+          if (badge.iconType === 'lucide' && badge.iconValue) {
+            const LucideIcon = badgeLucideIcons[badge.iconValue];
+            if (LucideIcon) return <LucideIcon className="w-3 h-3" />;
+          }
           if (badge.iconType === 'custom' && badge.iconValue) {
             return <img src={badge.iconValue} alt="" className="w-3 h-3 object-contain" />;
           }

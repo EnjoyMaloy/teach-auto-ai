@@ -383,7 +383,7 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
         {/* Text settings */}
         {subBlock.type === 'text' && (
           <>
-            {renderAlignmentSelector()}
+            {renderAlignmentSelector(false)}
             {renderTextSizeSelector()}
             {renderBackdropSelector()}
             
