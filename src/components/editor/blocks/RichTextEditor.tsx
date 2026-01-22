@@ -6,6 +6,7 @@ import Underline from '@tiptap/extension-underline';
 import { Mark, mergeAttributes } from '@tiptap/core';
 import { cn } from '@/lib/utils';
 import DOMPurify from 'dompurify';
+import { RichTextToolbar } from './RichTextToolbar';
 
 // Configure DOMPurify to allow only safe formatting tags
 const DOMPURIFY_CONFIG = {
@@ -69,6 +70,7 @@ interface RichTextEditorProps {
   underlineColor?: string;
   wavyColor?: string;
   isEditing?: boolean;
+  showToolbar?: boolean;
   className?: string;
   onFocusChange?: (focused: boolean) => void;
 }
@@ -84,6 +86,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   underlineColor = '262 83% 58%',
   wavyColor = '0 84% 60%',
   isEditing = true,
+  showToolbar = true,
   className,
   onFocusChange,
 }) => {
@@ -242,6 +245,19 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       }}
     >
       <style>{dynamicStyles}</style>
+      
+      {/* Formatting toolbar - shown when focused */}
+      {showToolbar && isFocused && (
+        <div className="mb-2">
+          <RichTextToolbar 
+            editor={editor}
+            highlightColor={highlightColor}
+            underlineColor={underlineColor}
+            wavyColor={wavyColor}
+          />
+        </div>
+      )}
+      
       <EditorContent editor={editor} />
     </div>
   );
