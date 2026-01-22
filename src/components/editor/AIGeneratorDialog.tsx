@@ -97,29 +97,28 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
   };
 
   const generateImageForSlide = async (slideContent: string, coursePrompt: string): Promise<string | null> => {
-    // Create a timeout promise (30 seconds max per image)
-    const timeoutPromise = new Promise<null>((_, reject) => {
-      setTimeout(() => reject(new Error('Image generation timeout')), 30000);
-    });
+    // Create an AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 seconds max
 
     try {
-      const fetchPromise = supabase.functions.invoke('generate-image', {
+      const response = await supabase.functions.invoke('generate-image', {
         body: { 
           prompt: coursePrompt,
           slideContext: slideContent
         },
       });
 
-      // Race between the actual request and the timeout
-      const response = await Promise.race([fetchPromise, timeoutPromise]);
+      clearTimeout(timeoutId);
 
-      if (!response || response.error) {
-        console.error('Image generation error:', response?.error);
+      if (response.error) {
+        console.error('Image generation error:', response.error);
         return null;
       }
 
       return response.data?.imageUrl || null;
     } catch (err) {
+      clearTimeout(timeoutId);
       console.error('Image generation failed:', err);
       return null;
     }
@@ -254,87 +253,96 @@ ${JSON.stringify(researchData, null, 2)}
       // Step 4: Generate images for all image_text slides (max 8)
       updateStep('images', { status: 'active', message: 'Генерирую иллюстрации...' });
 
-      // Find ALL slides that need images (image_text type), limit to 8
-      const slidesToIllustrate: { lessonIdx: number; slideIdx: number; description: string }[] = [];
-      
-      courseData.lessons.forEach((lesson, lessonIdx) => {
-        lesson.slides.forEach((slide, slideIdx) => {
-          // Generate images for image_text slides that have imageDescription
-          if (slide.type === 'image_text' && !slide.imageUrl && slidesToIllustrate.length < 8) {
-            slidesToIllustrate.push({
-              lessonIdx,
-              slideIdx,
-              // Use imageDescription if available, otherwise fall back to content
-              description: slide.imageDescription || slide.content || lesson.title
-            });
-          }
-        });
-      });
-
-      const totalImages = slidesToIllustrate.length;
-      
-      if (totalImages === 0) {
-        updateStep('images', { 
-          status: 'completed', 
-          message: 'Иллюстрации не требуются'
-        });
-      } else {
-        // Generate images in parallel (batch of 2 at a time to avoid rate limits)
-        let imagesGenerated = 0;
-        let imageErrors = 0;
+      try {
+        // Find ALL slides that need images (image_text type), limit to 8
+        const slidesToIllustrate: { lessonIdx: number; slideIdx: number; description: string }[] = [];
         
-        // Process in smaller batches to avoid rate limits
-        const batchSize = 2;
-        for (let i = 0; i < slidesToIllustrate.length; i += batchSize) {
-          const batch = slidesToIllustrate.slice(i, i + batchSize);
-          
-          try {
-            const imagePromises = batch.map(async ({ lessonIdx, slideIdx, description }) => {
-              try {
-                // Use the detailed imageDescription for generation
-                const imageUrl = await generateImageForSlide(description, prompt);
-                if (imageUrl) {
-                  courseData.lessons[lessonIdx].slides[slideIdx].imageUrl = imageUrl;
-                  imagesGenerated++;
-                  updateStep('images', { message: `Создано ${imagesGenerated} из ${totalImages} изображений...` });
-                } else {
-                  imageErrors++;
-                }
-                return imageUrl;
-              } catch (err) {
-                console.error('Image generation error:', err);
-                imageErrors++;
-                return null;
-              }
-            });
+        courseData.lessons.forEach((lesson, lessonIdx) => {
+          lesson.slides.forEach((slide, slideIdx) => {
+            // Generate images for image_text slides that have imageDescription
+            if (slide.type === 'image_text' && !slide.imageUrl && slidesToIllustrate.length < 8) {
+              slidesToIllustrate.push({
+                lessonIdx,
+                slideIdx,
+                // Use imageDescription if available, otherwise fall back to content
+                description: slide.imageDescription || slide.content || lesson.title
+              });
+            }
+          });
+        });
 
-            await Promise.all(imagePromises);
-          } catch (batchError) {
-            console.error('Batch image generation error:', batchError);
-            imageErrors += batch.length;
-          }
-          
-          // Small delay between batches to avoid rate limits
-          if (i + batchSize < slidesToIllustrate.length) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-          }
-        }
-
-        // Mark images step as completed (with warning if some failed)
-        if (imagesGenerated > 0) {
+        const totalImages = slidesToIllustrate.length;
+        
+        if (totalImages === 0) {
           updateStep('images', { 
             status: 'completed', 
-            message: imageErrors > 0 
-              ? `${imagesGenerated} из ${totalImages} иллюстраций (${imageErrors} не удалось)`
-              : `${imagesGenerated} иллюстраций создано`
+            message: 'Иллюстрации не требуются'
           });
         } else {
-          // All images failed - still continue but show warning
-          updateStep('images', { 
-            status: 'completed', 
-            message: 'Не удалось создать иллюстрации (можно добавить позже)'
-          });
+          // Generate images in parallel (batch of 2 at a time to avoid rate limits)
+          let imagesGenerated = 0;
+          let imageErrors = 0;
+          
+          // Process in smaller batches to avoid rate limits
+          const batchSize = 2;
+          for (let i = 0; i < slidesToIllustrate.length; i += batchSize) {
+            const batch = slidesToIllustrate.slice(i, i + batchSize);
+            
+            try {
+              const imagePromises = batch.map(async ({ lessonIdx, slideIdx, description }) => {
+                try {
+                  // Use the detailed imageDescription for generation
+                  const imageUrl = await generateImageForSlide(description, prompt);
+                  if (imageUrl) {
+                    courseData.lessons[lessonIdx].slides[slideIdx].imageUrl = imageUrl;
+                    imagesGenerated++;
+                    updateStep('images', { message: `Создано ${imagesGenerated} из ${totalImages} изображений...` });
+                  } else {
+                    imageErrors++;
+                  }
+                  return imageUrl;
+                } catch (err) {
+                  console.error('Image generation error:', err);
+                  imageErrors++;
+                  return null;
+                }
+              });
+
+              await Promise.all(imagePromises);
+            } catch (batchError) {
+              console.error('Batch image generation error:', batchError);
+              imageErrors += batch.length;
+            }
+            
+            // Small delay between batches to avoid rate limits
+            if (i + batchSize < slidesToIllustrate.length) {
+              await new Promise(resolve => setTimeout(resolve, 500));
+            }
+          }
+
+          // Mark images step as completed (with warning if some failed)
+          if (imagesGenerated > 0) {
+            updateStep('images', { 
+              status: 'completed', 
+              message: imageErrors > 0 
+                ? `${imagesGenerated} из ${totalImages} иллюстраций (${imageErrors} не удалось)`
+                : `${imagesGenerated} иллюстраций создано`
+            });
+          } else {
+            // All images failed - still continue but show warning
+            updateStep('images', { 
+              status: 'completed', 
+              message: 'Не удалось создать иллюстрации (можно добавить позже)'
+            });
+          }
         }
+      } catch (imageStepError) {
+        console.error('Image generation step failed:', imageStepError);
+        // Ensure step is marked as completed even on total failure
+        updateStep('images', { 
+          status: 'completed', 
+          message: 'Пропущено (ошибка генерации)'
+        });
       }
 
       // Convert to our Lesson/Slide format
