@@ -935,17 +935,6 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
           </div>
         </SortableContext>
       </DndContext>
-
-      {/* Add sub-block list */}
-      {isEditing && (
-        <SubBlockSelector
-          onSelectType={(type) => {
-            handleAddSubBlock(type);
-          }}
-          onClose={() => {}}
-          inline
-        />
-      )}
     </div>
   );
 };

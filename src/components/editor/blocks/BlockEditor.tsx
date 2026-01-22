@@ -1,5 +1,6 @@
 import React from 'react';
 import { Block, BlockType, BLOCK_CONFIGS, BlockOption } from '@/types/blocks';
+import { SubBlock, SubBlockType, SUB_BLOCK_CONFIGS, createSubBlock } from '@/types/designBlock';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,13 +13,18 @@ import {
   Heading, Type, Image, Play, Volume2, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
   Link2, ListOrdered, SlidersHorizontal, MousePointer2,
-  Lightbulb, Layers, CheckCircle, XCircle, AlertCircle
+  Lightbulb, Layers, CheckCircle, XCircle, AlertCircle,
+  MousePointerClick, Minus, Sparkles, Tag
 } from 'lucide-react';
 
 const iconMap = {
   Heading, Type, Image, Play, Volume2, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
   Link2, ListOrdered, SlidersHorizontal, MousePointer2, Layers
+};
+
+const subBlockIconMap = {
+  Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Play
 };
 
 interface BlockEditorProps {
@@ -609,21 +615,45 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
         )}
 
 
-        {/* Design block inline editing notice */}
+        {/* Design block - sub-block selector list */}
         {block.type === 'design' && (
-          <div className="text-center py-8">
-            <div className="w-16 h-16 rounded-2xl bg-ai/10 mx-auto mb-4 flex items-center justify-center">
-              <Layers className="w-8 h-8 text-ai" />
+          <div className="space-y-3">
+            <div className="text-center pb-4 border-b border-border">
+              <div className="w-12 h-12 rounded-xl bg-ai/10 mx-auto mb-3 flex items-center justify-center">
+                <Layers className="w-6 h-6 text-ai" />
+              </div>
+              <p className="font-medium text-foreground text-sm">Составной блок</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Добавляйте элементы из списка ниже
+              </p>
             </div>
-            <p className="font-medium text-foreground mb-2">Дизайн-блок</p>
-            <p className="text-sm text-muted-foreground mb-4">
-              Редактируйте содержимое прямо в области предпросмотра слева
-            </p>
-            <p className="text-xs text-muted-foreground">
-              • Кликните по элементу для редактирования<br/>
-              • Перетаскивайте для изменения порядка<br/>
-              • Нажмите «Добавить» для новых элементов
-            </p>
+            
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-muted-foreground px-1 mb-2">Добавить элемент:</p>
+              {Object.values(SUB_BLOCK_CONFIGS).map((config) => {
+                const IconComponent = subBlockIconMap[config.icon as keyof typeof subBlockIconMap];
+                return (
+                  <button
+                    key={config.type}
+                    onClick={() => {
+                      const currentSubBlocks = block.subBlocks || [];
+                      const newSubBlock = createSubBlock(config.type, currentSubBlocks.length);
+                      onUpdate({ subBlocks: [...currentSubBlocks, newSubBlock] });
+                    }}
+                    className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg hover:bg-muted transition-colors text-left group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      {IconComponent && <IconComponent className="w-4 h-4 text-primary" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground">{config.labelRu}</p>
+                      <p className="text-xs text-muted-foreground truncate">{config.description}</p>
+                    </div>
+                    <Plus className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
