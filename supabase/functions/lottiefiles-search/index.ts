@@ -6,7 +6,7 @@ const corsHeaders = {
 interface LottieFilesAnimation {
   id: string;
   name: string;
-  lottieUrl: string;
+  jsonUrl: string;
   gifUrl?: string;
   bgColor?: string;
   createdBy?: {
@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
 
     console.log('Searching LottieFiles for:', query);
 
-    // LottieFiles public GraphQL API
+    // LottieFiles public GraphQL API - use jsonUrl for raw JSON format
     const graphqlQuery = `
       query SearchAnimations($query: String!, $limit: Int!) {
         searchPublicAnimations(
@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
             node {
               id
               name
-              lottieUrl
+              jsonUrl
               gifUrl
               bgColor
               createdBy {
@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
         id: edge.node.id,
         name: edge.node.name,
         previewUrl: edge.node.gifUrl || '',
-        lottieUrl: edge.node.lottieUrl,
+        lottieUrl: edge.node.jsonUrl,
         author: edge.node.createdBy?.name || 'Unknown',
       })
     ) || [];
