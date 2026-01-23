@@ -226,11 +226,12 @@ const SortableSubBlockItem: React.FC<{
                   headingSizeClass, 
                   fontWeightClass, 
                   textAlignClass, 
-                  'w-full bg-transparent border-none outline-none resize-none overflow-hidden break-words leading-tight'
+                  'w-full bg-transparent border-none outline-none resize-none overflow-hidden break-words leading-tight p-0 m-0'
                 )}
                 style={{ 
                   color: `hsl(${ds.foregroundColor})`,
                   height: 'auto',
+                  display: 'block',
                 }}
                 ref={(el) => {
                   if (el) {
