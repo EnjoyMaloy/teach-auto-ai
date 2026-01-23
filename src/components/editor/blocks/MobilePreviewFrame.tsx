@@ -11,6 +11,7 @@ import { AudioPlayer } from './AudioPlayer';
 import { DesignBlockEditor } from './DesignBlockEditor';
 import { playSound, SoundConfig } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
+import { RiveMascot } from '@/components/runtime/RiveMascot';
 
 // Fixed preview dimensions (simulating a mobile screen at 100% browser zoom)
 const PREVIEW_BASE_WIDTH = 375; // iPhone width in CSS pixels
@@ -281,6 +282,34 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
   const isInteractive = ['single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'slider', 'matching', 'ordering'].includes(block.type);
 
+  // Mascot settings
+  const mascotSettings = designSystem?.mascot;
+  const showMascot = mascotSettings?.riveEnabled && mascotSettings?.riveUrl && isInteractive;
+  const mascotState: 'idle' | 'correct' | 'incorrect' = 
+    answerState === 'correct' ? 'correct' : 
+    answerState === 'incorrect' || answerState === 'partial' ? 'incorrect' : 'idle';
+
+  // Render mascot component
+  const renderMascot = () => {
+    if (!showMascot || !mascotSettings) return null;
+    
+    const positionClasses = {
+      top: 'mb-3',
+      bottom: 'mt-3 order-last',
+      left: 'mr-3',
+      right: 'ml-3 order-last',
+    };
+
+    return (
+      <div className={cn('flex-shrink-0 flex justify-center', positionClasses[mascotSettings.rivePosition || 'top'])}>
+        <RiveMascot 
+          settings={mascotSettings} 
+          state={mascotState}
+        />
+      </div>
+    );
+  };
+
   // Button depth and style
   const isRaised = designSystem?.buttonDepth !== 'flat';
   
@@ -428,7 +457,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       case 'single_choice':
         return (
           <div className="flex-1 flex flex-col items-center justify-center p-4 overflow-auto relative z-0 h-full min-h-0">
-            <div className="w-full">
+            {/* Mascot top */}
+            {mascotSettings?.rivePosition === 'top' && renderMascot()}
+            <div className="w-full flex-1 flex flex-col justify-center">
               <p 
                 className="text-lg font-semibold mb-4 text-center"
                 style={{ color: `hsl(${ds.foregroundColor})` }}
@@ -483,15 +514,18 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                 })}
               </div>
             </div>
+            {/* Mascot bottom */}
+            {mascotSettings?.rivePosition === 'bottom' && renderMascot()}
           </div>
         );
 
       case 'multiple_choice':
         return (
           <div className="flex-1 flex flex-col items-center justify-center p-4 overflow-auto relative z-0 h-full min-h-0">
-            <div className="w-full">
-              <p 
-                className="text-lg font-semibold mb-4 text-center"
+            {/* Mascot top */}
+            {mascotSettings?.rivePosition === 'top' && renderMascot()}
+            <div className="w-full flex-1 flex flex-col justify-center">
+              <p
                 style={{ color: `hsl(${ds.foregroundColor})` }}
               >
                 {block.content || 'Вопрос?'}
@@ -557,6 +591,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                 })}
               </div>
             </div>
+            {/* Mascot bottom */}
+            {mascotSettings?.rivePosition === 'bottom' && renderMascot()}
           </div>
         );
 
@@ -590,8 +626,10 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         
         return (
           <div className="flex-1 flex flex-col items-center justify-center p-4 relative z-0 h-full min-h-0">
-            <div className="w-full">
-              <p 
+            {/* Mascot top */}
+            {mascotSettings?.rivePosition === 'top' && renderMascot()}
+            <div className="w-full flex-1 flex flex-col justify-center">
+              <p
                 className="text-lg font-semibold mb-6 text-center"
                 style={{ color: `hsl(${ds.foregroundColor})` }}
               >
@@ -630,6 +668,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                 </button>
               </div>
             </div>
+            {/* Mascot bottom */}
+            {mascotSettings?.rivePosition === 'bottom' && renderMascot()}
           </div>
         );
 
@@ -640,6 +680,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         
         return (
           <div className="flex-1 flex flex-col items-center justify-center p-6 gap-4">
+            {/* Mascot top */}
+            {mascotSettings?.rivePosition === 'top' && renderMascot()}
             <p className="text-lg text-center text-foreground">
               {parts[0]}
               <span className={cn(
@@ -665,6 +707,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                 Правильный ответ: <span className="text-success font-medium">{block.blankWord}</span>
               </p>
             )}
+            {/* Mascot bottom */}
+            {mascotSettings?.rivePosition === 'bottom' && renderMascot()}
           </div>
         );
 
@@ -679,7 +723,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         
         return (
           <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6 h-full min-h-0">
-            <p 
+            {/* Mascot top */}
+            {mascotSettings?.rivePosition === 'top' && renderMascot()}
+            <p
               className="text-lg font-semibold text-center"
               style={{ color: `hsl(${ds.foregroundColor})` }}
             >
@@ -754,6 +800,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                 </span>
               </p>
             )}
+            {/* Mascot bottom */}
+            {mascotSettings?.rivePosition === 'bottom' && renderMascot()}
           </div>
         );
 
@@ -764,7 +812,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         
         return (
           <div className="flex-1 flex flex-col items-center justify-center p-4 overflow-auto h-full min-h-0">
-            <div className="w-full">
+            {/* Mascot top */}
+            {mascotSettings?.rivePosition === 'top' && renderMascot()}
+            <div className="w-full flex-1 flex flex-col justify-center">
               <p className="text-lg font-semibold mb-4 text-center text-foreground">
                 {block.content || 'Соедините пары'}
               </p>
@@ -826,6 +876,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                 </div>
               )}
             </div>
+            {/* Mascot bottom */}
+            {mascotSettings?.rivePosition === 'bottom' && renderMascot()}
           </div>
         );
 
@@ -834,7 +886,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         
         return (
           <div className="flex-1 flex flex-col items-center justify-center p-4 overflow-auto h-full min-h-0">
-            <div className="w-full">
+            {/* Mascot top */}
+            {mascotSettings?.rivePosition === 'top' && renderMascot()}
+            <div className="w-full flex-1 flex flex-col justify-center">
               <p className="text-lg font-semibold mb-4 text-center text-foreground">
                 {block.content || 'Расположите в порядке'}
               </p>
@@ -895,6 +949,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                 })}
               </div>
             </div>
+            {/* Mascot bottom */}
+            {mascotSettings?.rivePosition === 'bottom' && renderMascot()}
           </div>
         );
 
