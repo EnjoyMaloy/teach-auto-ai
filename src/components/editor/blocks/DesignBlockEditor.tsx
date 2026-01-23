@@ -938,7 +938,7 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
       ref={contentRef}
       className={cn(
         "h-full flex flex-col p-4 overflow-auto w-full relative",
-        isEditing && isOverflowing && "ring-2 ring-destructive ring-inset"
+        isEditing && isOverflowing && "ring-2 ring-yellow-500 ring-inset"
       )}
       style={{ backgroundColor: `hsl(${ds.backgroundColor})` }}
       onClick={() => {
@@ -953,7 +953,7 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="absolute top-2 right-2 z-50 bg-destructive text-destructive-foreground rounded-full p-1.5 shadow-lg animate-pulse cursor-help">
+              <div className="absolute top-2 right-2 z-50 bg-yellow-500 text-yellow-950 rounded-full p-1.5 shadow-lg animate-pulse cursor-help">
                 <AlertTriangle className="w-4 h-4" />
               </div>
             </TooltipTrigger>
