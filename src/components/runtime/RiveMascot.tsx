@@ -24,9 +24,9 @@ export const RiveMascot: React.FC<RiveMascotProps> = ({
   } = settings;
 
   const sizeClasses = {
-    small: 'w-24 h-24',
-    medium: 'w-32 h-32',
-    large: 'w-40 h-40',
+    small: 'w-32 h-32',
+    medium: 'w-48 h-48',
+    large: 'w-64 h-64',
   };
 
   const { rive, RiveComponent } = useRive({
