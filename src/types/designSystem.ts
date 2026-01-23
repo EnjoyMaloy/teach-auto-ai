@@ -66,9 +66,9 @@ export const DEFAULT_MASCOT_SETTINGS: MascotSettings = {
   riveEnabled: false,
   riveUrl: '',
   riveStateMachine: 'State Machine 1',
-  riveIdleState: 'idle',
-  riveCorrectState: 'correct',
-  riveIncorrectState: 'incorrect',
+  riveIdleState: 'Trigger 3',
+  riveCorrectState: 'Trigger 1',
+  riveIncorrectState: 'Trigger 2',
   rivePosition: 'top',
   riveSize: 'medium',
 };
