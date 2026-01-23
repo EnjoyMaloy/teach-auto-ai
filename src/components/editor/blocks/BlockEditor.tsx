@@ -16,7 +16,7 @@ import {
   CircleDot, CheckSquare, ToggleLeft, PenLine,
   Link2, ListOrdered, SlidersHorizontal, MousePointer2,
   Lightbulb, Layers, CheckCircle, XCircle, AlertCircle,
-  MousePointerClick, Minus, Sparkles, Tag, RotateCcw
+  MousePointerClick, Minus, Sparkles, Tag, RotateCcw, Table
 } from 'lucide-react';
 
 const iconMap = {
@@ -26,7 +26,7 @@ const iconMap = {
 };
 
 const subBlockIconMap = {
-  Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Play
+  Heading, Type, Image, MousePointerClick, Minus, Sparkles, Tag, Play, Table
 };
 
 interface BlockEditorProps {
