@@ -35,6 +35,10 @@ export const RiveMascot: React.FC<RiveMascotProps> = ({
     autoplay: true,
   });
 
+  // Note: The dark background is baked into the .riv file itself.
+  // To remove it, edit the file in Rive editor and remove/hide the background layer,
+  // or use a different .riv file with transparent background.
+
   // Get state machine inputs
   const idleInput = useStateMachineInput(rive, riveStateMachine, riveIdleState);
   const correctInput = useStateMachineInput(rive, riveStateMachine, riveCorrectState);
