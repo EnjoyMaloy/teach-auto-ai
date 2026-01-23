@@ -50,9 +50,30 @@ interface GeneratedSubBlock {
   fontWeight?: string;
   badgeText?: string;
   badgeVariant?: string;
+  badgeSize?: string;
+  badges?: { id: string; text: string; iconType: string; iconValue?: string }[];
+  badgeLayout?: string;
   iconName?: string;
   buttonLabel?: string;
+  buttonUrl?: string;
   buttonVariant?: string;
+  imageDescription?: string;
+  imageSize?: string;
+  imageRotation?: number;
+  textRotation?: number;
+  backdrop?: string;
+  backdropRounded?: boolean;
+  highlight?: string;
+  padding?: string;
+  dividerStyle?: string;
+  tableData?: { id: string; content: string }[][];
+  tableStyle?: string;
+  tableTextSize?: string;
+  animationKeyword?: string;
+  animationType?: string;
+  animationSize?: string;
+  animationAutoplay?: boolean;
+  animationLoop?: boolean;
 }
 
 interface GeneratedSlide {
@@ -61,9 +82,21 @@ interface GeneratedSlide {
   imageUrl?: string;
   imageDescription?: string; // AI-generated description for image generation
   options?: string[];
-  correctAnswer?: string | string[] | boolean;
+  correctAnswer?: string | string[] | boolean | number;
   explanation?: string;
+  explanationCorrect?: string;
+  explanationPartial?: string;
   blankWord?: string;
+  // Matching
+  matchingPairs?: { id: string; left: string; right: string }[];
+  // Ordering
+  orderingItems?: string[];
+  correctOrder?: string[];
+  // Slider
+  sliderMin?: number;
+  sliderMax?: number;
+  sliderCorrect?: number;
+  sliderStep?: number;
   subBlocks?: GeneratedSubBlock[];
 }
 
@@ -504,9 +537,29 @@ ${JSON.stringify(researchData, null, 2)}
             fontWeight: sb.fontWeight as any,
             badgeText: sb.badgeText,
             badgeVariant: sb.badgeVariant as any,
+            badgeSize: sb.badgeSize as any,
+            badges: sb.badges?.map(b => ({ ...b, id: crypto.randomUUID(), iconType: (b.iconType || 'none') as 'none' | 'emoji' | 'lucide' | 'custom' })),
+            badgeLayout: sb.badgeLayout as any,
             iconName: sb.iconName,
             buttonLabel: sb.buttonLabel,
+            buttonUrl: sb.buttonUrl,
             buttonVariant: sb.buttonVariant as any,
+            imageSize: sb.imageSize as any,
+            imageRotation: sb.imageRotation,
+            textRotation: sb.textRotation,
+            backdrop: sb.backdrop as any,
+            backdropRounded: sb.backdropRounded,
+            highlight: sb.highlight as any,
+            padding: sb.padding as any,
+            dividerStyle: sb.dividerStyle as any,
+            tableData: sb.tableData?.map(row => row.map(cell => ({ ...cell, id: crypto.randomUUID() }))),
+            tableStyle: sb.tableStyle as any,
+            tableTextSize: sb.tableTextSize as any,
+            // For animation, we'll resolve keyword to URL later
+            animationType: sb.animationType as any,
+            animationSize: sb.animationSize as any,
+            animationAutoplay: sb.animationAutoplay,
+            animationLoop: sb.animationLoop,
           }));
 
           return {
@@ -517,6 +570,7 @@ ${JSON.stringify(researchData, null, 2)}
             content: genSlide.content || '',
             imageUrl: genSlide.imageUrl,
             subBlocks: genSlide.type === 'design' ? subBlocks : undefined,
+            // Quiz options
             options: genSlide.options?.map(opt => ({
               id: crypto.randomUUID(),
               text: opt,
@@ -526,7 +580,19 @@ ${JSON.stringify(researchData, null, 2)}
             })),
             correctAnswer: genSlide.correctAnswer,
             explanation: genSlide.explanation,
+            explanationCorrect: genSlide.explanationCorrect,
+            explanationPartial: genSlide.explanationPartial,
             blankWord: genSlide.blankWord,
+            // Matching
+            matchingPairs: genSlide.matchingPairs?.map(p => ({ ...p, id: crypto.randomUUID() })),
+            // Ordering
+            orderingItems: genSlide.orderingItems,
+            correctOrder: genSlide.correctOrder,
+            // Slider
+            sliderMin: genSlide.sliderMin,
+            sliderMax: genSlide.sliderMax,
+            sliderCorrect: genSlide.sliderCorrect,
+            sliderStep: genSlide.sliderStep,
             createdAt: new Date(),
             updatedAt: new Date(),
           };
