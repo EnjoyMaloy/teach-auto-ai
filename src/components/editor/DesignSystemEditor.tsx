@@ -1265,12 +1265,18 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                       </p>
                     </div>
                     <Switch
-                      checked={config.mascot?.riveEnabled || false}
-                      onCheckedChange={(enabled) => 
-                        updateConfig({ 
-                          mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveEnabled: enabled } 
-                        })
-                      }
+                      checked={config.mascot?.riveEnabled === true}
+                      onCheckedChange={(enabled) => {
+                        const currentMascot = config.mascot || {};
+                        onChange({ 
+                          ...config,
+                          mascot: { 
+                            ...DEFAULT_MASCOT_SETTINGS, 
+                            ...currentMascot, 
+                            riveEnabled: enabled 
+                          } 
+                        });
+                      }}
                     />
                   </div>
 
