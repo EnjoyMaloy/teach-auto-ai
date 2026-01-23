@@ -249,6 +249,19 @@ serve(async (req) => {
     let result;
     try {
       result = JSON.parse(resultText);
+      
+      // Handle double-encoded JSON (when AI returns JSON inside message field)
+      if (result.message && typeof result.message === 'string' && !result.newBlocks) {
+        try {
+          const innerResult = JSON.parse(result.message);
+          if (innerResult.newBlocks || innerResult.message) {
+            console.log("Fixed double-encoded JSON response");
+            result = innerResult;
+          }
+        } catch {
+          // Not double-encoded, keep original
+        }
+      }
     } catch {
       result = { message: resultText };
     }
