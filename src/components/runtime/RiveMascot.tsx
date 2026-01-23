@@ -44,38 +44,34 @@ export const RiveMascot: React.FC<RiveMascotProps> = ({
   const correctInput = useStateMachineInput(rive, riveStateMachine, riveCorrectState);
   const incorrectInput = useStateMachineInput(rive, riveStateMachine, riveIncorrectState);
 
+  // Safe fire helper - handles null runtimeInput internally
+  const safeFire = (input: ReturnType<typeof useStateMachineInput>) => {
+    if (!input) return;
+    try {
+      if (typeof input.fire === 'function') {
+        input.fire();
+      } else if ('value' in input) {
+        input.value = true;
+      }
+    } catch (e) {
+      // Input not ready yet, ignore
+    }
+  };
+
   // Trigger state changes
   useEffect(() => {
     if (!rive) return;
 
     switch (state) {
       case 'correct':
-        if (correctInput) {
-          if (typeof correctInput.fire === 'function') {
-            correctInput.fire();
-          } else if ('value' in correctInput) {
-            correctInput.value = true;
-          }
-        }
+        safeFire(correctInput);
         break;
       case 'incorrect':
-        if (incorrectInput) {
-          if (typeof incorrectInput.fire === 'function') {
-            incorrectInput.fire();
-          } else if ('value' in incorrectInput) {
-            incorrectInput.value = true;
-          }
-        }
+        safeFire(incorrectInput);
         break;
       case 'idle':
       default:
-        if (idleInput) {
-          if (typeof idleInput.fire === 'function') {
-            idleInput.fire();
-          } else if ('value' in idleInput) {
-            idleInput.value = true;
-          }
-        }
+        safeFire(idleInput);
         break;
     }
   }, [state, rive, idleInput, correctInput, incorrectInput]);
