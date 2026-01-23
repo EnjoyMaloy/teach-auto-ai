@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SubBlock, SubBlockType, SUB_BLOCK_CONFIGS, TextHighlightType, DividerStyleType, BadgeItem } from '@/types/designBlock';
 import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
@@ -9,6 +9,7 @@ import { BadgeEditor } from './BadgeEditor';
 import { TableEditor } from './TableEditor';
 import { useTextEditor } from './TextEditorContext';
 import { SubBlockAIChat } from './SubBlockAIChat';
+import { LottieFilesSearch } from './LottieFilesSearch';
 import {
   Heading, Type, Image, MousePointerClick, Minus, Plus, Sparkles, Tag, Play,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
@@ -62,6 +63,7 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
   onClose,
   onReplaceAllBlocks,
 }) => {
+  const [showLottieSearch, setShowLottieSearch] = useState(false);
   const config = SUB_BLOCK_CONFIGS[subBlock.type];
   const IconComponent = subBlockIconMap[config.icon as keyof typeof subBlockIconMap];
   const { activeEditor } = useTextEditor();
@@ -595,9 +597,38 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
               </div>
             </div>
 
+            {/* LottieFiles Search - only for Lottie format */}
+            {(subBlock.animationType === 'lottie' || !subBlock.animationType) && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-muted-foreground">Поиск в LottieFiles</Label>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-xs"
+                    onClick={() => setShowLottieSearch(!showLottieSearch)}
+                  >
+                    {showLottieSearch ? 'Скрыть' : 'Открыть'}
+                  </Button>
+                </div>
+                {showLottieSearch && (
+                  <div className="p-3 rounded-lg border border-border bg-background">
+                    <LottieFilesSearch
+                      onSelect={(lottieUrl) => {
+                        onUpdate({ animationUrl: lottieUrl, animationType: 'lottie' });
+                        setShowLottieSearch(false);
+                      }}
+                      onClose={() => setShowLottieSearch(false)}
+                      contextHint={subBlock.content}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Animation file upload */}
             <div className="space-y-2">
-              <Label className="text-xs text-muted-foreground">Файл анимации</Label>
+              <Label className="text-xs text-muted-foreground">Или загрузить файл</Label>
               <div className="flex flex-col gap-2">
                 <label className="flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 border-dashed border-border hover:border-primary/50 cursor-pointer transition-colors">
                   <input
