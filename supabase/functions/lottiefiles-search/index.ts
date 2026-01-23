@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { query, limit = 12 } = await req.json();
+    const { query, limit = 12, cursor } = await req.json();
 
     if (!query) {
       return new Response(
@@ -37,15 +37,20 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log('Searching LottieFiles for:', query);
+    console.log('Searching LottieFiles for:', query, cursor ? `(cursor: ${cursor})` : '');
 
-    // LottieFiles public GraphQL API - use jsonUrl for raw JSON format
+    // LottieFiles public GraphQL API with cursor pagination
     const graphqlQuery = `
-      query SearchAnimations($query: String!, $limit: Int!) {
+      query SearchAnimations($query: String!, $limit: Int!, $after: String) {
         searchPublicAnimations(
           query: $query
           first: $limit
+          after: $after
         ) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
           edges {
             node {
               id
@@ -69,7 +74,7 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         query: graphqlQuery,
-        variables: { query, limit },
+        variables: { query, limit, after: cursor || null },
       }),
     });
 
@@ -83,7 +88,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    const animations: SearchResult[] = data.data?.searchPublicAnimations?.edges?.map(
+    const searchResult = data.data?.searchPublicAnimations;
+    const animations: SearchResult[] = searchResult?.edges?.map(
       (edge: { node: LottieFilesAnimation }) => ({
         id: edge.node.id,
         name: edge.node.name,
@@ -93,10 +99,15 @@ Deno.serve(async (req) => {
       })
     ) || [];
 
-    console.log(`Found ${animations.length} animations`);
+    console.log(`Found ${animations.length} animations, hasNext: ${searchResult?.pageInfo?.hasNextPage}`);
 
     return new Response(
-      JSON.stringify({ success: true, data: animations }),
+      JSON.stringify({
+        success: true,
+        data: animations,
+        nextCursor: searchResult?.pageInfo?.hasNextPage ? searchResult?.pageInfo?.endCursor : null,
+        hasMore: searchResult?.pageInfo?.hasNextPage || false,
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
