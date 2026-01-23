@@ -293,9 +293,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   const renderMascot = () => {
     if (!showMascot || !mascotSettings) return null;
 
-    // Absolute positioning at bottom of the screen
+    // Absolute positioning at top, below progress bar
     return (
-      <div className="absolute bottom-20 left-0 right-0 flex justify-center pointer-events-none z-10">
+      <div className="absolute top-16 left-0 right-0 flex justify-center pointer-events-none z-10">
         <RiveMascot 
           settings={{
             ...mascotSettings,
