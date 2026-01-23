@@ -47,7 +47,8 @@ import {
   X,
   Upload,
   Play,
-  Loader2
+  Loader2,
+  Link2
 } from 'lucide-react';
 import {
   Dialog,
@@ -188,7 +189,7 @@ const ColorInput: React.FC<{
   );
 };
 
-// Rive file uploader component
+// Rive file uploader component with URL input
 const RiveFileUploader: React.FC<{
   riveUrl: string;
   onUpload: (url: string) => void;
@@ -196,6 +197,8 @@ const RiveFileUploader: React.FC<{
 }> = ({ riveUrl, onUpload, onRemove }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [urlValue, setUrlValue] = useState('');
 
   const handleFileUpload = async (file: File) => {
     if (!file.name.endsWith('.riv')) {
@@ -227,14 +230,32 @@ const RiveFileUploader: React.FC<{
     }
   };
 
+  const handleUrlSubmit = () => {
+    if (!urlValue.trim()) {
+      setError('Введите URL');
+      return;
+    }
+    
+    // Basic URL validation
+    if (!urlValue.includes('.riv') && !urlValue.includes('rive.app')) {
+      setError('URL должен вести на .riv файл или Rive Community');
+      return;
+    }
+
+    setError(null);
+    onUpload(urlValue.trim());
+    setUrlValue('');
+    setShowUrlInput(false);
+  };
+
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <Label className="text-sm font-medium">Файл анимации (.riv)</Label>
       {riveUrl ? (
         <div className="flex items-center gap-3 p-3 rounded-xl border border-border bg-muted/30">
           <Play className="w-8 h-8 text-primary" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">Rive-файл загружен</p>
+            <p className="text-sm font-medium truncate">Rive-анимация подключена</p>
             <p className="text-xs text-muted-foreground truncate">{riveUrl.split('/').pop()}</p>
           </div>
           <Button variant="ghost" size="sm" onClick={onRemove}>
@@ -242,30 +263,78 @@ const RiveFileUploader: React.FC<{
           </Button>
         </div>
       ) : (
-        <label className="flex flex-col items-center justify-center gap-2 p-6 rounded-xl border-2 border-dashed border-border hover:border-primary/50 transition-colors cursor-pointer bg-muted/30">
-          <input
-            type="file"
-            accept=".riv"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleFileUpload(file);
-            }}
-            disabled={isUploading}
-          />
-          {isUploading ? (
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <div className="space-y-3">
+          {/* File upload option */}
+          <label className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-border hover:border-primary/50 transition-colors cursor-pointer bg-muted/30">
+            <input
+              type="file"
+              accept=".riv"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFileUpload(file);
+              }}
+              disabled={isUploading}
+            />
+            {isUploading ? (
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            ) : (
+              <Upload className="w-6 h-6 text-muted-foreground" />
+            )}
+            <span className="text-sm text-muted-foreground">
+              {isUploading ? 'Загрузка...' : 'Загрузить .riv файл'}
+            </span>
+          </label>
+
+          {/* Divider */}
+          <div className="flex items-center gap-2">
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-xs text-muted-foreground">или</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
+
+          {/* URL input option */}
+          {showUrlInput ? (
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <Input
+                  value={urlValue}
+                  onChange={(e) => setUrlValue(e.target.value)}
+                  placeholder="https://rive.app/community/..."
+                  className="flex-1"
+                  onKeyDown={(e) => e.key === 'Enter' && handleUrlSubmit()}
+                />
+                <Button size="sm" onClick={handleUrlSubmit}>
+                  <Check className="w-4 h-4" />
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => {
+                  setShowUrlInput(false);
+                  setUrlValue('');
+                  setError(null);
+                }}>
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
           ) : (
-            <Upload className="w-8 h-8 text-muted-foreground" />
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setShowUrlInput(true)}
+            >
+              <Link2 className="w-4 h-4 mr-2" />
+              Вставить URL анимации
+            </Button>
           )}
-          <span className="text-sm text-muted-foreground">
-            {isUploading ? 'Загрузка...' : 'Нажмите для загрузки .riv файла'}
-          </span>
-        </label>
+        </div>
       )}
       {error && <p className="text-xs text-destructive">{error}</p>}
       <p className="text-xs text-muted-foreground">
-        Создайте анимацию с состояниями idle, correct, incorrect в{' '}
+        Найдите анимации в{' '}
+        <a href="https://rive.app/community" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+          Rive Community
+        </a>
+        {' '}или создайте в{' '}
         <a href="https://rive.app" target="_blank" rel="noopener noreferrer" className="text-primary underline">
           Rive Editor
         </a>
