@@ -242,7 +242,7 @@ export const createSubBlock = (type: SubBlockType, order: number): SubBlock => (
     badgeLayout: 'horizontal' as const,
   } : {}),
   
-  ...(type === 'animation' ? { animationSize: 'medium' as const, animationAutoplay: true, animationLoop: true } : {}),
+  ...(type === 'animation' ? { animationSize: 'full' as const, animationAutoplay: true, animationLoop: true } : {}),
   ...(type === 'table' ? { 
     tableData: [
       [{ id: crypto.randomUUID(), content: 'Заголовок 1' }, { id: crypto.randomUUID(), content: 'Заголовок 2' }],
