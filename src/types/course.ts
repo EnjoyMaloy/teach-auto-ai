@@ -1,5 +1,6 @@
 // Core entities for the course platform
 import { SubBlock } from './designBlock';
+import { MascotSettings } from './designSystem';
 export type SlideType = 
   | 'text' 
   | 'heading'
@@ -114,6 +115,7 @@ export interface CourseDesignSystem {
     highlightUnderlineColor?: string;
     highlightWavyColor?: string;
   };
+  mascot?: MascotSettings;
 }
 
 export interface Course {

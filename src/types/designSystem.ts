@@ -38,6 +38,22 @@ export interface MascotSettings {
   name?: string;
   // Character personality traits for AI context
   personality?: string;
+  
+  // === RIVE ANIMATION SETTINGS ===
+  // Whether Rive mascot is enabled (shows in quiz slides)
+  riveEnabled?: boolean;
+  // URL to .riv file (stored in Supabase storage)
+  riveUrl?: string;
+  // State machine name in the Rive file
+  riveStateMachine?: string;
+  // Input names for triggering states
+  riveIdleState?: string;      // Default/waiting state
+  riveCorrectState?: string;   // Triggered on correct answer
+  riveIncorrectState?: string; // Triggered on incorrect answer
+  // Mascot position in quiz slides
+  rivePosition?: 'top' | 'bottom' | 'left' | 'right';
+  // Mascot size
+  riveSize?: 'small' | 'medium' | 'large';
 }
 
 export const DEFAULT_MASCOT_SETTINGS: MascotSettings = {
@@ -47,6 +63,14 @@ export const DEFAULT_MASCOT_SETTINGS: MascotSettings = {
   isApproved: false,
   name: '',
   personality: '',
+  riveEnabled: false,
+  riveUrl: '',
+  riveStateMachine: 'State Machine 1',
+  riveIdleState: 'idle',
+  riveCorrectState: 'correct',
+  riveIncorrectState: 'incorrect',
+  rivePosition: 'top',
+  riveSize: 'medium',
 };
 
 export const DEFAULT_DESIGN_BLOCK_SETTINGS: Required<DesignBlockSettings> = {

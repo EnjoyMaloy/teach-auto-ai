@@ -12,6 +12,7 @@ import { AudioPlayer } from '@/components/editor/blocks/AudioPlayer';
 import { DesignBlockEditor } from '@/components/editor/blocks/DesignBlockEditor';
 import { playSound, SoundConfig } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
+import { RiveMascot } from './RiveMascot';
 
 interface SlideRendererProps {
   slide: Slide | null;
@@ -181,7 +182,35 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
   };
 
   const pressAnimationClass = isRaised ? 'btn-raised' : 'btn-flat';
-  const isInteractive = ['single_choice', 'multiple_choice', 'true_false', 'fillblank', 'slider', 'matching', 'ordering'].includes(slide?.type || '');
+  const isInteractive = ['single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'slider', 'matching', 'ordering'].includes(slide?.type || '');
+
+  // Маскот настройки
+  const mascotSettings = designSystem?.mascot;
+  const showMascot = mascotSettings?.riveEnabled && mascotSettings?.riveUrl && isInteractive;
+  const mascotState: 'idle' | 'correct' | 'incorrect' = 
+    answerState === 'correct' ? 'correct' : 
+    answerState === 'incorrect' ? 'incorrect' : 'idle';
+
+  // Рендер маскота
+  const renderMascot = () => {
+    if (!showMascot || !mascotSettings) return null;
+    
+    const positionClasses = {
+      top: 'mb-4',
+      bottom: 'mt-4 order-last',
+      left: 'mr-4',
+      right: 'ml-4 order-last',
+    };
+
+    return (
+      <div className={cn('flex-shrink-0', positionClasses[mascotSettings.rivePosition || 'top'])}>
+        <RiveMascot 
+          settings={mascotSettings} 
+          state={mascotState}
+        />
+      </div>
+    );
+  };
 
   // Пустой слайд
   if (!slide) {
@@ -325,7 +354,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
       case 'multiple_choice':
         return (
           <div className="flex-1 flex flex-col items-center justify-center p-4 overflow-auto h-full min-h-0">
-            <div className="w-full">
+            {/* Маскот сверху */}
+            {mascotSettings?.rivePosition === 'top' && renderMascot()}
+            
+            <div className="w-full flex-1 flex flex-col justify-center">
               <p 
                 className="text-lg font-semibold mb-4 text-center"
                 style={{ color: `hsl(${ds.foregroundColor})` }}
@@ -385,62 +417,73 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                 })}
               </div>
             </div>
+            
+            {/* Маскот снизу */}
+            {mascotSettings?.rivePosition === 'bottom' && renderMascot()}
           </div>
         );
 
       case 'true_false':
         return (
           <div className="flex-1 flex flex-col items-center justify-center p-4 h-full min-h-0">
-            <p 
-              className="text-lg font-semibold mb-6 text-center"
-              style={{ color: `hsl(${ds.foregroundColor})` }}
-            >
-              {slide.content || 'Верно или неверно?'}
-            </p>
-            <div className="flex gap-4">
-              {[true, false].map((value) => {
-                const isSelected = trueFalseAnswer === value;
-                const showResult = answerState !== 'idle';
-                const isCorrect = slide.correctAnswer === value;
-                
-                let borderColor = `hsl(${ds.mutedColor})`;
-                let bgColor = `hsl(${ds.cardColor})`;
-                
-                if (showResult && isCorrect) {
-                  borderColor = `hsl(${ds.successColor})`;
-                  bgColor = `hsl(${ds.successColor} / 0.1)`;
-                } else if (showResult && isSelected && !isCorrect) {
-                  borderColor = `hsl(${ds.destructiveColor})`;
-                  bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
-                } else if (!showResult && isSelected) {
-                  borderColor = `hsl(${ds.primaryColor})`;
-                  bgColor = `hsl(${ds.primaryColor} / 0.1)`;
-                }
-                
-                return (
-                  <button
-                    key={String(value)}
-                    onClick={() => answerState === 'idle' && setTrueFalseAnswer(value)}
-                    disabled={answerState !== 'idle'}
-                    className="w-24 h-24 flex flex-col items-center justify-center border-2 transition-all"
-                    style={{
-                      borderColor,
-                      backgroundColor: bgColor,
-                      borderRadius: ds.borderRadius,
-                    }}
-                  >
-                    {value ? (
-                      <Check className="w-8 h-8" style={{ color: `hsl(${ds.successColor})` }} />
-                    ) : (
-                      <X className="w-8 h-8" style={{ color: `hsl(${ds.destructiveColor})` }} />
-                    )}
-                    <span className="text-sm mt-2" style={{ color: `hsl(${ds.foregroundColor})` }}>
-                      {value ? 'Верно' : 'Неверно'}
-                    </span>
-                  </button>
-                );
-              })}
+            {/* Маскот сверху */}
+            {mascotSettings?.rivePosition === 'top' && renderMascot()}
+            
+            <div className="flex-1 flex flex-col items-center justify-center">
+              <p 
+                className="text-lg font-semibold mb-6 text-center"
+                style={{ color: `hsl(${ds.foregroundColor})` }}
+              >
+                {slide.content || 'Верно или неверно?'}
+              </p>
+              <div className="flex gap-4">
+                {[true, false].map((value) => {
+                  const isSelected = trueFalseAnswer === value;
+                  const showResult = answerState !== 'idle';
+                  const isCorrect = slide.correctAnswer === value;
+                  
+                  let borderColor = `hsl(${ds.mutedColor})`;
+                  let bgColor = `hsl(${ds.cardColor})`;
+                  
+                  if (showResult && isCorrect) {
+                    borderColor = `hsl(${ds.successColor})`;
+                    bgColor = `hsl(${ds.successColor} / 0.1)`;
+                  } else if (showResult && isSelected && !isCorrect) {
+                    borderColor = `hsl(${ds.destructiveColor})`;
+                    bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
+                  } else if (!showResult && isSelected) {
+                    borderColor = `hsl(${ds.primaryColor})`;
+                    bgColor = `hsl(${ds.primaryColor} / 0.1)`;
+                  }
+                  
+                  return (
+                    <button
+                      key={String(value)}
+                      onClick={() => answerState === 'idle' && setTrueFalseAnswer(value)}
+                      disabled={answerState !== 'idle'}
+                      className="w-24 h-24 flex flex-col items-center justify-center border-2 transition-all"
+                      style={{
+                        borderColor,
+                        backgroundColor: bgColor,
+                        borderRadius: ds.borderRadius,
+                      }}
+                    >
+                      {value ? (
+                        <Check className="w-8 h-8" style={{ color: `hsl(${ds.successColor})` }} />
+                      ) : (
+                        <X className="w-8 h-8" style={{ color: `hsl(${ds.destructiveColor})` }} />
+                      )}
+                      <span className="text-sm mt-2" style={{ color: `hsl(${ds.foregroundColor})` }}>
+                        {value ? 'Верно' : 'Неверно'}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+            
+            {/* Маскот снизу */}
+            {mascotSettings?.rivePosition === 'bottom' && renderMascot()}
           </div>
         );
 
