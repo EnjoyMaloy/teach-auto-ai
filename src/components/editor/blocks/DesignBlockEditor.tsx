@@ -226,12 +226,11 @@ const SortableSubBlockItem: React.FC<{
                   headingSizeClass, 
                   fontWeightClass, 
                   textAlignClass, 
-                  'w-full bg-transparent border-none outline-none resize-none overflow-hidden break-words'
+                  'w-full bg-transparent border-none outline-none resize-none overflow-hidden break-words leading-tight'
                 )}
                 style={{ 
                   color: `hsl(${ds.foregroundColor})`,
                   height: 'auto',
-                  minHeight: '1.5em',
                 }}
                 ref={(el) => {
                   if (el) {
@@ -242,7 +241,7 @@ const SortableSubBlockItem: React.FC<{
               />
             ) : (
               <h2 
-                className={cn(headingSizeClass, fontWeightClass, textAlignClass, 'break-words whitespace-pre-wrap')}
+                className={cn(headingSizeClass, fontWeightClass, textAlignClass, 'break-words whitespace-pre-wrap leading-tight')}
                 style={{ color: `hsl(${ds.foregroundColor})` }}
               >
                 {subBlock.content || 'Заголовок'}
