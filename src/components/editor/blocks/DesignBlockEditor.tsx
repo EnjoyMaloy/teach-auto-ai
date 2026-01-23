@@ -950,9 +950,9 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
     >
       {/* Overflow warning */}
       {isEditing && isOverflowing && (
-        <div className="absolute top-2 right-2 z-50 bg-yellow-500/80 text-yellow-950 rounded-lg px-3 py-2 shadow-lg flex items-center gap-2 backdrop-blur-sm">
+        <div className="absolute top-2 right-2 z-50 bg-yellow-500/80 text-yellow-950 rounded-lg shadow-lg backdrop-blur-sm flex items-center gap-0 overflow-hidden transition-all duration-300 ease-out group hover:gap-2 p-2 hover:pr-3">
           <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-          <span className="text-xs font-medium whitespace-nowrap">Блок переполнен</span>
+          <span className="text-xs font-medium whitespace-nowrap max-w-0 overflow-hidden opacity-0 transition-all duration-300 ease-out group-hover:max-w-[100px] group-hover:opacity-100">Блок переполнен</span>
         </div>
       )}
       
