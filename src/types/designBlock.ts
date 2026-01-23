@@ -7,7 +7,6 @@ export type SubBlockType =
   | 'image'
   | 'button'
   | 'divider'
-  | 'icon'
   | 'badge'
   | 'animation'
   | 'table';
@@ -146,13 +145,6 @@ export const SUB_BLOCK_CONFIGS: Record<SubBlockType, SubBlockConfig> = {
     labelRu: 'Разделитель',
     description: 'Горизонтальная линия',
   },
-  icon: {
-    type: 'icon',
-    icon: 'Sparkles',
-    label: 'Icon',
-    labelRu: 'Иконка',
-    description: 'Декоративная иконка',
-  },
   badge: {
     type: 'badge',
     icon: 'Tag',
@@ -215,9 +207,9 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
     id: 'feature',
     name: 'Feature',
     nameRu: 'Фича',
-    description: 'Иконка с заголовком и описанием',
+    description: 'Бейдж с заголовком и описанием',
     subBlocks: [
-      { type: 'icon', order: 1, iconName: 'Star', iconSize: 'large', textAlign: 'center' },
+      { type: 'badge', order: 1, badges: [{ id: '1', text: '⭐ Фича', iconType: 'none' }], badgeVariant: 'oval', textAlign: 'center' },
       { type: 'heading', order: 2, content: 'Преимущество', textAlign: 'center', textSize: 'large', fontWeight: 'semibold' },
       { type: 'text', order: 3, content: 'Описание преимущества вашего курса', textAlign: 'center', textSize: 'medium' },
     ],
@@ -249,7 +241,7 @@ export const createSubBlock = (type: SubBlockType, order: number): SubBlock => (
     badges: [{ id: crypto.randomUUID(), text: 'Бейдж', iconType: 'none' as const }],
     badgeLayout: 'horizontal' as const,
   } : {}),
-  ...(type === 'icon' ? { iconName: 'Star', iconSize: 'medium' as const } : {}),
+  
   ...(type === 'animation' ? { animationSize: 'medium' as const, animationAutoplay: true, animationLoop: true } : {}),
   ...(type === 'table' ? { 
     tableData: [

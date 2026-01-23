@@ -548,54 +548,6 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
           </>
         )}
 
-        {/* Icon settings */}
-        {subBlock.type === 'icon' && (
-          <>
-            {renderAlignmentSelector(false)}
-            <div className="space-y-2">
-              <Label className="text-xs text-muted-foreground">Иконка</Label>
-              <div className="grid grid-cols-5 gap-1.5">
-                {ICON_OPTIONS.map(({ name, icon: IconComponent }) => (
-                  <button
-                    key={name}
-                    onClick={() => onUpdate({ iconName: name })}
-                    className={cn(
-                      "p-2 rounded-lg transition-colors flex items-center justify-center",
-                      (subBlock.iconName === name || (!subBlock.iconName && name === 'Sparkles'))
-                        ? "bg-primary text-primary-foreground" 
-                        : "bg-muted hover:bg-muted/80"
-                    )}
-                    title={name}
-                  >
-                    <IconComponent className="w-4 h-4" />
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs text-muted-foreground">Размер</Label>
-              <div className="flex gap-1">
-                {[
-                  { value: 'medium', label: 'M' },
-                  { value: 'large', label: 'L' },
-                ].map(({ value, label }) => (
-                  <button
-                    key={value}
-                    onClick={() => onUpdate({ iconSize: value as 'medium' | 'large' })}
-                    className={cn(
-                      "flex-1 py-1.5 px-2 rounded-lg text-sm font-medium transition-colors",
-                      (subBlock.iconSize === value || (!subBlock.iconSize && value === 'medium'))
-                        ? "bg-primary text-primary-foreground" 
-                        : "bg-muted hover:bg-muted/80"
-                    )}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
 
         {/* Badge settings */}
         {subBlock.type === 'badge' && (

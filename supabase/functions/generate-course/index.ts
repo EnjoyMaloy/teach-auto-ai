@@ -97,12 +97,6 @@ const CONTENT_PROMPT = `Ты — контент-мейкер. Создай ко�
 - badgeLayout: 'horizontal' | 'vertical'
 - textAlign, padding
 
-##### icon — декоративная иконка Lucide
-- iconName: Star|Heart|CheckCircle|Zap|Target|Trophy|Gift|Crown|Flame|Rocket|Lightbulb|ThumbsUp|BookOpen|Brain|Puzzle|GraduationCap|Award|Gem|Shield|Eye
-- iconSize: 'medium' | 'large'
-- iconColor: string — CSS цвет (например "#FFD700")
-- textAlign, padding
-
 ##### divider — горизонтальный разделитель
 - dividerStyle: 'thin' | 'medium' | 'bold' | 'dashed' | 'dotted' | 'wavy'
 - padding
@@ -119,8 +113,7 @@ const CONTENT_PROMPT = `Ты — контент-мейкер. Создай ко�
   "subBlocks": [
     { "type": "badge", "order": 1, "badges": [{"id": "1", "text": "Урок 1", "iconType": "emoji", "iconValue": "📚"}], "badgeVariant": "oval", "textAlign": "center" },
     { "type": "heading", "order": 2, "content": "Введение в тему", "textAlign": "center", "textSize": "xlarge", "fontWeight": "bold" },
-    { "type": "text", "order": 3, "content": "Краткое описание", "textAlign": "center", "textSize": "medium", "backdrop": "primary", "backdropRounded": true },
-    { "type": "icon", "order": 4, "iconName": "Rocket", "textAlign": "center", "iconSize": "large", "iconColor": "#6366F1" }
+    { "type": "text", "order": 3, "content": "Краткое описание", "textAlign": "center", "textSize": "medium", "backdrop": "primary", "backdropRounded": true }
   ]
 }
 
