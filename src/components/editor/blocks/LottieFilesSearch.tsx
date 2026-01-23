@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -28,27 +28,64 @@ export const LottieFilesSearch: React.FC<LottieFilesSearchProps> = ({
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<LottieSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [currentQuery, setCurrentQuery] = useState('');
+  
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useCallback((node: HTMLDivElement | null) => {
+    if (isLoadingMore) return;
+    
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+    
+    observerRef.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+        loadMore();
+      }
+    }, { threshold: 0.1 });
+    
+    if (node) {
+      observerRef.current.observe(node);
+    }
+  }, [hasMore, isLoadingMore, nextCursor, currentQuery]);
 
-  const handleSearch = async (searchQuery: string) => {
+  const handleSearch = async (searchQuery: string, cursor?: string | null) => {
     if (!searchQuery.trim()) return;
 
-    setIsLoading(true);
+    const isNewSearch = !cursor;
+    if (isNewSearch) {
+      setIsLoading(true);
+      setResults([]);
+      setCurrentQuery(searchQuery);
+    } else {
+      setIsLoadingMore(true);
+    }
     setError(null);
-    setResults([]);
 
     try {
       const { data, error: fnError } = await supabase.functions.invoke('lottiefiles-search', {
-        body: { query: searchQuery.trim(), limit: 12 },
+        body: { query: searchQuery.trim(), limit: 12, cursor },
       });
 
       if (fnError) throw fnError;
 
       if (data?.success) {
-        setResults(data.data || []);
-        if (data.data?.length === 0) {
+        const newResults = data.data || [];
+        if (isNewSearch) {
+          setResults(newResults);
+        } else {
+          setResults(prev => [...prev, ...newResults]);
+        }
+        setNextCursor(data.nextCursor);
+        setHasMore(data.hasMore);
+        
+        if (isNewSearch && newResults.length === 0) {
           setError('Анимации не найдены. Попробуйте другой запрос.');
         }
       } else {
@@ -59,6 +96,13 @@ export const LottieFilesSearch: React.FC<LottieFilesSearchProps> = ({
       setError('Не удалось выполнить поиск');
     } finally {
       setIsLoading(false);
+      setIsLoadingMore(false);
+    }
+  };
+
+  const loadMore = () => {
+    if (nextCursor && currentQuery && !isLoadingMore) {
+      handleSearch(currentQuery, nextCursor);
     }
   };
 
@@ -69,7 +113,6 @@ export const LottieFilesSearch: React.FC<LottieFilesSearchProps> = ({
     setError(null);
 
     try {
-      // Use AI to generate search keywords based on context
       const { data, error: fnError } = await supabase.functions.invoke('lottiefiles-ai-suggest', {
         body: { context: contextHint },
       });
@@ -155,7 +198,7 @@ export const LottieFilesSearch: React.FC<LottieFilesSearchProps> = ({
         <p className="text-xs text-destructive text-center py-2">{error}</p>
       )}
 
-      {/* Results grid */}
+      {/* Results grid with infinite scroll */}
       {results.length > 0 && (
         <ScrollArea className="h-64">
           <div className="grid grid-cols-2 gap-3 pr-3">
@@ -197,6 +240,20 @@ export const LottieFilesSearch: React.FC<LottieFilesSearchProps> = ({
               </button>
             ))}
           </div>
+          
+          {/* Load more trigger */}
+          {hasMore && (
+            <div 
+              ref={loadMoreRef} 
+              className="flex justify-center py-4"
+            >
+              {isLoadingMore ? (
+                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+              ) : (
+                <span className="text-xs text-muted-foreground">Прокрутите для загрузки</span>
+              )}
+            </div>
+          )}
         </ScrollArea>
       )}
 
