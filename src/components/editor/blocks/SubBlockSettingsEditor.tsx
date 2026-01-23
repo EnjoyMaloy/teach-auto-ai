@@ -639,9 +639,8 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
             {/* Size selector */}
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">Размер</Label>
-              <div className="grid grid-cols-4 gap-1">
+              <div className="grid grid-cols-3 gap-1">
                 {[
-                  { value: 'small', label: 'S' },
                   { value: 'medium', label: 'M' },
                   { value: 'large', label: 'L' },
                   { value: 'full', label: '100%' },
