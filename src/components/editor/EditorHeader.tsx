@@ -295,6 +295,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                       buttonStyle: course.designSystem?.buttonStyle || 'rounded',
                       buttonDepth: course.designSystem?.buttonDepth || 'raised',
                       sound: course.designSystem?.sound,
+                      designBlock: course.designSystem?.designBlock,
+                      mascot: course.designSystem?.mascot,
                     }}
                     onChange={onUpdateDesignSystem}
                   />
