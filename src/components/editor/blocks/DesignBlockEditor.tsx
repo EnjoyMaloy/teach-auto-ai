@@ -517,34 +517,6 @@ const SortableSubBlockItem: React.FC<{
           </div>
         );
 
-      case 'icon':
-        const iconSizeClass = {
-          medium: 'w-10 h-10',
-          large: 'w-16 h-16',
-        }[subBlock.iconSize || 'medium'];
-
-        const IconComponent = subBlockIconMap[subBlock.iconName || 'Sparkles'] || Sparkles;
-
-        return (
-          <div 
-            className={cn('flex', textAlignClass === 'text-center' ? 'justify-center' : textAlignClass === 'text-right' ? 'justify-end' : 'justify-start')}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (isEditing && onSelect) onSelect();
-            }}
-          >
-            <div 
-              className={cn('rounded-full flex items-center justify-center', iconSizeClass)}
-              style={{ 
-                backgroundColor: `hsl(${ds.primaryColor} / 0.1)`,
-                padding: '0.75rem'
-              }}
-            >
-              <IconComponent className={iconSizeClass} style={{ color: `hsl(${ds.primaryColor})` }} />
-            </div>
-          </div>
-        );
-
       case 'badge':
         const badgeVariant = subBlock.badgeVariant || 'oval';
         const badgeSize = subBlock.badgeSize || 'medium';
