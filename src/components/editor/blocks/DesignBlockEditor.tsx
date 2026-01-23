@@ -935,6 +935,7 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
 
   return (
     <div 
+      ref={contentRef}
       className={cn(
         "h-full flex flex-col p-4 overflow-auto w-full relative",
         isEditing && isOverflowing && "ring-2 ring-destructive ring-inset"
@@ -973,7 +974,7 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
           items={subBlocks.map((sb) => sb.id)}
           strategy={verticalListSortingStrategy}
         >
-          <div ref={contentRef} className="flex-1 flex flex-col w-full space-y-1">
+          <div className="flex flex-col w-full space-y-1">
             {subBlocks.map((subBlock) => (
               <SortableSubBlockItem
                 key={subBlock.id}
