@@ -2,3 +2,9 @@ project_id = "meisahpkysqibnjyvubh"
 
 [functions.subblock-ai]
 verify_jwt = false
+
+[functions.lottiefiles-search]
+verify_jwt = false
+
+[functions.lottiefiles-ai-suggest]
+verify_jwt = false
