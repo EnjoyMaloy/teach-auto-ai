@@ -569,7 +569,7 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
         {/* Animation settings */}
         {subBlock.type === 'animation' && (
           <>
-            {renderAlignmentSelector()}
+            {renderAlignmentSelector(false)}
             
             {/* Animation format selector */}
             <div className="space-y-2">
