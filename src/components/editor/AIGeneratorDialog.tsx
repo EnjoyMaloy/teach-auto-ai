@@ -58,6 +58,7 @@ interface GeneratedSubBlock {
   buttonUrl?: string;
   buttonVariant?: string;
   imageDescription?: string;
+  imageUrl?: string;
   imageSize?: string;
   imageRotation?: number;
   textRotation?: number;
@@ -504,8 +505,10 @@ ${JSON.stringify(researchData, null, 2)}
         updateStep('images', { status: 'active', message: 'Генерирую иллюстрации...' });
 
         try {
-          // Find ALL slides that need images (image_text type), limit to 8
-          const slidesToIllustrate: { lessonIdx: number; slideIdx: number; description: string }[] = [];
+          // Find ALL slides that need images:
+          // 1. image_text type slides
+          // 2. design blocks with image sub-blocks that have imageDescription
+          const slidesToIllustrate: { lessonIdx: number; slideIdx: number; subBlockIdx?: number; description: string }[] = [];
           
           // Log all slide types for debugging
           console.log('=== Analyzing slides for image generation ===');
@@ -519,10 +522,24 @@ ${JSON.stringify(researchData, null, 2)}
                 slidesToIllustrate.push({
                   lessonIdx,
                   slideIdx,
-                  // Use imageDescription if available, otherwise fall back to content
                   description: slide.imageDescription || slide.content || lesson.title
                 });
-                console.log(`    -> Added to illustration queue with description: ${(slide.imageDescription || slide.content || '').substring(0, 50)}...`);
+                console.log(`    -> Added image_text to queue: ${(slide.imageDescription || slide.content || '').substring(0, 50)}...`);
+              }
+              
+              // Check design blocks for image sub-blocks
+              if (slide.type === 'design' && slide.subBlocks) {
+                slide.subBlocks.forEach((sb: any, sbIdx: number) => {
+                  if (sb.type === 'image' && sb.imageDescription && !sb.imageUrl) {
+                    slidesToIllustrate.push({
+                      lessonIdx,
+                      slideIdx,
+                      subBlockIdx: sbIdx,
+                      description: sb.imageDescription
+                    });
+                    console.log(`    -> Added design.image sub-block to queue: ${sb.imageDescription.substring(0, 50)}...`);
+                  }
+                });
               }
             });
           });
@@ -546,12 +563,21 @@ ${JSON.stringify(researchData, null, 2)}
               const batch = slidesToIllustrate.slice(i, i + batchSize);
               
               try {
-                const imagePromises = batch.map(async ({ lessonIdx, slideIdx, description }) => {
+                const imagePromises = batch.map(async ({ lessonIdx, slideIdx, subBlockIdx, description }) => {
                   try {
                     // Use the detailed imageDescription for generation
                     const imageUrl = await generateImageForSlide(description, prompt);
                     if (imageUrl) {
-                      courseData.lessons[lessonIdx].slides[slideIdx].imageUrl = imageUrl;
+                      // If it's a sub-block image, update the sub-block
+                      if (subBlockIdx !== undefined) {
+                        const subBlocks = courseData.lessons[lessonIdx].slides[slideIdx].subBlocks as any[];
+                        if (subBlocks && subBlocks[subBlockIdx]) {
+                          subBlocks[subBlockIdx].imageUrl = imageUrl;
+                        }
+                      } else {
+                        // Regular image_text slide
+                        courseData.lessons[lessonIdx].slides[slideIdx].imageUrl = imageUrl;
+                      }
                       imagesGenerated++;
                       updateStep('images', { message: `Создано ${imagesGenerated} из ${totalImages} изображений...` });
                     } else {
@@ -626,6 +652,7 @@ ${JSON.stringify(researchData, null, 2)}
             buttonLabel: sb.buttonLabel,
             buttonUrl: sb.buttonUrl,
             buttonVariant: sb.buttonVariant as any,
+            imageUrl: sb.imageUrl,
             imageSize: sb.imageSize as any,
             imageRotation: sb.imageRotation,
             textRotation: sb.textRotation,
