@@ -44,7 +44,10 @@ import {
   ImageIcon,
   Plus,
   Trash2,
-  X
+  X,
+  Upload,
+  Play,
+  Loader2
 } from 'lucide-react';
 import {
   Dialog,
@@ -54,6 +57,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DesignSystemEditorProps {
   config: DesignSystemConfig;
@@ -180,6 +184,92 @@ const ColorInput: React.FC<{
       {description && (
         <p className="text-xs text-muted-foreground">{description}</p>
       )}
+    </div>
+  );
+};
+
+// Rive file uploader component
+const RiveFileUploader: React.FC<{
+  riveUrl: string;
+  onUpload: (url: string) => void;
+  onRemove: () => void;
+}> = ({ riveUrl, onUpload, onRemove }) => {
+  const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleFileUpload = async (file: File) => {
+    if (!file.name.endsWith('.riv')) {
+      setError('Пожалуйста, выберите файл .riv');
+      return;
+    }
+
+    setIsUploading(true);
+    setError(null);
+
+    try {
+      const fileName = `${Date.now()}-${file.name}`;
+      const { data, error: uploadError } = await supabase.storage
+        .from('mascots')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: publicUrl } = supabase.storage
+        .from('mascots')
+        .getPublicUrl(data.path);
+
+      onUpload(publicUrl.publicUrl);
+    } catch (err) {
+      console.error('Rive upload error:', err);
+      setError('Ошибка загрузки файла');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-sm font-medium">Файл анимации (.riv)</Label>
+      {riveUrl ? (
+        <div className="flex items-center gap-3 p-3 rounded-xl border border-border bg-muted/30">
+          <Play className="w-8 h-8 text-primary" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium truncate">Rive-файл загружен</p>
+            <p className="text-xs text-muted-foreground truncate">{riveUrl.split('/').pop()}</p>
+          </div>
+          <Button variant="ghost" size="sm" onClick={onRemove}>
+            <Trash2 className="w-4 h-4 text-destructive" />
+          </Button>
+        </div>
+      ) : (
+        <label className="flex flex-col items-center justify-center gap-2 p-6 rounded-xl border-2 border-dashed border-border hover:border-primary/50 transition-colors cursor-pointer bg-muted/30">
+          <input
+            type="file"
+            accept=".riv"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFileUpload(file);
+            }}
+            disabled={isUploading}
+          />
+          {isUploading ? (
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          ) : (
+            <Upload className="w-8 h-8 text-muted-foreground" />
+          )}
+          <span className="text-sm text-muted-foreground">
+            {isUploading ? 'Загрузка...' : 'Нажмите для загрузки .riv файла'}
+          </span>
+        </label>
+      )}
+      {error && <p className="text-xs text-destructive">{error}</p>}
+      <p className="text-xs text-muted-foreground">
+        Создайте анимацию с состояниями idle, correct, incorrect в{' '}
+        <a href="https://rive.app" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+          Rive Editor
+        </a>
+      </p>
     </div>
   );
 };
@@ -1151,6 +1241,142 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     <p className="text-xs text-muted-foreground text-center mt-2">
                       После утверждения ИИ-агент будет использовать эти настройки для генерации персонажа
                     </p>
+                  )}
+                </div>
+
+                {/* === RIVE MASCOT SECTION === */}
+                <div className="pt-6 border-t border-border space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Play className="w-5 h-5 text-primary" />
+                    <div>
+                      <h4 className="font-medium text-foreground">Rive-маскот для квизов</h4>
+                      <p className="text-xs text-muted-foreground">
+                        Анимированный персонаж с реакциями как в Duolingo
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Enable Rive mascot */}
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Включить Rive-маскота</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Показывать в блоках с вопросами
+                      </p>
+                    </div>
+                    <Switch
+                      checked={config.mascot?.riveEnabled || false}
+                      onCheckedChange={(enabled) => 
+                        updateConfig({ 
+                          mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveEnabled: enabled } 
+                        })
+                      }
+                    />
+                  </div>
+
+                  {config.mascot?.riveEnabled && (
+                    <>
+                      {/* Rive file upload */}
+                      <RiveFileUploader
+                        riveUrl={config.mascot?.riveUrl || ''}
+                        onUpload={(url) => updateConfig({
+                          mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveUrl: url }
+                        })}
+                        onRemove={() => updateConfig({
+                          mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveUrl: '' }
+                        })}
+                      />
+
+                      {/* State machine settings */}
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Настройки State Machine</Label>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <Label className="text-xs text-muted-foreground">Имя State Machine</Label>
+                            <Input
+                              value={config.mascot?.riveStateMachine || 'State Machine 1'}
+                              onChange={(e) => updateConfig({
+                                mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveStateMachine: e.target.value }
+                              })}
+                              placeholder="State Machine 1"
+                              className="text-xs"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs text-muted-foreground">Триггер Idle</Label>
+                            <Input
+                              value={config.mascot?.riveIdleState || 'idle'}
+                              onChange={(e) => updateConfig({
+                                mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveIdleState: e.target.value }
+                              })}
+                              placeholder="idle"
+                              className="text-xs"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs text-muted-foreground">Триггер Correct</Label>
+                            <Input
+                              value={config.mascot?.riveCorrectState || 'correct'}
+                              onChange={(e) => updateConfig({
+                                mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveCorrectState: e.target.value }
+                              })}
+                              placeholder="correct"
+                              className="text-xs"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs text-muted-foreground">Триггер Incorrect</Label>
+                            <Input
+                              value={config.mascot?.riveIncorrectState || 'incorrect'}
+                              onChange={(e) => updateConfig({
+                                mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveIncorrectState: e.target.value }
+                              })}
+                              placeholder="incorrect"
+                              className="text-xs"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Position and size */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <Label className="text-xs text-muted-foreground">Позиция</Label>
+                          <Select
+                            value={config.mascot?.rivePosition || 'top'}
+                            onValueChange={(v) => updateConfig({
+                              mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, rivePosition: v as 'top' | 'bottom' }
+                            })}
+                          >
+                            <SelectTrigger className="text-xs">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="top">Сверху</SelectItem>
+                              <SelectItem value="bottom">Снизу</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs text-muted-foreground">Размер</Label>
+                          <Select
+                            value={config.mascot?.riveSize || 'medium'}
+                            onValueChange={(v) => updateConfig({
+                              mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveSize: v as 'small' | 'medium' | 'large' }
+                            })}
+                          >
+                            <SelectTrigger className="text-xs">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="small">Маленький</SelectItem>
+                              <SelectItem value="medium">Средний</SelectItem>
+                              <SelectItem value="large">Большой</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
