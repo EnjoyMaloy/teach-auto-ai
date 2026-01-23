@@ -157,36 +157,39 @@ export const LottieFilesSearch: React.FC<LottieFilesSearchProps> = ({
 
       {/* Results grid */}
       {results.length > 0 && (
-        <ScrollArea className="h-48">
-          <div className="grid grid-cols-3 gap-2 pr-3">
+        <ScrollArea className="h-64">
+          <div className="grid grid-cols-2 gap-3 pr-3">
             {results.map((result) => (
               <button
                 key={result.id}
                 onClick={() => handleSelect(result)}
                 className={cn(
-                  "relative aspect-square rounded-lg overflow-hidden border-2 transition-all hover:scale-105",
+                  "relative rounded-xl overflow-hidden border-2 transition-all hover:scale-[1.02] p-2 bg-muted/30",
                   selectedId === result.id
                     ? "border-primary ring-2 ring-primary/20"
                     : "border-border hover:border-primary/50"
                 )}
               >
-                {result.previewUrl ? (
-                  <img
-                    src={result.previewUrl}
-                    alt={result.name}
-                    className="w-full h-full object-cover bg-muted"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-muted flex items-center justify-center">
+                <div className="aspect-square w-full flex items-center justify-center">
+                  {result.previewUrl ? (
+                    <img
+                      src={result.previewUrl}
+                      alt={result.name}
+                      className="max-w-full max-h-full object-contain"
+                      loading="lazy"
+                    />
+                  ) : (
                     <span className="text-[10px] text-muted-foreground text-center px-1">
-                      {result.name.slice(0, 20)}
+                      {result.name.slice(0, 30)}
                     </span>
-                  </div>
-                )}
+                  )}
+                </div>
+                <p className="text-[10px] text-muted-foreground truncate mt-1 text-center">
+                  {result.name}
+                </p>
                 {selectedId === result.id && (
-                  <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                    <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                  <div className="absolute inset-0 bg-primary/20 flex items-center justify-center rounded-xl">
+                    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
                       <span className="text-primary-foreground text-xs">✓</span>
                     </div>
                   </div>
