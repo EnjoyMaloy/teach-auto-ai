@@ -295,7 +295,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     
     const positionClasses = {
       top: 'mb-4',
-      bottom: 'mt-4 order-last',
+      bottom: 'mt-8 order-last',
       left: 'mr-4',
       right: 'ml-4 order-last',
     };
