@@ -950,19 +950,10 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
     >
       {/* Overflow warning */}
       {isEditing && isOverflowing && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="absolute top-2 right-2 z-50 bg-yellow-500 text-yellow-950 rounded-full p-1.5 shadow-lg animate-pulse cursor-help">
-                <AlertTriangle className="w-4 h-4" />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="left" className="max-w-[200px]">
-              <p className="text-xs font-medium">Контент превышает экран на {Math.round(overflowAmount)}px</p>
-              <p className="text-xs text-muted-foreground mt-1">Уменьшите текст или удалите элементы</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <div className="absolute top-2 left-2 right-2 z-50 bg-yellow-500 text-yellow-950 rounded-lg px-3 py-2 shadow-lg flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+          <span className="text-xs font-medium">Блок переполнен</span>
+        </div>
       )}
       
       <DndContext
