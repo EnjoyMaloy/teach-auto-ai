@@ -40,16 +40,38 @@ export const RiveMascot: React.FC<RiveMascotProps> = ({
   const correctInput = useStateMachineInput(rive, riveStateMachine, riveCorrectState);
   const incorrectInput = useStateMachineInput(rive, riveStateMachine, riveIncorrectState);
 
-  // Debug logging
+  // Debug logging - list all available inputs in state machine
   useEffect(() => {
     console.log('[RiveMascot] State:', state);
     console.log('[RiveMascot] Rive loaded:', !!rive);
-    console.log('[RiveMascot] Inputs:', {
+    console.log('[RiveMascot] Looking for inputs:', { riveIdleState, riveCorrectState, riveIncorrectState });
+    console.log('[RiveMascot] Found inputs:', {
       idle: idleInput ? (typeof idleInput.fire === 'function' ? 'trigger' : 'boolean') : null,
       correct: correctInput ? (typeof correctInput.fire === 'function' ? 'trigger' : 'boolean') : null,
       incorrect: incorrectInput ? (typeof incorrectInput.fire === 'function' ? 'trigger' : 'boolean') : null,
     });
-  }, [state, rive, idleInput, correctInput, incorrectInput]);
+    
+    // Log all available state machines and inputs
+    if (rive) {
+      console.log('[RiveMascot] Available state machines:', rive.stateMachineNames);
+      const sm = rive.stateMachineNames?.[0];
+      if (sm) {
+        // Try to get all inputs from the state machine
+        const stateMachine = (rive as any).stateMachine?.(0);
+        if (stateMachine) {
+          const inputCount = stateMachine.inputCount?.() || 0;
+          const inputs: string[] = [];
+          for (let i = 0; i < inputCount; i++) {
+            const input = stateMachine.input(i);
+            if (input) {
+              inputs.push(`${input.name} (${input.type})`);
+            }
+          }
+          console.log('[RiveMascot] Available inputs in state machine:', inputs);
+        }
+      }
+    }
+  }, [state, rive, idleInput, correctInput, incorrectInput, riveIdleState, riveCorrectState, riveIncorrectState]);
 
   // Trigger state changes
   useEffect(() => {
