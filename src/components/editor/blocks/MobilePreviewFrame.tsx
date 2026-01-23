@@ -294,16 +294,20 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     if (!showMascot || !mascotSettings) return null;
     
     const positionClasses = {
-      top: 'mb-3',
-      bottom: 'mt-3 order-last',
-      left: 'mr-3',
-      right: 'ml-3 order-last',
+      top: 'mb-4',
+      bottom: 'mt-4 order-last',
+      left: 'mr-4',
+      right: 'ml-4 order-last',
     };
 
     return (
-      <div className={cn('flex-shrink-0 flex justify-center', positionClasses[mascotSettings.rivePosition || 'top'])}>
+      <div className={cn('flex-shrink-0 w-full flex justify-center', positionClasses[mascotSettings.rivePosition || 'top'])}>
         <RiveMascot 
-          settings={mascotSettings} 
+          settings={{
+            ...mascotSettings,
+            // Override to larger size for better visibility
+            riveSize: mascotSettings.riveSize === 'small' ? 'medium' : mascotSettings.riveSize === 'medium' ? 'large' : 'large'
+          }} 
           state={mascotState}
         />
       </div>

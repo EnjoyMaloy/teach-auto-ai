@@ -203,9 +203,13 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
     };
 
     return (
-      <div className={cn('flex-shrink-0', positionClasses[mascotSettings.rivePosition || 'top'])}>
+      <div className={cn('flex-shrink-0 w-full flex justify-center', positionClasses[mascotSettings.rivePosition || 'top'])}>
         <RiveMascot 
-          settings={mascotSettings} 
+          settings={{
+            ...mascotSettings,
+            // Override to larger size for better visibility
+            riveSize: mascotSettings.riveSize === 'small' ? 'medium' : mascotSettings.riveSize === 'medium' ? 'large' : 'large'
+          }} 
           state={mascotState}
         />
       </div>
