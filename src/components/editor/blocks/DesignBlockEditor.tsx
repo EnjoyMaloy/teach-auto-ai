@@ -568,8 +568,10 @@ const SortableSubBlockItem: React.FC<{
         return (
           <div className={cn(
             'flex gap-1.5',
-            badgeLayout === 'vertical' ? 'flex-col items-start' : 'flex-wrap',
-            textAlignClass === 'text-center' ? 'justify-center' : textAlignClass === 'text-right' ? 'justify-end' : 'justify-start'
+            badgeLayout === 'vertical' ? 'flex-col' : 'flex-wrap',
+            badgeLayout === 'vertical' 
+              ? (textAlignClass === 'text-center' ? 'items-center' : textAlignClass === 'text-right' ? 'items-end' : 'items-start')
+              : (textAlignClass === 'text-center' ? 'justify-center' : textAlignClass === 'text-right' ? 'justify-end' : 'justify-start')
           )}>
             {badges.map((badge) => (
               <span
