@@ -146,7 +146,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     editorProps: {
       attributes: {
         class: cn(
-          'outline-none min-h-[60px] px-1 py-2',
+          'outline-none px-0 py-0 leading-tight',
           textSizeClass,
           textAlignClass
         ),
