@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -834,6 +834,10 @@ const SubBlockSelector: React.FC<{
   );
 };
 
+import { useOverflowDetection } from '@/hooks/useOverflowDetection';
+import { AlertTriangle } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
 export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
   subBlocks,
   onUpdateSubBlocks,
@@ -844,6 +848,10 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
 }) => {
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [showTemplateSelector, setShowTemplateSelector] = useState(subBlocks.length === 0);
+  const contentRef = useRef<HTMLDivElement>(null);
+  
+  // Detect overflow
+  const { isOverflowing, overflowAmount } = useOverflowDetection(contentRef, [subBlocks]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -927,7 +935,10 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
 
   return (
     <div 
-      className="h-full flex flex-col p-4 overflow-auto w-full"
+      className={cn(
+        "h-full flex flex-col p-4 overflow-auto w-full relative",
+        isEditing && isOverflowing && "ring-2 ring-destructive ring-inset"
+      )}
       style={{ backgroundColor: `hsl(${ds.backgroundColor})` }}
       onClick={() => {
         // Deselect when clicking empty space
@@ -936,6 +947,23 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
         }
       }}
     >
+      {/* Overflow warning */}
+      {isEditing && isOverflowing && (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="absolute top-2 right-2 z-50 bg-destructive text-destructive-foreground rounded-full p-1.5 shadow-lg animate-pulse cursor-help">
+                <AlertTriangle className="w-4 h-4" />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="left" className="max-w-[200px]">
+              <p className="text-xs font-medium">Контент превышает экран на {Math.round(overflowAmount)}px</p>
+              <p className="text-xs text-muted-foreground mt-1">Уменьшите текст или удалите элементы</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+      
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -945,7 +973,7 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
           items={subBlocks.map((sb) => sb.id)}
           strategy={verticalListSortingStrategy}
         >
-          <div className="flex-1 flex flex-col w-full space-y-1">
+          <div ref={contentRef} className="flex-1 flex flex-col w-full space-y-1">
             {subBlocks.map((subBlock) => (
               <SortableSubBlockItem
                 key={subBlock.id}
