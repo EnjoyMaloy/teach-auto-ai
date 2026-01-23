@@ -124,7 +124,7 @@ const CONTENT_PROMPT = `Ты — контент-мейкер для мобиль
 {
   "type": "text",
   "order": 2,
-  "content": "Текст (МАКС 120 символов! Поддерживает <b>, <i>, <u>, <mark>)",
+  "content": "Текст (МАКС 120 символов! Используй <b>жирный</b>, <i>курсив</i>, <u>подчёркивание</u>, <mark>выделение</mark> ТОЛЬКО для ключевых слов/фраз!)",
   "textAlign": "left|center|right",
   "textSize": "small|medium|large",
   "fontWeight": "normal|medium|semibold|bold",
@@ -133,6 +133,12 @@ const CONTENT_PROMPT = `Ты — контент-мейкер для мобиль
   "highlight": "none|marker|underline|wavy",
   "padding": "none|small|medium|large"
 }
+
+⚠️ ПРАВИЛО ФОРМАТИРОВАНИЯ ТЕКСТА:
+- <b>, <i>, <u>, <mark> — ТОЛЬКО для выделения КЛЮЧЕВЫХ слов или важных фраз
+- НЕ форматируй весь текст целиком
+- Пример: "Кофе нужно молоть <b>непосредственно перед завариванием</b>"
+- Пример: "Температура воды должна быть <mark>92-96°C</mark>"
 
 #### image (картинка)
 {
