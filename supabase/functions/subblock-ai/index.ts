@@ -80,11 +80,14 @@ const SYSTEM_PROMPT = `Ты — ИИ-ассистент для редактир�
 - textAlign: 'left' | 'center' | 'right'
 - padding: 'none' | 'small' | 'medium' | 'large'
 
-### 9. animation — Lottie/Rive анимация (пользователь загружает сам)
-- animationType: 'lottie' | 'rive'
+### 9. animation — Lottie анимация (ИИ подбирает автоматически!)
+- animationType: 'lottie' (по умолчанию)
+- animationKeyword: string — ОБЯЗАТЕЛЬНО! Ключевое слово для поиска анимации НА АНГЛИЙСКОМ (например: "rocket", "success", "loading", "coffee", "star")
 - animationSize: 'small' | 'medium' | 'large' | 'full'
 - textAlign: 'left' | 'center' | 'right'
 - padding: 'none' | 'small' | 'medium' | 'large'
+
+ВАЖНО для анимаций: Указывай animationKeyword — лучшие слова: rocket, success, loading, check, star, heart, celebration, confetti, trophy, gift, coins, money, fire, lightning, brain, idea, lightbulb, target, goal, growth, chart, progress, done, complete, thumbs up
 
 ## ОБЩИЕ ПОЛЯ ДЛЯ ВСЕХ БЛОКОВ:
 - id: string — уникальный ID (генерируется автоматически)
@@ -186,6 +189,43 @@ Style requirements:
   }
 }
 
+// Search LottieFiles for animation by keyword
+async function searchLottieAnimation(keyword: string, supabaseUrl: string, supabaseKey: string): Promise<string | null> {
+  try {
+    console.log("Searching Lottie animation for:", keyword);
+    
+    const response = await fetch(
+      `${supabaseUrl}/functions/v1/lottiefiles-search`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${supabaseKey}`,
+        },
+        body: JSON.stringify({ query: keyword, limit: 1 }),
+      }
+    );
+
+    if (!response.ok) {
+      console.error("Lottie search failed:", response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    if (data?.success && data?.data?.length > 0) {
+      const lottieUrl = data.data[0].lottieUrl;
+      console.log("Found Lottie animation:", lottieUrl);
+      return lottieUrl;
+    }
+    
+    console.log("No Lottie animation found for:", keyword);
+    return null;
+  } catch (error) {
+    console.error("Lottie search error:", error);
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -275,17 +315,43 @@ serve(async (req) => {
       result = { message: resultText };
     }
 
-    // Generate images for image blocks that have descriptions but no URLs
+    // Get Supabase URL for internal function calls
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
+    const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") || "";
+
+    // Generate images for image blocks and find animations for animation blocks
     if (result.newBlocks && Array.isArray(result.newBlocks)) {
+      const promises: Promise<void>[] = [];
+      
       for (const block of result.newBlocks) {
+        // Generate images
         if (block.type === 'image' && block.imageDescription && !block.imageUrl) {
           console.log("Found image block needing generation:", block.imageDescription);
-          const imageUrl = await generateImage(block.imageDescription, GEMINI_API_KEY);
-          if (imageUrl) {
-            block.imageUrl = imageUrl;
-          }
+          promises.push(
+            generateImage(block.imageDescription, GEMINI_API_KEY).then(imageUrl => {
+              if (imageUrl) {
+                block.imageUrl = imageUrl;
+              }
+            })
+          );
+        }
+        
+        // Search Lottie animations
+        if (block.type === 'animation' && block.animationKeyword && !block.animationUrl) {
+          console.log("Found animation block needing search:", block.animationKeyword);
+          promises.push(
+            searchLottieAnimation(block.animationKeyword, SUPABASE_URL, SUPABASE_ANON_KEY).then(animationUrl => {
+              if (animationUrl) {
+                block.animationUrl = animationUrl;
+                block.animationType = 'lottie';
+              }
+            })
+          );
         }
       }
+      
+      // Wait for all media generation to complete
+      await Promise.all(promises);
     }
 
     return new Response(JSON.stringify(result), {
