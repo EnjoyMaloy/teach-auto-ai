@@ -292,20 +292,13 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   // Render mascot component
   const renderMascot = () => {
     if (!showMascot || !mascotSettings) return null;
-    
-    const positionClasses = {
-      top: 'mb-4',
-      bottom: 'mt-8 order-last',
-      left: 'mr-4',
-      right: 'ml-4 order-last',
-    };
 
+    // Absolute positioning at bottom of the screen
     return (
-      <div className={cn('flex-shrink-0 w-full flex justify-center', positionClasses[mascotSettings.rivePosition || 'bottom'])}>
+      <div className="absolute bottom-20 left-0 right-0 flex justify-center pointer-events-none z-10">
         <RiveMascot 
           settings={{
             ...mascotSettings,
-            // Use large size for better visibility
             riveSize: 'large'
           }} 
           state={mascotState}
