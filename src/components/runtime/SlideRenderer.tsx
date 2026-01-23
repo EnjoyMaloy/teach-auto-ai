@@ -197,7 +197,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
     // Absolute positioning at top, below progress bar
     return (
-      <div className="absolute top-16 left-0 right-0 flex justify-center pointer-events-none z-10">
+      <div className="absolute top-4 left-0 right-0 flex justify-center pointer-events-none z-10">
         <RiveMascot 
           settings={{
             ...mascotSettings,
