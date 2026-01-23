@@ -99,6 +99,7 @@ export const DesignAIChat: React.FC<DesignAIChatProps> = ({
       }
 
       const data = await response.json();
+      console.log('AI response:', JSON.stringify(data, null, 2));
 
       if (data.error) {
         throw new Error(data.error);
@@ -113,6 +114,8 @@ export const DesignAIChat: React.FC<DesignAIChatProps> = ({
 
       // Handle new blocks
       if (data.newBlocks && Array.isArray(data.newBlocks) && data.newBlocks.length > 0) {
+        console.log('Applying blocks:', data.newBlocks.map((b: SubBlock) => ({ type: b.type, id: b.id })));
+        
         const blocksWithIds = data.newBlocks.map((block: Partial<SubBlock>, index: number) => ({
           ...block,
           id: block.id || crypto.randomUUID(),
@@ -121,6 +124,8 @@ export const DesignAIChat: React.FC<DesignAIChatProps> = ({
         
         onReplaceAllBlocks(blocksWithIds);
         toast.success(`Обновлено ${blocksWithIds.length} элементов`);
+      } else {
+        console.log('No newBlocks in response or empty array');
       }
 
     } catch (error) {
