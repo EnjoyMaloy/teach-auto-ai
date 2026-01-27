@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { LogOut, User, ChevronDown, Search, Shield } from 'lucide-react';
+import { LogOut, User, ChevronDown, Search, Shield, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface AppHeaderProps {
@@ -41,6 +41,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 
   const userInitials = user?.email?.slice(0, 2).toUpperCase() || 'U';
   const isModerator = userRole === 'moderator' || userRole === 'admin';
+  const isAdmin = user?.email === 'trupcgames@gmail.com';
 
   return (
     <header className="h-16 border-b border-gray-100 flex items-center justify-between px-6 bg-white my-0 py-[40px]">
@@ -97,6 +98,18 @@ const AppHeader: React.FC<AppHeaderProps> = ({
                 >
                   <Shield className="w-4 h-4" />
                   {language === 'ru' ? 'Модерация' : 'Moderation'}
+                </DropdownMenuItem>
+              </>
+            )}
+            {isAdmin && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  className="gap-2 cursor-pointer text-orange-600 focus:text-orange-700"
+                  onClick={() => navigate('/admin')}
+                >
+                  <Settings className="w-4 h-4" />
+                  {language === 'ru' ? 'Админка' : 'Admin'}
                 </DropdownMenuItem>
               </>
             )}

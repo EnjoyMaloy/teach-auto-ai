@@ -18,6 +18,7 @@ const CourseStats = lazy(() => import("./pages/CourseStats"));
 const PublicCourse = lazy(() => import("./pages/PublicCourse"));
 const ShortCourse = lazy(() => import("./pages/ShortCourse"));
 const Moderation = lazy(() => import("./pages/Moderation"));
+const Admin = lazy(() => import("./pages/Admin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -77,6 +78,7 @@ const AppRoutes = () => (
       <Route path="/course/:courseId/settings" element={<ProtectedRoute><CourseSettings /></ProtectedRoute>} />
       <Route path="/course/:courseId/stats" element={<ProtectedRoute><CourseStats /></ProtectedRoute>} />
       <Route path="/moderation" element={<ProtectedRoute><Moderation /></ProtectedRoute>} />
+      <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
       <Route path="/course/:courseId" element={<PublicCourse />} />
       <Route path="/c/:shortId" element={<ShortCourse />} />
       <Route path="*" element={<NotFound />} />
