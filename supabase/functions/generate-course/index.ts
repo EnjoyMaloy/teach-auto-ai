@@ -521,6 +521,7 @@ serve(async (req) => {
         generationConfig: {
           temperature: 0.7,
           maxOutputTokens: 16384,
+          responseMimeType: "application/json",
         }
       }),
     });
