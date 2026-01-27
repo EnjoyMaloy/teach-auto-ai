@@ -78,15 +78,16 @@ serve(async (req) => {
       );
     }
 
-    // Create image generation prompt - photorealistic or traditional Chinese watercolor style
+    // Create image generation prompt - minimalist flat design style
     const imagePrompt = `${slideContext || prompt}
 
 Style requirements:
-- High quality, detailed illustration
-- Either photorealistic style OR traditional Chinese watercolor/ink painting style
+- Minimalist flat design illustration
+- Clean geometric shapes and simplified forms
+- Bold, vibrant colors with good contrast
 - NO text, words, letters, or labels on the image
-- Professional, elegant composition
-- Resolution: high detail suitable for educational content`;
+- Modern, professional look suitable for educational content
+- Simple backgrounds, no complex textures`;
 
     console.log(`Generating image via Gemini 3 Pro Image for: ${(slideContext || prompt).substring(0, 60)}...`);
 
