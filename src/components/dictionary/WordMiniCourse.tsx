@@ -117,52 +117,75 @@ const WordMiniCourse: React.FC<WordMiniCourseProps> = ({
 
   if (completed) {
     return (
-      <div className="p-8 text-center">
-        <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-          <Trophy className="w-10 h-10 text-green-600" />
+      <div className="p-8 text-center relative overflow-hidden">
+        {/* Background celebration */}
+        <div className="absolute inset-0 bg-gradient-to-b from-green-500/10 to-transparent" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-green-500/10 rounded-full blur-3xl" />
+        
+        <div className="relative">
+          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-green-500/30 animate-scale-in">
+            <Trophy className="w-12 h-12 text-white" />
+          </div>
+          <h3 className="text-2xl font-display font-bold mb-2 bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
+            Отлично!
+          </h3>
+          <p className="text-muted-foreground mb-8">
+            Вы успешно прошли уровень <span className="font-semibold text-foreground">"{difficulty === 'easy' ? 'Лёгкий' : difficulty === 'medium' ? 'Средний' : 'Сложный'}"</span>
+          </p>
+          <Button 
+            onClick={onClose} 
+            className="w-full rounded-xl h-12 text-base font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all"
+          >
+            Продолжить
+          </Button>
         </div>
-        <h3 className="text-xl font-bold mb-2">Отлично!</h3>
-        <p className="text-muted-foreground mb-6">
-          Вы успешно прошли уровень "{difficulty === 'easy' ? 'Лёгкий' : difficulty === 'medium' ? 'Средний' : 'Сложный'}"
-        </p>
-        <Button onClick={onClose} className="w-full">
-          Продолжить
-        </Button>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-[500px]">
+    <div className="flex flex-col h-[520px]">
       {/* Progress */}
-      <div className="px-4 py-2">
-        <Progress value={progress} className="h-2" />
-        <div className="text-xs text-muted-foreground text-center mt-1">
-          {currentSlide + 1} / {slides.length}
+      <div className="px-5 py-3">
+        <div className="flex items-center gap-3">
+          <div className="flex-1 h-2 bg-muted/50 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <span className="text-sm font-medium text-muted-foreground min-w-[40px] text-right">
+            {currentSlide + 1}/{slides.length}
+          </span>
         </div>
       </div>
 
       {/* Background Image */}
       {word.image_url && (
         <div 
-          className="h-32 mx-4 rounded-lg overflow-hidden"
-          style={{
-            backgroundImage: `url(${word.image_url})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-        />
+          className="h-36 mx-5 rounded-2xl overflow-hidden relative group"
+        >
+          <div 
+            className="absolute inset-0 transition-transform duration-500 group-hover:scale-105"
+            style={{
+              backgroundImage: `url(${word.image_url})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+        </div>
       )}
 
       {/* Content */}
-      <div className="flex-1 p-4 overflow-y-auto">
+      <div className="flex-1 p-5 overflow-y-auto">
         {slide.type === 'info' && slide.content && (
           <div className="prose prose-sm max-w-none">
             <div 
-              className="text-base leading-relaxed"
+              className="text-base leading-relaxed text-foreground/90"
               dangerouslySetInnerHTML={{ 
                 __html: slide.content
-                  .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                  .replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>')
                   .replace(/\n/g, '<br/>')
               }}
             />
@@ -170,36 +193,42 @@ const WordMiniCourse: React.FC<WordMiniCourseProps> = ({
         )}
 
         {slide.type === 'quiz' && (
-          <div className="space-y-4">
-            <h4 className="font-medium text-base">{slide.question}</h4>
+          <div className="space-y-5">
+            <h4 className="font-display font-semibold text-lg">{slide.question}</h4>
             
             <RadioGroup 
               value={selectedAnswer || ''} 
               onValueChange={setSelectedAnswer}
               disabled={showResult}
+              className="space-y-3"
             >
               {slide.options?.map((option, idx) => (
                 <div 
                   key={idx}
                   className={cn(
-                    "flex items-center space-x-3 p-3 rounded-lg border transition-colors",
-                    showResult && idx === slide.correctAnswer && "bg-green-50 border-green-500",
-                    showResult && selectedAnswer === String(idx) && idx !== slide.correctAnswer && "bg-red-50 border-red-500",
-                    !showResult && selectedAnswer === String(idx) && "bg-primary/10 border-primary"
+                    "flex items-center space-x-3 p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer",
+                    showResult && idx === slide.correctAnswer && "bg-green-50 border-green-500 dark:bg-green-500/10",
+                    showResult && selectedAnswer === String(idx) && idx !== slide.correctAnswer && "bg-red-50 border-red-500 dark:bg-red-500/10",
+                    !showResult && selectedAnswer === String(idx) && "bg-primary/5 border-primary shadow-md shadow-primary/10",
+                    !showResult && selectedAnswer !== String(idx) && "hover:border-primary/50 hover:bg-muted/30"
                   )}
                 >
-                  <RadioGroupItem value={String(idx)} id={`option-${idx}`} />
+                  <RadioGroupItem value={String(idx)} id={`option-${idx}`} className="border-2" />
                   <Label 
                     htmlFor={`option-${idx}`} 
-                    className="flex-1 cursor-pointer text-sm"
+                    className="flex-1 cursor-pointer text-sm font-medium"
                   >
                     {option}
                   </Label>
                   {showResult && idx === slide.correctAnswer && (
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                      <CheckCircle2 className="w-4 h-4 text-white" />
+                    </div>
                   )}
                   {showResult && selectedAnswer === String(idx) && idx !== slide.correctAnswer && (
-                    <XCircle className="w-5 h-5 text-red-500" />
+                    <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center">
+                      <XCircle className="w-4 h-4 text-white" />
+                    </div>
                   )}
                 </div>
               ))}
@@ -208,12 +237,12 @@ const WordMiniCourse: React.FC<WordMiniCourseProps> = ({
         )}
 
         {slide.type === 'fill_blank' && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {slide.content && (
               <div 
                 className="text-base leading-relaxed"
                 dangerouslySetInnerHTML={{ 
-                  __html: slide.content.replace(/___/g, '<span class="inline-block w-24 border-b-2 border-primary mx-1"></span>')
+                  __html: slide.content.replace(/___/g, '<span class="inline-block w-28 border-b-2 border-primary/50 mx-1"></span>')
                 }}
               />
             )}
@@ -225,24 +254,30 @@ const WordMiniCourse: React.FC<WordMiniCourseProps> = ({
                 placeholder="Введите ответ..."
                 disabled={showResult}
                 className={cn(
-                  showResult && isCorrect && "border-green-500 bg-green-50",
-                  showResult && !isCorrect && "border-red-500 bg-red-50"
+                  "h-12 rounded-xl border-2 text-base px-4 transition-all",
+                  showResult && isCorrect && "border-green-500 bg-green-50 dark:bg-green-500/10",
+                  showResult && !isCorrect && "border-red-500 bg-red-50 dark:bg-red-500/10",
+                  !showResult && "focus:border-primary focus:shadow-md focus:shadow-primary/10"
                 )}
               />
               {showResult && (
-                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                <div className="absolute right-4 top-1/2 -translate-y-1/2">
                   {isCorrect ? (
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                      <CheckCircle2 className="w-4 h-4 text-white" />
+                    </div>
                   ) : (
-                    <XCircle className="w-5 h-5 text-red-500" />
+                    <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center">
+                      <XCircle className="w-4 h-4 text-white" />
+                    </div>
                   )}
                 </div>
               )}
             </div>
             
             {showResult && !isCorrect && (
-              <p className="text-sm text-muted-foreground">
-                Правильный ответ: <strong>{slide.blankWord}</strong>
+              <p className="text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
+                Правильный ответ: <strong className="text-foreground">{slide.blankWord}</strong>
               </p>
             )}
           </div>
@@ -251,18 +286,22 @@ const WordMiniCourse: React.FC<WordMiniCourseProps> = ({
         {/* Result Feedback */}
         {showResult && (
           <div className={cn(
-            "mt-4 p-4 rounded-lg text-center",
-            isCorrect ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            "mt-5 p-4 rounded-xl text-center animate-scale-in",
+            isCorrect ? "bg-gradient-to-r from-green-500/10 to-emerald-500/10" : "bg-gradient-to-r from-red-500/10 to-rose-500/10"
           )}>
             {isCorrect ? (
               <div className="flex items-center justify-center gap-2">
-                <CheckCircle2 className="w-5 h-5" />
-                <span className="font-medium">Правильно!</span>
+                <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                  <CheckCircle2 className="w-5 h-5 text-white" />
+                </div>
+                <span className="font-display font-semibold text-green-600 dark:text-green-400">Правильно!</span>
               </div>
             ) : (
               <div className="flex items-center justify-center gap-2">
-                <XCircle className="w-5 h-5" />
-                <span className="font-medium">Неправильно</span>
+                <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center">
+                  <XCircle className="w-5 h-5 text-white" />
+                </div>
+                <span className="font-display font-semibold text-red-600 dark:text-red-400">Неправильно</span>
               </div>
             )}
           </div>
@@ -270,10 +309,10 @@ const WordMiniCourse: React.FC<WordMiniCourseProps> = ({
       </div>
 
       {/* Action Button */}
-      <div className="p-4 border-t">
+      <div className="p-5 border-t border-border/50 bg-gradient-to-t from-muted/20 to-transparent">
         <Button 
           onClick={handleContinue}
-          className="w-full"
+          className="w-full h-12 rounded-xl text-base font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all"
           disabled={
             (slide.type === 'quiz' && !selectedAnswer && !showResult) ||
             (slide.type === 'fill_blank' && !fillAnswer.trim() && !showResult)
@@ -282,7 +321,7 @@ const WordMiniCourse: React.FC<WordMiniCourseProps> = ({
           {showResult || slide.type === 'info' ? (
             <>
               {currentSlide < slides.length - 1 ? 'Далее' : 'Завершить'}
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="w-5 h-5 ml-2" />
             </>
           ) : (
             'Проверить'
