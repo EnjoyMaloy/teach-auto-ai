@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, BookOpen, PenTool } from 'lucide-react';
+import { Home, BookOpen, PenTool, Library } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Logo from '@/assets/Logo.svg';
 
@@ -17,6 +17,10 @@ const navItems: NavItem[] = [{
   icon: BookOpen,
   label: 'Каталог',
   path: '/catalog'
+}, {
+  icon: Library,
+  label: 'Словарь',
+  path: '/dictionary'
 }, {
   icon: PenTool,
   label: 'Мастерская авторов',
