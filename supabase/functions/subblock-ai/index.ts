@@ -176,11 +176,12 @@ async function generateImage(description: string, apiKey: string): Promise<strin
     const imagePrompt = `${description}
 
 Style requirements:
-- High quality, detailed illustration
-- Modern, clean, professional style
+- Minimalist flat design illustration
+- Clean geometric shapes and simplified forms
+- Bold, vibrant colors with good contrast
 - NO text, words, letters, or labels on the image
-- Suitable for mobile educational app
-- Vibrant colors, engaging composition`;
+- Modern look suitable for mobile educational app
+- Simple backgrounds, no complex textures`;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=${apiKey}`,
