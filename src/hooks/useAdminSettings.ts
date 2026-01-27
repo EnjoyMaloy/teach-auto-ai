@@ -38,10 +38,12 @@ export const AVAILABLE_TEXT_MODELS = [
   { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', description: 'Максимальное качество, медленнее' },
   { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', description: 'Быстрый, хорошее качество' },
   { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', description: 'Самый быстрый, базовое качество' },
+  { value: 'gemini-3-pro-preview', label: 'Gemini 3 Pro (Preview)', description: 'Новейший, топовое качество' },
+  { value: 'gemini-3-flash-preview', label: 'Gemini 3 Flash (Preview)', description: 'Новейший быстрый' },
 ];
 
 export const AVAILABLE_IMAGE_MODELS = [
-  { value: 'gemini-3-pro-image-preview', label: 'Gemini 3 Pro Image', description: 'Высокое качество' },
+  { value: 'gemini-3-pro-image-preview', label: 'Gemini 3 Pro Image', description: 'Высокое качество, медленнее' },
   { value: 'gemini-2.5-flash-image', label: 'Nano Banana (Flash Image)', description: 'Быстрый, хорошее качество' },
 ];
 
