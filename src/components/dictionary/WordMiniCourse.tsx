@@ -156,7 +156,7 @@ const WordMiniCourse: React.FC<WordMiniCourseProps> = ({
 
       {/* Content */}
       <div className="flex-1 p-4 overflow-y-auto">
-        {slide.type === 'info' && (
+        {slide.type === 'info' && slide.content && (
           <div className="prose prose-sm max-w-none">
             <div 
               className="text-base leading-relaxed"
@@ -209,12 +209,14 @@ const WordMiniCourse: React.FC<WordMiniCourseProps> = ({
 
         {slide.type === 'fill_blank' && (
           <div className="space-y-4">
-            <div 
-              className="text-base leading-relaxed"
-              dangerouslySetInnerHTML={{ 
-                __html: slide.content.replace(/___/g, '<span class="inline-block w-24 border-b-2 border-primary mx-1"></span>')
-              }}
-            />
+            {slide.content && (
+              <div 
+                className="text-base leading-relaxed"
+                dangerouslySetInnerHTML={{ 
+                  __html: slide.content.replace(/___/g, '<span class="inline-block w-24 border-b-2 border-primary mx-1"></span>')
+                }}
+              />
+            )}
             
             <div className="relative">
               <Input
