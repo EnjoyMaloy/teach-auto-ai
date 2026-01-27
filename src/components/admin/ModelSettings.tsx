@@ -44,7 +44,7 @@ const ModelSettings: React.FC<ModelSettingsProps> = ({ models, isSaving, onSave 
     {
       key: 'generate_image' as const,
       label: 'Генерация изображений',
-      description: 'Используется для создания картинок в курсах',
+      description: 'Единая модель для всех картинок (курсы и design-блоки)',
       options: AVAILABLE_IMAGE_MODELS,
     },
     {
@@ -52,12 +52,6 @@ const ModelSettings: React.FC<ModelSettingsProps> = ({ models, isSaving, onSave 
       label: 'Design AI (текст)',
       description: 'Используется для текстовых ответов в редакторе блоков',
       options: AVAILABLE_TEXT_MODELS,
-    },
-    {
-      key: 'subblock_ai_image' as const,
-      label: 'Design AI (картинки)',
-      description: 'Используется для генерации изображений в design-блоках',
-      options: AVAILABLE_IMAGE_MODELS,
     },
   ];
 
