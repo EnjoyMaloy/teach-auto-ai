@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { z } from 'zod';
 import authIllustration from '@/assets/auth-illustration.jpg';
+import Logo from '@/assets/Logo.svg';
 const GoogleIcon = () => <svg className="w-5 h-5" viewBox="0 0 24 24">
     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -106,10 +107,7 @@ const Auth: React.FC = () => {
   return <div className="min-h-screen flex bg-white relative">
       {/* Logo - Top Left Corner */}
       <div className="absolute top-6 left-8 lg:left-16 xl:left-24 flex items-center gap-3 z-10">
-        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[#9381ef]">
-          <span className="text-white text-3xl font-semibold">А</span>
-        </div>
-        <span className="text-foreground text-3xl font-semibold">Open Academy</span>
+        <img src={Logo} alt="Academy Logo" className="h-8" />
       </div>
 
       {/* Left side - Form */}
