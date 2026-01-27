@@ -469,8 +469,8 @@ serve(async (req) => {
       );
     }
     
-    // Using Gemini 2.5 Pro model
-    const MODEL = "gemini-2.5-pro";
+    // Using Gemini 3 Flash Preview model (newest, fast + smart)
+    const MODEL = "gemini-3-flash-preview";
     console.log(`Calling Google Gemini (${MODEL}) with role: ${agentRole || 'builder'} for user: ${user.id}`);
     
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
