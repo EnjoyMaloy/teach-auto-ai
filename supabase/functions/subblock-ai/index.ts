@@ -6,6 +6,44 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Helper function to verify user authentication
+async function verifyAuth(req: Request): Promise<{ user: any; error: Response | null }> {
+  const authHeader = req.headers.get('Authorization');
+  
+  if (!authHeader) {
+    console.error("No authorization header provided");
+    return {
+      user: null,
+      error: new Response(
+        JSON.stringify({ error: "Требуется авторизация" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    };
+  }
+
+  const supabaseClient = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_ANON_KEY')!,
+    { global: { headers: { Authorization: authHeader } } }
+  );
+
+  const { data: { user }, error } = await supabaseClient.auth.getUser();
+  
+  if (error || !user) {
+    console.error("Auth verification failed:", error?.message || "No user found");
+    return {
+      user: null,
+      error: new Response(
+        JSON.stringify({ error: "Недействительный токен авторизации" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    };
+  }
+
+  console.log(`Authenticated user: ${user.id}`);
+  return { user, error: null };
+}
+
 const SYSTEM_PROMPT = `Ты — ИИ-ассистент для редактирования саб-блоков в конструкторе образовательных курсов.
 
 ## ТИПЫ САБ-БЛОКОВ И ВСЕ ИХ ПОЛЯ:
@@ -232,7 +270,14 @@ serve(async (req) => {
   }
 
   try {
+    // Verify authentication
+    const { user, error: authError } = await verifyAuth(req);
+    if (authError) {
+      return authError;
+    }
+
     const { message, currentSubBlock, allSubBlocks, conversationHistory } = await req.json();
+    console.log(`Processing subblock-ai request for user: ${user.id}`);
     
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     if (!GEMINI_API_KEY) {
