@@ -46,13 +46,13 @@ const Dictionary: React.FC = () => {
 
   const fetchWords = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('dictionary_words')
         .select('*')
         .order('term');
       
       if (error) throw error;
-      setWords(data || []);
+      setWords((data as DictionaryWord[]) || []);
     } catch (error) {
       console.error('Error fetching words:', error);
       toast.error('Ошибка загрузки словаря');
@@ -65,7 +65,7 @@ const Dictionary: React.FC = () => {
     if (!user) return;
     
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_word_progress')
         .select('*')
         .eq('user_id', user.id);
@@ -73,7 +73,7 @@ const Dictionary: React.FC = () => {
       if (error) throw error;
       
       const progressMap: Record<string, UserWordProgress> = {};
-      data?.forEach(p => {
+      (data as any[])?.forEach((p: any) => {
         progressMap[p.word_id] = p;
       });
       setUserProgress(progressMap);
@@ -151,7 +151,7 @@ const Dictionary: React.FC = () => {
         const updates: any = { updated_at: new Date().toISOString(), last_studied_at: new Date().toISOString() };
         updates[`${difficulty}_completed`] = true;
         
-        await supabase
+        await (supabase as any)
           .from('user_word_progress')
           .update(updates)
           .eq('user_id', user.id)
@@ -166,7 +166,7 @@ const Dictionary: React.FC = () => {
           last_studied_at: new Date().toISOString()
         };
         
-        await supabase
+        await (supabase as any)
           .from('user_word_progress')
           .insert(newProgress);
       }
