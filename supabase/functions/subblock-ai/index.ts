@@ -168,10 +168,10 @@ const SYSTEM_PROMPT = `Ты — ИИ-ассистент для редактир�
 Если это просто вопрос — верни только message без newBlocks.
 Верни ТОЛЬКО валидный JSON без markdown-обёртки.`;
 
-// Generate image using Gemini API (same model as generate-image function)
+// Generate image using Imagen 4.0 Fast API
 async function generateImage(description: string, apiKey: string): Promise<string | null> {
   try {
-    console.log("Generating image for:", description);
+    console.log("Generating image via Imagen 4.0 Fast for:", description);
     
     const imagePrompt = `${description}
 
@@ -183,18 +183,17 @@ Style requirements:
 - Vibrant colors, engaging composition`;
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:generateImages?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [{
-            parts: [{ text: imagePrompt }]
-          }],
-          generationConfig: {
-            imageConfig: {
-              aspectRatio: "9:16",
-              imageSize: "1K"
+          prompt: imagePrompt,
+          config: {
+            numberOfImages: 1,
+            aspectRatio: "9:16",
+            outputConfig: {
+              mimeType: "image/jpeg"
             }
           }
         })
@@ -208,18 +207,15 @@ Style requirements:
     }
 
     const data = await response.json();
-    const parts = data.candidates?.[0]?.content?.parts || [];
+    const generatedImages = data.generatedImages || [];
     
-    for (const part of parts) {
-      if (part.inlineData?.mimeType?.startsWith('image/')) {
-        const base64 = part.inlineData.data;
-        const mimeType = part.inlineData.mimeType;
-        console.log("Image generated successfully");
-        return `data:${mimeType};base64,${base64}`;
-      }
+    if (generatedImages.length > 0 && generatedImages[0].image?.imageBytes) {
+      const base64 = generatedImages[0].image.imageBytes;
+      console.log("Image generated successfully via Imagen 4.0 Fast");
+      return `data:image/jpeg;base64,${base64}`;
     }
     
-    console.log("No image in response");
+    console.log("No image in Imagen response");
     return null;
   } catch (error) {
     console.error("Image generation error:", error);
