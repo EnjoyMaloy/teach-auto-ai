@@ -190,7 +190,7 @@ async function getAdminSettings(): Promise<{ textModel: string; imageModel: stri
     
     return {
       textModel: (modelData?.value as any)?.subblock_ai_text || 'gemini-2.5-flash',
-      imageModel: (modelData?.value as any)?.subblock_ai_image || 'gemini-3-pro-image-preview',
+      imageModel: (modelData?.value as any)?.generate_image || 'gemini-3-pro-image-preview',
       prompt: (promptData?.value as any)?.subblock_ai || ''
     };
   } catch (error) {
