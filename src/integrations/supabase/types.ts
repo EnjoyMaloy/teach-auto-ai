@@ -214,6 +214,45 @@ export type Database = {
           },
         ]
       }
+      dictionary_words: {
+        Row: {
+          category: string
+          created_at: string
+          definition: string
+          difficulty_easy_content: Json | null
+          difficulty_hard_content: Json | null
+          difficulty_medium_content: Json | null
+          id: string
+          image_url: string | null
+          term: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          definition: string
+          difficulty_easy_content?: Json | null
+          difficulty_hard_content?: Json | null
+          difficulty_medium_content?: Json | null
+          id?: string
+          image_url?: string | null
+          term: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          definition?: string
+          difficulty_easy_content?: Json | null
+          difficulty_hard_content?: Json | null
+          difficulty_medium_content?: Json | null
+          id?: string
+          image_url?: string | null
+          term?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lessons: {
         Row: {
           course_id: string
@@ -539,6 +578,50 @@ export type Database = {
             columns: ["lesson_id"]
             isOneToOne: false
             referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_word_progress: {
+        Row: {
+          created_at: string
+          easy_completed: boolean | null
+          hard_completed: boolean | null
+          id: string
+          last_studied_at: string | null
+          medium_completed: boolean | null
+          updated_at: string
+          user_id: string
+          word_id: string
+        }
+        Insert: {
+          created_at?: string
+          easy_completed?: boolean | null
+          hard_completed?: boolean | null
+          id?: string
+          last_studied_at?: string | null
+          medium_completed?: boolean | null
+          updated_at?: string
+          user_id: string
+          word_id: string
+        }
+        Update: {
+          created_at?: string
+          easy_completed?: boolean | null
+          hard_completed?: boolean | null
+          id?: string
+          last_studied_at?: string | null
+          medium_completed?: boolean | null
+          updated_at?: string
+          user_id?: string
+          word_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_word_progress_word_id_fkey"
+            columns: ["word_id"]
+            isOneToOne: false
+            referencedRelation: "dictionary_words"
             referencedColumns: ["id"]
           },
         ]
