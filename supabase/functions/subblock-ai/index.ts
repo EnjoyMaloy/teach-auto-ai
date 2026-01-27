@@ -189,13 +189,13 @@ async function getAdminSettings(): Promise<{ textModel: string; imageModel: stri
       .maybeSingle();
     
     return {
-      textModel: (modelData?.value as any)?.subblock_ai_text || 'gemini-2.5-flash',
-      imageModel: (modelData?.value as any)?.generate_image || 'gemini-3-pro-image-preview',
+      textModel: (modelData?.value as any)?.text_model || 'gemini-2.5-pro',
+      imageModel: (modelData?.value as any)?.image_model || 'gemini-3-pro-image-preview',
       prompt: (promptData?.value as any)?.subblock_ai || ''
     };
   } catch (error) {
     console.error("Error fetching admin settings:", error);
-    return { textModel: 'gemini-2.5-flash', imageModel: 'gemini-3-pro-image-preview', prompt: '' };
+    return { textModel: 'gemini-2.5-pro', imageModel: 'gemini-3-pro-image-preview', prompt: '' };
   }
 }
 
