@@ -35,8 +35,7 @@ const DEFAULT_PROMPTS: PromptSettings = {
 };
 
 export const AVAILABLE_TEXT_MODELS = [
-  { value: 'gemini-3-pro-latest', label: 'Gemini 3 Pro Latest', description: 'Новейшая флагманская модель (январь 2026), лучшая для сложных рассуждений' },
-  { value: 'gemini-3-flash-latest', label: 'Gemini 3 Flash Latest', description: 'Самая современная из быстрых моделей, идеальный баланс интеллекта и скорости' },
+  { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', description: 'Флагманская модель, лучшая для сложных рассуждений и длинного контекста' },
   { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', description: 'Стабильная рабочая лошадка, очень дешевая и надежная для массовых курсов' },
   { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', description: 'Максимально облегченная и быстрая модель для простых текстовых задач' },
 ];
