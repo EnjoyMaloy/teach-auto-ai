@@ -35,15 +35,17 @@ const DEFAULT_PROMPTS: PromptSettings = {
 };
 
 export const AVAILABLE_TEXT_MODELS = [
-  { value: 'gemini-3-flash', label: 'Gemini 3 Flash', description: 'Новейший, быстрый и качественный (рекомендуется)' },
-  { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', description: 'Максимальное качество, медленнее' },
-  { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', description: 'Быстрый, хорошее качество' },
-  { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', description: 'Самый быстрый, базовое качество' },
+  { value: 'gemini-3-pro-latest', label: 'Gemini 3 Pro Latest', description: 'Новейшая флагманская модель (январь 2026), лучшая для сложных рассуждений' },
+  { value: 'gemini-3-flash-latest', label: 'Gemini 3 Flash Latest', description: 'Самая современная из быстрых моделей, идеальный баланс интеллекта и скорости' },
+  { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', description: 'Стабильная рабочая лошадка, очень дешевая и надежная для массовых курсов' },
+  { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', description: 'Максимально облегченная и быстрая модель для простых текстовых задач' },
 ];
 
 export const AVAILABLE_IMAGE_MODELS = [
-  { value: 'imagen-4', label: 'Imagen 4', description: 'Новейший, высокое качество (рекомендуется)' },
-  { value: 'gemini-2.5-flash-image', label: 'Nano Banana (Flash Image)', description: 'Быстрый, хорошее качество' },
+  { value: 'imagen-4.0-ultra-generate-001', label: 'Imagen 4 Ultra', description: 'Максимальное качество, поддержка разрешения до 2K/4K' },
+  { value: 'imagen-4.0-generate-001', label: 'Imagen 4', description: 'Стандартная версия четвертого поколения' },
+  { value: 'imagen-4.0-fast-generate-001', label: 'Imagen 4 Fast', description: 'Самая быстрая и дешевая' },
+  { value: 'gemini-3-pro-image', label: 'Gemini 3 Pro Image', description: 'Новая мультимодальная модель, лучше всех понимает длинные и сложные описания сцен' },
 ];
 
 export const useAdminSettings = () => {
