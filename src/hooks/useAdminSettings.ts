@@ -4,9 +4,8 @@ import { toast } from 'sonner';
 import type { Json } from '@/integrations/supabase/types';
 
 export interface ModelSettings {
-  generate_course: string;
-  generate_image: string;
-  subblock_ai_text: string;
+  text_model: string;
+  image_model: string;
 }
 
 export interface PromptSettings {
@@ -23,9 +22,8 @@ interface AdminSettings {
 }
 
 const DEFAULT_MODELS: ModelSettings = {
-  generate_course: 'gemini-2.5-pro',
-  generate_image: 'gemini-3-pro-image-preview',
-  subblock_ai_text: 'gemini-2.5-flash',
+  text_model: 'gemini-2.5-pro',
+  image_model: 'gemini-3-pro-image-preview',
 };
 
 const DEFAULT_PROMPTS: PromptSettings = {

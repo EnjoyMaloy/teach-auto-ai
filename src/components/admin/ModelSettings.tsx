@@ -36,22 +36,16 @@ const ModelSettings: React.FC<ModelSettingsProps> = ({ models, isSaving, onSave 
 
   const modelConfigs = [
     {
-      key: 'generate_course' as const,
-      label: 'Генерация курсов (текст)',
-      description: 'Используется для research, structure и content этапов',
+      key: 'text_model' as const,
+      label: 'Текстовая модель',
+      description: 'Используется для генерации курсов и Design AI',
       options: AVAILABLE_TEXT_MODELS,
     },
     {
-      key: 'generate_image' as const,
-      label: 'Генерация изображений',
-      description: 'Единая модель для всех картинок (курсы и design-блоки)',
+      key: 'image_model' as const,
+      label: 'Модель изображений',
+      description: 'Единая модель для всех картинок',
       options: AVAILABLE_IMAGE_MODELS,
-    },
-    {
-      key: 'subblock_ai_text' as const,
-      label: 'Design AI (текст)',
-      description: 'Используется для текстовых ответов в редакторе блоков',
-      options: AVAILABLE_TEXT_MODELS,
     },
   ];
 

@@ -70,7 +70,7 @@ async function getImageModel(): Promise<string> {
       .eq('key', 'models')
       .maybeSingle();
     
-    return (data?.value as any)?.generate_image || 'gemini-3-pro-image-preview';
+    return (data?.value as any)?.image_model || 'gemini-3-pro-image-preview';
   } catch (error) {
     console.error("Error fetching image model:", error);
     return 'gemini-3-pro-image-preview';

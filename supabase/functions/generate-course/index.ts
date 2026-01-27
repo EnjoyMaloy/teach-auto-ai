@@ -450,7 +450,7 @@ async function getAdminSettings(): Promise<{ model: string; prompts: Record<stri
       .maybeSingle();
     
     return {
-      model: (modelData?.value as any)?.generate_course || 'gemini-2.5-pro',
+      model: (modelData?.value as any)?.text_model || 'gemini-2.5-pro',
       prompts: (promptData?.value as any) || {}
     };
   } catch (error) {
