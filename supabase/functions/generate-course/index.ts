@@ -429,36 +429,6 @@ async function verifyAuth(req: Request): Promise<{ user: any; error: Response | 
   return { user, error: null };
 }
 
-// Get admin settings from database
-async function getAdminSettings(): Promise<{ model: string; prompts: Record<string, string> }> {
-  try {
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    );
-    
-    const { data: modelData } = await supabaseAdmin
-      .from('admin_settings')
-      .select('value')
-      .eq('key', 'models')
-      .maybeSingle();
-    
-    const { data: promptData } = await supabaseAdmin
-      .from('admin_settings')
-      .select('value')
-      .eq('key', 'prompts')
-      .maybeSingle();
-    
-    return {
-      model: (modelData?.value as any)?.text_model || 'gemini-2.5-pro',
-      prompts: (promptData?.value as any) || {}
-    };
-  } catch (error) {
-    console.error("Error fetching admin settings:", error);
-    return { model: 'gemini-2.5-pro', prompts: {} };
-  }
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -473,25 +443,20 @@ serve(async (req) => {
 
     const { userMessage, agentRole, mode } = await req.json();
 
-    // Get dynamic settings from database
-    const settings = await getAdminSettings();
-    const MODEL = settings.model;
-
-    // Use custom prompts from DB if available, otherwise use defaults
-    let systemPrompt = settings.prompts.content || CONTENT_PROMPT;
+    let systemPrompt = CONTENT_PROMPT;
     let userPrompt = userMessage;
 
     // Chat mode for editor assistant
     if (mode === "chat") {
-      systemPrompt = settings.prompts.chat || CHAT_SYSTEM_PROMPT;
+      systemPrompt = CHAT_SYSTEM_PROMPT;
     }
     // Adjust prompts based on agent role for course generation
     else if (agentRole === "research") {
-      systemPrompt = settings.prompts.research || RESEARCH_PROMPT;
+      systemPrompt = RESEARCH_PROMPT;
     } else if (agentRole === "structure") {
-      systemPrompt = settings.prompts.structure || STRUCTURE_PROMPT;
+      systemPrompt = STRUCTURE_PROMPT;
     } else if (agentRole === "content") {
-      systemPrompt = settings.prompts.content || CONTENT_PROMPT;
+      systemPrompt = CONTENT_PROMPT;
     }
 
     // Use user's own Gemini API key (required)
@@ -504,6 +469,8 @@ serve(async (req) => {
       );
     }
     
+    // Using Gemini 2.5 Pro model
+    const MODEL = "gemini-2.5-pro";
     console.log(`Calling Google Gemini (${MODEL}) with role: ${agentRole || 'builder'} for user: ${user.id}`);
     
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
@@ -521,7 +488,6 @@ serve(async (req) => {
         generationConfig: {
           temperature: 0.7,
           maxOutputTokens: 16384,
-          responseMimeType: "application/json",
         }
       }),
     });

@@ -168,41 +168,10 @@ const SYSTEM_PROMPT = `Ты — ИИ-ассистент для редактир�
 Если это просто вопрос — верни только message без newBlocks.
 Верни ТОЛЬКО валидный JSON без markdown-обёртки.`;
 
-// Get admin settings from database
-async function getAdminSettings(): Promise<{ textModel: string; imageModel: string; prompt: string }> {
+// Generate image using Gemini API (same model as generate-image function)
+async function generateImage(description: string, apiKey: string): Promise<string | null> {
   try {
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    );
-    
-    const { data: modelData } = await supabaseAdmin
-      .from('admin_settings')
-      .select('value')
-      .eq('key', 'models')
-      .maybeSingle();
-    
-    const { data: promptData } = await supabaseAdmin
-      .from('admin_settings')
-      .select('value')
-      .eq('key', 'prompts')
-      .maybeSingle();
-    
-    return {
-      textModel: (modelData?.value as any)?.text_model || 'gemini-2.5-pro',
-      imageModel: (modelData?.value as any)?.image_model || 'gemini-3-pro-image-preview',
-      prompt: (promptData?.value as any)?.subblock_ai || ''
-    };
-  } catch (error) {
-    console.error("Error fetching admin settings:", error);
-    return { textModel: 'gemini-2.5-pro', imageModel: 'gemini-3-pro-image-preview', prompt: '' };
-  }
-}
-
-// Generate image using Gemini API (with dynamic model from settings)
-async function generateImage(description: string, apiKey: string, model: string): Promise<string | null> {
-  try {
-    console.log(`Generating image with ${model} for:`, description);
+    console.log("Generating image for:", description);
     
     const imagePrompt = `${description}
 
@@ -214,7 +183,7 @@ Style requirements:
 - Vibrant colors, engaging composition`;
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -315,15 +284,6 @@ serve(async (req) => {
       throw new Error("GEMINI_API_KEY is not configured");
     }
 
-    // Get dynamic settings from database
-    const settings = await getAdminSettings();
-    const TEXT_MODEL = settings.textModel;
-    const IMAGE_MODEL = settings.imageModel;
-    const customPrompt = settings.prompt;
-
-    // Use custom prompt if available, otherwise use default
-    const effectivePrompt = customPrompt || SYSTEM_PROMPT;
-
     // Build context based on what we have
     let userContext = '';
     if (currentSubBlock) {
@@ -336,7 +296,7 @@ serve(async (req) => {
 
     // Build conversation with history
     const contents = [
-      { role: "user", parts: [{ text: effectivePrompt }] },
+      { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
       { role: "model", parts: [{ text: "Понял. Готов помочь с дизайном слайдов. Жду запрос." }] },
     ];
 
@@ -353,9 +313,8 @@ serve(async (req) => {
     // Add current message
     contents.push({ role: "user", parts: [{ text: userContext }] });
 
-    console.log(`Calling Gemini ${TEXT_MODEL} for subblock-ai`);
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${TEXT_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -414,7 +373,7 @@ serve(async (req) => {
         if (block.type === 'image' && block.imageDescription && !block.imageUrl) {
           console.log("Found image block needing generation:", block.imageDescription);
           promises.push(
-            generateImage(block.imageDescription, GEMINI_API_KEY, IMAGE_MODEL).then(imageUrl => {
+            generateImage(block.imageDescription, GEMINI_API_KEY).then(imageUrl => {
               if (imageUrl) {
                 block.imageUrl = imageUrl;
               }

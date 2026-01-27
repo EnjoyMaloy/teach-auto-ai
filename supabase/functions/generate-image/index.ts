@@ -56,27 +56,6 @@ function base64ToUint8Array(base64: string): Uint8Array {
   return bytes;
 }
 
-// Get image model from admin settings
-async function getImageModel(): Promise<string> {
-  try {
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    );
-    
-    const { data } = await supabaseAdmin
-      .from('admin_settings')
-      .select('value')
-      .eq('key', 'models')
-      .maybeSingle();
-    
-    return (data?.value as any)?.image_model || 'gemini-3-pro-image-preview';
-  } catch (error) {
-    console.error("Error fetching image model:", error);
-    return 'gemini-3-pro-image-preview';
-  }
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -99,9 +78,6 @@ serve(async (req) => {
       );
     }
 
-    // Get model from admin settings
-    const MODEL = await getImageModel();
-
     // Create image generation prompt - photorealistic or traditional Chinese watercolor style
     const imagePrompt = `${slideContext || prompt}
 
@@ -112,7 +88,10 @@ Style requirements:
 - Professional, elegant composition
 - Resolution: high detail suitable for educational content`;
 
-    console.log(`Generating image via ${MODEL} for: ${(slideContext || prompt).substring(0, 60)}...`);
+    console.log(`Generating image via Gemini 3 Pro Image for: ${(slideContext || prompt).substring(0, 60)}...`);
+
+    // Use gemini-3-pro-image-preview model
+    const MODEL = "gemini-3-pro-image-preview";
     
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",

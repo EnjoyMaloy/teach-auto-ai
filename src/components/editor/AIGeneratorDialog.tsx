@@ -428,32 +428,12 @@ ${JSON.stringify(researchData, null, 2)}
       let courseData: GeneratedCourse;
       try {
         const content = generateResponse.data?.content || '';
-        const parsedData = extractAndFixJson(content);
-        
-        // Handle both { lessons: [...] } and { course: { lessons: [...] } } formats
-        if (parsedData.course && parsedData.course.lessons) {
-          console.log('Detected nested course format, extracting...');
-          courseData = {
-            title: parsedData.course.title || parsedData.course.course_title || 'Сгенерированный курс',
-            description: parsedData.course.description || parsedData.course.course_description || '',
-            targetAudience: parsedData.course.targetAudience || parsedData.course.target_audience || '',
-            estimatedMinutes: parsedData.course.estimatedMinutes || parsedData.course.estimated_minutes || 15,
-            lessons: parsedData.course.lessons
-          };
-        } else if (parsedData.lessons) {
-          console.log('Detected flat format with lessons');
-          courseData = parsedData;
-        } else {
-          console.error('Unexpected response structure:', Object.keys(parsedData));
-          throw new Error('Неожиданная структура ответа');
-        }
+        courseData = extractAndFixJson(content);
       } catch (parseError) {
         console.error('Parse error:', parseError);
         throw new Error('Не удалось распознать структуру курса');
       }
 
-      console.log(`Parsed course with ${courseData.lessons?.length || 0} lessons`);
-      
       if (!courseData.lessons || courseData.lessons.length === 0) {
         throw new Error('Курс не содержит уроков');
       }
