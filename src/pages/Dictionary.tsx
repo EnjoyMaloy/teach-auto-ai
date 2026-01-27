@@ -206,55 +206,77 @@ const Dictionary: React.FC = () => {
     <AppLayout>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Крипто-словарь</h1>
-          <p className="text-muted-foreground">
-            Изучайте термины криптовалют и финансов через интерактивные мини-курсы
-          </p>
+        <div className="mb-8 relative">
+          <div className="absolute -top-4 -left-4 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+          <div className="absolute top-0 right-0 w-24 h-24 bg-accent/20 rounded-full blur-2xl" />
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/25">
+                <BookOpen className="w-5 h-5 text-primary-foreground" />
+              </div>
+              <h1 className="text-3xl font-display font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                Крипто-словарь
+              </h1>
+            </div>
+            <p className="text-muted-foreground ml-13">
+              Изучайте термины криптовалют и финансов через интерактивные мини-курсы
+            </p>
+          </div>
         </div>
 
         {/* Overall Progress */}
-        <Card className="p-6 mb-8 bg-gradient-to-r from-primary/10 to-primary/5">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-primary" />
+        <Card className="p-6 mb-8 border-0 bg-gradient-to-br from-card via-card to-primary/5 shadow-xl shadow-primary/5 overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="relative flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary via-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/30">
+                <BookOpen className="w-7 h-7 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold">Общий прогресс</h2>
+                <h2 className="text-xl font-display font-semibold">Общий прогресс</h2>
                 <p className="text-sm text-muted-foreground">
-                  Изучено {learnedCount} из {words.length} терминов
+                  Изучено <span className="font-semibold text-primary">{learnedCount}</span> из <span className="font-semibold">{words.length}</span> терминов
                 </p>
               </div>
             </div>
-            <div className="text-3xl font-bold text-primary">
+            <div className="text-4xl font-display font-bold bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
               {getOverallProgress()}%
             </div>
           </div>
-          <Progress value={getOverallProgress()} className="h-3" />
+          <div className="relative">
+            <div className="h-3 bg-muted/50 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-primary via-primary to-primary/80 rounded-full transition-all duration-500 ease-out shadow-sm shadow-primary/50"
+                style={{ width: `${getOverallProgress()}%` }}
+              />
+            </div>
+          </div>
         </Card>
 
         {/* Generate Button (for admin) */}
         {words.length === 0 && (
-          <Card className="p-8 text-center mb-8">
-            <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Словарь пуст</h3>
-            <p className="text-muted-foreground mb-4">
-              Сгенерируйте 20 базовых криптовалютных и финансовых терминов
+          <Card className="p-10 text-center mb-8 border-0 bg-gradient-to-br from-card to-muted/30 shadow-xl">
+            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto mb-6 shadow-inner">
+              <Sparkles className="w-10 h-10 text-primary" />
+            </div>
+            <h3 className="text-2xl font-display font-semibold mb-3">Словарь пуст</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Сгенерируйте 20 базовых криптовалютных и финансовых терминов с уникальными иллюстрациями
             </p>
             <Button 
               onClick={generateWords} 
               disabled={generating}
               size="lg"
+              className="rounded-xl px-8 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all"
             >
               {generating ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                   Генерация...
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 mr-2" />
+                  <Sparkles className="w-5 h-5 mr-2" />
                   Сгенерировать словарь
                 </>
               )}
@@ -263,8 +285,8 @@ const Dictionary: React.FC = () => {
         )}
 
         {/* Words Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {words.map(word => {
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {words.map((word, index) => {
             const progress = getWordProgress(word.id);
             const isComplete = progress === 100;
             const nextDifficulty = getNextDifficulty(word.id);
@@ -274,67 +296,96 @@ const Dictionary: React.FC = () => {
               <Card 
                 key={word.id}
                 onClick={() => handleWordClick(word)}
-                className={`relative overflow-hidden cursor-pointer transition-all hover:shadow-lg hover:-translate-y-1 ${
-                  isComplete ? 'ring-2 ring-green-500' : ''
+                className={`group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2 border-0 bg-gradient-to-br from-card to-card/80 ${
+                  isComplete ? 'ring-2 ring-green-500/50 shadow-lg shadow-green-500/10' : 'shadow-lg'
                 }`}
+                style={{ animationDelay: `${index * 50}ms` }}
               >
-                {/* Background Image */}
+                {/* Background Image with Overlay */}
                 {word.image_url && (
-                  <div 
-                    className="absolute inset-0 opacity-20"
-                    style={{
-                      backgroundImage: `url(${word.image_url})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  />
+                  <div className="absolute inset-0">
+                    <div 
+                      className="absolute inset-0 opacity-15 group-hover:opacity-25 transition-opacity duration-300"
+                      style={{
+                        backgroundImage: `url(${word.image_url})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-card via-card/80 to-transparent" />
+                  </div>
                 )}
                 
-                <div className="relative p-4">
+                <div className="relative p-5">
                   {/* Category Badge */}
-                  <Badge variant="secondary" className="mb-2 text-xs">
+                  <Badge 
+                    variant="secondary" 
+                    className="mb-3 text-xs font-medium bg-primary/10 text-primary border-0 hover:bg-primary/15"
+                  >
                     {word.category}
                   </Badge>
                   
                   {/* Term */}
-                  <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
+                  <h3 className="text-lg font-display font-bold mb-2 flex items-center gap-2 group-hover:text-primary transition-colors">
                     {word.term}
                     {isComplete && (
-                      <CheckCircle2 className="w-5 h-5 text-green-500" />
+                      <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                      </div>
                     )}
                   </h3>
                   
                   {/* Definition Preview */}
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4 leading-relaxed">
                     {word.definition}
                   </p>
                   
                   {/* Difficulty Stars */}
-                  <div className="flex items-center gap-1 mb-3">
-                    <Star 
-                      className={`w-4 h-4 ${userProg?.easy_completed ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} 
-                    />
-                    <Star 
-                      className={`w-4 h-4 ${userProg?.medium_completed ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} 
-                    />
-                    <Star 
-                      className={`w-4 h-4 ${userProg?.hard_completed ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} 
-                    />
+                  <div className="flex items-center gap-2 mb-4">
+                    {['easy', 'medium', 'hard'].map((level, idx) => {
+                      const isCompleted = level === 'easy' ? userProg?.easy_completed : 
+                                         level === 'medium' ? userProg?.medium_completed : 
+                                         userProg?.hard_completed;
+                      return (
+                        <div 
+                          key={level}
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+                            isCompleted 
+                              ? 'bg-gradient-to-br from-yellow-400 to-amber-500 shadow-md shadow-yellow-500/30' 
+                              : 'bg-muted/50'
+                          }`}
+                        >
+                          <Star 
+                            className={`w-4 h-4 ${isCompleted ? 'fill-white text-white' : 'text-muted-foreground/40'}`} 
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                   
                   {/* Progress Bar */}
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground">Прогресс</span>
-                      <span className="font-medium">{progress}%</span>
+                      <span className="font-semibold text-foreground">{progress}%</span>
                     </div>
-                    <Progress value={progress} className="h-2" />
+                    <div className="h-2 bg-muted/50 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          isComplete 
+                            ? 'bg-gradient-to-r from-green-400 to-emerald-500' 
+                            : 'bg-gradient-to-r from-primary to-primary/70'
+                        }`}
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
                   </div>
                   
                   {/* Next Action */}
                   {nextDifficulty && (
-                    <div className="mt-3 text-center">
-                      <span className="text-xs text-primary font-medium">
+                    <div className="mt-4 pt-3 border-t border-border/50">
+                      <span className="text-xs text-primary font-medium flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                         Следующий: {getDifficultyLabel(nextDifficulty)}
                       </span>
                     </div>
@@ -347,18 +398,27 @@ const Dictionary: React.FC = () => {
 
         {/* Mini Course Modal */}
         {selectedWord && selectedDifficulty && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-background rounded-2xl max-w-md w-full max-h-[90vh] overflow-hidden shadow-2xl">
-              <div className="p-4 border-b flex items-center justify-between">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+            <div className="bg-gradient-to-b from-card to-background rounded-3xl max-w-md w-full max-h-[90vh] overflow-hidden shadow-2xl shadow-black/20 border border-border/50 animate-scale-in">
+              <div className="p-5 border-b border-border/50 flex items-center justify-between bg-gradient-to-r from-primary/5 to-transparent">
                 <div>
-                  <h3 className="font-bold text-lg">{selectedWord.term}</h3>
-                  <Badge variant="outline" className="mt-1">
+                  <h3 className="font-display font-bold text-xl">{selectedWord.term}</h3>
+                  <Badge 
+                    className={`mt-2 border-0 ${
+                      selectedDifficulty === 'easy' 
+                        ? 'bg-green-500/15 text-green-600' 
+                        : selectedDifficulty === 'medium' 
+                          ? 'bg-yellow-500/15 text-yellow-600' 
+                          : 'bg-red-500/15 text-red-600'
+                    }`}
+                  >
                     {getDifficultyLabel(selectedDifficulty)}
                   </Badge>
                 </div>
                 <Button 
                   variant="ghost" 
                   size="icon"
+                  className="rounded-xl hover:bg-muted/80"
                   onClick={() => {
                     setSelectedWord(null);
                     setSelectedDifficulty(null);
