@@ -375,29 +375,45 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   };
 
   // Get user's personal themes to check if selected theme is personal
-  const { systems: userSystems, updateSystem: updateUserSystem } = useUserDesignSystems();
+  const { systems: userSystems, updateSystem: updateUserSystem, isLoading: isLoadingUserSystems } = useUserDesignSystems();
 
   // Check if the selected theme is a personal theme
   const isPersonalThemeSelected = userSystems.some(s => s.id === selectedBaseSystemId);
-  const hasCommonThemeSelected = !!selectedBaseSystemId && !isPersonalThemeSelected;
+  const hasCommonThemeSelected = !!selectedBaseSystemId && !isPersonalThemeSelected && !isLoadingUserSystems;
   const isEditingRestricted = !isAdmin && hasCommonThemeSelected;
 
   // Auto-save personal theme changes with debounce
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedConfigRef = useRef<string>('');
-  const isInitialLoadRef = useRef(true);
+  const currentThemeIdRef = useRef<string | null>(null);
+
+  // Save changes to personal theme
+  const savePersonalTheme = useCallback(async (themeId: string, configToSave: DesignSystemConfig) => {
+    const configStr = JSON.stringify(configToSave);
+    if (configStr !== lastSavedConfigRef.current) {
+      console.log('Saving personal theme:', themeId);
+      await updateUserSystem(themeId, { config: configToSave });
+      lastSavedConfigRef.current = configStr;
+    }
+  }, [updateUserSystem]);
 
   // Auto-save effect for personal themes
   useEffect(() => {
-    // Skip initial load
-    if (isInitialLoadRef.current) {
-      isInitialLoadRef.current = false;
-      lastSavedConfigRef.current = JSON.stringify(config);
+    // Skip if still loading user systems or no theme selected
+    if (isLoadingUserSystems || !selectedBaseSystemId) {
       return;
     }
 
-    // Only auto-save if a personal theme is selected
-    if (!isPersonalThemeSelected || !selectedBaseSystemId) {
+    // Check if this is a personal theme
+    const personalTheme = userSystems.find(s => s.id === selectedBaseSystemId);
+    if (!personalTheme) {
+      return;
+    }
+
+    // If theme changed, update ref and don't save (it's a load, not a change)
+    if (currentThemeIdRef.current !== selectedBaseSystemId) {
+      currentThemeIdRef.current = selectedBaseSystemId;
+      lastSavedConfigRef.current = JSON.stringify(config);
       return;
     }
 
@@ -413,29 +429,22 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
       clearTimeout(saveTimeoutRef.current);
     }
 
-    // Debounce save - wait 1 second after last change
-    saveTimeoutRef.current = setTimeout(async () => {
-      await updateUserSystem(selectedBaseSystemId, { config });
-      lastSavedConfigRef.current = currentConfigStr;
-    }, 1000);
+    // Debounce save - wait 800ms after last change
+    saveTimeoutRef.current = setTimeout(() => {
+      savePersonalTheme(selectedBaseSystemId, config);
+    }, 800);
 
     return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [config, isPersonalThemeSelected, selectedBaseSystemId, updateUserSystem]);
-
-  // Reset initial load flag when theme changes
-  useEffect(() => {
-    isInitialLoadRef.current = true;
-    lastSavedConfigRef.current = JSON.stringify(config);
-  }, [selectedBaseSystemId]);
+  }, [config, selectedBaseSystemId, userSystems, isLoadingUserSystems, savePersonalTheme]);
 
   // Handler for base system selection
   const handleBaseSystemSelect = (system: BaseDesignSystem, isPersonalTheme: boolean) => {
-    // Mark as initial load to prevent auto-save of the loaded config
-    isInitialLoadRef.current = true;
+    // Update refs to prevent auto-save of the loaded config
+    currentThemeIdRef.current = system.id;
     lastSavedConfigRef.current = JSON.stringify(system.config);
     
     onChange(system.config);
