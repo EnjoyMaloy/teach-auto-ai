@@ -583,14 +583,20 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                   let bgColor = `hsl(${ds.cardColor})`;
                   let textColor = `hsl(${ds.foregroundColor})`;
                   
-                  // For partial state, use amber/yellow for correct answers instead of green
+                  // For partial state, use amber/yellow for selected correct answers only (don't reveal unselected correct answers)
                   const correctColor = answerState === 'partial' ? '45 93% 47%' : ds.successColor;
                   const correctBgColor = answerState === 'partial' ? '48 100% 90%' : `${ds.successColor} / 0.1`;
                   
-                  if (showResult && option.isCorrect) {
+                  if (showResult && option.isCorrect && isSelected) {
+                    // Selected correct answer
                     borderColor = `hsl(${correctColor})`;
                     bgColor = `hsl(${correctBgColor})`;
                     textColor = `hsl(${correctColor})`;
+                  } else if (showResult && option.isCorrect && !isSelected && answerState !== 'partial') {
+                    // Unselected correct answer - only show for non-partial states
+                    borderColor = `hsl(${ds.successColor})`;
+                    bgColor = `hsl(${ds.successColor} / 0.1)`;
+                    textColor = `hsl(${ds.successColor})`;
                   } else if (showResult && isSelected && !option.isCorrect) {
                     borderColor = `hsl(${ds.destructiveColor})`;
                     bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
