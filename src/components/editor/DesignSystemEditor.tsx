@@ -498,19 +498,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
 
       {/* Detailed Settings - view-only for non-admins with base system selected */}
       <div className={cn("space-y-4", isEditingRestricted && "opacity-60 [&_input]:pointer-events-none [&_input]:opacity-50 [&_button:not([data-radix-collection-item])]:pointer-events-none [&_button:not([data-radix-collection-item])]:opacity-50 [&_select]:pointer-events-none [&_textarea]:pointer-events-none [&_[role=slider]]:pointer-events-none [&_[role=switch]]:pointer-events-none [&_[type=color]]:pointer-events-none")}>
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-foreground">Детальные настройки</h3>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={resetToDefault}
-            className="text-xs"
-            disabled={isEditingRestricted}
-          >
-            <RotateCcw className="w-3 h-3 mr-1" />
-            Сбросить
-          </Button>
-        </div>
+        <h3 className="font-semibold text-foreground">Детальные настройки</h3>
         <Tabs defaultValue="colors" className="w-full">
           <TabsList className="w-full grid grid-cols-6 h-auto p-1 bg-muted/50">
             <TabsTrigger value="colors" className="text-xs py-2 px-1 data-[state=active]:bg-background">
