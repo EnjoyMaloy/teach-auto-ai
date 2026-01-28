@@ -183,7 +183,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
       {hasBaseSystems && (
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Palette className="w-3.5 h-3.5" />
+            <Users className="w-3.5 h-3.5" />
             <span>Общие темы</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
