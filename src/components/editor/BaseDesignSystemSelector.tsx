@@ -24,7 +24,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Check, Edit, Trash2, Plus, Loader2, Palette, Users, User, Wand2 } from 'lucide-react';
+import { Check, Edit, Trash2, Plus, Loader2, Palette, Users, User, Wand2, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BaseDesignSystemSelectorProps {
@@ -38,6 +38,7 @@ interface BaseDesignSystemSelectorProps {
   onCreateBaseSystem: (name: string, description: string, config: DesignSystemConfig) => Promise<BaseDesignSystem | null>;
   onUpdateBaseSystem: (id: string, updates: Partial<Omit<BaseDesignSystem, 'id' | 'created_at' | 'updated_at'>>) => Promise<boolean>;
   onDeleteBaseSystem: (id: string) => Promise<boolean>;
+  onSetDefaultBaseSystem: (id: string) => Promise<boolean>;
   // Pass user systems from parent to ensure state sync
   userSystems: UserDesignSystem[];
   isLoadingUserSystems: boolean;
@@ -56,6 +57,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
   onCreateBaseSystem,
   onUpdateBaseSystem,
   onDeleteBaseSystem,
+  onSetDefaultBaseSystem,
   userSystems,
   isLoadingUserSystems,
   onCreateUserSystem,
@@ -201,6 +203,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
                 key={system.id}
                 system={system}
                 isSelected={selectedId === system.id}
+                isDefault={'is_default' in system && system.is_default}
                 onSelect={() => onSelect(system, false)}
                 isAdmin={isAdmin}
                 isBase={true}
@@ -209,6 +212,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
                   setSelectedForDelete({ system, isBase: true });
                   setIsDeleteDialogOpen(true);
                 }}
+                onSetDefault={() => onSetDefaultBaseSystem(system.id)}
               />
             ))}
           </div>
@@ -354,23 +358,27 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
 interface ThemeCardProps {
   system: BaseDesignSystem | UserDesignSystem;
   isSelected: boolean;
+  isDefault?: boolean;
   onSelect: () => void;
   isAdmin: boolean;
   isBase: boolean;
   isOwner?: boolean;
   onEdit: () => void;
   onDelete: () => void;
+  onSetDefault?: () => void;
 }
 
 const ThemeCard: React.FC<ThemeCardProps> = ({
   system,
   isSelected,
+  isDefault = false,
   onSelect,
   isAdmin,
   isBase,
   isOwner = false,
   onEdit,
   onDelete,
+  onSetDefault,
 }) => {
   const canEdit = isBase ? isAdmin : isOwner;
 
@@ -379,11 +387,20 @@ const ThemeCard: React.FC<ThemeCardProps> = ({
       className={cn(
         "relative p-3 rounded-xl border-2 transition-all bg-card group cursor-pointer",
         isSelected
-          ? "border-primary bg-primary/5" 
+          ? "border-primary bg-primary/5 ring-2 ring-primary/20" 
           : "border-border hover:border-primary/50"
       )}
       onClick={onSelect}
     >
+      {/* Default badge */}
+      {isDefault && (
+        <div className="absolute -top-1.5 -left-1.5">
+          <div className="w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center shadow-sm">
+            <Star className="w-3 h-3 text-white fill-white" />
+          </div>
+        </div>
+      )}
+
       {/* Color preview dots */}
       <div className="flex gap-1 mb-2">
         <div 
@@ -400,18 +417,30 @@ const ThemeCard: React.FC<ThemeCardProps> = ({
         />
       </div>
       
-      <p className="text-sm font-medium text-foreground truncate">{system.name}</p>
+      <p className="text-sm font-medium text-foreground truncate pr-12">{system.name}</p>
       
-
-      {/* Edit actions */}
+      {/* Edit actions - always visible in corner with pastel colors */}
       {canEdit && (
-        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-2 right-2 flex gap-1">
+          {/* Set as default button (only for base themes) */}
+          {isBase && onSetDefault && !isDefault && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSetDefault();
+              }}
+              className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center hover:bg-amber-200 transition-colors opacity-0 group-hover:opacity-100"
+              title="Сделать по умолчанию"
+            >
+              <Star className="w-3 h-3" />
+            </button>
+          )}
           <button
             onClick={(e) => {
               e.stopPropagation();
               onEdit();
             }}
-            className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition-colors"
+            className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-200 transition-colors opacity-0 group-hover:opacity-100"
             title="Редактировать название"
           >
             <Edit className="w-3 h-3" />
@@ -421,7 +450,7 @@ const ThemeCard: React.FC<ThemeCardProps> = ({
               e.stopPropagation();
               onDelete();
             }}
-            className="w-6 h-6 rounded-full bg-destructive/10 text-destructive flex items-center justify-center hover:bg-destructive/20 transition-colors"
+            className="w-6 h-6 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center hover:bg-rose-200 transition-colors opacity-0 group-hover:opacity-100"
             title="Удалить"
           >
             <Trash2 className="w-3 h-3" />
