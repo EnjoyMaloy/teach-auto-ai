@@ -454,7 +454,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-semibold text-foreground flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-primary" />
+              <Palette className="w-4 h-4 text-primary" />
               Готовые темы
             </h3>
             <p className="text-xs text-muted-foreground mt-0.5">Быстрый старт с готовым дизайном</p>
