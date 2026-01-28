@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { Upload, Loader2, Trash2, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 interface AudioUploaderProps {
   audioUrl?: string;
@@ -16,6 +16,7 @@ export const AudioUploader: React.FC<AudioUploaderProps> = ({
   audioName,
   onUpdate 
 }) => {
+  const { user } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -23,6 +24,11 @@ export const AudioUploader: React.FC<AudioUploaderProps> = ({
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    if (!user) {
+      toast.error('Необходима авторизация для загрузки аудио');
+      return;
+    }
 
     // Check file type
     const allowedTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/m4a', 'audio/x-m4a', 'audio/mp4'];
@@ -41,10 +47,10 @@ export const AudioUploader: React.FC<AudioUploaderProps> = ({
       setIsUploading(true);
       setUploadProgress(20);
 
-      // Generate unique filename
+      // Generate unique filename with user folder for RLS
       const fileExt = file.name.split('.').pop();
       const fileName = `${crypto.randomUUID()}.${fileExt}`;
-      const filePath = `audio/${fileName}`;
+      const filePath = `${user.id}/audio/${fileName}`;
 
       setUploadProgress(40);
 

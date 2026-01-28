@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
 
 interface VideoUploaderProps {
   videoUrl?: string;
@@ -19,6 +20,7 @@ interface VideoMetadata {
 }
 
 export const VideoUploader: React.FC<VideoUploaderProps> = ({ videoUrl, onUpdate }) => {
+  const { user } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [showUrlInput, setShowUrlInput] = useState(false);
@@ -77,6 +79,11 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({ videoUrl, onUpdate
     const file = event.target.files?.[0];
     if (!file) return;
 
+    if (!user) {
+      toast.error('Необходима авторизация для загрузки видео');
+      return;
+    }
+
     // Check file type
     const allowedTypes = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo'];
     if (!allowedTypes.includes(file.type)) {
@@ -106,10 +113,10 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({ videoUrl, onUpdate
         return;
       }
 
-      // Generate unique filename
+      // Generate unique filename with user folder for RLS
       const fileExt = file.name.split('.').pop();
       const fileName = `${crypto.randomUUID()}.${fileExt}`;
-      const filePath = `videos/${fileName}`;
+      const filePath = `${user.id}/videos/${fileName}`;
 
       setUploadProgress(30);
 

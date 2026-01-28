@@ -5,6 +5,31 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Standard error messages
+const ERROR_MESSAGES = {
+  INTERNAL_ERROR: 'Unable to process request. Please try again.',
+  INVALID_INPUT: 'Invalid request data.',
+  AUTH_REQUIRED: 'Authentication required.',
+  RATE_LIMIT: 'Too many requests. Please try again later.',
+  EXTERNAL_SERVICE: 'AI service temporarily unavailable.',
+  CONFIG_ERROR: 'Service configuration error.'
+};
+
+// Input validation
+function validateInput(data: any): { valid: boolean; error?: string } {
+  if (!data || typeof data !== 'object') {
+    return { valid: false, error: 'Invalid request body' };
+  }
+  
+  const { context } = data;
+  
+  if (typeof context !== 'string' || context.length === 0 || context.length > 5000) {
+    return { valid: false, error: 'Context must be a string between 1 and 5000 characters' };
+  }
+  
+  return { valid: true };
+}
+
 // Helper function to verify user authentication
 async function verifyAuth(req: Request): Promise<{ user: any; error: Response | null }> {
   const authHeader = req.headers.get('Authorization');
@@ -13,7 +38,7 @@ async function verifyAuth(req: Request): Promise<{ user: any; error: Response | 
     return {
       user: null,
       error: new Response(
-        JSON.stringify({ success: false, error: "Authentication required" }),
+        JSON.stringify({ success: false, error: ERROR_MESSAGES.AUTH_REQUIRED }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     };
@@ -31,7 +56,7 @@ async function verifyAuth(req: Request): Promise<{ user: any; error: Response | 
     return {
       user: null,
       error: new Response(
-        JSON.stringify({ success: false, error: "Invalid authentication" }),
+        JSON.stringify({ success: false, error: ERROR_MESSAGES.AUTH_REQUIRED }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     };
@@ -52,21 +77,35 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { context } = await req.json();
-
-    if (!context) {
+    // Parse and validate input
+    let requestData;
+    try {
+      requestData = await req.json();
+    } catch {
       return new Response(
-        JSON.stringify({ success: false, error: 'Context is required' }),
+        JSON.stringify({ success: false, error: ERROR_MESSAGES.INVALID_INPUT }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    const validation = validateInput(requestData);
+    if (!validation.valid) {
+      console.error("Input validation failed:", validation.error);
+      return new Response(
+        JSON.stringify({ success: false, error: ERROR_MESSAGES.INVALID_INPUT }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { context } = requestData;
 
     console.log('AI suggesting animation for context:', context.slice(0, 100));
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
+      console.error('LOVABLE_API_KEY not configured');
       return new Response(
-        JSON.stringify({ success: false, error: 'API key not configured' }),
+        JSON.stringify({ success: false, error: ERROR_MESSAGES.CONFIG_ERROR }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -105,18 +144,18 @@ Examples: "rocket", "success", "brain thinking", "celebration", "data chart"`
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('AI API error:', response.status, errorText);
+      const status = response.status;
+      console.error('AI API error:', status);
       
-      if (response.status === 429) {
+      if (status === 429) {
         return new Response(
-          JSON.stringify({ success: false, error: 'Rate limit exceeded' }),
+          JSON.stringify({ success: false, error: ERROR_MESSAGES.RATE_LIMIT }),
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
       
       return new Response(
-        JSON.stringify({ success: false, error: 'AI request failed' }),
+        JSON.stringify({ success: false, error: ERROR_MESSAGES.EXTERNAL_SERVICE }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -128,7 +167,7 @@ Examples: "rocket", "success", "brain thinking", "celebration", "data chart"`
 
     if (!keyword) {
       return new Response(
-        JSON.stringify({ success: false, error: 'No keyword generated' }),
+        JSON.stringify({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -139,9 +178,8 @@ Examples: "rocket", "success", "brain thinking", "celebration", "data chart"`
     );
   } catch (error) {
     console.error('Error in AI suggest:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ success: false, error: errorMessage }),
+      JSON.stringify({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

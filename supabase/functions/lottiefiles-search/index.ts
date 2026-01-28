@@ -5,6 +5,15 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Standard error messages
+const ERROR_MESSAGES = {
+  INTERNAL_ERROR: 'Unable to process request. Please try again.',
+  INVALID_INPUT: 'Invalid request data.',
+  AUTH_REQUIRED: 'Authentication required.',
+  RATE_LIMIT: 'Too many requests. Please try again later.',
+  EXTERNAL_SERVICE: 'External service temporarily unavailable.'
+};
+
 interface LottieFilesAnimation {
   id: string;
   name: string;
@@ -24,6 +33,29 @@ interface SearchResult {
   author?: string;
 }
 
+// Input validation
+function validateInput(data: any): { valid: boolean; error?: string } {
+  if (!data || typeof data !== 'object') {
+    return { valid: false, error: 'Invalid request body' };
+  }
+  
+  const { query, limit, cursor } = data;
+  
+  if (typeof query !== 'string' || query.length === 0 || query.length > 200) {
+    return { valid: false, error: 'Query must be a string between 1 and 200 characters' };
+  }
+  
+  if (limit !== undefined && (typeof limit !== 'number' || limit < 1 || limit > 50)) {
+    return { valid: false, error: 'Limit must be a number between 1 and 50' };
+  }
+  
+  if (cursor !== undefined && typeof cursor !== 'string') {
+    return { valid: false, error: 'Cursor must be a string' };
+  }
+  
+  return { valid: true };
+}
+
 // Helper function to verify user authentication
 async function verifyAuth(req: Request): Promise<{ user: any; error: Response | null }> {
   const authHeader = req.headers.get('Authorization');
@@ -32,7 +64,7 @@ async function verifyAuth(req: Request): Promise<{ user: any; error: Response | 
     return {
       user: null,
       error: new Response(
-        JSON.stringify({ success: false, error: "Authentication required" }),
+        JSON.stringify({ success: false, error: ERROR_MESSAGES.AUTH_REQUIRED }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     };
@@ -50,7 +82,7 @@ async function verifyAuth(req: Request): Promise<{ user: any; error: Response | 
     return {
       user: null,
       error: new Response(
-        JSON.stringify({ success: false, error: "Invalid authentication" }),
+        JSON.stringify({ success: false, error: ERROR_MESSAGES.AUTH_REQUIRED }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     };
@@ -71,14 +103,27 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { query, limit = 12, cursor } = await req.json();
-
-    if (!query) {
+    // Parse and validate input
+    let requestData;
+    try {
+      requestData = await req.json();
+    } catch {
       return new Response(
-        JSON.stringify({ success: false, error: 'Query is required' }),
+        JSON.stringify({ success: false, error: ERROR_MESSAGES.INVALID_INPUT }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    const validation = validateInput(requestData);
+    if (!validation.valid) {
+      console.error("Input validation failed:", validation.error);
+      return new Response(
+        JSON.stringify({ success: false, error: ERROR_MESSAGES.INVALID_INPUT }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { query, limit = 12, cursor } = requestData;
 
     console.log('Searching LottieFiles for:', query, cursor ? `(cursor: ${cursor})` : '');
 
@@ -126,7 +171,7 @@ Deno.serve(async (req) => {
     if (data.errors) {
       console.error('LottieFiles API error:', data.errors);
       return new Response(
-        JSON.stringify({ success: false, error: 'LottieFiles API error' }),
+        JSON.stringify({ success: false, error: ERROR_MESSAGES.EXTERNAL_SERVICE }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -155,9 +200,8 @@ Deno.serve(async (req) => {
     );
   } catch (error) {
     console.error('Error searching LottieFiles:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ success: false, error: errorMessage }),
+      JSON.stringify({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
