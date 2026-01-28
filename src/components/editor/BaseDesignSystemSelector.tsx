@@ -28,7 +28,7 @@ import { cn } from '@/lib/utils';
 
 interface BaseDesignSystemSelectorProps {
   selectedId: string | null;
-  onSelect: (system: BaseDesignSystem | UserDesignSystem) => void;
+  onSelect: (system: BaseDesignSystem | UserDesignSystem, isPersonalTheme: boolean) => void;
   isAdmin: boolean;
   currentConfig?: DesignSystemConfig;
 }
@@ -193,7 +193,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
                 key={system.id}
                 system={system}
                 isSelected={selectedId === system.id}
-                onSelect={() => onSelect(system)}
+                onSelect={() => onSelect(system, false)}
                 isAdmin={isAdmin}
                 isBase={true}
                 onEdit={() => handleEditOpen(system, true)}
@@ -220,7 +220,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
                 key={system.id}
                 system={system}
                 isSelected={selectedId === system.id}
-                onSelect={() => onSelect(system as any)}
+                onSelect={() => onSelect(system, true)}
                 isAdmin={false}
                 isBase={false}
                 isOwner={true}
