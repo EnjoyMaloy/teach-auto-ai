@@ -1169,7 +1169,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       {/* Hint button - only when idle and has more hints */}
       {hintButton}
       
-      {isInteractive && answerState !== 'idle' && (
+      {/* Show retry button only for incorrect/partial answers */}
+      {isInteractive && answerState !== 'idle' && answerState !== 'correct' && (
         <button
           type="button"
           onClick={resetState}
@@ -1204,13 +1205,21 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         )}
         disabled={isInteractive && answerState === 'idle' && !canCheck()}
         style={{
-          backgroundColor: `hsl(${ds.primaryColor})`,
-          color: `hsl(${ds.primaryForeground})`,
-          borderRadius: getButtonRadius(),
-          ...getRaisedButtonStyle(ds.primaryColor),
+          // Use success color for correct answer, primary for others
+          backgroundColor: answerState === 'correct' 
+            ? `hsl(${ds.successColor})` 
+            : `hsl(${ds.primaryColor})`,
+          color: answerState === 'correct' 
+            ? `hsl(0 0% 100%)` 
+            : `hsl(${ds.primaryForeground})`,
+          // Always pill style for correct answer
+          borderRadius: answerState === 'correct' ? '9999px' : getButtonRadius(),
+          ...(answerState === 'correct' 
+            ? getRaisedButtonStyle(ds.successColor) 
+            : getRaisedButtonStyle(ds.primaryColor)),
         }}
       >
-        {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ПРОДОЛЖИТЬ'}
+        {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ДАЛЕЕ'}
       </button>
     </div>
   );
@@ -1246,7 +1255,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           {/* Hint button - only when idle and has more hints */}
           {hintButton}
           
-          {isInteractive && answerState !== 'idle' && (
+          {/* Show retry button only for incorrect/partial answers */}
+          {isInteractive && answerState !== 'idle' && answerState !== 'correct' && (
             <button
               type="button"
               onClick={resetState}
@@ -1281,13 +1291,19 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             )}
             disabled={isInteractive && answerState === 'idle' && !canCheck()}
             style={{
-              backgroundColor: `hsl(${ds.primaryColor})`,
-              color: `hsl(${ds.primaryForeground})`,
-              borderRadius: getButtonRadius(),
-              ...getRaisedButtonStyle(ds.primaryColor),
+              backgroundColor: answerState === 'correct' 
+                ? `hsl(${ds.successColor})` 
+                : `hsl(${ds.primaryColor})`,
+              color: answerState === 'correct' 
+                ? `hsl(0 0% 100%)` 
+                : `hsl(${ds.primaryForeground})`,
+              borderRadius: answerState === 'correct' ? '9999px' : getButtonRadius(),
+              ...(answerState === 'correct' 
+                ? getRaisedButtonStyle(ds.successColor) 
+                : getRaisedButtonStyle(ds.primaryColor)),
             }}
           >
-            {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ПРОДОЛЖИТЬ'}
+            {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ДАЛЕЕ'}
           </button>
         </div>
       </div>
@@ -1395,7 +1411,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             borderColor: `hsl(${ds.mutedColor} / 0.3)`,
           }}
         >
-          {isInteractive && answerState !== 'idle' && (
+          {/* Show retry button only for incorrect/partial answers */}
+          {isInteractive && answerState !== 'idle' && answerState !== 'correct' && (
             <button
               type="button"
               onClick={resetState}
@@ -1430,13 +1447,19 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             )}
             disabled={isInteractive && answerState === 'idle' && !canCheck()}
             style={{
-              backgroundColor: `hsl(${ds.primaryColor})`,
-              color: `hsl(${ds.primaryForeground})`,
-              borderRadius: getButtonRadius(),
-              ...getRaisedButtonStyle(ds.primaryColor),
+              backgroundColor: answerState === 'correct' 
+                ? `hsl(${ds.successColor})` 
+                : `hsl(${ds.primaryColor})`,
+              color: answerState === 'correct' 
+                ? `hsl(0 0% 100%)` 
+                : `hsl(${ds.primaryForeground})`,
+              borderRadius: answerState === 'correct' ? '9999px' : getButtonRadius(),
+              ...(answerState === 'correct' 
+                ? getRaisedButtonStyle(ds.successColor) 
+                : getRaisedButtonStyle(ds.primaryColor)),
             }}
           >
-            {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ПРОДОЛЖИТЬ'}
+            {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ДАЛЕЕ'}
           </button>
         </div>
       </div>

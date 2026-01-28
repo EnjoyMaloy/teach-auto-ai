@@ -877,13 +877,19 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
             }}
             className={cn("w-full h-12 font-bold uppercase tracking-wide", pressAnimationClass)}
             style={{
-              backgroundColor: `hsl(${ds.primaryColor})`,
-              color: `hsl(${ds.primaryForeground})`,
-              borderRadius: getButtonRadius(),
-              ...getRaisedButtonStyle(ds.primaryColor),
+              backgroundColor: answerState === 'correct' 
+                ? `hsl(${ds.successColor})` 
+                : `hsl(${ds.primaryColor})`,
+              color: answerState === 'correct' 
+                ? `hsl(0 0% 100%)` 
+                : `hsl(${ds.primaryForeground})`,
+              borderRadius: answerState === 'correct' ? '9999px' : getButtonRadius(),
+              ...(answerState === 'correct' 
+                ? getRaisedButtonStyle(ds.successColor) 
+                : getRaisedButtonStyle(ds.primaryColor)),
             }}
           >
-            ПРОДОЛЖИТЬ
+            ДАЛЕЕ
           </button>
         )}
       </div>
