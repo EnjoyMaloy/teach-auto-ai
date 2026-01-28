@@ -552,15 +552,21 @@ const SortableSubBlockItem: React.FC<{
         // Use the global subBlockIconMap for badge icons (includes all AI-supported icons)
         const badgeLucideIcons = subBlockIconMap;
 
+        const badgeIconSize = {
+          small: 'w-3.5 h-3.5',
+          medium: 'w-4 h-4',
+          large: 'w-5 h-5',
+        }[badgeSize];
+
         const renderBadgeIcon = (badge: typeof badges[0]) => {
           if (badge.iconType === 'none' || !badge.iconValue) return null;
           if (badge.iconType === 'emoji') return <span>{badge.iconValue}</span>;
           if (badge.iconType === 'lucide' && badge.iconValue) {
             const LucideIcon = badgeLucideIcons[badge.iconValue];
-            if (LucideIcon) return <LucideIcon className="w-3 h-3" />;
+            if (LucideIcon) return <LucideIcon className={badgeIconSize} />;
           }
           if (badge.iconType === 'custom' && badge.iconValue) {
-            return <img src={badge.iconValue} alt="" className="w-3 h-3 object-contain" />;
+            return <img src={badge.iconValue} alt="" className={`${badgeIconSize} object-contain`} />;
           }
           return null;
         };
