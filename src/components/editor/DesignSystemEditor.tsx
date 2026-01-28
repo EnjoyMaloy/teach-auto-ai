@@ -497,6 +497,16 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
         </div>
       )}
 
+      {/* Show hint when no theme is selected */}
+      {!selectedBaseSystemId && !isEditingRestricted && (
+        <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-sm">
+          <p className="font-medium">Тема не выбрана</p>
+          <p className="text-xs mt-1 text-blue-600">
+            Выберите готовую тему выше или создайте свою для настройки дизайна курса.
+          </p>
+        </div>
+      )}
+
       {/* Detailed Settings - view-only for non-admins with base system selected */}
       <div className={cn("space-y-4", isEditingRestricted && "opacity-60 [&_input]:pointer-events-none [&_input]:opacity-50 [&_button:not([data-radix-collection-item])]:pointer-events-none [&_button:not([data-radix-collection-item])]:opacity-50 [&_select]:pointer-events-none [&_textarea]:pointer-events-none [&_[role=slider]]:pointer-events-none [&_[role=switch]]:pointer-events-none [&_[type=color]]:pointer-events-none")}>
         <h3 className="font-semibold text-foreground">Детальные настройки</h3>
