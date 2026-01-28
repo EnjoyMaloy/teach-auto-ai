@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { 
   Plus, Trash2, GripVertical, 
-  Smile, ImageIcon, X,
+  ImageIcon, X,
   Star, Heart, CheckCircle, Zap, Target, Trophy, 
   Gift, Crown, Flame, Rocket, Lightbulb, ThumbsUp,
   LayoutList, LayoutGrid,
@@ -21,13 +21,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-
-// Common emojis for badges
-const EMOJI_OPTIONS = [
-  '✨', '🔥', '⭐', '💎', '🎯', '🚀', '💡', '🎉',
-  '✅', '❤️', '👍', '🏆', '🎁', '👑', '⚡', '🌟',
-  '📌', '🔔', '💬', '📚', '🎓', '💪', '🌈', '🔮',
-];
 
 // Lucide icons for badges (extended set for AI compatibility)
 const LUCIDE_ICON_OPTIONS = [
@@ -132,10 +125,6 @@ export const BadgeEditor: React.FC<BadgeEditorProps> = ({
   const renderIconPreview = (badge: BadgeItem) => {
     if (badge.iconType === 'none' || !badge.iconValue) {
       return null;
-    }
-
-    if (badge.iconType === 'emoji') {
-      return <span className="text-sm">{badge.iconValue}</span>;
     }
 
     if (badge.iconType === 'lucide') {
@@ -245,11 +234,10 @@ export const BadgeEditor: React.FC<BadgeEditorProps> = ({
                 </PopoverTrigger>
                 <PopoverContent className="w-64 p-3" align="start">
                   <div className="space-y-3">
-                    {/* Icon type tabs */}
+                    {/* Icon type tabs - emoji removed */}
                     <div className="flex gap-1">
                       {[
                         { type: 'none' as const, label: 'Без' },
-                        { type: 'emoji' as const, label: '😀' },
                         { type: 'lucide' as const, label: 'Иконки' },
                         { type: 'custom' as const, label: 'Своя' },
                       ].map(({ type, label }) => (
@@ -276,35 +264,11 @@ export const BadgeEditor: React.FC<BadgeEditorProps> = ({
                       ))}
                     </div>
 
-                    {/* Emoji grid */}
-                    {badge.iconType !== 'none' && (
-                      <div className="space-y-2">
-                        <p className="text-xs text-muted-foreground">Эмодзи</p>
-                        <div className="grid grid-cols-8 gap-1">
-                          {EMOJI_OPTIONS.map((emoji) => (
-                            <button
-                              key={emoji}
-                              onClick={() => {
-                                updateBadge(badge.id, { iconType: 'emoji', iconValue: emoji });
-                                setActiveIconPicker(null);
-                              }}
-                              className={cn(
-                                "w-7 h-7 rounded flex items-center justify-center text-base hover:bg-muted transition-colors",
-                                badge.iconType === 'emoji' && badge.iconValue === emoji && "bg-primary/20"
-                              )}
-                            >
-                              {emoji}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
                     {/* Lucide icons grid */}
-                    {badge.iconType !== 'none' && (
+                    {badge.iconType === 'lucide' && (
                       <div className="space-y-2">
                         <p className="text-xs text-muted-foreground">Иконки</p>
-                        <div className="grid grid-cols-6 gap-1">
+                        <div className="grid grid-cols-6 gap-1 max-h-48 overflow-y-auto">
                           {LUCIDE_ICON_OPTIONS.map(({ name, icon: Icon }) => (
                             <button
                               key={name}
@@ -314,7 +278,7 @@ export const BadgeEditor: React.FC<BadgeEditorProps> = ({
                               }}
                               className={cn(
                                 "w-7 h-7 rounded flex items-center justify-center hover:bg-muted transition-colors",
-                                badge.iconType === 'lucide' && badge.iconValue === name && "bg-primary/20"
+                                badge.iconValue === name && "bg-primary/20"
                               )}
                             >
                               <Icon className="w-4 h-4" />
@@ -325,7 +289,7 @@ export const BadgeEditor: React.FC<BadgeEditorProps> = ({
                     )}
 
                     {/* Custom upload */}
-                    {badge.iconType !== 'none' && (
+                    {badge.iconType === 'custom' && (
                       <div className="space-y-2">
                         <p className="text-xs text-muted-foreground">Своя иконка (макс 100KB)</p>
                         <label className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg border-2 border-dashed border-border hover:border-primary/50 cursor-pointer transition-colors">
