@@ -101,6 +101,12 @@ export interface CourseDesignSystem {
   borderRadius?: string;
   buttonStyle?: 'rounded' | 'pill' | 'square';
   buttonDepth?: 'flat' | 'raised';
+  // Background settings
+  backgroundPresetId?: string;
+  backgroundType?: 'solid' | 'gradient';
+  gradientFrom?: string;
+  gradientTo?: string;
+  gradientAngle?: number;
   sound?: {
     enabled: boolean;
     theme: 'duolingo' | 'minimal' | 'playful' | 'none';
