@@ -670,6 +670,28 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 </div>
               </div>
 
+              {/* Accent Color - moved here from Interactive */}
+              <div className="border-t pt-6 space-y-2">
+                <Label className="text-base font-semibold">Акцентный цвет</Label>
+                <p className="text-sm text-muted-foreground">
+                  Основной цвет для кнопок и интерактивных элементов
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <ColorInput
+                  label="Основной цвет"
+                  value={config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor}
+                  onChange={(v) => updateConfig({ primaryColor: v })}
+                  description="Цвет кнопок и акцентов"
+                />
+                <ColorInput
+                  label="Текст на основном"
+                  value={config.primaryForeground || DEFAULT_DESIGN_SYSTEM.primaryForeground}
+                  onChange={(v) => updateConfig({ primaryForeground: v })}
+                  description="Цвет текста на кнопках"
+                />
+              </div>
+
               {/* Button Backdrop */}
               <div className="border-t pt-6 space-y-2">
                 <Label className="text-base font-semibold">Подложка кнопки «Продолжить»</Label>
@@ -712,28 +734,6 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                   value={config.destructiveColor || DEFAULT_DESIGN_SYSTEM.destructiveColor}
                   onChange={(v) => updateConfig({ destructiveColor: v })}
                   description="Цвет при неверном ответе"
-                />
-              </div>
-
-              {/* Primary color for interactive elements */}
-              <div className="border-t pt-6 space-y-2">
-                <Label className="text-base font-semibold">Акцентный цвет</Label>
-                <p className="text-sm text-muted-foreground">
-                  Основной цвет для кнопок и интерактивных элементов
-                </p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <ColorInput
-                  label="Основной цвет"
-                  value={config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor}
-                  onChange={(v) => updateConfig({ primaryColor: v })}
-                  description="Цвет кнопок и акцентов"
-                />
-                <ColorInput
-                  label="Текст на основном"
-                  value={config.primaryForeground || DEFAULT_DESIGN_SYSTEM.primaryForeground}
-                  onChange={(v) => updateConfig({ primaryForeground: v })}
-                  description="Цвет текста на кнопках"
                 />
               </div>
 
