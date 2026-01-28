@@ -1050,7 +1050,10 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   );
 
   const contentArea = (
-    <div className="flex-1 min-h-0 overflow-auto relative z-0 flex flex-col justify-center">
+    <div 
+      className="flex-1 min-h-0 overflow-auto relative z-0 flex flex-col justify-center"
+      style={getBackgroundStyle(ds)}
+    >
       {renderContent()}
     </div>
   );
@@ -1221,13 +1224,15 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         ref={containerRef}
         className="h-full w-full flex flex-col"
         style={{ 
-          ...getBackgroundStyle(ds),
           fontFamily: ds.fontFamily,
         }}
       >
         {progressBar}
         {/* Content area - flex-1 to fill space, min-h-0 for scroll, centered */}
-        <div className="flex-1 min-h-0 overflow-auto flex flex-col justify-center items-center px-4 py-4">
+        <div 
+          className="flex-1 min-h-0 overflow-auto flex flex-col justify-center items-center px-4 py-4"
+          style={getBackgroundStyle(ds)}
+        >
           {renderContent()}
         </div>
         {hintDisplay}
@@ -1301,7 +1306,6 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       <div 
         className="relative h-full w-full overflow-hidden"
         style={{ 
-          ...getBackgroundStyle(ds),
           fontFamily: ds.fontFamily,
         }}
       >
@@ -1345,6 +1349,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           style={{ 
             top: `${HEADER_HEIGHT}px`,
             bottom: `${NAV_HEIGHT}px`,
+            ...getBackgroundStyle(ds),
           }}
         >
           {renderContent()}
@@ -1454,7 +1459,6 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       <div 
         className="flex flex-col overflow-hidden"
         style={{ 
-          ...getBackgroundStyle(ds),
           fontFamily: ds.fontFamily,
           // Fixed internal dimensions (mobile screen size)
           width: `${PREVIEW_BASE_WIDTH}px`,
