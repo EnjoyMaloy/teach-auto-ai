@@ -93,6 +93,12 @@ export interface DesignBlockSettings {
   
   // Continue button backdrop
   buttonBackdropColor?: string;      // Background behind continue button
+  
+  // Answer feedback notification colors
+  correctAnswerBgColor?: string;     // Background for correct answer notification
+  correctAnswerTextColor?: string;   // Text color for correct answer notification
+  incorrectAnswerBgColor?: string;   // Background for incorrect answer notification
+  incorrectAnswerTextColor?: string; // Text color for incorrect answer notification
 }
 
 // Mascot settings for AI-generated characters
@@ -159,6 +165,11 @@ export const DEFAULT_DESIGN_BLOCK_SETTINGS: Required<DesignBlockSettings> = {
   progressBackdropColor: '0 0% 0% / 0.05',   // Very subtle backdrop
   // Button backdrop
   buttonBackdropColor: '0 0% 100% / 0.9',    // White with slight transparency
+  // Answer feedback notifications
+  correctAnswerBgColor: '142 71% 45% / 0.15',   // Green tinted background
+  correctAnswerTextColor: '142 71% 30%',        // Dark green text
+  incorrectAnswerBgColor: '0 84% 60% / 0.15',   // Red tinted background
+  incorrectAnswerTextColor: '0 84% 35%',        // Dark red text
 };
 
 export type BackgroundType = 'solid' | 'gradient';

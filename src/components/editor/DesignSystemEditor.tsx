@@ -868,6 +868,65 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 />
               </div>
 
+              {/* Answer notification settings */}
+              <div className="border-t pt-6 space-y-2">
+                <Label className="text-base font-semibold">Уведомления о результате</Label>
+                <p className="text-sm text-muted-foreground">
+                  Цвета фона и текста уведомлений после ответа
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <ColorInput
+                  label="Фон правильного"
+                  value={config.designBlock?.correctAnswerBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.correctAnswerBgColor}
+                  onChange={(v) => updateConfig({ 
+                    designBlock: { 
+                      ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                      ...config.designBlock, 
+                      correctAnswerBgColor: v 
+                    } 
+                  })}
+                  description="Фон уведомления"
+                />
+                <ColorInput
+                  label="Текст правильного"
+                  value={config.designBlock?.correctAnswerTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.correctAnswerTextColor}
+                  onChange={(v) => updateConfig({ 
+                    designBlock: { 
+                      ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                      ...config.designBlock, 
+                      correctAnswerTextColor: v 
+                    } 
+                  })}
+                  description="Цвет текста"
+                />
+                <ColorInput
+                  label="Фон неправильного"
+                  value={config.designBlock?.incorrectAnswerBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.incorrectAnswerBgColor}
+                  onChange={(v) => updateConfig({ 
+                    designBlock: { 
+                      ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                      ...config.designBlock, 
+                      incorrectAnswerBgColor: v 
+                    } 
+                  })}
+                  description="Фон уведомления"
+                />
+                <ColorInput
+                  label="Текст неправильного"
+                  value={config.designBlock?.incorrectAnswerTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.incorrectAnswerTextColor}
+                  onChange={(v) => updateConfig({ 
+                    designBlock: { 
+                      ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                      ...config.designBlock, 
+                      incorrectAnswerTextColor: v 
+                    } 
+                  })}
+                  description="Цвет текста"
+                />
+              </div>
+
               {/* Hint settings */}
               <div className="border-t pt-6 space-y-2">
                 <Label className="text-base font-semibold">Подсказки</Label>
