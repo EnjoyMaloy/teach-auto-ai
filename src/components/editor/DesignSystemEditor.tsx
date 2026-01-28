@@ -5,15 +5,10 @@ import {
   DEFAULT_SOUND_SETTINGS,
   DEFAULT_DESIGN_BLOCK_SETTINGS,
   DEFAULT_MASCOT_SETTINGS,
-  BASE_THEMES,
-  ThemePreset,
   FONT_OPTIONS,
   BORDER_RADIUS_OPTIONS,
   SoundTheme,
   ButtonDepth,
-  BackgroundType,
-  BACKGROUND_PRESETS,
-  BackgroundPreset
 } from '@/types/designSystem';
 import { playSound, SOUND_THEME_OPTIONS } from '@/lib/sounds';
 import { BaseDesignSystemSelector } from './BaseDesignSystemSelector';
@@ -368,43 +363,14 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
       setActivePreset(config.themeId);
     }
   }, [config.themeId]);
-  // Hidden built-in themes (admin can hide them)
-  const [hiddenBuiltInThemes, setHiddenBuiltInThemes] = useState<string[]>(() => {
-    const saved = localStorage.getItem('hiddenBuiltInThemes');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  // Use only base themes (Google, Notion, Apple, Duolingo), filter out hidden ones
-  const allThemes = BASE_THEMES.filter(t => !hiddenBuiltInThemes.includes(t.id));
-
   const updateConfig = (updates: Partial<DesignSystemConfig>) => {
     // Keep themeId and don't reset activePreset - user is just customizing within the theme
     onChange({ ...config, ...updates });
-  };
-
-  const applyPreset = (presetId: string) => {
-    const preset = BASE_THEMES.find(p => p.id === presetId);
-    if (preset) {
-      onChange({ ...DEFAULT_DESIGN_SYSTEM, ...preset.config, themeId: presetId });
-      setActivePreset(presetId);
-    }
   };
   
   const resetToDefault = () => {
     onChange(DEFAULT_DESIGN_SYSTEM);
     setActivePreset(null);
-  };
-
-  // Hide built-in theme (admin only)
-  const handleBuiltInThemeDelete = (themeId: string) => {
-    const updated = [...hiddenBuiltInThemes, themeId];
-    setHiddenBuiltInThemes(updated);
-    localStorage.setItem('hiddenBuiltInThemes', JSON.stringify(updated));
-    
-    // If this theme was active, reset
-    if (activePreset === themeId || config.themeId === themeId) {
-      resetToDefault();
-    }
   };
 
   // Handler for base system selection
@@ -431,19 +397,12 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
           <p className="text-xs text-muted-foreground mt-0.5">Быстрый старт с готовым дизайном</p>
         </div>
 
-        {/* Base design systems from database + built-in presets */}
+        {/* Base design systems from database */}
         <BaseDesignSystemSelector
           selectedId={selectedBaseSystemId || null}
           onSelect={handleBaseSystemSelect}
           isAdmin={isAdmin}
           currentConfig={config}
-          builtInThemes={allThemes}
-          activePresetId={activePreset || config.themeId}
-          onPresetSelect={(presetId) => {
-            applyPreset(presetId);
-            onBaseSystemSelect?.(null);
-          }}
-          onBuiltInThemeDelete={isAdmin ? handleBuiltInThemeDelete : undefined}
         />
       </div>
 
