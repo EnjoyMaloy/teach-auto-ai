@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { ChevronRight, ArrowLeft } from 'lucide-react';
+import { ChevronRight, ArrowLeft, Shield, User } from 'lucide-react';
 import { DesignSystemConfig } from '@/types/designSystem';
 import { DesignSystemEditor } from './DesignSystemEditor';
 import { DesignPreviewBlocks } from './DesignPreviewBlocks';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 interface FullscreenDesignEditorProps {
   config: DesignSystemConfig;
@@ -20,11 +23,17 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
   config,
   onChange,
   onClose,
-  isAdmin,
+  isAdmin: realIsAdmin,
   courseTitle,
   selectedBaseSystemId,
   onBaseSystemSelect,
 }) => {
+  // Test mode toggle - allows switching between admin and regular user view
+  const [isTestModeAdmin, setIsTestModeAdmin] = useState(realIsAdmin);
+
+  // Use test mode value for display, but only if real user is admin
+  const effectiveIsAdmin = realIsAdmin ? isTestModeAdmin : false;
+
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col">
       {/* Header with breadcrumbs */}
@@ -55,6 +64,29 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
             Дизайн-система
           </span>
         </nav>
+
+        {/* Role toggle for testing (only visible to real admins) */}
+        {realIsAdmin && (
+          <div className="flex items-center gap-3 px-3 py-1.5 rounded-lg bg-muted/50 border border-border">
+            <div className="flex items-center gap-2">
+              <User className={cn("w-4 h-4", !isTestModeAdmin && "text-blue-500")} />
+              <span className={cn("text-xs font-medium", !isTestModeAdmin && "text-blue-600")}>
+                Юзер
+              </span>
+            </div>
+            <Switch
+              checked={isTestModeAdmin}
+              onCheckedChange={setIsTestModeAdmin}
+              className="data-[state=checked]:bg-pink-500"
+            />
+            <div className="flex items-center gap-2">
+              <Shield className={cn("w-4 h-4", isTestModeAdmin && "text-pink-500")} />
+              <span className={cn("text-xs font-medium", isTestModeAdmin && "text-pink-600")}>
+                Админ
+              </span>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Main content */}
@@ -70,7 +102,7 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
               <DesignSystemEditor
                 config={config}
                 onChange={onChange}
-                isAdmin={isAdmin}
+                isAdmin={effectiveIsAdmin}
                 selectedBaseSystemId={selectedBaseSystemId}
                 onBaseSystemSelect={onBaseSystemSelect}
               />
