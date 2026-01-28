@@ -144,15 +144,15 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
     );
   };
 
-  // Alignment selector with optional justify option
-  const renderAlignmentSelector = (includeJustify = true) => (
+  // Alignment selector with optional justify and right options
+  const renderAlignmentSelector = (includeJustify = true, includeRight = true) => (
     <div className="space-y-2">
       <Label className="text-xs text-muted-foreground">Выравнивание</Label>
       <div className="flex gap-1">
         {[
           { value: 'left', icon: AlignLeft, label: 'Слева' },
           { value: 'center', icon: AlignCenter, label: 'По центру' },
-          { value: 'right', icon: AlignRight, label: 'Справа' },
+          ...(includeRight ? [{ value: 'right', icon: AlignRight, label: 'Справа' }] : []),
           ...(includeJustify ? [{ value: 'justify', icon: AlignJustify, label: 'По ширине' }] : []),
         ].map(({ value, icon: Icon, label }) => (
           <button
@@ -553,7 +553,7 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
         {/* Badge settings */}
         {subBlock.type === 'badge' && (
           <>
-            {renderAlignmentSelector(false)}
+            {renderAlignmentSelector(false, false)}
             {renderBadgeSizeSelector()}
             {renderBadgeVariantSelector()}
             
