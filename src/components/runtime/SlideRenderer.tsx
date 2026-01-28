@@ -746,10 +746,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
     if (answerState === 'idle') return null;
 
     const bgColor = answerState === 'correct' 
-      ? `hsl(${ds.successColor} / 0.1)`
+      ? `hsl(${ds.successColor} / 0.15)`
       : answerState === 'partial'
-        ? `hsl(142 71% 45% / 0.1)`
-        : `hsl(${ds.destructiveColor} / 0.1)`;
+        ? `hsl(142 71% 45% / 0.15)`
+        : `hsl(${ds.destructiveColor} / 0.15)`;
     
     const textColor = answerState === 'correct'
       ? `hsl(${ds.successColor})`

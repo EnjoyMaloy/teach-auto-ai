@@ -408,11 +408,15 @@ export const SlideView: React.FC<SlideViewProps> = ({
           style={{
             bottom: `${NAV_HEIGHT}px`,
             backgroundColor: answerState === 'correct' 
+              ? `hsl(${ds.successColor} / 0.15)` 
+              : answerState === 'partial'
+                ? `hsl(45 93% 47% / 0.15)`
+                : `hsl(${ds.destructiveColor} / 0.15)`,
+            color: answerState === 'correct' 
               ? `hsl(${ds.successColor})` 
               : answerState === 'partial'
                 ? `hsl(45 93% 47%)`
                 : `hsl(${ds.destructiveColor})`,
-            color: `hsl(0 0% 100%)`,
           }}
         >
           <div className="flex items-center justify-center gap-2">

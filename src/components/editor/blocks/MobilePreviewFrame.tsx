@@ -1063,10 +1063,10 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       className="px-4 py-3 text-center text-sm font-medium shrink-0"
       style={{
         backgroundColor: answerState === 'correct' 
-          ? `hsl(${ds.successColor} / 0.1)` 
+          ? `hsl(${ds.successColor} / 0.15)` 
           : answerState === 'partial'
-            ? `hsl(45 93% 47% / 0.1)` // Warning yellow
-            : `hsl(${ds.destructiveColor} / 0.1)`,
+            ? `hsl(45 93% 47% / 0.15)` // Warning yellow
+            : `hsl(${ds.destructiveColor} / 0.15)`,
         color: answerState === 'correct' 
           ? `hsl(${ds.successColor})` 
           : answerState === 'partial'
