@@ -301,25 +301,7 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
     }
   };
 
-  // Resolve animation keyword to Lottie URL
-  const resolveAnimationUrl = async (keyword: string): Promise<string | null> => {
-    try {
-      const response = await supabase.functions.invoke('lottiefiles-search', {
-        body: { query: keyword, limit: 1 },
-      });
-
-      if (response.error || !response.data?.success) {
-        console.error('Animation search error:', response.error);
-        return null;
-      }
-
-      const animations = response.data.data || [];
-      return animations[0]?.lottieUrl || null;
-    } catch (err) {
-      console.error('Animation resolution failed:', err);
-      return null;
-    }
-  };
+  // Animation auto-selection removed - users can add animations manually via LottieFiles search
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
@@ -327,12 +309,11 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
     setIsGenerating(true);
     setError(null);
     
-    // Initialize steps - new 5-step pipeline
+    // Initialize steps - 4-step pipeline (animations removed)
     const initialSteps: GenerationStep[] = [
       { id: 'research', label: 'Исследование темы', status: 'pending' },
       { id: 'structure', label: 'Планирование структуры', status: 'pending' },
       { id: 'content', label: 'Генерация контента', status: 'pending' },
-      { id: 'animations', label: 'Загрузка анимаций', status: 'pending' },
       { id: 'images', label: 'Создание иллюстраций', status: 'pending' },
     ];
     setSteps(initialSteps);
@@ -438,65 +419,7 @@ ${JSON.stringify(researchData, null, 2)}
         throw new Error('Курс не содержит уроков');
       }
 
-      // Step 4: Resolve animation keywords to Lottie URLs
-      updateStep('animations', { status: 'active', message: 'Загружаю анимации...' });
-      
-      try {
-        // Find all animation subBlocks with animationKeyword
-        const animationsToResolve: { lessonIdx: number; slideIdx: number; subBlockIdx: number; keyword: string }[] = [];
-        
-        courseData.lessons.forEach((lesson, lessonIdx) => {
-          lesson.slides.forEach((slide, slideIdx) => {
-            if (slide.type === 'design' && slide.subBlocks) {
-              slide.subBlocks.forEach((sb: any, sbIdx: number) => {
-                if (sb.type === 'animation' && sb.animationKeyword && !sb.animationUrl) {
-                  animationsToResolve.push({
-                    lessonIdx,
-                    slideIdx,
-                    subBlockIdx: sbIdx,
-                    keyword: sb.animationKeyword
-                  });
-                }
-              });
-            }
-          });
-        });
-
-        console.log(`Found ${animationsToResolve.length} animations to resolve`);
-        
-        if (animationsToResolve.length === 0) {
-          updateStep('animations', { status: 'completed', message: 'Анимации не требуются' });
-        } else {
-          let resolved = 0;
-          // Resolve in batches of 3
-          for (let i = 0; i < animationsToResolve.length; i += 3) {
-            const batch = animationsToResolve.slice(i, i + 3);
-            
-            await Promise.all(batch.map(async ({ lessonIdx, slideIdx, subBlockIdx, keyword }) => {
-              try {
-                const url = await resolveAnimationUrl(keyword);
-                if (url && courseData.lessons[lessonIdx]?.slides[slideIdx]?.subBlocks?.[subBlockIdx]) {
-                  (courseData.lessons[lessonIdx].slides[slideIdx].subBlocks as any)[subBlockIdx].animationUrl = url;
-                  resolved++;
-                  updateStep('animations', { message: `Загружено ${resolved} из ${animationsToResolve.length}...` });
-                }
-              } catch (err) {
-                console.error('Animation resolve error:', err);
-              }
-            }));
-            
-            // Small delay between batches
-            if (i + 3 < animationsToResolve.length) {
-              await new Promise(resolve => setTimeout(resolve, 300));
-            }
-          }
-          
-          updateStep('animations', { status: 'completed', message: `${resolved} анимаций загружено` });
-        }
-      } catch (animError) {
-        console.error('Animation step error:', animError);
-        updateStep('animations', { status: 'completed', message: 'Пропущено (ошибка)' });
-      }
+      // Step 4: Images (animations step removed - users can add manually)
 
       // Step 5: Generate images for all image_text slides (max 8) - or skip if user chose fast mode
       if (skipImages) {
