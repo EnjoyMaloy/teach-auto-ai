@@ -381,7 +381,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   const applyPreset = (presetId: string) => {
     const preset = allThemes.find(p => p.id === presetId);
     if (preset) {
-      onChange({ ...DEFAULT_DESIGN_SYSTEM, ...preset.config });
+      onChange({ ...DEFAULT_DESIGN_SYSTEM, ...preset.config, themeId: presetId });
       setActivePreset(presetId);
     }
   };
@@ -417,8 +417,9 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   };
 
   // Custom background functions
-  // Get theme-specific presets or default ones
-  const activeTheme = allThemes.find(t => t.id === activePreset);
+  // Get theme-specific presets using themeId from config (persisted) or activePreset (local state)
+  const currentThemeId = config.themeId || activePreset;
+  const activeTheme = allThemes.find(t => t.id === currentThemeId);
   const themeBackgroundPresets = activeTheme?.backgroundPresets || BACKGROUND_PRESETS;
   const allBackgrounds = [...themeBackgroundPresets, ...customBackgrounds];
 
