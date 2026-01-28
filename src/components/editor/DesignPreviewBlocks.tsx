@@ -9,12 +9,49 @@ import { SubBlock } from '@/types/designBlock';
 const createSampleSlides = (): Slide[] => {
   const now = new Date();
   return [
+    // Design block intro
+    {
+      id: 'sample-design-intro',
+      lessonId: 'sample',
+      type: 'design',
+      order: 1,
+      content: '',
+      subBlocks: [
+        {
+          id: 'sub-badge',
+          type: 'badge',
+          order: 1,
+          badges: [{ id: '1', text: '🎨 Превью', iconType: 'none' }],
+          badgeVariant: 'oval',
+          textAlign: 'center',
+        } as SubBlock,
+        {
+          id: 'sub-heading',
+          type: 'heading',
+          order: 2,
+          content: 'Дизайн-система',
+          textSize: 'xlarge',
+          fontWeight: 'bold',
+          textAlign: 'center',
+        } as SubBlock,
+        {
+          id: 'sub-text',
+          type: 'text',
+          order: 3,
+          content: 'Так будет выглядеть ваш курс для учеников',
+          textSize: 'medium',
+          textAlign: 'center',
+        } as SubBlock,
+      ],
+      createdAt: now,
+      updatedAt: now,
+    },
     // Heading
     {
       id: 'sample-heading',
       lessonId: 'sample',
       type: 'heading',
-      order: 1,
+      order: 2,
       content: 'Заголовок урока',
       createdAt: now,
       updatedAt: now,
@@ -24,7 +61,7 @@ const createSampleSlides = (): Slide[] => {
       id: 'sample-text',
       lessonId: 'sample',
       type: 'text',
-      order: 2,
+      order: 3,
       content: 'Это пример текстового блока. Здесь может быть подробное описание материала урока с форматированием и акцентами.',
       createdAt: now,
       updatedAt: now,
@@ -34,7 +71,7 @@ const createSampleSlides = (): Slide[] => {
       id: 'sample-image-text',
       lessonId: 'sample',
       type: 'image_text',
-      order: 3,
+      order: 4,
       content: 'Подпись к изображению — краткое описание иллюстрации.',
       imageUrl: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80',
       createdAt: now,
@@ -45,16 +82,16 @@ const createSampleSlides = (): Slide[] => {
       id: 'sample-single-choice',
       lessonId: 'sample',
       type: 'single_choice',
-      order: 4,
-      content: 'Какой язык программирования самый популярный в 2024 году?',
+      order: 5,
+      content: 'Какой язык программирования самый популярный?',
       options: [
         { id: 'opt1', text: 'JavaScript', isCorrect: true },
         { id: 'opt2', text: 'Python', isCorrect: false },
         { id: 'opt3', text: 'Java', isCorrect: false },
         { id: 'opt4', text: 'C++', isCorrect: false },
       ],
-      explanation: 'JavaScript остаётся самым используемым языком для веб-разработки.',
-      explanationCorrect: 'Верно! JavaScript лидирует по популярности.',
+      explanation: 'JavaScript остаётся самым используемым языком.',
+      explanationCorrect: 'Верно! JavaScript лидирует.',
       createdAt: now,
       updatedAt: now,
     },
@@ -63,7 +100,7 @@ const createSampleSlides = (): Slide[] => {
       id: 'sample-multiple-choice',
       lessonId: 'sample',
       type: 'multiple_choice',
-      order: 5,
+      order: 6,
       content: 'Выберите все фреймворки JavaScript:',
       options: [
         { id: 'opt1', text: 'React', isCorrect: true },
@@ -71,8 +108,6 @@ const createSampleSlides = (): Slide[] => {
         { id: 'opt3', text: 'Django', isCorrect: false },
         { id: 'opt4', text: 'Angular', isCorrect: true },
       ],
-      explanation: 'Django — это Python фреймворк.',
-      explanationCorrect: 'Отлично! React, Vue и Angular — JS фреймворки.',
       createdAt: now,
       updatedAt: now,
     },
@@ -81,11 +116,9 @@ const createSampleSlides = (): Slide[] => {
       id: 'sample-true-false',
       lessonId: 'sample',
       type: 'true_false',
-      order: 6,
+      order: 7,
       content: 'TypeScript компилируется в JavaScript.',
       correctAnswer: true,
-      explanation: 'TypeScript транспилируется в JavaScript для выполнения в браузере.',
-      explanationCorrect: 'Правильно! TypeScript — надмножество JavaScript.',
       createdAt: now,
       updatedAt: now,
     },
@@ -94,11 +127,9 @@ const createSampleSlides = (): Slide[] => {
       id: 'sample-fill-blank',
       lessonId: 'sample',
       type: 'fill_blank',
-      order: 7,
-      content: 'React использует виртуальный ___ для оптимизации обновлений.',
+      order: 8,
+      content: 'React использует виртуальный ___ для оптимизации.',
       blankWord: 'DOM',
-      explanation: 'Virtual DOM — ключевая концепция React.',
-      explanationCorrect: 'Верно! Виртуальный DOM ускоряет рендеринг.',
       createdAt: now,
       updatedAt: now,
     },
@@ -107,12 +138,12 @@ const createSampleSlides = (): Slide[] => {
       id: 'sample-matching',
       lessonId: 'sample',
       type: 'matching',
-      order: 8,
+      order: 9,
       content: 'Соедините технологии с их назначением:',
       matchingPairs: [
         { id: 'pair1', left: 'HTML', right: 'Структура' },
         { id: 'pair2', left: 'CSS', right: 'Стилизация' },
-        { id: 'pair3', left: 'JavaScript', right: 'Интерактивность' },
+        { id: 'pair3', left: 'JS', right: 'Интерактивность' },
       ],
       createdAt: now,
       updatedAt: now,
@@ -122,8 +153,8 @@ const createSampleSlides = (): Slide[] => {
       id: 'sample-ordering',
       lessonId: 'sample',
       type: 'ordering',
-      order: 9,
-      content: 'Расположите этапы разработки в правильном порядке:',
+      order: 10,
+      content: 'Расположите этапы в правильном порядке:',
       orderingItems: ['Тестирование', 'Дизайн', 'Разработка', 'Анализ'],
       correctOrder: ['Анализ', 'Дизайн', 'Разработка', 'Тестирование'],
       createdAt: now,
@@ -134,43 +165,12 @@ const createSampleSlides = (): Slide[] => {
       id: 'sample-slider',
       lessonId: 'sample',
       type: 'slider',
-      order: 10,
-      content: 'Сколько процентов кода должно покрываться тестами?',
+      order: 11,
+      content: 'Сколько % кода должно покрываться тестами?',
       sliderMin: 0,
       sliderMax: 100,
       sliderCorrect: 80,
       sliderStep: 5,
-      explanation: 'Рекомендуется покрытие не менее 80%.',
-      explanationCorrect: 'Отлично! 80% — хороший показатель.',
-      createdAt: now,
-      updatedAt: now,
-    },
-    // Design block
-    {
-      id: 'sample-design',
-      lessonId: 'sample',
-      type: 'design',
-      order: 11,
-      content: '',
-      subBlocks: [
-        {
-          id: 'sub1',
-          type: 'heading',
-          order: 1,
-          content: 'Дизайн-блок',
-          textSize: 'xlarge',
-          fontWeight: 'bold',
-          textAlign: 'center',
-        } as SubBlock,
-        {
-          id: 'sub2',
-          type: 'text',
-          order: 2,
-          content: 'Составной блок с несколькими элементами для создания красивых слайдов.',
-          textSize: 'medium',
-          textAlign: 'center',
-        } as SubBlock,
-      ],
       createdAt: now,
       updatedAt: now,
     },
@@ -184,80 +184,83 @@ interface DesignPreviewBlocksProps {
 export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config }) => {
   const sampleSlides = createSampleSlides();
 
+  // Compute background style
+  const bgStyle = config.backgroundType === 'gradient'
+    ? `linear-gradient(${config.gradientAngle || 135}deg, hsl(${config.gradientFrom}), hsl(${config.gradientTo}))`
+    : `hsl(${config.backgroundColor})`;
+
   return (
-    <DesignSystemProvider config={config}>
-      <div className="h-full flex flex-col">
-        <div className="flex-1 overflow-y-auto">
-          <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 p-4">
+    <div className="h-full flex items-start justify-center p-6 overflow-y-auto">
+      {/* Phone frame container */}
+      <div 
+        className="w-[390px] min-h-[844px] rounded-[2.5rem] border-[8px] border-foreground/10 shadow-2xl overflow-hidden flex flex-col"
+        style={{ background: bgStyle }}
+      >
+        {/* Status bar */}
+        <div className="h-12 flex items-center justify-center flex-shrink-0">
+          <div className="w-24 h-6 bg-foreground/10 rounded-full" />
+        </div>
+
+        {/* Progress bar */}
+        <div className="px-4 pb-2 flex-shrink-0">
+          <div className="h-2 bg-muted/50 rounded-full overflow-hidden">
+            <div 
+              className="h-full rounded-full transition-all"
+              style={{ 
+                width: '100%',
+                backgroundColor: `hsl(${config.primaryColor})`,
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Content area - all slides stacked */}
+        <DesignSystemProvider config={config}>
+          <div className="flex-1 overflow-y-auto">
             {sampleSlides.map((slide, index) => (
               <div 
                 key={slide.id}
-                className="relative bg-card rounded-2xl border border-border overflow-hidden shadow-sm"
+                className="border-b border-border/20 last:border-b-0"
               >
-                {/* Block type label */}
-                <div className="absolute top-2 left-2 z-10 px-2 py-1 rounded-lg bg-background/80 backdrop-blur-sm text-xs font-medium text-muted-foreground">
-                  {slide.type.replace('_', ' ')}
+                {/* Block type indicator */}
+                <div className="px-4 pt-3 pb-1">
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground/60 font-medium">
+                    {slide.type.replace('_', ' ')}
+                  </span>
                 </div>
                 
-                {/* Phone frame preview */}
-                <div 
-                  className="aspect-[9/16] overflow-hidden"
-                  style={{
-                    background: config.backgroundType === 'gradient'
-                      ? `linear-gradient(${config.gradientAngle || 135}deg, hsl(${config.gradientFrom}), hsl(${config.gradientTo}))`
-                      : `hsl(${config.backgroundColor})`,
-                  }}
-                >
-                  <div className="h-full flex flex-col">
-                    {/* Status bar mock */}
-                    <div className="h-6 flex items-center justify-center">
-                      <div className="w-16 h-1 bg-foreground/20 rounded-full" />
-                    </div>
-                    
-                    {/* Progress bar mock */}
-                    <div className="px-4 py-2">
-                      <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full rounded-full transition-all"
-                          style={{ 
-                            width: `${((index + 1) / sampleSlides.length) * 100}%`,
-                            backgroundColor: `hsl(${config.primaryColor})`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                    
-                    {/* Content */}
-                    <div className="flex-1 overflow-hidden pointer-events-none">
-                      <SlideRenderer
-                        slide={slide}
-                        designSystem={config}
-                      />
-                    </div>
-                    
-                    {/* Bottom button mock */}
-                    <div className="p-4 pb-6">
-                      <div 
-                        className="w-full py-3 rounded-xl text-center text-sm font-medium"
-                        style={{
-                          backgroundColor: `hsl(${config.primaryColor})`,
-                          color: `hsl(${config.primaryForeground})`,
-                          borderRadius: config.buttonStyle === 'pill' ? '9999px' : config.buttonStyle === 'square' ? '0' : config.borderRadius,
-                          boxShadow: config.buttonDepth === 'raised' 
-                            ? `0 4px 0 0 hsl(${config.primaryColor} / 0.4)` 
-                            : 'none',
-                        }}
-                      >
-                        Продолжить
-                      </div>
-                    </div>
-                  </div>
+                {/* Slide content */}
+                <div className="pointer-events-none">
+                  <SlideRenderer
+                    slide={slide}
+                    designSystem={config}
+                  />
                 </div>
               </div>
             ))}
+            
+            {/* Bottom spacing */}
+            <div className="h-24" />
+          </div>
+        </DesignSystemProvider>
+
+        {/* Bottom button - fixed at bottom */}
+        <div className="p-4 pb-8 flex-shrink-0" style={{ background: bgStyle }}>
+          <div 
+            className="w-full py-4 text-center font-semibold"
+            style={{
+              backgroundColor: `hsl(${config.primaryColor})`,
+              color: `hsl(${config.primaryForeground})`,
+              borderRadius: config.buttonStyle === 'pill' ? '9999px' : config.buttonStyle === 'square' ? '0' : config.borderRadius,
+              boxShadow: config.buttonDepth === 'raised' 
+                ? `0 4px 0 0 hsl(${config.primaryColor} / 0.4)` 
+                : 'none',
+            }}
+          >
+            Продолжить
           </div>
         </div>
       </div>
-    </DesignSystemProvider>
+    </div>
   );
 };
