@@ -1,7 +1,8 @@
 // Core entities for the course platform
 import { SubBlock } from './designBlock';
-import { MascotSettings } from './designSystem';
-export type SlideType = 
+import { MascotSettings, SoundTheme } from './designSystem';
+
+export type SlideType =
   | 'text' 
   | 'heading'
   | 'video'
@@ -122,7 +123,7 @@ export interface CourseDesignSystem {
   gradientAngle?: number;
   sound?: {
     enabled: boolean;
-    theme: 'duolingo' | 'minimal' | 'playful' | 'none';
+    theme: SoundTheme;
     volume: number;
   };
   designBlock?: {
