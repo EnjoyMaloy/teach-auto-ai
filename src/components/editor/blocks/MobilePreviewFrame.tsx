@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { AudioPlayer } from './AudioPlayer';
 import { DesignBlockEditor } from './DesignBlockEditor';
 import { playSound, SoundConfig } from '@/lib/sounds';
-import { DEFAULT_SOUND_SETTINGS, DEFAULT_DESIGN_BLOCK_SETTINGS } from '@/types/designSystem';
+import { DEFAULT_SOUND_SETTINGS, DEFAULT_DESIGN_BLOCK_SETTINGS, BackgroundPreset } from '@/types/designSystem';
 import { RiveMascot } from '@/components/runtime/RiveMascot';
 
 // Fixed preview dimensions (simulating a mobile screen at 100% browser zoom)
@@ -108,7 +108,25 @@ const getBackgroundStyle = (ds: {
   gradientFrom?: string; 
   gradientTo?: string; 
   gradientAngle?: number;
+  themeBackgrounds?: BackgroundPreset[];
+  defaultBackgroundId?: string;
 }): React.CSSProperties => {
+  // First check if we have themeBackgrounds and a defaultBackgroundId
+  if (ds.themeBackgrounds && ds.themeBackgrounds.length > 0 && ds.defaultBackgroundId) {
+    const preset = ds.themeBackgrounds.find(bg => bg.id === ds.defaultBackgroundId);
+    if (preset) {
+      if (preset.type === 'gradient' && preset.from && preset.to) {
+        return {
+          background: `linear-gradient(${preset.angle || 135}deg, hsl(${preset.from}), hsl(${preset.to}))`,
+        };
+      }
+      if (preset.type === 'solid' && preset.color) {
+        return { backgroundColor: `hsl(${preset.color})` };
+      }
+    }
+  }
+  
+  // Fallback to legacy fields
   if (ds.backgroundType === 'gradient' && ds.gradientFrom && ds.gradientTo) {
     return {
       background: `linear-gradient(${ds.gradientAngle || 135}deg, hsl(${ds.gradientFrom}), hsl(${ds.gradientTo}))`,
