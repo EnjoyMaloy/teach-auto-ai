@@ -431,6 +431,9 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
             sound: course.designSystem?.sound,
             designBlock: course.designSystem?.designBlock,
             mascot: course.designSystem?.mascot,
+            themeBackgrounds: course.designSystem?.themeBackgrounds || [],
+            defaultBackgroundId: course.designSystem?.defaultBackgroundId,
+            themeId: course.designSystem?.themeId,
           }}
           onChange={onUpdateDesignSystem}
           onClose={() => setShowDesignSystem(false)}
