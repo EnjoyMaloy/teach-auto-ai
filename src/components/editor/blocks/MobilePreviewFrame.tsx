@@ -86,14 +86,19 @@ const DEFAULT_DS = {
   mutedColor: '240 5% 96%',
   successColor: '142 71% 45%',
   destructiveColor: '0 84% 60%',
-  fontFamily: 'Inter, system-ui, sans-serif',
-  headingFontFamily: 'Inter, system-ui, sans-serif',
+  fontFamily: '"Inter", sans-serif',
+  headingFontFamily: '"Inter", sans-serif',
   borderRadius: '0.75rem',
   buttonStyle: 'rounded' as const,
   backgroundType: 'solid' as 'solid' | 'gradient',
   gradientFrom: '262 83% 95%',
   gradientTo: '200 83% 95%',
   gradientAngle: 135,
+  // Hint colors
+  hintBackgroundColor: '240 5% 96%',
+  hintBorderColor: '240 5% 90%',
+  hintTextColor: '240 10% 30%',
+  hintIconColor: '262 83% 58%',
 };
 
 // Calculate background style based on design system
@@ -172,12 +177,16 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     }
   }, [JSON.stringify(block?.matchingPairs)]);
 
+  // Hint state
+  const [shownHintIndex, setShownHintIndex] = useState(-1);
+
   const resetState = () => {
     setSelectedOptions([]);
     setTrueFalseAnswer(null);
     setSliderValue(block?.sliderMin || 0);
     setFillBlankInput('');
     setAnswerState('idle');
+    setShownHintIndex(-1);
     setMatchingSelected({ left: null, pairs: {} });
     // Shuffle right options for matching
     if (block?.matchingPairs) {
@@ -1077,6 +1086,58 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     </div>
   );
 
+  // Hint display and button
+  const hasHints = block?.hints && block.hints.length > 0;
+  const currentHint = hasHints && shownHintIndex >= 0 ? block.hints[shownHintIndex] : null;
+  const canShowNextHint = hasHints && shownHintIndex < (block?.hints?.length || 0) - 1;
+  
+  const hintDisplay = hasHints && shownHintIndex >= 0 && (
+    <div 
+      className="mx-4 mb-2 p-3 rounded-lg border-2 shrink-0"
+      style={{
+        backgroundColor: `hsl(${ds.hintBackgroundColor})`,
+        borderColor: `hsl(${ds.hintBorderColor})`,
+      }}
+    >
+      <div className="flex items-start gap-2">
+        <AlertCircle 
+          className="w-4 h-4 mt-0.5 shrink-0" 
+          style={{ color: `hsl(${ds.hintIconColor})` }} 
+        />
+        <p 
+          className="text-sm"
+          style={{ color: `hsl(${ds.hintTextColor})` }}
+        >
+          {currentHint?.text}
+        </p>
+      </div>
+      {shownHintIndex < (block?.hints?.length || 0) - 1 && (
+        <p 
+          className="text-xs mt-1 opacity-60"
+          style={{ color: `hsl(${ds.hintTextColor})` }}
+        >
+          Подсказка {shownHintIndex + 1} из {block?.hints?.length}
+        </p>
+      )}
+    </div>
+  );
+
+  const hintButton = hasHints && answerState === 'idle' && canShowNextHint && (
+    <button
+      type="button"
+      onClick={() => setShownHintIndex(prev => prev + 1)}
+      className="h-10 px-3 flex items-center gap-2 border-2 text-sm font-medium rounded-lg"
+      style={{
+        backgroundColor: `hsl(${ds.hintBackgroundColor})`,
+        borderColor: `hsl(${ds.hintBorderColor})`,
+        color: `hsl(${ds.hintTextColor})`,
+      }}
+    >
+      <AlertCircle className="w-4 h-4" style={{ color: `hsl(${ds.hintIconColor})` }} />
+      Подсказка
+    </button>
+  );
+
   const bottomNavigation = (
     <div 
       className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0 relative z-10"
@@ -1085,6 +1146,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         borderColor: `hsl(${ds.mutedColor})`,
       }}
     >
+      {/* Hint button - only when idle and has more hints */}
+      {hintButton}
+      
       {isInteractive && answerState !== 'idle' && (
         <button
           type="button"
@@ -1148,6 +1212,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         <div className="flex-1 min-h-0 overflow-auto flex flex-col justify-center items-center px-4 py-4">
           {renderContent()}
         </div>
+        {hintDisplay}
         {resultFeedback}
         {/* Bottom navigation - shrink-0 to stay fixed at bottom */}
         <div 
@@ -1157,6 +1222,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             borderColor: `hsl(${ds.mutedColor})`,
           }}
         >
+          {/* Hint button - only when idle and has more hints */}
+          {hintButton}
+          
           {isInteractive && answerState !== 'idle' && (
             <button
               type="button"
@@ -1379,6 +1447,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       >
         {progressBar}
         {contentArea}
+        {hintDisplay}
         {resultFeedback}
         {bottomNavigation}
       </div>

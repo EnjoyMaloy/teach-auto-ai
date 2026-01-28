@@ -260,7 +260,7 @@ const createSampleSlides = (): Slide[] => {
       createdAt: now,
       updatedAt: now,
     },
-    // Single choice
+    // Single choice with hints
     {
       id: 'sample-single-choice',
       lessonId: 'sample',
@@ -272,6 +272,10 @@ const createSampleSlides = (): Slide[] => {
         { id: 'opt2', text: '<link>', isCorrect: false },
         { id: 'opt3', text: '<href>', isCorrect: false },
         { id: 'opt4', text: '<url>', isCorrect: false },
+      ],
+      hints: [
+        { id: 'h1', text: 'Подсказка: этот тег происходит от слова "anchor"', order: 1 },
+        { id: 'h2', text: 'Вторая подсказка: тег начинается с буквы "a"', order: 2 },
       ],
       explanation: 'Тег <a> (anchor) создаёт гиперссылку на другую страницу.',
       explanationCorrect: 'Верно! Тег <a> используется для ссылок.',

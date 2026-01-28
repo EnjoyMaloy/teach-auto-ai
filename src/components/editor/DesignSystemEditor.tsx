@@ -749,7 +749,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 />
               </div>
 
-              {/* Hint backdrop (future: quiz-specific settings) */}
+              {/* Hint settings */}
               <div className="border-t pt-6 space-y-2">
                 <Label className="text-base font-semibold">Подсказки</Label>
                 <p className="text-sm text-muted-foreground">
@@ -758,9 +758,23 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
               </div>
               <ColorInput
                 label="Фон подсказки"
-                value={config.mutedColor || DEFAULT_DESIGN_SYSTEM.mutedColor}
-                onChange={(v) => updateConfig({ mutedColor: v })}
-                description="Подложка для текста подсказок"
+                value={config.hintBackgroundColor || DEFAULT_DESIGN_SYSTEM.hintBackgroundColor}
+                onChange={(v) => updateConfig({ hintBackgroundColor: v })}
+              />
+              <ColorInput
+                label="Обводка подсказки"
+                value={config.hintBorderColor || DEFAULT_DESIGN_SYSTEM.hintBorderColor}
+                onChange={(v) => updateConfig({ hintBorderColor: v })}
+              />
+              <ColorInput
+                label="Цвет текста подсказки"
+                value={config.hintTextColor || DEFAULT_DESIGN_SYSTEM.hintTextColor}
+                onChange={(v) => updateConfig({ hintTextColor: v })}
+              />
+              <ColorInput
+                label="Цвет иконки подсказки"
+                value={config.hintIconColor || DEFAULT_DESIGN_SYSTEM.hintIconColor}
+                onChange={(v) => updateConfig({ hintIconColor: v })}
               />
 
               {/* === RIVE MASCOT SECTION === */}

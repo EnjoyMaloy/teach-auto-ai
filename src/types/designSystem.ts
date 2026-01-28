@@ -212,6 +212,12 @@ export interface DesignSystemConfig {
   
   // Mascot settings
   mascot?: MascotSettings;
+  
+  // Hint/tooltip settings for quizzes
+  hintBackgroundColor?: string;
+  hintBorderColor?: string;
+  hintTextColor?: string;
+  hintIconColor?: string;
 }
 
 export const DEFAULT_SOUND_SETTINGS: SoundSettings = {
@@ -235,12 +241,17 @@ export const DEFAULT_DESIGN_SYSTEM: DesignSystemConfig = {
   gradientFrom: '262 83% 95%',
   gradientTo: '200 83% 95%',
   gradientAngle: 135,
-  fontFamily: 'Inter, system-ui, sans-serif',
-  headingFontFamily: 'Inter, system-ui, sans-serif',
+  fontFamily: '"Inter", sans-serif',
+  headingFontFamily: '"Inter", sans-serif',
   borderRadius: '0.75rem',
   buttonStyle: 'rounded',
   buttonDepth: 'raised',
   sound: DEFAULT_SOUND_SETTINGS,
+  // Hint defaults
+  hintBackgroundColor: '240 5% 96%',
+  hintBorderColor: '240 5% 90%',
+  hintTextColor: '240 10% 30%',
+  hintIconColor: '262 83% 58%',
 };
 
 export interface ThemePreset {
