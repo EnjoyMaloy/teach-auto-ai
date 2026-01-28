@@ -849,7 +849,8 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
       <div 
         className="p-5 border-t flex-shrink-0"
         style={{ 
-          borderColor: `hsl(${ds.mutedColor} / 0.3)`,
+          borderColor: answerState === 'correct' ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
+          backgroundColor: answerState === 'correct' ? `hsl(${ds.successColor} / 0.15)` : 'transparent',
         }}
       >
         {isInteractive && answerState === 'idle' ? (
@@ -883,7 +884,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
               color: answerState === 'correct' 
                 ? `hsl(0 0% 100%)` 
                 : `hsl(${ds.primaryForeground})`,
-              borderRadius: answerState === 'correct' ? '9999px' : getButtonRadius(),
+              borderRadius: getButtonRadius(),
               ...(answerState === 'correct' 
                 ? getRaisedButtonStyle(ds.successColor) 
                 : getRaisedButtonStyle(ds.primaryColor)),
