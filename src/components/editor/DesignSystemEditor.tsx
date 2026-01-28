@@ -670,9 +670,9 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 </div>
               </div>
 
-              {/* Accent Color - moved here from Interactive */}
+              {/* Button Color */}
               <div className="border-t pt-6 space-y-2">
-                <Label className="text-base font-semibold">Акцентный цвет</Label>
+                <Label className="text-base font-semibold">Цвет кнопки</Label>
                 <p className="text-sm text-muted-foreground">
                   Основной цвет для кнопок и интерактивных элементов
                 </p>
