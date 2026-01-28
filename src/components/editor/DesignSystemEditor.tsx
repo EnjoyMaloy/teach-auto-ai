@@ -654,7 +654,9 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     return (
                       <button
                         key={preset.id}
+                        type="button"
                         onClick={() => {
+                          console.log('Preset clicked:', preset.id, preset.type);
                           if (preset.type === 'gradient') {
                             updateConfig({
                               backgroundPresetId: preset.id,
@@ -691,7 +693,11 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 {/* Custom background option */}
                 <div className="flex items-center gap-2 pt-2">
                   <button
-                    onClick={() => updateConfig({ backgroundPresetId: 'custom' })}
+                    type="button"
+                    onClick={() => {
+                      console.log('Custom button clicked');
+                      updateConfig({ backgroundPresetId: 'custom' });
+                    }}
                     className={cn(
                       "flex-1 py-2 px-3 rounded-lg text-sm transition-colors border-2 text-left",
                       config.backgroundPresetId === 'custom'
@@ -708,6 +714,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                   <div className="space-y-3 p-3 rounded-lg border border-border bg-muted/30">
                     <div className="flex gap-2">
                       <button
+                        type="button"
                         onClick={() => updateConfig({ backgroundType: 'solid' })}
                         className={cn(
                           "flex-1 py-1.5 px-2 rounded text-xs transition-colors",
@@ -719,6 +726,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                         Сплошной
                       </button>
                       <button
+                        type="button"
                         onClick={() => updateConfig({ backgroundType: 'gradient' })}
                         className={cn(
                           "flex-1 py-1.5 px-2 rounded text-xs transition-colors",
