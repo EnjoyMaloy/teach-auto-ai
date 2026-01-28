@@ -181,16 +181,8 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <Label className="text-sm font-medium">Фоны курса ({backgrounds.length}/{maxBackgrounds})</Label>
-      </div>
-      
-      <p className="text-xs text-muted-foreground">
-        Добавьте до {maxBackgrounds} фонов, которые можно будет использовать в блоках курса
-      </p>
-
       {/* Background list */}
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-3 gap-2">
         {backgrounds.map((bg) => {
           const isDefault = defaultBackgroundId === bg.id;
           return (
@@ -202,7 +194,7 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
                 type="button"
                 onClick={() => openEditDialog(bg)}
                 className={cn(
-                  "w-full h-14 rounded-lg border-2 transition-all flex items-end justify-center pb-1",
+                  "w-full h-20 rounded-lg border-2 transition-all flex flex-col items-center justify-end pb-1.5 gap-0.5",
                   isDefault
                     ? "border-primary ring-2 ring-primary/20"
                     : "border-border hover:border-primary/50"
@@ -210,11 +202,13 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
                 style={getBackgroundStyle(bg)}
                 title={`${bg.name}${isDefault ? ' (по умолчанию)' : ''}`}
               >
-                <span className="text-[10px] font-medium text-foreground/70 bg-white/80 px-1.5 py-0.5 rounded truncate max-w-full">
+                <span className="text-xs font-medium text-foreground/80 bg-white/90 px-2 py-0.5 rounded truncate max-w-[90%]">
                   {bg.name}
                 </span>
                 {isDefault && (
-                  <Check className="absolute top-1 right-1 w-3 h-3 text-primary" />
+                  <span className="text-[9px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                    по умолчанию
+                  </span>
                 )}
               </button>
               
@@ -252,7 +246,7 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
           <button
             type="button"
             onClick={openAddDialog}
-            className="h-14 rounded-lg border-2 border-dashed border-border hover:border-primary/50 transition-colors flex items-center justify-center"
+            className="h-20 rounded-lg border-2 border-dashed border-border hover:border-primary/50 transition-colors flex items-center justify-center"
           >
             <Plus className="w-5 h-5 text-muted-foreground" />
           </button>
