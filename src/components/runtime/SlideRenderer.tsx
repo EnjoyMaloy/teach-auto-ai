@@ -27,7 +27,25 @@ interface SlideRendererProps {
 type AnswerState = 'idle' | 'correct' | 'incorrect' | 'partial';
 
 // Дефолтные значения дизайн-системы
-const DEFAULT_DS = {
+const DEFAULT_DS: {
+  primaryColor: string;
+  primaryForeground: string;
+  backgroundColor: string;
+  foregroundColor: string;
+  cardColor: string;
+  mutedColor: string;
+  successColor: string;
+  destructiveColor: string;
+  fontFamily: string;
+  headingFontFamily: string;
+  borderRadius: string;
+  buttonStyle: 'rounded' | 'pill' | 'square';
+  buttonDepth: 'flat' | 'raised';
+  backgroundType: 'solid' | 'gradient';
+  gradientFrom: string;
+  gradientTo: string;
+  gradientAngle: number;
+} = {
   primaryColor: '262 83% 58%',
   primaryForeground: '0 0% 100%',
   backgroundColor: '0 0% 100%',
@@ -39,8 +57,12 @@ const DEFAULT_DS = {
   fontFamily: 'Inter, system-ui, sans-serif',
   headingFontFamily: 'Inter, system-ui, sans-serif',
   borderRadius: '0.75rem',
-  buttonStyle: 'rounded' as const,
-  buttonDepth: 'raised' as const,
+  buttonStyle: 'rounded',
+  buttonDepth: 'raised',
+  backgroundType: 'solid',
+  gradientFrom: '262 83% 95%',
+  gradientTo: '200 83% 95%',
+  gradientAngle: 135,
 };
 
 export const SlideRenderer: React.FC<SlideRendererProps> = ({
@@ -751,11 +773,28 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
   // Прогресс бар
   const progress = totalCount > 0 ? ((currentIndex + 1) / totalCount) * 100 : 0;
 
+  // Calculate background style
+  const getBackgroundStyle = (): React.CSSProperties => {
+    // If slide has custom background color, use it
+    if (slide?.backgroundColor) {
+      return { backgroundColor: `hsl(${slide.backgroundColor})` };
+    }
+    
+    // Use design system background
+    if (ds.backgroundType === 'gradient' && ds.gradientFrom && ds.gradientTo) {
+      return {
+        background: `linear-gradient(${ds.gradientAngle || 135}deg, hsl(${ds.gradientFrom}), hsl(${ds.gradientTo}))`,
+      };
+    }
+    
+    return { backgroundColor: `hsl(${ds.backgroundColor})` };
+  };
+
   return (
     <div 
       className="h-full w-full flex flex-col overflow-hidden"
       style={{ 
-        backgroundColor: slide.backgroundColor ? `hsl(${slide.backgroundColor})` : `hsl(${ds.backgroundColor})`,
+        ...getBackgroundStyle(),
         fontFamily: ds.fontFamily,
       }}
     >
