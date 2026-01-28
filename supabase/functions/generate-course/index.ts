@@ -6,6 +6,43 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Standard error messages
+const ERROR_MESSAGES = {
+  INTERNAL_ERROR: 'Произошла ошибка. Попробуйте снова.',
+  INVALID_INPUT: 'Некорректные данные запроса.',
+  AUTH_REQUIRED: 'Требуется авторизация.',
+  RATE_LIMIT: 'Превышен лимит запросов. Попробуйте позже.',
+  API_ERROR: 'Сервис временно недоступен.',
+  CONFIG_ERROR: 'Ошибка конфигурации сервиса.'
+};
+
+// Input validation helper
+function validateInput(data: any): { valid: boolean; error?: string } {
+  if (!data || typeof data !== 'object') {
+    return { valid: false, error: 'Invalid request body' };
+  }
+  
+  const { userMessage, agentRole, mode } = data;
+  
+  // userMessage is required and must be a string with reasonable length
+  if (typeof userMessage !== 'string' || userMessage.length === 0 || userMessage.length > 50000) {
+    return { valid: false, error: 'userMessage must be a string between 1 and 50000 characters' };
+  }
+  
+  // agentRole is optional but must be one of the valid roles if provided
+  const validRoles = ['research', 'structure', 'content', undefined];
+  if (agentRole !== undefined && !validRoles.includes(agentRole)) {
+    return { valid: false, error: 'Invalid agentRole' };
+  }
+  
+  // mode is optional but must be 'chat' or undefined if provided
+  if (mode !== undefined && mode !== 'chat') {
+    return { valid: false, error: 'Invalid mode' };
+  }
+  
+  return { valid: true };
+}
+
 // Step 1: Research - gather facts about the topic
 const RESEARCH_PROMPT = `Ты — исследователь. Твоя задача — собрать ключевые факты по теме для образовательного курса.
 
@@ -428,7 +465,27 @@ serve(async (req) => {
       return authError;
     }
 
-    const { userMessage, agentRole, mode } = await req.json();
+    // Parse and validate input
+    let requestData;
+    try {
+      requestData = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ error: ERROR_MESSAGES.INVALID_INPUT }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const validation = validateInput(requestData);
+    if (!validation.valid) {
+      console.error("Input validation failed:", validation.error);
+      return new Response(
+        JSON.stringify({ error: ERROR_MESSAGES.INVALID_INPUT }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { userMessage, agentRole, mode } = requestData;
 
     let systemPrompt = CONTENT_PROMPT;
     let userPrompt = userMessage;
@@ -450,9 +507,10 @@ serve(async (req) => {
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     
     if (!GEMINI_API_KEY) {
+      console.error("GEMINI_API_KEY not configured");
       return new Response(
-        JSON.stringify({ error: "GEMINI_API_KEY не настроен. Добавьте ваш API ключ в настройках." }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: ERROR_MESSAGES.CONFIG_ERROR }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
     
@@ -480,23 +538,26 @@ serve(async (req) => {
     });
     
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Google Gemini API error:", response.status, errorText);
+      const status = response.status;
+      console.error("Google Gemini API error:", status);
       
-      if (response.status === 429) {
+      if (status === 429) {
         return new Response(
-          JSON.stringify({ error: "Превышен лимит запросов Google API. Попробуйте позже." }),
+          JSON.stringify({ error: ERROR_MESSAGES.RATE_LIMIT }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 403 || response.status === 400) {
+      if (status === 403 || status === 400) {
         return new Response(
-          JSON.stringify({ error: "Неверный API ключ Gemini. Проверьте настройки." }),
+          JSON.stringify({ error: ERROR_MESSAGES.CONFIG_ERROR }),
           { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       
-      throw new Error(`Google Gemini API error: ${response.status}`);
+      return new Response(
+        JSON.stringify({ error: ERROR_MESSAGES.API_ERROR }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
     
     const data = await response.json();
@@ -511,7 +572,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("Error in generate-course:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({ error: ERROR_MESSAGES.INTERNAL_ERROR }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

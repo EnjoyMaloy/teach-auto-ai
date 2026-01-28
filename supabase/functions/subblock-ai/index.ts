@@ -6,6 +6,56 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Standard error messages
+const ERROR_MESSAGES = {
+  INTERNAL_ERROR: 'Произошла ошибка. Попробуйте снова.',
+  INVALID_INPUT: 'Некорректные данные запроса.',
+  AUTH_REQUIRED: 'Требуется авторизация.',
+  RATE_LIMIT: 'Слишком много запросов. Подождите немного.',
+  API_ERROR: 'Сервис временно недоступен.',
+  CONFIG_ERROR: 'Ошибка конфигурации сервиса.'
+};
+
+// Input validation helper
+function validateInput(data: any): { valid: boolean; error?: string } {
+  if (!data || typeof data !== 'object') {
+    return { valid: false, error: 'Invalid request body' };
+  }
+  
+  const { message, currentSubBlock, allSubBlocks, conversationHistory } = data;
+  
+  // Message is required and must be a string with reasonable length
+  if (typeof message !== 'string' || message.length === 0 || message.length > 5000) {
+    return { valid: false, error: 'Message must be a string between 1 and 5000 characters' };
+  }
+  
+  // currentSubBlock is optional but must be an object if provided
+  if (currentSubBlock !== undefined && (typeof currentSubBlock !== 'object' || currentSubBlock === null)) {
+    return { valid: false, error: 'currentSubBlock must be an object' };
+  }
+  
+  // allSubBlocks is optional but must be an array if provided
+  if (allSubBlocks !== undefined && !Array.isArray(allSubBlocks)) {
+    return { valid: false, error: 'allSubBlocks must be an array' };
+  }
+  
+  // Limit array sizes
+  if (Array.isArray(allSubBlocks) && allSubBlocks.length > 50) {
+    return { valid: false, error: 'Too many sub-blocks' };
+  }
+  
+  // conversationHistory is optional but must be an array if provided
+  if (conversationHistory !== undefined && !Array.isArray(conversationHistory)) {
+    return { valid: false, error: 'conversationHistory must be an array' };
+  }
+  
+  if (Array.isArray(conversationHistory) && conversationHistory.length > 20) {
+    return { valid: false, error: 'Conversation history too long' };
+  }
+  
+  return { valid: true };
+}
+
 // Helper function to verify user authentication
 async function verifyAuth(req: Request): Promise<{ user: any; error: Response | null }> {
   const authHeader = req.headers.get('Authorization');
@@ -15,7 +65,7 @@ async function verifyAuth(req: Request): Promise<{ user: any; error: Response | 
     return {
       user: null,
       error: new Response(
-        JSON.stringify({ error: "Требуется авторизация" }),
+        JSON.stringify({ error: ERROR_MESSAGES.AUTH_REQUIRED }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     };
@@ -34,7 +84,7 @@ async function verifyAuth(req: Request): Promise<{ user: any; error: Response | 
     return {
       user: null,
       error: new Response(
-        JSON.stringify({ error: "Недействительный токен авторизации" }),
+        JSON.stringify({ error: ERROR_MESSAGES.AUTH_REQUIRED }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     };
@@ -202,8 +252,7 @@ Style requirements:
     );
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Image generation failed:", response.status, errorText);
+      console.error("Image generation failed:", response.status);
       return null;
     }
 
@@ -276,12 +325,36 @@ serve(async (req) => {
       return authError;
     }
 
-    const { message, currentSubBlock, allSubBlocks, conversationHistory } = await req.json();
+    // Parse and validate input
+    let requestData;
+    try {
+      requestData = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ error: ERROR_MESSAGES.INVALID_INPUT }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const validation = validateInput(requestData);
+    if (!validation.valid) {
+      console.error("Input validation failed:", validation.error);
+      return new Response(
+        JSON.stringify({ error: ERROR_MESSAGES.INVALID_INPUT }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { message, currentSubBlock, allSubBlocks, conversationHistory } = requestData;
     console.log(`Processing subblock-ai request for user: ${user.id}`);
     
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     if (!GEMINI_API_KEY) {
-      throw new Error("GEMINI_API_KEY is not configured");
+      console.error("GEMINI_API_KEY not configured");
+      return new Response(
+        JSON.stringify({ error: ERROR_MESSAGES.CONFIG_ERROR }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // Build context based on what we have
@@ -300,13 +373,15 @@ serve(async (req) => {
       { role: "model", parts: [{ text: "Понял. Готов помочь с дизайном слайдов. Жду запрос." }] },
     ];
 
-    // Add conversation history if available
+    // Add conversation history if available (limited to validated entries)
     if (conversationHistory && Array.isArray(conversationHistory)) {
-      for (const msg of conversationHistory) {
-        contents.push({
-          role: msg.role === 'user' ? 'user' : 'model',
-          parts: [{ text: msg.content }]
-        });
+      for (const msg of conversationHistory.slice(-10)) {
+        if (msg && typeof msg === 'object' && typeof msg.content === 'string') {
+          contents.push({
+            role: msg.role === 'user' ? 'user' : 'model',
+            parts: [{ text: msg.content.slice(0, 2000) }]
+          });
+        }
       }
     }
 
@@ -329,9 +404,20 @@ serve(async (req) => {
     );
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Gemini API error:", response.status, errorText);
-      throw new Error(`Gemini API error: ${response.status}`);
+      const status = response.status;
+      console.error("Gemini API error:", status);
+      
+      if (status === 429) {
+        return new Response(
+          JSON.stringify({ error: ERROR_MESSAGES.RATE_LIMIT }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      return new Response(
+        JSON.stringify({ error: ERROR_MESSAGES.API_ERROR }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const data = await response.json();
@@ -404,9 +490,9 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error("subblock-ai error:", error);
+    console.error("subblock-ai internal error:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({ error: ERROR_MESSAGES.INTERNAL_ERROR }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

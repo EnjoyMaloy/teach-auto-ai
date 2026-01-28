@@ -6,11 +6,53 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Standard error messages
+const ERROR_MESSAGES = {
+  INTERNAL_ERROR: 'Произошла ошибка. Попробуйте снова.',
+  INVALID_INPUT: 'Некорректные данные запроса.',
+  INVALID_TOKEN: 'Недействительный токен бота.',
+  AUTH_REQUIRED: 'Требуется авторизация.',
+  COURSE_NOT_FOUND: 'Курс не найден.',
+  ACCESS_DENIED: 'Нет доступа к этому курсу.',
+  EXTERNAL_SERVICE: 'Сервис Telegram временно недоступен.'
+};
+
 interface DeployRequest {
   botToken: string;
   courseId: string;
   courseTitle: string;
   webAppUrl: string;
+}
+
+// Input validation
+function validateInput(data: any): { valid: boolean; error?: string } {
+  if (!data || typeof data !== 'object') {
+    return { valid: false, error: 'Invalid request body' };
+  }
+  
+  const { botToken, courseId, courseTitle, webAppUrl } = data;
+  
+  // Bot token validation (basic format check)
+  if (typeof botToken !== 'string' || botToken.length < 30 || botToken.length > 100) {
+    return { valid: false, error: 'Invalid bot token format' };
+  }
+  
+  // Course ID validation (UUID format)
+  if (typeof courseId !== 'string' || !/^[0-9a-f-]{36}$/i.test(courseId)) {
+    return { valid: false, error: 'Invalid course ID format' };
+  }
+  
+  // Course title validation
+  if (typeof courseTitle !== 'string' || courseTitle.length === 0 || courseTitle.length > 500) {
+    return { valid: false, error: 'Invalid course title' };
+  }
+  
+  // Web app URL validation
+  if (typeof webAppUrl !== 'string' || !webAppUrl.startsWith('https://')) {
+    return { valid: false, error: 'Invalid web app URL' };
+  }
+  
+  return { valid: true };
 }
 
 // Helper function to verify user authentication and course ownership
@@ -26,7 +68,7 @@ async function verifyAuthAndOwnership(
       user: null,
       supabaseClient: null,
       error: new Response(
-        JSON.stringify({ error: "Требуется авторизация" }),
+        JSON.stringify({ error: ERROR_MESSAGES.AUTH_REQUIRED }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     };
@@ -46,7 +88,7 @@ async function verifyAuthAndOwnership(
       user: null,
       supabaseClient: null,
       error: new Response(
-        JSON.stringify({ error: "Недействительный токен авторизации" }),
+        JSON.stringify({ error: ERROR_MESSAGES.AUTH_REQUIRED }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     };
@@ -67,7 +109,7 @@ async function verifyAuthAndOwnership(
       user: null,
       supabaseClient: null,
       error: new Response(
-        JSON.stringify({ error: "Курс не найден" }),
+        JSON.stringify({ error: ERROR_MESSAGES.COURSE_NOT_FOUND }),
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     };
@@ -79,7 +121,7 @@ async function verifyAuthAndOwnership(
       user: null,
       supabaseClient: null,
       error: new Response(
-        JSON.stringify({ error: "У вас нет прав для деплоя бота этого курса" }),
+        JSON.stringify({ error: ERROR_MESSAGES.ACCESS_DENIED }),
         { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     };
@@ -95,14 +137,27 @@ serve(async (req) => {
   }
 
   try {
-    const { botToken, courseId, courseTitle, webAppUrl }: DeployRequest = await req.json();
-
-    if (!botToken || !courseId || !webAppUrl) {
+    // Parse and validate input
+    let requestData: DeployRequest;
+    try {
+      requestData = await req.json();
+    } catch {
       return new Response(
-        JSON.stringify({ error: "Missing required fields" }),
+        JSON.stringify({ error: ERROR_MESSAGES.INVALID_INPUT }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    const validation = validateInput(requestData);
+    if (!validation.valid) {
+      console.error("Input validation failed:", validation.error);
+      return new Response(
+        JSON.stringify({ error: ERROR_MESSAGES.INVALID_INPUT }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { botToken, courseId, courseTitle, webAppUrl } = requestData;
 
     // Verify authentication and course ownership
     const { user, error: authError } = await verifyAuthAndOwnership(req, courseId);
@@ -117,8 +172,9 @@ serve(async (req) => {
     const botInfo = await botInfoResponse.json();
 
     if (!botInfo.ok) {
+      console.error("Bot token validation failed");
       return new Response(
-        JSON.stringify({ error: "Invalid bot token", details: botInfo.description }),
+        JSON.stringify({ error: ERROR_MESSAGES.INVALID_TOKEN }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -143,7 +199,7 @@ serve(async (req) => {
     const menuButtonResult = await menuButtonResponse.json();
 
     if (!menuButtonResult.ok) {
-      console.error("Failed to set menu button:", menuButtonResult);
+      console.error("Failed to set menu button");
     }
 
     // Set bot commands
@@ -187,11 +243,10 @@ serve(async (req) => {
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+  } catch (error) {
     console.error("Error deploying Telegram bot:", error);
     return new Response(
-      JSON.stringify({ error: "Internal server error", details: errorMessage }),
+      JSON.stringify({ error: ERROR_MESSAGES.INTERNAL_ERROR }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
