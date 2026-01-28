@@ -375,7 +375,13 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   };
 
   // Get user's personal themes to check if selected theme is personal
-  const { systems: userSystems, updateSystem: updateUserSystem, isLoading: isLoadingUserSystems } = useUserDesignSystems();
+  const { 
+    systems: userSystems, 
+    isLoading: isLoadingUserSystems,
+    createSystem: createUserSystem, 
+    updateSystem: updateUserSystem, 
+    deleteSystem: deleteUserSystem 
+  } = useUserDesignSystems();
 
   // Check if the selected theme is a personal theme
   const isPersonalThemeSelected = userSystems.some(s => s.id === selectedBaseSystemId);
@@ -471,6 +477,11 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
           onSelect={handleBaseSystemSelect}
           isAdmin={isAdmin}
           currentConfig={config}
+          userSystems={userSystems}
+          isLoadingUserSystems={isLoadingUserSystems}
+          onCreateUserSystem={createUserSystem}
+          onUpdateUserSystem={updateUserSystem}
+          onDeleteUserSystem={deleteUserSystem}
         />
       </div>
 
