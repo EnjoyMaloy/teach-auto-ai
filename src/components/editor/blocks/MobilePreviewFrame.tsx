@@ -1014,7 +1014,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     inactive: designSystem?.designBlock?.progressInactiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressInactiveColor,
     backdrop: designSystem?.designBlock?.progressBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressBackdropColor,
   };
-  const buttonBackdropColor = ds.backgroundColor;
+  
 
   const progressBar = !hideHeader && (
     <div 
@@ -1163,8 +1163,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     <div 
       className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0 relative z-10"
       style={{ 
-        backgroundColor: `hsl(${buttonBackdropColor})`,
-        borderColor: `hsl(${ds.mutedColor})`,
+        borderColor: `hsl(${ds.mutedColor} / 0.3)`,
       }}
     >
       {/* Hint button - only when idle and has more hints */}
@@ -1241,8 +1240,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         <div 
           className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0"
           style={{ 
-            backgroundColor: `hsl(${buttonBackdropColor})`,
-            borderColor: `hsl(${ds.mutedColor})`,
+            borderColor: `hsl(${ds.mutedColor} / 0.3)`,
           }}
         >
           {/* Hint button - only when idle and has more hints */}
@@ -1394,8 +1392,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         <div 
           className="absolute bottom-0 left-0 right-0 h-16 border-t flex items-center justify-center gap-3 px-4 z-10"
           style={{ 
-            backgroundColor: `hsl(${buttonBackdropColor})`,
-            borderColor: `hsl(${ds.mutedColor})`,
+            borderColor: `hsl(${ds.mutedColor} / 0.3)`,
           }}
         >
           {isInteractive && answerState !== 'idle' && (

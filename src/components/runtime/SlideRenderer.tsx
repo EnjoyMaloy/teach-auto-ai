@@ -849,8 +849,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
       <div 
         className="p-4 border-t flex-shrink-0"
         style={{ 
-          borderColor: `hsl(${ds.mutedColor})`,
-          backgroundColor: `hsl(${ds.backgroundColor})`,
+          borderColor: `hsl(${ds.mutedColor} / 0.3)`,
         }}
       >
         {isInteractive && answerState === 'idle' ? (
