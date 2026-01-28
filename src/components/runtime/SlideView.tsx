@@ -440,7 +440,8 @@ export const SlideView: React.FC<SlideViewProps> = ({
       <div 
         className="absolute bottom-0 left-0 right-0 h-20 border-t flex items-center justify-center gap-3 px-4"
         style={{ 
-          borderColor: `hsl(${ds.mutedColor} / 0.3)`,
+          borderColor: answerState === 'correct' ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
+          backgroundColor: answerState === 'correct' ? `hsl(${ds.successColor} / 0.15)` : 'transparent',
         }}
       >
         {/* Show retry button only for incorrect/partial answers */}
@@ -478,7 +479,7 @@ export const SlideView: React.FC<SlideViewProps> = ({
             color: answerState === 'correct' 
               ? `hsl(0 0% 100%)` 
               : `hsl(${ds.primaryForeground})`,
-            borderRadius: answerState === 'correct' ? '9999px' : getButtonRadius(),
+            borderRadius: getButtonRadius(),
             ...(answerState === 'correct' 
               ? getRaisedButtonStyle(ds.successColor) 
               : getRaisedButtonStyle(ds.primaryColor)),

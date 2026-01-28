@@ -1163,7 +1163,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     <div 
       className="h-20 border-t flex items-center justify-center gap-3 px-4 shrink-0 relative z-10"
       style={{ 
-        borderColor: `hsl(${ds.mutedColor} / 0.3)`,
+        borderColor: answerState === 'correct' ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
+        backgroundColor: answerState === 'correct' ? `hsl(${ds.successColor} / 0.15)` : 'transparent',
       }}
     >
       {/* Hint button - only when idle and has more hints */}
@@ -1212,8 +1213,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           color: answerState === 'correct' 
             ? `hsl(0 0% 100%)` 
             : `hsl(${ds.primaryForeground})`,
-          // Always pill style for correct answer
-          borderRadius: answerState === 'correct' ? '9999px' : getButtonRadius(),
+          // Keep button shape from design system
+          borderRadius: getButtonRadius(),
           ...(answerState === 'correct' 
             ? getRaisedButtonStyle(ds.successColor) 
             : getRaisedButtonStyle(ds.primaryColor)),
@@ -1249,7 +1250,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         <div 
           className="h-20 border-t flex items-center justify-center gap-3 px-4 shrink-0"
           style={{ 
-            borderColor: `hsl(${ds.mutedColor} / 0.3)`,
+            borderColor: answerState === 'correct' ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
+            backgroundColor: answerState === 'correct' ? `hsl(${ds.successColor} / 0.15)` : 'transparent',
           }}
         >
           {/* Hint button - only when idle and has more hints */}
@@ -1297,7 +1299,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
               color: answerState === 'correct' 
                 ? `hsl(0 0% 100%)` 
                 : `hsl(${ds.primaryForeground})`,
-              borderRadius: answerState === 'correct' ? '9999px' : getButtonRadius(),
+              borderRadius: getButtonRadius(),
               ...(answerState === 'correct' 
                 ? getRaisedButtonStyle(ds.successColor) 
                 : getRaisedButtonStyle(ds.primaryColor)),
@@ -1408,7 +1410,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         <div 
           className="absolute bottom-0 left-0 right-0 h-20 border-t flex items-center justify-center gap-3 px-4 z-10"
           style={{ 
-            borderColor: `hsl(${ds.mutedColor} / 0.3)`,
+            borderColor: answerState === 'correct' ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
+            backgroundColor: answerState === 'correct' ? `hsl(${ds.successColor} / 0.15)` : 'transparent',
           }}
         >
           {/* Show retry button only for incorrect/partial answers */}
@@ -1453,7 +1456,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
               color: answerState === 'correct' 
                 ? `hsl(0 0% 100%)` 
                 : `hsl(${ds.primaryForeground})`,
-              borderRadius: answerState === 'correct' ? '9999px' : getButtonRadius(),
+              borderRadius: getButtonRadius(),
               ...(answerState === 'correct' 
                 ? getRaisedButtonStyle(ds.successColor) 
                 : getRaisedButtonStyle(ds.primaryColor)),
