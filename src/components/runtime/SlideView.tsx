@@ -411,7 +411,7 @@ export const SlideView: React.FC<SlideViewProps> = ({
               ? `hsl(${ds.successColor} / 0.15)` 
               : answerState === 'partial'
                 ? `hsl(48 100% 90%)`
-                : `hsl(${ds.destructiveColor} / 0.15)`,
+                : `hsl(0 100% 95%)`,
             color: answerState === 'correct' 
               ? `hsl(${ds.successColor})` 
               : answerState === 'partial'
@@ -444,24 +444,26 @@ export const SlideView: React.FC<SlideViewProps> = ({
       <div 
         className="absolute bottom-0 left-0 right-0 h-20 border-t flex items-center justify-center gap-3 px-4"
         style={{ 
-          borderColor: (answerState === 'correct' || answerState === 'partial') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
+          borderColor: (answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
           backgroundColor: answerState === 'correct' 
             ? `hsl(${ds.successColor} / 0.15)` 
             : answerState === 'partial'
               ? `hsl(48 100% 90%)`
-              : 'transparent',
+              : answerState === 'incorrect'
+                ? `hsl(0 100% 95%)`
+                : 'transparent',
         }}
       >
-        {/* Show retry button for incorrect and partial answers */}
-        {isInteractive && (answerState === 'incorrect' || answerState === 'partial') && (
+        {/* Show retry button only for partial answers */}
+        {isInteractive && answerState === 'partial' && (
           <button
             type="button"
             onClick={resetState}
             className={cn("h-11 px-4 flex items-center gap-2 border-2 font-bold uppercase tracking-wide", pressAnimationClass)}
             style={{
-              borderColor: answerState === 'partial' ? `hsl(45 93% 47%)` : `hsl(${ds.mutedColor})`,
+              borderColor: `hsl(45 93% 47%)`,
               backgroundColor: `hsl(0 0% 100%)`,
-              color: answerState === 'partial' ? `hsl(45 93% 47%)` : `hsl(${ds.foregroundColor})`,
+              color: `hsl(45 93% 47%)`,
               borderRadius: getButtonRadius(),
             }}
           >
@@ -486,8 +488,10 @@ export const SlideView: React.FC<SlideViewProps> = ({
               ? `hsl(${ds.successColor})` 
               : answerState === 'partial'
                 ? `hsl(45 93% 47%)`
-                : `hsl(${ds.primaryColor})`,
-            color: answerState === 'correct' || answerState === 'partial'
+                : answerState === 'incorrect'
+                  ? `hsl(${ds.destructiveColor})`
+                  : `hsl(${ds.primaryColor})`,
+            color: answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect'
               ? `hsl(0 0% 100%)` 
               : `hsl(${ds.primaryForeground})`,
             borderRadius: getButtonRadius(),
@@ -495,10 +499,16 @@ export const SlideView: React.FC<SlideViewProps> = ({
               ? getRaisedButtonStyle(ds.successColor) 
               : answerState === 'partial'
                 ? getRaisedButtonStyle('45 93% 47%')
-                : getRaisedButtonStyle(ds.primaryColor)),
+                : answerState === 'incorrect'
+                  ? getRaisedButtonStyle(ds.destructiveColor)
+                  : getRaisedButtonStyle(ds.primaryColor)),
           }}
         >
-          {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ДАЛЕЕ'}
+          {isInteractive && answerState === 'idle' 
+            ? 'ПРОВЕРИТЬ' 
+            : answerState === 'incorrect' 
+              ? 'ПОНЯТНО' 
+              : 'ДАЛЕЕ'}
         </button>
       </div>
     </div>

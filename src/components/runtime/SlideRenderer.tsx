@@ -759,7 +759,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
       ? `hsl(${ds.successColor} / 0.15)`
       : answerState === 'partial'
         ? `hsl(48 100% 90%)`
-        : `hsl(${ds.destructiveColor} / 0.15)`;
+        : `hsl(0 100% 95%)`;
     
     const textColor = answerState === 'correct'
       ? `hsl(${ds.successColor})`
@@ -859,12 +859,14 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
       <div 
         className="p-5 border-t flex-shrink-0"
         style={{ 
-          borderColor: (answerState === 'correct' || answerState === 'partial') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
+          borderColor: (answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
           backgroundColor: answerState === 'correct' 
             ? `hsl(${ds.successColor} / 0.15)` 
             : answerState === 'partial'
               ? `hsl(48 100% 90%)`
-              : 'transparent',
+              : answerState === 'incorrect'
+                ? `hsl(0 100% 95%)`
+                : 'transparent',
         }}
       >
         {isInteractive && answerState === 'idle' ? (
@@ -896,8 +898,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                 ? `hsl(${ds.successColor})` 
                 : answerState === 'partial'
                   ? `hsl(45 93% 47%)`
-                  : `hsl(${ds.primaryColor})`,
-              color: answerState === 'correct' || answerState === 'partial'
+                  : answerState === 'incorrect'
+                    ? `hsl(${ds.destructiveColor})`
+                    : `hsl(${ds.primaryColor})`,
+              color: answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect'
                 ? `hsl(0 0% 100%)` 
                 : `hsl(${ds.primaryForeground})`,
               borderRadius: getButtonRadius(),
@@ -905,10 +909,12 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                 ? getRaisedButtonStyle(ds.successColor) 
                 : answerState === 'partial'
                   ? getRaisedButtonStyle('45 93% 47%')
-                  : getRaisedButtonStyle(ds.primaryColor)),
+                  : answerState === 'incorrect'
+                    ? getRaisedButtonStyle(ds.destructiveColor)
+                    : getRaisedButtonStyle(ds.primaryColor)),
             }}
           >
-            ДАЛЕЕ
+            {answerState === 'incorrect' ? 'ПОНЯТНО' : 'ДАЛЕЕ'}
           </button>
         )}
       </div>
