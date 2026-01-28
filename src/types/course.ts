@@ -101,6 +101,19 @@ export interface CourseDesignSystem {
   borderRadius?: string;
   buttonStyle?: 'rounded' | 'pill' | 'square';
   buttonDepth?: 'flat' | 'raised';
+  // Theme identification
+  themeId?: string;
+  // Theme backgrounds - up to 5 backgrounds for the course
+  themeBackgrounds?: Array<{
+    id: string;
+    name: string;
+    type: 'solid' | 'gradient';
+    color?: string;
+    from?: string;
+    to?: string;
+    angle?: number;
+  }>;
+  defaultBackgroundId?: string;
   // Background settings
   backgroundPresetId?: string;
   backgroundType?: 'solid' | 'gradient';
