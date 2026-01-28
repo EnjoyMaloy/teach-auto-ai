@@ -24,7 +24,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Check, Edit, Trash2, Plus, Star, Loader2, Crown } from 'lucide-react';
+import { Check, Edit, Trash2, Plus, Star, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BaseDesignSystemSelectorProps {
@@ -32,9 +32,6 @@ interface BaseDesignSystemSelectorProps {
   onSelect: (system: BaseDesignSystem) => void;
   isAdmin: boolean;
   currentConfig?: DesignSystemConfig;
-  onSaveAsBase?: (name: string, description: string, config: DesignSystemConfig) => Promise<void>;
-  onUpdateBase?: (id: string, config: DesignSystemConfig) => Promise<void>;
-  onDeleteBase?: (id: string) => Promise<void>;
 }
 
 export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> = ({
@@ -42,9 +39,6 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
   onSelect,
   isAdmin,
   currentConfig,
-  onSaveAsBase,
-  onUpdateBase,
-  onDeleteBase,
 }) => {
   const { systems, isLoading, createSystem, updateSystem, deleteSystem, setDefault } = useBaseDesignSystems();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -98,51 +92,20 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+      <div className="flex items-center justify-center py-4">
+        <Loader2 className="w-5 h-5 animate-spin text-primary" />
       </div>
     );
   }
 
+  // If no systems and not admin, show nothing
   if (systems.length === 0 && !isAdmin) {
-    return (
-      <Card className="border-dashed">
-        <CardContent className="flex flex-col items-center justify-center py-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            Базовые дизайн-системы пока не созданы
-          </p>
-        </CardContent>
-      </Card>
-    );
+    return null;
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="font-semibold text-foreground flex items-center gap-2">
-            <Crown className="w-4 h-4 text-amber-500" />
-            {isAdmin ? 'Управление базовыми темами' : 'Базовые темы'}
-          </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {isAdmin 
-              ? 'Создавайте и редактируйте темы для всех пользователей'
-              : 'Выберите готовую тему от администратора'
-            }
-          </p>
-        </div>
-        {isAdmin && (
-          <Button 
-            size="sm" 
-            onClick={() => setIsCreateDialogOpen(true)}
-            className="gap-1"
-          >
-            <Plus className="w-4 h-4" />
-            Создать
-          </Button>
-        )}
-      </div>
-
+    <>
+      {/* Systems grid + Create button for admin */}
       <div className="grid grid-cols-2 gap-2">
         {systems.map((system) => (
           <div
@@ -174,18 +137,9 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
             <div className="flex items-center gap-1">
               <p className="text-sm font-medium text-foreground truncate">{system.name}</p>
               {system.is_default && (
-                <Badge variant="secondary" className="text-[10px] px-1 py-0 bg-amber-100 text-amber-700">
-                  <Star className="w-2.5 h-2.5 mr-0.5" />
-                  По умолчанию
-                </Badge>
+                <Star className="w-3 h-3 text-amber-500 fill-amber-500 flex-shrink-0" />
               )}
             </div>
-            
-            {system.description && (
-              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                {system.description}
-              </p>
-            )}
             
             {selectedId === system.id && (
               <Check className="absolute top-2 right-2 w-4 h-4 text-primary" />
@@ -231,13 +185,24 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
             )}
           </div>
         ))}
+
+        {/* Create button - only for admin */}
+        {isAdmin && (
+          <button
+            onClick={() => setIsCreateDialogOpen(true)}
+            className="p-3 rounded-xl border-2 border-dashed border-border hover:border-primary/50 transition-all text-left bg-card/50 flex flex-col items-center justify-center gap-1 min-h-[80px]"
+          >
+            <Plus className="w-5 h-5 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">Новая тема</span>
+          </button>
+        )}
       </div>
 
       {/* Create Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Создать базовую тему</DialogTitle>
+            <DialogTitle>Создать новую тему</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
@@ -258,7 +223,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
               />
             </div>
             <p className="text-sm text-muted-foreground">
-              Текущие настройки дизайна будут сохранены в эту базовую тему.
+              Текущие настройки дизайна будут сохранены в эту тему.
               Все пользователи смогут её выбрать.
             </p>
           </div>
@@ -278,7 +243,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Удалить базовую тему?</AlertDialogTitle>
+            <AlertDialogTitle>Удалить тему?</AlertDialogTitle>
             <AlertDialogDescription>
               Тема "{selectedForDelete?.name}" будет удалена. Курсы, использующие эту тему, 
               сохранят свои настройки, но потеряют связь с базовой темой.
@@ -296,7 +261,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </>
   );
 };
 
