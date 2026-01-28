@@ -682,28 +682,6 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 </div>
               </div>
 
-              {/* Button Color */}
-              <div className="border-t pt-6 space-y-2">
-                <Label className="text-base font-semibold">Цвет кнопки</Label>
-                <p className="text-sm text-muted-foreground">
-                  Основной цвет для кнопок и интерактивных элементов
-                </p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <ColorInput
-                  label="Основной цвет"
-                  value={config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor}
-                  onChange={(v) => updateConfig({ primaryColor: v })}
-                  description="Цвет кнопок и акцентов"
-                />
-                <ColorInput
-                  label="Текст на основном"
-                  value={config.primaryForeground || DEFAULT_DESIGN_SYSTEM.primaryForeground}
-                  onChange={(v) => updateConfig({ primaryForeground: v })}
-                  description="Цвет текста на кнопках"
-                />
-              </div>
-
               {/* Button Backdrop */}
               <div className="border-t pt-6 space-y-2">
                 <Label className="text-base font-semibold">Подложка кнопки</Label>
@@ -727,7 +705,29 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
 
             {/* === INTERACTIVE TAB: Quiz states, hints === */}
             <TabsContent value="interactive" className="space-y-6">
+              {/* Button Color - moved here */}
               <div className="space-y-2">
+                <Label className="text-base font-semibold">Цвет кнопки</Label>
+                <p className="text-sm text-muted-foreground">
+                  Основной цвет для кнопок и интерактивных элементов
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <ColorInput
+                  label="Основной цвет"
+                  value={config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor}
+                  onChange={(v) => updateConfig({ primaryColor: v })}
+                  description="Цвет кнопок и акцентов"
+                />
+                <ColorInput
+                  label="Текст на кнопке"
+                  value={config.primaryForeground || DEFAULT_DESIGN_SYSTEM.primaryForeground}
+                  onChange={(v) => updateConfig({ primaryForeground: v })}
+                  description="Цвет текста на кнопках"
+                />
+              </div>
+
+              <div className="border-t pt-6 space-y-2">
                 <Label className="text-base font-semibold">Цвета ответов</Label>
                 <p className="text-sm text-muted-foreground">
                   Настройте цвета для состояний правильных и неправильных ответов
