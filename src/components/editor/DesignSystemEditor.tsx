@@ -350,7 +350,8 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   config,
   onChange,
 }) => {
-  const [activePreset, setActivePreset] = useState<string | null>(null);
+  // Initialize activePreset from config.themeId if available
+  const [activePreset, setActivePreset] = useState<string | null>(config.themeId || null);
   const [customThemes, setCustomThemes] = useState<ThemePreset[]>(() => {
     // Load custom themes from localStorage
     const saved = localStorage.getItem('customThemes');
