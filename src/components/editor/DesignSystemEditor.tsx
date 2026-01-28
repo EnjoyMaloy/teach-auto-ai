@@ -539,46 +539,6 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 onDefaultChange={(id) => updateConfig({ defaultBackgroundId: id })}
                 maxBackgrounds={5}
               />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <ColorInput
-                  label="Основной цвет"
-                  value={config.primaryColor}
-                  onChange={(v) => updateConfig({ primaryColor: v })}
-                  description="Цвет кнопок и акцентов"
-                />
-                <ColorInput
-                  label="Текст на основном"
-                  value={config.primaryForeground}
-                  onChange={(v) => updateConfig({ primaryForeground: v })}
-                  description="Цвет текста на кнопках"
-                />
-                <ColorInput
-                  label="Текст"
-                  value={config.foregroundColor}
-                  onChange={(v) => updateConfig({ foregroundColor: v })}
-                />
-                <ColorInput
-                  label="Карточки"
-                  value={config.cardColor}
-                  onChange={(v) => updateConfig({ cardColor: v })}
-                />
-                <ColorInput
-                  label="Приглушённый"
-                  value={config.mutedColor}
-                  onChange={(v) => updateConfig({ mutedColor: v })}
-                />
-                <ColorInput
-                  label="Успех"
-                  value={config.successColor}
-                  onChange={(v) => updateConfig({ successColor: v })}
-                />
-                <ColorInput
-                  label="Ошибка"
-                  value={config.destructiveColor}
-                  onChange={(v) => updateConfig({ destructiveColor: v })}
-                />
-              </div>
             </TabsContent>
 
             <TabsContent value="typography" className="space-y-4">
