@@ -440,7 +440,7 @@ export const SlideView: React.FC<SlideViewProps> = ({
       <div 
         className="absolute bottom-0 left-0 right-0 h-16 border-t flex items-center justify-center gap-3 px-4"
         style={{ 
-          backgroundColor: `hsl(${ds.cardColor})`,
+          backgroundColor: `hsl(${ds.backgroundColor})`,
           borderColor: `hsl(${ds.mutedColor})`,
         }}
       >

@@ -754,18 +754,6 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     onChange={(v) => updateConfig({ primaryForeground: v })}
                     description="Цвет текста на кнопках"
                   />
-                  <ColorInput
-                    label="Подложка кнопки"
-                    value={config.designBlock?.buttonBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.buttonBackdropColor}
-                    onChange={(v) => updateConfig({ 
-                      designBlock: { 
-                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                        ...config.designBlock, 
-                        buttonBackdropColor: v 
-                      } 
-                    })}
-                    description="Фон области с кнопкой"
-                  />
                 </div>
 
                 <div className="space-y-2">
@@ -820,7 +808,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 <div 
                   className="rounded-lg p-3"
                   style={{ 
-                    backgroundColor: `hsl(${config.designBlock?.buttonBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.buttonBackdropColor})` 
+                    backgroundColor: `hsl(${config.backgroundColor || DEFAULT_DESIGN_SYSTEM.backgroundColor})` 
                   }}
                 >
                   <button
