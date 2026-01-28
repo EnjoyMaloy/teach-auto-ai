@@ -32,6 +32,22 @@ export const BACKGROUND_PRESETS: BackgroundPreset[] = [
   { id: 'mint', name: 'Мята', type: 'gradient', from: '160 50% 94%', to: '200 50% 96%', angle: 135 },
 ];
 
+// Google-themed background presets (5 solid + 5 gradient)
+export const GOOGLE_BACKGROUND_PRESETS: BackgroundPreset[] = [
+  // Solid backgrounds
+  { id: 'google-white', name: 'Белый', type: 'solid', color: '0 0% 100%' },
+  { id: 'google-light-gray', name: 'Светло-серый', type: 'solid', color: '210 17% 98%' },
+  { id: 'google-blue-tint', name: 'Голубой', type: 'solid', color: '214 100% 97%' },
+  { id: 'google-green-tint', name: 'Зелёный', type: 'solid', color: '142 60% 96%' },
+  { id: 'google-yellow-tint', name: 'Жёлтый', type: 'solid', color: '45 100% 96%' },
+  // Gradient backgrounds
+  { id: 'google-blue-gradient', name: 'Синий градиент', type: 'gradient', from: '214 100% 97%', to: '200 80% 94%', angle: 135 },
+  { id: 'google-sunset', name: 'Закат', type: 'gradient', from: '45 100% 96%', to: '5 90% 95%', angle: 135 },
+  { id: 'google-ocean', name: 'Океан', type: 'gradient', from: '200 80% 96%', to: '142 60% 94%', angle: 180 },
+  { id: 'google-candy', name: 'Конфета', type: 'gradient', from: '5 90% 96%', to: '280 70% 95%', angle: 120 },
+  { id: 'google-aurora', name: 'Аврора', type: 'gradient', from: '142 60% 96%', to: '214 100% 94%', angle: 160 },
+];
+
 // Design block backdrop options
 export interface DesignBlockSettings {
   // Text sub-block backdrop colors (HSL values)
@@ -183,6 +199,7 @@ export interface ThemePreset {
   name: string;
   config: Partial<DesignSystemConfig>;
   isCustom?: boolean;
+  backgroundPresets?: BackgroundPreset[]; // Theme-specific background presets
 }
 
 // Base themes that cannot be deleted
@@ -212,8 +229,12 @@ export const BASE_THEMES: ThemePreset[] = [
       // Roboto is Google's signature font
       fontFamily: '"Roboto", system-ui, sans-serif',
       headingFontFamily: '"Roboto", system-ui, sans-serif',
+      // Default background preset for Google theme
+      backgroundPresetId: 'google-white',
+      backgroundType: 'solid',
     },
     isCustom: false,
+    backgroundPresets: GOOGLE_BACKGROUND_PRESETS,
   },
   {
     id: 'notion',

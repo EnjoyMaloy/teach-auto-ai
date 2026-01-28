@@ -417,7 +417,10 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   };
 
   // Custom background functions
-  const allBackgrounds = [...BACKGROUND_PRESETS, ...customBackgrounds];
+  // Get theme-specific presets or default ones
+  const activeTheme = allThemes.find(t => t.id === activePreset);
+  const themeBackgroundPresets = activeTheme?.backgroundPresets || BACKGROUND_PRESETS;
+  const allBackgrounds = [...themeBackgroundPresets, ...customBackgrounds];
 
   const saveCustomBackgrounds = (backgrounds: BackgroundPreset[]) => {
     setCustomBackgrounds(backgrounds);
@@ -734,9 +737,9 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 
                 {/* Default presets */}
                 <div className="grid grid-cols-5 gap-2">
-                  {BACKGROUND_PRESETS.map((preset) => {
+                  {themeBackgroundPresets.map((preset) => {
                     const isSelected = config.backgroundPresetId === preset.id;
-                    const bgStyle = preset.type === 'gradient' 
+                    const bgStyle = preset.type === 'gradient'
                       ? { background: `linear-gradient(${preset.angle || 135}deg, hsl(${preset.from}), hsl(${preset.to}))` }
                       : { backgroundColor: `hsl(${preset.color})` };
                     
