@@ -817,32 +817,57 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 </div>
 
                 {/* Button Preview */}
-                <div className="p-4 rounded-xl border bg-muted/30">
-                  <p className="text-xs text-muted-foreground mb-3">Превью кнопки</p>
-                  <div 
-                    className="rounded-lg p-4"
-                    style={{ 
-                      backgroundColor: `hsl(${config.designBlock?.buttonBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.buttonBackdropColor})` 
+                <div 
+                  className="rounded-lg p-3 space-y-3"
+                  style={{ 
+                    backgroundColor: `hsl(${config.designBlock?.buttonBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.buttonBackdropColor})` 
+                  }}
+                >
+                  {/* Progress bar */}
+                  <div className="flex gap-1">
+                    {[0, 1].map((i) => (
+                      <div 
+                        key={`completed-${i}`}
+                        className="h-1 flex-1 rounded-sm"
+                        style={{ 
+                          backgroundColor: `hsl(${config.designBlock?.progressCompletedColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressCompletedColor})` 
+                        }}
+                      />
+                    ))}
+                    <div 
+                      className="h-1 flex-1 rounded-sm"
+                      style={{ 
+                        backgroundColor: `hsl(${config.designBlock?.progressActiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressActiveColor})` 
+                      }}
+                    />
+                    {[0, 1, 2].map((i) => (
+                      <div 
+                        key={`inactive-${i}`}
+                        className="h-1 flex-1 rounded-sm"
+                        style={{ 
+                          backgroundColor: `hsl(${config.designBlock?.progressInactiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressInactiveColor})` 
+                        }}
+                      />
+                    ))}
+                  </div>
+                  {/* Button */}
+                  <button
+                    className="w-full py-3 font-bold uppercase tracking-wide text-sm transition-all"
+                    style={{
+                      backgroundColor: `hsl(${config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor})`,
+                      color: `hsl(${config.primaryForeground || DEFAULT_DESIGN_SYSTEM.primaryForeground})`,
+                      borderRadius: config.buttonStyle === 'pill' 
+                        ? '9999px' 
+                        : config.buttonStyle === 'square' 
+                          ? '0.5rem' 
+                          : '0.75rem',
+                      boxShadow: (config.buttonDepth ?? 'raised') === 'raised'
+                        ? `0 4px 0 0 hsl(${config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor} / 0.4), 0 6px 12px -2px hsl(${config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor} / 0.25)`
+                        : 'none',
                     }}
                   >
-                    <button
-                      className="w-full py-3 font-bold uppercase tracking-wide text-sm transition-all"
-                      style={{
-                        backgroundColor: `hsl(${config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor})`,
-                        color: `hsl(${config.primaryForeground || DEFAULT_DESIGN_SYSTEM.primaryForeground})`,
-                        borderRadius: config.buttonStyle === 'pill' 
-                          ? '9999px' 
-                          : config.buttonStyle === 'square' 
-                            ? '0.5rem' 
-                            : '0.75rem',
-                        boxShadow: (config.buttonDepth ?? 'raised') === 'raised'
-                          ? `0 4px 0 0 hsl(${config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor} / 0.4), 0 6px 12px -2px hsl(${config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor} / 0.25)`
-                          : 'none',
-                      }}
-                    >
-                      ПРОДОЛЖИТЬ
-                    </button>
-                  </div>
+                    ПРОДОЛЖИТЬ
+                  </button>
                 </div>
               </div>
             </TabsContent>
