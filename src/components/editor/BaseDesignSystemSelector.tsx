@@ -394,9 +394,6 @@ const ThemeCard: React.FC<ThemeCardProps> = ({
       
       <p className="text-sm font-medium text-foreground truncate">{system.name}</p>
       
-      {isSelected && (
-        <Check className="absolute top-2 right-2 w-4 h-4 text-primary" />
-      )}
 
       {/* Edit actions */}
       {canEdit && (
