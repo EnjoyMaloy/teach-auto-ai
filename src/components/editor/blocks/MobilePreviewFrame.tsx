@@ -1017,20 +1017,16 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     }
   };
 
-  // Get progress bar colors from design system
-  const progressColors = {
-    active: designSystem?.designBlock?.progressActiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressActiveColor,
-    completed: designSystem?.designBlock?.progressCompletedColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressCompletedColor,
-    inactive: designSystem?.designBlock?.progressInactiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressInactiveColor,
-    backdrop: designSystem?.designBlock?.progressBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressBackdropColor,
-  };
+  // Get accent color from design system for progress bar and quiz selections
+  const accentColor = (designSystem?.designBlock as { accentElementColor?: string })?.accentElementColor || DEFAULT_DESIGN_BLOCK_SETTINGS.accentElementColor;
+  const inactiveColor = '0 0% 0% / 0.15'; // Light gray for inactive elements
   
 
   const progressBar = !hideHeader && (
     <div 
       className="h-10 flex items-center justify-center px-4 border-b shrink-0"
       style={{ 
-        backgroundColor: `hsl(${progressColors.backdrop})`,
+        backgroundColor: `hsl(0 0% 0% / 0.03)`,
         borderColor: `hsl(${ds.mutedColor})`,
       }}
     >
@@ -1042,11 +1038,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             style={{
               height: '6px',
               width: i === blockIndex ? '24px' : '8px',
-              backgroundColor: i === blockIndex 
-                ? `hsl(${progressColors.active})` 
-                : i < blockIndex 
-                  ? `hsl(${progressColors.completed})` 
-                  : `hsl(${progressColors.inactive})`,
+              backgroundColor: i <= blockIndex 
+                ? `hsl(${accentColor})` 
+                : `hsl(${inactiveColor})`,
             }}
           />
         ))}
@@ -1395,7 +1389,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           <div 
             className="absolute top-0 left-0 right-0 h-10 flex items-center justify-center px-4 border-b z-10"
             style={{ 
-              backgroundColor: `hsl(${progressColors.backdrop})`,
+              backgroundColor: `hsl(0 0% 0% / 0.03)`,
               borderColor: `hsl(${ds.mutedColor})`,
             }}
           >
@@ -1407,11 +1401,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                   style={{
                     height: '6px',
                     width: i === blockIndex ? '24px' : '8px',
-                    backgroundColor: i === blockIndex 
-                      ? `hsl(${progressColors.active})` 
-                      : i < blockIndex 
-                        ? `hsl(${progressColors.completed})` 
-                        : `hsl(${progressColors.inactive})`,
+                    backgroundColor: i <= blockIndex 
+                      ? `hsl(${accentColor})` 
+                      : `hsl(${inactiveColor})`,
                   }}
                 />
               ))}

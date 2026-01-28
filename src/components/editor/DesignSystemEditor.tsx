@@ -635,102 +635,72 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 maxBackgrounds={5}
               />
 
-              {/* Progress Bar */}
-              <div className="border-t pt-6 space-y-2">
-                <Label className="text-base font-semibold">Прогресс-бар</Label>
-                <p className="text-sm text-muted-foreground">
-                  Цвета индикаторов прогресса в слайдах
-                </p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Accent Color for Interactive Elements */}
+              <div className="border-t pt-6 space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-base font-semibold">Акцентный цвет</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Применяется к прогресс-бару и выбранным вариантам ответа в квизах
+                  </p>
+                </div>
                 <ColorInput
-                  label="Активный слайд"
-                  value={config.designBlock?.progressActiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressActiveColor}
+                  label="Цвет"
+                  value={config.designBlock?.accentElementColor || DEFAULT_DESIGN_BLOCK_SETTINGS.accentElementColor}
                   onChange={(v) => updateConfig({ 
                     designBlock: { 
                       ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
                       ...config.designBlock, 
-                      progressActiveColor: v 
+                      accentElementColor: v 
                     } 
                   })}
-                  description="Текущий слайд"
+                  description="Основной цвет интерактивных элементов"
                 />
-                <ColorInput
-                  label="Пройденные"
-                  value={config.designBlock?.progressCompletedColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressCompletedColor}
-                  onChange={(v) => updateConfig({ 
-                    designBlock: { 
-                      ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                      ...config.designBlock, 
-                      progressCompletedColor: v 
-                    } 
-                  })}
-                  description="Завершённые слайды"
-                />
-                <ColorInput
-                  label="Неактивные"
-                  value={config.designBlock?.progressInactiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressInactiveColor}
-                  onChange={(v) => updateConfig({ 
-                    designBlock: { 
-                      ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                      ...config.designBlock, 
-                      progressInactiveColor: v 
-                    } 
-                  })}
-                  description="Непройденные слайды"
-                />
-                <ColorInput
-                  label="Подложка прогресс-бара"
-                  value={config.designBlock?.progressBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressBackdropColor}
-                  onChange={(v) => updateConfig({ 
-                    designBlock: { 
-                      ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                      ...config.designBlock, 
-                      progressBackdropColor: v 
-                    } 
-                  })}
-                  description="Фон за индикаторами"
-                />
-              </div>
 
-              {/* Progress Bar Preview */}
-              <div 
-                className="mt-4 rounded-lg px-3 py-2"
-                style={{ 
-                  backgroundColor: `hsl(${config.designBlock?.progressBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressBackdropColor})` 
-                }}
-              >
-                <div className="flex gap-1">
-                  {/* Completed slides */}
-                  {[0, 1].map((i) => (
-                    <div 
-                      key={`completed-${i}`}
-                      className="h-1 flex-1 rounded-sm transition-colors"
-                      style={{ 
-                        backgroundColor: `hsl(${config.designBlock?.progressCompletedColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressCompletedColor})` 
-                      }}
-                    />
-                  ))}
-                  {/* Active slide */}
-                  <div 
-                    className="h-1 flex-1 rounded-sm transition-colors"
-                    style={{ 
-                      backgroundColor: `hsl(${config.designBlock?.progressActiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressActiveColor})` 
-                    }}
-                  />
-                  {/* Inactive slides */}
-                  {[0, 1, 2].map((i) => (
-                    <div 
-                      key={`inactive-${i}`}
-                      className="h-1 flex-1 rounded-sm transition-colors"
-                      style={{ 
-                        backgroundColor: `hsl(${config.designBlock?.progressInactiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressInactiveColor})` 
-                      }}
-                    />
-                  ))}
+                {/* Preview */}
+                <div className="space-y-3 p-4 rounded-xl bg-muted/30 border border-border">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Превью</p>
+                  
+                  {/* Progress bar preview */}
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Прогресс-бар:</p>
+                    <div className="flex gap-1 bg-black/5 rounded-lg px-2 py-1.5">
+                      {[0, 1, 2].map((i) => (
+                        <div 
+                          key={`active-${i}`}
+                          className="h-1 flex-1 rounded-sm transition-colors"
+                          style={{ 
+                            backgroundColor: `hsl(${config.designBlock?.accentElementColor || DEFAULT_DESIGN_BLOCK_SETTINGS.accentElementColor})` 
+                          }}
+                        />
+                      ))}
+                      {[0, 1, 2].map((i) => (
+                        <div 
+                          key={`inactive-${i}`}
+                          className="h-1 flex-1 rounded-sm transition-colors bg-black/15"
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Quiz selection preview */}
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Выбор ответа:</p>
+                    <div className="flex gap-2">
+                      <div 
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium text-white"
+                        style={{ 
+                          backgroundColor: `hsl(${config.designBlock?.accentElementColor || DEFAULT_DESIGN_BLOCK_SETTINGS.accentElementColor})` 
+                        }}
+                      >
+                        Выбранный
+                      </div>
+                      <div className="px-3 py-1.5 rounded-lg text-xs font-medium border border-border bg-background text-muted-foreground">
+                        Не выбран
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-
               {/* Button Style */}
               <div className="border-t pt-6 space-y-2">
                 <Label className="text-base font-semibold">Кнопки</Label>
