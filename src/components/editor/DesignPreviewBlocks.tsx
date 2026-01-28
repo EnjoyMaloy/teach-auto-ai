@@ -457,7 +457,7 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
             onContinue={handleContinue}
             designSystem={config}
             isReadOnly={true}
-            isMuted={true}
+            isMuted={false}
           />
         </div>
       </div>
