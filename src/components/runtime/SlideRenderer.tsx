@@ -754,9 +754,9 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
   // Фидбек после ответа
   const renderFeedback = () => {
     if (answerState === 'idle') return null;
-
+    // Solid pastel backgrounds (no transparency)
     const bgColor = answerState === 'correct' 
-      ? `hsl(${ds.successColor} / 0.15)`
+      ? `hsl(142 76% 92%)`
       : answerState === 'partial'
         ? `hsl(48 100% 90%)`
         : `hsl(0 100% 95%)`;
@@ -861,7 +861,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
         style={{ 
           borderColor: (answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
           backgroundColor: answerState === 'correct' 
-            ? `hsl(${ds.successColor} / 0.15)` 
+            ? `hsl(142 76% 92%)` 
             : answerState === 'partial'
               ? `hsl(48 100% 90%)`
               : answerState === 'incorrect'

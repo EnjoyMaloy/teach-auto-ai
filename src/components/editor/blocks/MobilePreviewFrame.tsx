@@ -1076,13 +1076,16 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   // Incorrect answer colors
   const incorrectBgTint = '0 100% 95%'; // Pastel pink background
   const incorrectTextColor = ds.destructiveColor; // Red text
+  
+  // Correct answer colors (solid, no transparency)
+  const correctBgTint = '142 76% 92%'; // Pastel green background
 
   const resultFeedback = answerState !== 'idle' && (
     <div 
       className="px-4 py-3 text-center text-sm font-medium shrink-0"
       style={{
         backgroundColor: answerState === 'correct' 
-          ? `hsl(${ds.successColor} / 0.15)` 
+          ? `hsl(${correctBgTint})` 
           : answerState === 'partial'
             ? `hsl(${partialBgTint})`
             : `hsl(${incorrectBgTint})`,
@@ -1188,7 +1191,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       style={{ 
         borderColor: (answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
         backgroundColor: answerState === 'correct' 
-          ? `hsl(${ds.successColor} / 0.15)` 
+          ? `hsl(${correctBgTint})` 
           : answerState === 'partial'
             ? `hsl(${partialBgColor})`
             : answerState === 'incorrect'
@@ -1294,7 +1297,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           style={{ 
             borderColor: (answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
             backgroundColor: answerState === 'correct' 
-              ? `hsl(${ds.successColor} / 0.15)` 
+              ? `hsl(${correctBgTint})` 
               : answerState === 'partial'
                 ? `hsl(${partialBgTint})`
                 : answerState === 'incorrect'
@@ -1472,7 +1475,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           className="absolute bottom-0 left-0 right-0 h-20 border-t flex items-center justify-center gap-3 px-4 z-10"
           style={{ 
             borderColor: answerState === 'correct' ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
-            backgroundColor: answerState === 'correct' ? `hsl(${ds.successColor} / 0.15)` : 'transparent',
+            backgroundColor: answerState === 'correct' ? `hsl(${correctBgTint})` : 'transparent',
           }}
         >
           {/* Show retry button only for incorrect/partial answers */}

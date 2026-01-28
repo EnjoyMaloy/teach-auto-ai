@@ -408,7 +408,7 @@ export const SlideView: React.FC<SlideViewProps> = ({
           style={{
             bottom: `${NAV_HEIGHT}px`,
             backgroundColor: answerState === 'correct' 
-              ? `hsl(${ds.successColor} / 0.15)` 
+              ? `hsl(142 76% 92%)` 
               : answerState === 'partial'
                 ? `hsl(48 100% 90%)`
                 : `hsl(0 100% 95%)`,
@@ -446,7 +446,7 @@ export const SlideView: React.FC<SlideViewProps> = ({
         style={{ 
           borderColor: (answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
           backgroundColor: answerState === 'correct' 
-            ? `hsl(${ds.successColor} / 0.15)` 
+            ? `hsl(142 76% 92%)` 
             : answerState === 'partial'
               ? `hsl(48 100% 90%)`
               : answerState === 'incorrect'
