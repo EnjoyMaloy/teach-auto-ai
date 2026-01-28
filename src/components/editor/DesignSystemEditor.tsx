@@ -367,27 +367,15 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
       setActivePreset(config.themeId);
     }
   }, [config.themeId]);
-  const [customThemes, setCustomThemes] = useState<ThemePreset[]>(() => {
-    // Load custom themes from localStorage
-    const saved = localStorage.getItem('customThemes');
-    return saved ? JSON.parse(saved) : [];
-  });
   const [customBackgrounds, setCustomBackgrounds] = useState<BackgroundPreset[]>(() => {
     const saved = localStorage.getItem('customBackgrounds');
     return saved ? JSON.parse(saved) : [];
   });
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isCreateBgDialogOpen, setIsCreateBgDialogOpen] = useState(false);
-  const [newThemeName, setNewThemeName] = useState('');
   const [newBgName, setNewBgName] = useState('');
 
-  // Combined themes: base + custom
-  const allThemes = [...BASE_THEMES, ...customThemes];
-
-  const saveCustomThemes = (themes: ThemePreset[]) => {
-    setCustomThemes(themes);
-    localStorage.setItem('customThemes', JSON.stringify(themes));
-  };
+  // Use only base themes (Google, Notion, Apple, Duolingo)
+  const allThemes = BASE_THEMES;
 
   const updateConfig = (updates: Partial<DesignSystemConfig>) => {
     // Keep themeId and don't reset activePreset - user is just customizing within the theme
@@ -401,32 +389,6 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
       setActivePreset(presetId);
     }
   };
-
-  const createCustomTheme = () => {
-    if (!newThemeName.trim()) return;
-    
-    const newTheme: ThemePreset = {
-      id: `custom-${Date.now()}`,
-      name: newThemeName.trim(),
-      config: { ...config },
-      isCustom: true,
-    };
-    
-    saveCustomThemes([...customThemes, newTheme]);
-    setNewThemeName('');
-    setIsCreateDialogOpen(false);
-    setActivePreset(newTheme.id);
-  };
-
-  const deleteCustomTheme = (themeId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const updated = customThemes.filter(t => t.id !== themeId);
-    saveCustomThemes(updated);
-    if (activePreset === themeId) {
-      setActivePreset(null);
-    }
-  };
-
   const resetToDefault = () => {
     onChange(DEFAULT_DESIGN_SYSTEM);
     setActivePreset(null);
@@ -563,25 +525,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Base Design Systems - from admin */}
-      <BaseDesignSystemSelector
-        selectedId={selectedBaseSystemId || null}
-        onSelect={handleBaseSystemSelect}
-        isAdmin={isAdmin}
-        currentConfig={config}
-      />
-
-      {/* Show restriction message for non-admins */}
-      {isEditingRestricted && (
-        <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
-          <p className="font-medium">Базовая тема выбрана</p>
-          <p className="text-xs mt-1 text-amber-600">
-            Вы не можете редактировать параметры базовой темы. Выберите другую тему или попросите администратора внести изменения.
-          </p>
-        </div>
-      )}
-
-      {/* Presets - shown always but only editable for admins or when no base system is selected */}
+      {/* Unified Themes Block - Base systems from DB + Preset themes */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
@@ -601,14 +545,27 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
             Сбросить
           </Button>
         </div>
+
+        {/* Base design systems from database (admin-managed) */}
+        <BaseDesignSystemSelector
+          selectedId={selectedBaseSystemId || null}
+          onSelect={handleBaseSystemSelect}
+          isAdmin={isAdmin}
+          currentConfig={config}
+        />
+
+        {/* Built-in preset themes */}
         <div className="grid grid-cols-2 gap-2">
           {allThemes.map((preset) => (
             <button
               key={preset.id}
-              onClick={() => applyPreset(preset.id)}
+              onClick={() => {
+                applyPreset(preset.id);
+                onBaseSystemSelect?.(null); // Deselect base system when selecting preset
+              }}
               className={cn(
                 "relative p-3 rounded-xl border-2 transition-all text-left bg-card group",
-                (activePreset === preset.id || config.themeId === preset.id)
+                (activePreset === preset.id || config.themeId === preset.id) && !selectedBaseSystemId
                   ? "border-primary bg-primary/5" 
                   : "border-border hover:border-primary/50"
               )}
@@ -628,61 +585,23 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 />
               </div>
               <p className="text-sm font-medium text-foreground">{preset.name}</p>
-              {(activePreset === preset.id || config.themeId === preset.id) && (
+              {(activePreset === preset.id || config.themeId === preset.id) && !selectedBaseSystemId && (
                 <Check className="absolute top-2 right-2 w-4 h-4 text-primary" />
-              )}
-              {preset.isCustom && (
-                <button
-                  onClick={(e) => deleteCustomTheme(preset.id, e)}
-                  className="absolute top-2 right-2 w-6 h-6 rounded-full bg-destructive/10 text-destructive opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-destructive/20"
-                >
-                  <Trash2 className="w-3 h-3" />
-                </button>
               )}
             </button>
           ))}
-          
-          {/* Add new theme button */}
-          <button
-            onClick={() => setIsCreateDialogOpen(true)}
-            className="p-3 rounded-xl border-2 border-dashed border-border hover:border-primary/50 transition-all text-left bg-card/50 flex flex-col items-center justify-center gap-1 min-h-[80px]"
-          >
-            <Plus className="w-5 h-5 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">Новая тема</span>
-          </button>
         </div>
       </div>
 
-      {/* Create Theme Dialog */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Создать новую тему</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>Название темы</Label>
-              <Input
-                value={newThemeName}
-                onChange={(e) => setNewThemeName(e.target.value)}
-                placeholder="Например: Моя тема"
-                onKeyDown={(e) => e.key === 'Enter' && createCustomTheme()}
-              />
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Текущие настройки дизайна будут сохранены в эту тему.
-            </p>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-              Отмена
-            </Button>
-            <Button onClick={createCustomTheme} disabled={!newThemeName.trim()}>
-              Создать
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Show restriction message for non-admins with base system selected */}
+      {isEditingRestricted && (
+        <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+          <p className="font-medium">Базовая тема выбрана</p>
+          <p className="text-xs mt-1 text-amber-600">
+            Вы не можете редактировать параметры базовой темы. Выберите другую тему или попросите администратора внести изменения.
+          </p>
+        </div>
+      )}
 
       {/* Create Background Preset Dialog */}
       <Dialog open={isCreateBgDialogOpen} onOpenChange={setIsCreateBgDialogOpen}>
