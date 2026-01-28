@@ -452,15 +452,16 @@ export const SlideView: React.FC<SlideViewProps> = ({
               : 'transparent',
         }}
       >
-        {/* Show retry button only for incorrect answers */}
-        {isInteractive && answerState === 'incorrect' && (
+        {/* Show retry button for incorrect and partial answers */}
+        {isInteractive && (answerState === 'incorrect' || answerState === 'partial') && (
           <button
             type="button"
             onClick={resetState}
             className={cn("h-11 px-4 flex items-center gap-2 border-2 font-bold uppercase tracking-wide", pressAnimationClass)}
             style={{
-              borderColor: `hsl(${ds.mutedColor})`,
-              color: `hsl(${ds.foregroundColor})`,
+              borderColor: answerState === 'partial' ? `hsl(45 93% 47%)` : `hsl(${ds.mutedColor})`,
+              backgroundColor: `hsl(0 0% 100%)`,
+              color: answerState === 'partial' ? `hsl(45 93% 47%)` : `hsl(${ds.foregroundColor})`,
               borderRadius: getButtonRadius(),
             }}
           >

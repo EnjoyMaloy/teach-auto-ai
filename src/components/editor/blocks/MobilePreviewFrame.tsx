@@ -583,10 +583,14 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                   let bgColor = `hsl(${ds.cardColor})`;
                   let textColor = `hsl(${ds.foregroundColor})`;
                   
+                  // For partial state, use amber/yellow for correct answers instead of green
+                  const correctColor = answerState === 'partial' ? '45 93% 47%' : ds.successColor;
+                  const correctBgColor = answerState === 'partial' ? '48 100% 90%' : `${ds.successColor} / 0.1`;
+                  
                   if (showResult && option.isCorrect) {
-                    borderColor = `hsl(${ds.successColor})`;
-                    bgColor = `hsl(${ds.successColor} / 0.1)`;
-                    textColor = `hsl(${ds.successColor})`;
+                    borderColor = `hsl(${correctColor})`;
+                    bgColor = `hsl(${correctBgColor})`;
+                    textColor = `hsl(${correctColor})`;
                   } else if (showResult && isSelected && !option.isCorrect) {
                     borderColor = `hsl(${ds.destructiveColor})`;
                     bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
@@ -1183,8 +1187,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       {/* Hint button - only when idle and has more hints */}
       {hintButton}
       
-      {/* Show retry button only for incorrect answers (not for correct or partial) */}
-      {isInteractive && answerState === 'incorrect' && (
+      {/* Show retry button for incorrect and partial answers */}
+      {isInteractive && (answerState === 'incorrect' || answerState === 'partial') && (
         <button
           type="button"
           onClick={resetState}
@@ -1193,8 +1197,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             pressAnimationClass
           )}
           style={{
-            borderColor: `hsl(${ds.mutedColor})`,
-            color: `hsl(${ds.foregroundColor})`,
+            borderColor: answerState === 'partial' ? `hsl(${partialButtonColor})` : `hsl(${ds.mutedColor})`,
+            backgroundColor: `hsl(0 0% 100%)`,
+            color: answerState === 'partial' ? `hsl(${partialButtonColor})` : `hsl(${ds.foregroundColor})`,
             borderRadius: getButtonRadius(),
           }}
         >
@@ -1278,8 +1283,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           {/* Hint button - only when idle and has more hints */}
           {hintButton}
           
-          {/* Show retry button only for incorrect answers (not for correct or partial) */}
-          {isInteractive && answerState === 'incorrect' && (
+          {/* Show retry button for incorrect and partial answers */}
+          {isInteractive && (answerState === 'incorrect' || answerState === 'partial') && (
             <button
               type="button"
               onClick={resetState}
@@ -1288,8 +1293,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                 pressAnimationClass
               )}
               style={{
-                borderColor: `hsl(${ds.mutedColor})`,
-                color: `hsl(${ds.foregroundColor})`,
+                borderColor: answerState === 'partial' ? `hsl(${partialButtonColor})` : `hsl(${ds.mutedColor})`,
+                backgroundColor: `hsl(0 0% 100%)`,
+                color: answerState === 'partial' ? `hsl(${partialButtonColor})` : `hsl(${ds.foregroundColor})`,
                 borderRadius: getButtonRadius(),
               }}
             >
