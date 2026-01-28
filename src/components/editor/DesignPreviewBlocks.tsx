@@ -83,20 +83,52 @@ const createSampleSlides = (): Slide[] => {
       order: 1,
       content: '',
       subBlocks: [
-        // Badge - 4 варианта с иконками Lucide
+        // Badge - Oval
         {
-          id: 'sub-badge',
+          id: 'sub-badge-oval',
           type: 'badge',
           order: 1,
           badges: [
-            { id: '1', text: 'Square', iconType: 'lucide', iconValue: 'BookOpen' },
-            { id: '2', text: 'Oval', iconType: 'lucide', iconValue: 'Sparkles' },
-            { id: '3', text: 'Contrast', iconType: 'lucide', iconValue: 'Zap' },
-            { id: '4', text: 'Pastel', iconType: 'lucide', iconValue: 'Heart' },
+            { id: '1', text: 'Oval', iconType: 'lucide', iconValue: 'BookOpen' },
           ],
           badgeVariant: 'oval',
           badgeSize: 'large',
-          badgeLayout: 'horizontal',
+          textAlign: 'center',
+        } as SubBlock,
+        // Badge - Square
+        {
+          id: 'sub-badge-square',
+          type: 'badge',
+          order: 2,
+          badges: [
+            { id: '1', text: 'Square', iconType: 'lucide', iconValue: 'Sparkles' },
+          ],
+          badgeVariant: 'square',
+          badgeSize: 'large',
+          textAlign: 'center',
+        } as SubBlock,
+        // Badge - Contrast
+        {
+          id: 'sub-badge-contrast',
+          type: 'badge',
+          order: 3,
+          badges: [
+            { id: '1', text: 'Contrast', iconType: 'lucide', iconValue: 'Zap' },
+          ],
+          badgeVariant: 'contrast',
+          badgeSize: 'large',
+          textAlign: 'center',
+        } as SubBlock,
+        // Badge - Pastel
+        {
+          id: 'sub-badge-pastel',
+          type: 'badge',
+          order: 4,
+          badges: [
+            { id: '1', text: 'Pastel', iconType: 'lucide', iconValue: 'Heart' },
+          ],
+          badgeVariant: 'pastel',
+          badgeSize: 'large',
           textAlign: 'center',
         } as SubBlock,
         // Heading
