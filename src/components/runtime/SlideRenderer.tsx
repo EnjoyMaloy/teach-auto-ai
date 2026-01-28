@@ -379,7 +379,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
             <div className="w-full flex-1 flex flex-col justify-center">
               <p 
                 className="text-lg font-semibold mb-4 text-center"
-                style={{ color: `hsl(${ds.foregroundColor})` }}
+                style={{ 
+                  color: `hsl(${ds.foregroundColor})`,
+                  fontFamily: ds.headingFontFamily,
+                }}
               >
                 {slide.content || 'Вопрос?'}
               </p>
@@ -451,7 +454,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
             <div className="flex-1 flex flex-col items-center justify-center">
               <p 
                 className="text-lg font-semibold mb-6 text-center"
-                style={{ color: `hsl(${ds.foregroundColor})` }}
+                style={{ 
+                  color: `hsl(${ds.foregroundColor})`,
+                  fontFamily: ds.headingFontFamily,
+                }}
               >
                 {slide.content || 'Верно или неверно?'}
               </p>
@@ -541,7 +547,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
           <div className="flex-1 flex flex-col items-center justify-center p-4 h-full min-h-0">
             <p 
               className="text-lg font-semibold mb-6 text-center"
-              style={{ color: `hsl(${ds.foregroundColor})` }}
+              style={{ 
+                color: `hsl(${ds.foregroundColor})`,
+                fontFamily: ds.headingFontFamily,
+              }}
             >
               {slide.content || 'Выберите значение'}
             </p>
@@ -573,7 +582,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
           <div className="flex-1 flex flex-col p-4 overflow-auto h-full min-h-0">
             <p 
               className="text-lg font-semibold mb-4 text-center"
-              style={{ color: `hsl(${ds.foregroundColor})` }}
+              style={{ 
+                color: `hsl(${ds.foregroundColor})`,
+                fontFamily: ds.headingFontFamily,
+              }}
             >
               {slide.content || 'Соедините пары'}
             </p>
@@ -648,7 +660,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
           <div className="flex-1 flex flex-col p-4 overflow-auto h-full min-h-0">
             <p 
               className="text-lg font-semibold mb-4 text-center"
-              style={{ color: `hsl(${ds.foregroundColor})` }}
+              style={{ 
+                color: `hsl(${ds.foregroundColor})`,
+                fontFamily: ds.headingFontFamily,
+              }}
             >
               {slide.content || 'Расположите в правильном порядке'}
             </p>
