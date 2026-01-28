@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { BaseDesignSystem, useBaseDesignSystems } from '@/hooks/useBaseDesignSystems';
+import { UserDesignSystem, useUserDesignSystems } from '@/hooks/useUserDesignSystems';
 import { DesignSystemConfig } from '@/types/designSystem';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -24,12 +23,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Check, Edit, Trash2, Plus, Star, Loader2 } from 'lucide-react';
+import { Check, Edit, Trash2, Plus, Star, Loader2, Palette, Users, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BaseDesignSystemSelectorProps {
   selectedId: string | null;
-  onSelect: (system: BaseDesignSystem) => void;
+  onSelect: (system: BaseDesignSystem | UserDesignSystem) => void;
   isAdmin: boolean;
   currentConfig?: DesignSystemConfig;
 }
@@ -40,34 +39,71 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
   isAdmin,
   currentConfig,
 }) => {
-  const { systems, isLoading, createSystem, updateSystem, deleteSystem, setDefault } = useBaseDesignSystems();
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const { 
+    systems: baseSystems, 
+    isLoading: isLoadingBase, 
+    createSystem: createBaseSystem, 
+    updateSystem: updateBaseSystem, 
+    deleteSystem: deleteBaseSystem, 
+    setDefault 
+  } = useBaseDesignSystems();
+  
+  const { 
+    systems: userSystems, 
+    isLoading: isLoadingUser, 
+    createSystem: createUserSystem, 
+    updateSystem: updateUserSystem, 
+    deleteSystem: deleteUserSystem 
+  } = useUserDesignSystems();
+
+  const [isCreateBaseDialogOpen, setIsCreateBaseDialogOpen] = useState(false);
+  const [isCreateUserDialogOpen, setIsCreateUserDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedForDelete, setSelectedForDelete] = useState<BaseDesignSystem | null>(null);
+  const [selectedForDelete, setSelectedForDelete] = useState<{ system: BaseDesignSystem | UserDesignSystem; isBase: boolean } | null>(null);
   const [newName, setNewName] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleCreate = async () => {
+  const isLoading = isLoadingBase || isLoadingUser;
+
+  const handleCreateBase = async () => {
     if (!newName.trim() || !currentConfig) return;
     
     setIsSaving(true);
     try {
-      await createSystem(newName.trim(), newDescription.trim(), currentConfig);
+      await createBaseSystem(newName.trim(), newDescription.trim(), currentConfig);
       setNewName('');
       setNewDescription('');
-      setIsCreateDialogOpen(false);
+      setIsCreateBaseDialogOpen(false);
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleUpdateConfig = async (system: BaseDesignSystem) => {
+  const handleCreateUser = async () => {
+    if (!newName.trim() || !currentConfig) return;
+    
+    setIsSaving(true);
+    try {
+      await createUserSystem(newName.trim(), newDescription.trim(), currentConfig);
+      setNewName('');
+      setNewDescription('');
+      setIsCreateUserDialogOpen(false);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleUpdateConfig = async (system: BaseDesignSystem | UserDesignSystem, isBase: boolean) => {
     if (!currentConfig) return;
     
     setIsSaving(true);
     try {
-      await updateSystem(system.id, { config: currentConfig });
+      if (isBase) {
+        await updateBaseSystem(system.id, { config: currentConfig });
+      } else {
+        await updateUserSystem(system.id, { config: currentConfig });
+      }
     } finally {
       setIsSaving(false);
     }
@@ -78,7 +114,11 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
     
     setIsSaving(true);
     try {
-      await deleteSystem(selectedForDelete.id);
+      if (selectedForDelete.isBase) {
+        await deleteBaseSystem(selectedForDelete.system.id);
+      } else {
+        await deleteUserSystem(selectedForDelete.system.id);
+      }
       setSelectedForDelete(null);
       setIsDeleteDialogOpen(false);
     } finally {
@@ -98,146 +138,149 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
     );
   }
 
-  // If no systems and not admin, show nothing
-  if (systems.length === 0 && !isAdmin) {
-    return null;
+  const hasBaseSystems = baseSystems.length > 0;
+  const hasUserSystems = userSystems.length > 0;
+
+  // If no systems at all and not admin, still show option to create personal theme
+  if (!hasBaseSystems && !hasUserSystems && !isAdmin) {
+    return (
+      <div className="space-y-3">
+        <Button
+          variant="outline"
+          className="w-full justify-start gap-2"
+          onClick={() => setIsCreateUserDialogOpen(true)}
+        >
+          <Plus className="w-4 h-4" />
+          <User className="w-4 h-4" />
+          Сохранить как личную тему
+        </Button>
+        
+        {/* User Create Dialog */}
+        <CreateThemeDialog
+          open={isCreateUserDialogOpen}
+          onOpenChange={setIsCreateUserDialogOpen}
+          title="Сохранить личную тему"
+          description="Эта тема будет доступна только вам в вашем аккаунте."
+          name={newName}
+          onNameChange={setNewName}
+          descriptionValue={newDescription}
+          onDescriptionChange={setNewDescription}
+          onSubmit={handleCreateUser}
+          isSaving={isSaving}
+        />
+      </div>
+    );
   }
 
   return (
-    <>
-      {/* Systems grid + Create button for admin */}
-      <div className="grid grid-cols-2 gap-2">
-        {systems.map((system) => (
-          <div
-            key={system.id}
-            className={cn(
-              "relative p-3 rounded-xl border-2 transition-all bg-card group cursor-pointer",
-              selectedId === system.id
-                ? "border-primary bg-primary/5" 
-                : "border-border hover:border-primary/50"
-            )}
-            onClick={() => onSelect(system)}
-          >
-            {/* Color preview dots */}
-            <div className="flex gap-1 mb-2">
-              <div 
-                className="w-5 h-5 rounded-full border border-border/50"
-                style={{ backgroundColor: `hsl(${system.config.primaryColor || '262 83% 58%'})` }}
-              />
-              <div 
-                className="w-5 h-5 rounded-full border border-border/50"
-                style={{ backgroundColor: `hsl(${system.config.backgroundColor || '0 0% 100%'})` }}
-              />
-              <div 
-                className="w-5 h-5 rounded-full border border-border/50"
-                style={{ backgroundColor: `hsl(${system.config.foregroundColor || '240 10% 4%'})` }}
-              />
-            </div>
-            
-            <div className="flex items-center gap-1">
-              <p className="text-sm font-medium text-foreground truncate">{system.name}</p>
-              {system.is_default && (
-                <Star className="w-3 h-3 text-amber-500 fill-amber-500 flex-shrink-0" />
-              )}
-            </div>
-            
-            {selectedId === system.id && (
-              <Check className="absolute top-2 right-2 w-4 h-4 text-primary" />
-            )}
-
-            {/* Admin actions */}
-            {isAdmin && (
-              <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                {!system.is_default && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleSetDefault(system.id);
-                    }}
-                    className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center hover:bg-amber-200 transition-colors"
-                    title="Сделать по умолчанию"
-                  >
-                    <Star className="w-3 h-3" />
-                  </button>
-                )}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleUpdateConfig(system);
-                  }}
-                  className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition-colors"
-                  title="Обновить конфигурацию"
-                >
-                  <Edit className="w-3 h-3" />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedForDelete(system);
-                    setIsDeleteDialogOpen(true);
-                  }}
-                  className="w-6 h-6 rounded-full bg-destructive/10 text-destructive flex items-center justify-center hover:bg-destructive/20 transition-colors"
-                  title="Удалить"
-                >
-                  <Trash2 className="w-3 h-3" />
-                </button>
-              </div>
-            )}
+    <div className="space-y-4">
+      {/* Base systems (admin-managed, visible to all) */}
+      {hasBaseSystems && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Palette className="w-3.5 h-3.5" />
+            <span>Общие темы</span>
           </div>
-        ))}
+          <div className="grid grid-cols-2 gap-2">
+            {baseSystems.map((system) => (
+              <ThemeCard
+                key={system.id}
+                system={system}
+                isSelected={selectedId === system.id}
+                onSelect={() => onSelect(system)}
+                isAdmin={isAdmin}
+                isBase={true}
+                onSetDefault={() => handleSetDefault(system.id)}
+                onUpdateConfig={() => handleUpdateConfig(system, true)}
+                onDelete={() => {
+                  setSelectedForDelete({ system, isBase: true });
+                  setIsDeleteDialogOpen(true);
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
-        {/* Create button - only for admin */}
+      {/* User systems (personal themes) */}
+      {hasUserSystems && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <User className="w-3.5 h-3.5" />
+            <span>Мои темы</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {userSystems.map((system) => (
+              <ThemeCard
+                key={system.id}
+                system={system}
+                isSelected={selectedId === system.id}
+                onSelect={() => onSelect(system as any)}
+                isAdmin={false}
+                isBase={false}
+                isOwner={true}
+                onUpdateConfig={() => handleUpdateConfig(system, false)}
+                onDelete={() => {
+                  setSelectedForDelete({ system, isBase: false });
+                  setIsDeleteDialogOpen(true);
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Create buttons at the bottom */}
+      <div className="flex flex-col gap-2 pt-2 border-t border-border">
         {isAdmin && (
-          <button
-            onClick={() => setIsCreateDialogOpen(true)}
-            className="p-3 rounded-xl border-2 border-dashed border-border hover:border-primary/50 transition-all text-left bg-card/50 flex flex-col items-center justify-center gap-1 min-h-[80px]"
+          <Button
+            variant="outline"
+            className="w-full justify-start gap-2 text-sm"
+            onClick={() => setIsCreateBaseDialogOpen(true)}
           >
-            <Plus className="w-5 h-5 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">Новая тема</span>
-          </button>
+            <Plus className="w-4 h-4" />
+            <Users className="w-4 h-4" />
+            Добавить общую тему
+          </Button>
         )}
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2 text-sm text-muted-foreground hover:text-foreground"
+          onClick={() => setIsCreateUserDialogOpen(true)}
+        >
+          <Plus className="w-4 h-4" />
+          <User className="w-4 h-4" />
+          Сохранить как личную тему
+        </Button>
       </div>
 
-      {/* Create Dialog */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Создать новую тему</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>Название</Label>
-              <Input
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder="Например: Корпоративная тема"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Описание (необязательно)</Label>
-              <Textarea
-                value={newDescription}
-                onChange={(e) => setNewDescription(e.target.value)}
-                placeholder="Краткое описание темы..."
-                rows={2}
-              />
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Текущие настройки дизайна будут сохранены в эту тему.
-              Все пользователи смогут её выбрать.
-            </p>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-              Отмена
-            </Button>
-            <Button onClick={handleCreate} disabled={!newName.trim() || isSaving}>
-              {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-              Создать
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Base Create Dialog */}
+      <CreateThemeDialog
+        open={isCreateBaseDialogOpen}
+        onOpenChange={setIsCreateBaseDialogOpen}
+        title="Создать общую тему"
+        description="Эта тема будет доступна всем пользователям платформы."
+        name={newName}
+        onNameChange={setNewName}
+        descriptionValue={newDescription}
+        onDescriptionChange={setNewDescription}
+        onSubmit={handleCreateBase}
+        isSaving={isSaving}
+      />
+
+      {/* User Create Dialog */}
+      <CreateThemeDialog
+        open={isCreateUserDialogOpen}
+        onOpenChange={setIsCreateUserDialogOpen}
+        title="Сохранить личную тему"
+        description="Эта тема будет доступна только вам в вашем аккаунте."
+        name={newName}
+        onNameChange={setNewName}
+        descriptionValue={newDescription}
+        onDescriptionChange={setNewDescription}
+        onSubmit={handleCreateUser}
+        isSaving={isSaving}
+      />
 
       {/* Delete Confirmation */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
@@ -245,8 +288,8 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
           <AlertDialogHeader>
             <AlertDialogTitle>Удалить тему?</AlertDialogTitle>
             <AlertDialogDescription>
-              Тема "{selectedForDelete?.name}" будет удалена. Курсы, использующие эту тему, 
-              сохранят свои настройки, но потеряют связь с базовой темой.
+              Тема "{selectedForDelete?.system.name}" будет удалена.
+              {selectedForDelete?.isBase && ' Курсы, использующие эту тему, сохранят свои настройки, но потеряют связь с базовой темой.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -261,8 +304,179 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   );
 };
+
+// Theme card component
+interface ThemeCardProps {
+  system: BaseDesignSystem | UserDesignSystem;
+  isSelected: boolean;
+  onSelect: () => void;
+  isAdmin: boolean;
+  isBase: boolean;
+  isOwner?: boolean;
+  onSetDefault?: () => void;
+  onUpdateConfig: () => void;
+  onDelete: () => void;
+}
+
+const ThemeCard: React.FC<ThemeCardProps> = ({
+  system,
+  isSelected,
+  onSelect,
+  isAdmin,
+  isBase,
+  isOwner = false,
+  onSetDefault,
+  onUpdateConfig,
+  onDelete,
+}) => {
+  const canEdit = isBase ? isAdmin : isOwner;
+  const isDefault = 'is_default' in system && system.is_default;
+
+  return (
+    <div
+      className={cn(
+        "relative p-3 rounded-xl border-2 transition-all bg-card group cursor-pointer",
+        isSelected
+          ? "border-primary bg-primary/5" 
+          : "border-border hover:border-primary/50"
+      )}
+      onClick={onSelect}
+    >
+      {/* Color preview dots */}
+      <div className="flex gap-1 mb-2">
+        <div 
+          className="w-5 h-5 rounded-full border border-border/50"
+          style={{ backgroundColor: `hsl(${system.config.primaryColor || '262 83% 58%'})` }}
+        />
+        <div 
+          className="w-5 h-5 rounded-full border border-border/50"
+          style={{ backgroundColor: `hsl(${system.config.backgroundColor || '0 0% 100%'})` }}
+        />
+        <div 
+          className="w-5 h-5 rounded-full border border-border/50"
+          style={{ backgroundColor: `hsl(${system.config.foregroundColor || '240 10% 4%'})` }}
+        />
+      </div>
+      
+      <div className="flex items-center gap-1">
+        <p className="text-sm font-medium text-foreground truncate">{system.name}</p>
+        {isDefault && (
+          <Star className="w-3 h-3 text-amber-500 fill-amber-500 flex-shrink-0" />
+        )}
+      </div>
+      
+      {isSelected && (
+        <Check className="absolute top-2 right-2 w-4 h-4 text-primary" />
+      )}
+
+      {/* Edit actions */}
+      {canEdit && (
+        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {isBase && !isDefault && onSetDefault && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSetDefault();
+              }}
+              className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center hover:bg-amber-200 transition-colors"
+              title="Сделать по умолчанию"
+            >
+              <Star className="w-3 h-3" />
+            </button>
+          )}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onUpdateConfig();
+            }}
+            className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition-colors"
+            title="Обновить конфигурацию"
+          >
+            <Edit className="w-3 h-3" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            className="w-6 h-6 rounded-full bg-destructive/10 text-destructive flex items-center justify-center hover:bg-destructive/20 transition-colors"
+            title="Удалить"
+          >
+            <Trash2 className="w-3 h-3" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Create theme dialog component
+interface CreateThemeDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description: string;
+  name: string;
+  onNameChange: (value: string) => void;
+  descriptionValue: string;
+  onDescriptionChange: (value: string) => void;
+  onSubmit: () => void;
+  isSaving: boolean;
+}
+
+const CreateThemeDialog: React.FC<CreateThemeDialogProps> = ({
+  open,
+  onOpenChange,
+  title,
+  description,
+  name,
+  onNameChange,
+  descriptionValue,
+  onDescriptionChange,
+  onSubmit,
+  isSaving,
+}) => (
+  <Dialog open={open} onOpenChange={onOpenChange}>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>{title}</DialogTitle>
+      </DialogHeader>
+      <div className="space-y-4 py-4">
+        <div className="space-y-2">
+          <Label>Название</Label>
+          <Input
+            value={name}
+            onChange={(e) => onNameChange(e.target.value)}
+            placeholder="Например: Моя корпоративная тема"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Описание (необязательно)</Label>
+          <Textarea
+            value={descriptionValue}
+            onChange={(e) => onDescriptionChange(e.target.value)}
+            placeholder="Краткое описание темы..."
+            rows={2}
+          />
+        </div>
+        <p className="text-sm text-muted-foreground">
+          {description}
+        </p>
+      </div>
+      <DialogFooter>
+        <Button variant="outline" onClick={() => onOpenChange(false)}>
+          Отмена
+        </Button>
+        <Button onClick={onSubmit} disabled={!name.trim() || isSaving}>
+          {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+          Сохранить
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+);
 
 export default BaseDesignSystemSelector;
