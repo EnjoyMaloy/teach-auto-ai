@@ -5,7 +5,6 @@ import { DesignSystemConfig } from '@/types/designSystem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
@@ -63,9 +62,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
   const [selectedForDelete, setSelectedForDelete] = useState<{ system: BaseDesignSystem | UserDesignSystem; isBase: boolean } | null>(null);
   const [selectedForEdit, setSelectedForEdit] = useState<{ system: BaseDesignSystem | UserDesignSystem; isBase: boolean } | null>(null);
   const [newName, setNewName] = useState('');
-  const [newDescription, setNewDescription] = useState('');
   const [editName, setEditName] = useState('');
-  const [editDescription, setEditDescription] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
   const isLoading = isLoadingBase || isLoadingUser;
@@ -75,9 +72,8 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
     
     setIsSaving(true);
     try {
-      await createBaseSystem(newName.trim(), newDescription.trim(), currentConfig);
+      await createBaseSystem(newName.trim(), '', currentConfig);
       setNewName('');
-      setNewDescription('');
       setIsCreateBaseDialogOpen(false);
     } finally {
       setIsSaving(false);
@@ -89,9 +85,8 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
     
     setIsSaving(true);
     try {
-      await createUserSystem(newName.trim(), newDescription.trim(), currentConfig);
+      await createUserSystem(newName.trim(), '', currentConfig);
       setNewName('');
-      setNewDescription('');
       setIsCreateUserDialogOpen(false);
     } finally {
       setIsSaving(false);
@@ -101,7 +96,6 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
   const handleEditOpen = (system: BaseDesignSystem | UserDesignSystem, isBase: boolean) => {
     setSelectedForEdit({ system, isBase });
     setEditName(system.name);
-    setEditDescription(system.description || '');
     setIsEditDialogOpen(true);
   };
 
@@ -112,13 +106,11 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
     try {
       if (selectedForEdit.isBase) {
         await updateBaseSystem(selectedForEdit.system.id, { 
-          name: editName.trim(), 
-          description: editDescription.trim() 
+          name: editName.trim()
         });
       } else {
         await updateUserSystem(selectedForEdit.system.id, { 
-          name: editName.trim(), 
-          description: editDescription.trim() 
+          name: editName.trim()
         });
       }
       setIsEditDialogOpen(false);
@@ -178,8 +170,6 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
           description="Эта тема будет доступна только вам в вашем аккаунте."
           name={newName}
           onNameChange={setNewName}
-          descriptionValue={newDescription}
-          onDescriptionChange={setNewDescription}
           onSubmit={handleCreateUser}
           isSaving={isSaving}
         />
@@ -282,8 +272,6 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
         description="Эта тема будет доступна всем пользователям платформы."
         name={newName}
         onNameChange={setNewName}
-        descriptionValue={newDescription}
-        onDescriptionChange={setNewDescription}
         onSubmit={handleCreateBase}
         isSaving={isSaving}
       />
@@ -296,8 +284,6 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
         description="Эта тема будет доступна только вам в вашем аккаунте."
         name={newName}
         onNameChange={setNewName}
-        descriptionValue={newDescription}
-        onDescriptionChange={setNewDescription}
         onSubmit={handleCreateUser}
         isSaving={isSaving}
       />
@@ -315,15 +301,6 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 placeholder="Название темы"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Описание</Label>
-              <Textarea
-                value={editDescription}
-                onChange={(e) => setEditDescription(e.target.value)}
-                placeholder="Описание темы"
-                rows={3}
               />
             </div>
           </div>
@@ -458,8 +435,6 @@ interface CreateThemeDialogProps {
   description: string;
   name: string;
   onNameChange: (value: string) => void;
-  descriptionValue: string;
-  onDescriptionChange: (value: string) => void;
   onSubmit: () => void;
   isSaving: boolean;
 }
@@ -471,8 +446,6 @@ const CreateThemeDialog: React.FC<CreateThemeDialogProps> = ({
   description,
   name,
   onNameChange,
-  descriptionValue,
-  onDescriptionChange,
   onSubmit,
   isSaving,
 }) => (
@@ -489,15 +462,6 @@ const CreateThemeDialog: React.FC<CreateThemeDialogProps> = ({
             value={name}
             onChange={(e) => onNameChange(e.target.value)}
             placeholder="Например: Моя корпоративная тема"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label>Описание (необязательно)</Label>
-          <Textarea
-            value={descriptionValue}
-            onChange={(e) => onDescriptionChange(e.target.value)}
-            placeholder="Краткое описание темы"
-            rows={3}
           />
         </div>
       </div>
