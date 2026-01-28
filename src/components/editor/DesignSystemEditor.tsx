@@ -1067,6 +1067,86 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                   />
                 </div>
 
+                {/* Progress bar settings */}
+                <div className="border-t pt-6 space-y-2">
+                  <Label className="text-base font-semibold">Прогресс-бар</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Цвета индикаторов прогресса в слайдах
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <ColorInput
+                    label="Активный слайд"
+                    value={config.designBlock?.progressActiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressActiveColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        progressActiveColor: v 
+                      } 
+                    })}
+                    description="Текущий слайд"
+                  />
+                  <ColorInput
+                    label="Пройденные"
+                    value={config.designBlock?.progressCompletedColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressCompletedColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        progressCompletedColor: v 
+                      } 
+                    })}
+                    description="Завершённые слайды"
+                  />
+                  <ColorInput
+                    label="Неактивные"
+                    value={config.designBlock?.progressInactiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressInactiveColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        progressInactiveColor: v 
+                      } 
+                    })}
+                    description="Непройденные слайды"
+                  />
+                  <ColorInput
+                    label="Подложка прогресс-бара"
+                    value={config.designBlock?.progressBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressBackdropColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        progressBackdropColor: v 
+                      } 
+                    })}
+                    description="Фон за индикаторами"
+                  />
+                </div>
+
+                {/* Button backdrop settings */}
+                <div className="border-t pt-6 space-y-2">
+                  <Label className="text-base font-semibold">Кнопка «Продолжить»</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Подложка под кнопкой навигации
+                  </p>
+                </div>
+
+                <ColorInput
+                  label="Подложка кнопки"
+                  value={config.designBlock?.buttonBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.buttonBackdropColor}
+                  onChange={(v) => updateConfig({ 
+                    designBlock: { 
+                      ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                      ...config.designBlock, 
+                      buttonBackdropColor: v 
+                    } 
+                  })}
+                  description="Фон области с кнопкой внизу экрана"
+                />
+
               </div>
             </TabsContent>
 

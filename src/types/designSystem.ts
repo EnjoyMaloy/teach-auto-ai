@@ -60,6 +60,15 @@ export interface DesignBlockSettings {
   highlightMarkerColor?: string;
   highlightUnderlineColor?: string;
   highlightWavyColor?: string;
+  
+  // Progress bar colors
+  progressActiveColor?: string;      // Current/active slide indicator
+  progressInactiveColor?: string;    // Not yet visited slides
+  progressCompletedColor?: string;   // Already completed slides
+  progressBackdropColor?: string;    // Background behind progress bar
+  
+  // Continue button backdrop
+  buttonBackdropColor?: string;      // Background behind continue button
 }
 
 // Mascot settings for AI-generated characters
@@ -119,6 +128,13 @@ export const DEFAULT_DESIGN_BLOCK_SETTINGS: Required<DesignBlockSettings> = {
   highlightMarkerColor: '50 100% 50% / 0.4',
   highlightUnderlineColor: '262 83% 58%',
   highlightWavyColor: '0 84% 60%',
+  // Progress bar defaults
+  progressActiveColor: '262 83% 58%',        // Primary color
+  progressInactiveColor: '0 0% 0% / 0.15',   // Light gray
+  progressCompletedColor: '262 83% 58%',     // Primary color (same as active)
+  progressBackdropColor: '0 0% 0% / 0.05',   // Very subtle backdrop
+  // Button backdrop
+  buttonBackdropColor: '0 0% 100% / 0.9',    // White with slight transparency
 };
 
 export type BackgroundType = 'solid' | 'gradient';
