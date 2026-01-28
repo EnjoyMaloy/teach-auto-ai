@@ -463,30 +463,21 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
     setActivePreset(null);
   };
 
-  // Check if user is restricted from editing (non-admin with selected base system)
-  const isEditingRestricted = !isAdmin && !!selectedBaseSystemId;
+  // Check if user is restricted from editing (non-admin with selected base system or built-in theme)
+  const hasBuiltInThemeSelected = !!(activePreset || config.themeId);
+  const hasBaseSystemSelected = !!selectedBaseSystemId;
+  const isEditingRestricted = !isAdmin && (hasBaseSystemSelected || hasBuiltInThemeSelected);
 
   return (
     <div className="space-y-6">
       {/* Unified Themes Block - Base systems from DB + Preset themes */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-semibold text-foreground flex items-center gap-2">
-              <Palette className="w-4 h-4 text-primary" />
-              Готовые темы
-            </h3>
-            <p className="text-xs text-muted-foreground mt-0.5">Быстрый старт с готовым дизайном</p>
-          </div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={resetToDefault}
-            className="text-xs"
-          >
-            <RotateCcw className="w-3 h-3 mr-1" />
-            Сбросить
-          </Button>
+        <div>
+          <h3 className="font-semibold text-foreground flex items-center gap-2">
+            <Palette className="w-4 h-4 text-primary" />
+            Готовые темы
+          </h3>
+          <p className="text-xs text-muted-foreground mt-0.5">Быстрый старт с готовым дизайном</p>
         </div>
 
         {/* Base design systems from database + built-in presets */}
@@ -505,12 +496,12 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
         />
       </div>
 
-      {/* Show restriction message for non-admins with base system selected */}
+      {/* Show restriction message for non-admins with base system or built-in theme selected */}
       {isEditingRestricted && (
         <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
-          <p className="font-medium">Базовая тема выбрана</p>
+          <p className="font-medium">Общая тема выбрана</p>
           <p className="text-xs mt-1 text-amber-600">
-            Вы не можете редактировать параметры базовой темы. Выберите другую тему или попросите администратора внести изменения.
+            Вы не можете редактировать параметры общих тем. Создайте свою тему, чтобы настроить дизайн.
           </p>
         </div>
       )}
@@ -557,9 +548,21 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Detailed Settings - disabled for non-admins with base system selected */}
+      {/* Detailed Settings - disabled for non-admins with base system or built-in theme selected */}
       <div className={cn("space-y-4", isEditingRestricted && "opacity-50 pointer-events-none")}>
-        <h3 className="font-semibold text-foreground">Детальные настройки</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-foreground">Детальные настройки</h3>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={resetToDefault}
+            className="text-xs"
+            disabled={isEditingRestricted}
+          >
+            <RotateCcw className="w-3 h-3 mr-1" />
+            Сбросить
+          </Button>
+        </div>
         <Tabs defaultValue="colors" className="w-full">
           <TabsList className="w-full grid grid-cols-6 h-auto p-1 bg-muted/50">
             <TabsTrigger value="colors" className="text-xs py-2 px-1 data-[state=active]:bg-background">
