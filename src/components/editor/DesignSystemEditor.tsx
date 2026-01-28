@@ -896,51 +896,78 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
             </TabsContent>
 
             {/* === TYPOGRAPHY TAB === */}
-            <TabsContent value="typography" className="space-y-4">
+            <TabsContent value="typography" className="space-y-6">
               <div className="space-y-2">
-                <Label>Основной шрифт</Label>
-                <Select
-                  value={config.fontFamily}
-                  onValueChange={(v) => updateConfig({ fontFamily: v })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {FONT_OPTIONS.map((font) => (
-                      <SelectItem 
-                        key={font.value} 
-                        value={font.value}
-                        style={{ fontFamily: font.value }}
-                      >
-                        {font.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label className="text-base font-semibold">Шрифты курса</Label>
+                <p className="text-sm text-muted-foreground">
+                  Выберите шрифты для текста и заголовков
+                </p>
               </div>
 
-              <div className="space-y-2">
-                <Label>Шрифт заголовков</Label>
-                <Select
-                  value={config.headingFontFamily}
-                  onValueChange={(v) => updateConfig({ headingFontFamily: v })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {FONT_OPTIONS.map((font) => (
-                      <SelectItem 
-                        key={font.value} 
-                        value={font.value}
-                        style={{ fontFamily: font.value }}
-                      >
-                        {font.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Основной шрифт</Label>
+                  <Select
+                    value={config.fontFamily}
+                    onValueChange={(v) => updateConfig({ fontFamily: v })}
+                  >
+                    <SelectTrigger className="w-full">
+                      <span style={{ fontFamily: config.fontFamily }}>
+                        {FONT_OPTIONS.find(f => f.value === config.fontFamily)?.label || 'Выберите шрифт'}
+                      </span>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FONT_OPTIONS.map((font) => (
+                        <SelectItem 
+                          key={font.value} 
+                          value={font.value}
+                          style={{ fontFamily: font.value }}
+                        >
+                          {font.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {/* Preview */}
+                  <div 
+                    className="p-3 rounded-lg border bg-muted/30 text-sm"
+                    style={{ fontFamily: config.fontFamily }}
+                  >
+                    Пример текста с выбранным шрифтом
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Шрифт заголовков</Label>
+                  <Select
+                    value={config.headingFontFamily}
+                    onValueChange={(v) => updateConfig({ headingFontFamily: v })}
+                  >
+                    <SelectTrigger className="w-full">
+                      <span style={{ fontFamily: config.headingFontFamily }}>
+                        {FONT_OPTIONS.find(f => f.value === config.headingFontFamily)?.label || 'Выберите шрифт'}
+                      </span>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FONT_OPTIONS.map((font) => (
+                        <SelectItem 
+                          key={font.value} 
+                          value={font.value}
+                          style={{ fontFamily: font.value }}
+                        >
+                          {font.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {/* Preview */}
+                  <div 
+                    className="p-3 rounded-lg border bg-muted/30 text-lg font-bold"
+                    style={{ fontFamily: config.headingFontFamily }}
+                  >
+                    Заголовок с выбранным шрифтом
+                  </div>
+                </div>
               </div>
             </TabsContent>
 
