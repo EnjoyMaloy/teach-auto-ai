@@ -470,51 +470,19 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
           </Button>
         </div>
 
-        {/* Base design systems from database (admin-managed) */}
+        {/* Base design systems from database + built-in presets */}
         <BaseDesignSystemSelector
           selectedId={selectedBaseSystemId || null}
           onSelect={handleBaseSystemSelect}
           isAdmin={isAdmin}
           currentConfig={config}
+          builtInThemes={allThemes}
+          activePresetId={activePreset || config.themeId}
+          onPresetSelect={(presetId) => {
+            applyPreset(presetId);
+            onBaseSystemSelect?.(null);
+          }}
         />
-
-        {/* Built-in preset themes */}
-        <div className="grid grid-cols-2 gap-2">
-          {allThemes.map((preset) => (
-            <button
-              key={preset.id}
-              onClick={() => {
-                applyPreset(preset.id);
-                onBaseSystemSelect?.(null); // Deselect base system when selecting preset
-              }}
-              className={cn(
-                "relative p-3 rounded-xl border-2 transition-all text-left bg-card group",
-                (activePreset === preset.id || config.themeId === preset.id) && !selectedBaseSystemId
-                  ? "border-primary bg-primary/5" 
-                  : "border-border hover:border-primary/50"
-              )}
-            >
-              <div className="flex gap-1 mb-2">
-                <div 
-                  className="w-5 h-5 rounded-full border border-border/50"
-                  style={{ backgroundColor: `hsl(${preset.config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor})` }}
-                />
-                <div 
-                  className="w-5 h-5 rounded-full border border-border/50"
-                  style={{ backgroundColor: `hsl(${preset.config.backgroundColor || DEFAULT_DESIGN_SYSTEM.backgroundColor})` }}
-                />
-                <div 
-                  className="w-5 h-5 rounded-full border border-border/50"
-                  style={{ backgroundColor: `hsl(${preset.config.foregroundColor || DEFAULT_DESIGN_SYSTEM.foregroundColor})` }}
-                />
-              </div>
-              <p className="text-sm font-medium text-foreground">{preset.name}</p>
-              {(activePreset === preset.id || config.themeId === preset.id) && !selectedBaseSystemId && (
-                <Check className="absolute top-2 right-2 w-4 h-4 text-primary" />
-              )}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Show restriction message for non-admins with base system selected */}
