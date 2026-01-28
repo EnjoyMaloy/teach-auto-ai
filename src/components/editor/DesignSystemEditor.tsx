@@ -630,6 +630,8 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 onChange={(backgrounds) => updateConfig({ themeBackgrounds: backgrounds })}
                 defaultBackgroundId={config.defaultBackgroundId}
                 onDefaultChange={(id) => updateConfig({ defaultBackgroundId: id })}
+                selectedBackgroundId={config.defaultBackgroundId}
+                onSelectBackground={(id) => updateConfig({ defaultBackgroundId: id })}
                 maxBackgrounds={5}
               />
 

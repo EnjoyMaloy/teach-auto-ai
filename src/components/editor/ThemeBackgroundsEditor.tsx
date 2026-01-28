@@ -10,7 +10,7 @@ import {
   DialogTitle, 
   DialogFooter 
 } from '@/components/ui/dialog';
-import { Plus, Trash2, Check, X } from 'lucide-react';
+import { Plus, Trash2, Check, Edit } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AnglePicker } from './AnglePicker';
 
@@ -19,6 +19,8 @@ interface ThemeBackgroundsEditorProps {
   onChange: (backgrounds: BackgroundPreset[]) => void;
   defaultBackgroundId?: string;
   onDefaultChange: (id: string | undefined) => void;
+  selectedBackgroundId?: string;
+  onSelectBackground?: (id: string) => void;
   maxBackgrounds?: number;
 }
 
@@ -98,6 +100,8 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
   onChange,
   defaultBackgroundId,
   onDefaultChange,
+  selectedBackgroundId,
+  onSelectBackground,
   maxBackgrounds = 5,
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -186,19 +190,23 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
       <div className="grid grid-cols-3 gap-2">
         {backgrounds.map((bg) => {
           const isDefault = defaultBackgroundId === bg.id;
+          const isSelected = selectedBackgroundId === bg.id;
           return (
             <div 
               key={bg.id} 
               className="relative group"
             >
+              {/* Main background card - click to select for preview */}
               <button
                 type="button"
-                onClick={() => openEditDialog(bg)}
+                onClick={() => onSelectBackground?.(bg.id)}
                 className={cn(
                   "w-full h-20 rounded-lg border-2 transition-all flex flex-col items-center justify-end pb-1.5 gap-0.5",
-                  isDefault
+                  isSelected
                     ? "border-primary ring-2 ring-primary/20"
-                    : "border-border hover:border-primary/50"
+                    : isDefault
+                      ? "border-primary/50"
+                      : "border-border hover:border-primary/50"
                 )}
                 style={getBackgroundStyle(bg)}
                 title={`${bg.name}${isDefault ? ' (по умолчанию)' : ''}`}
@@ -213,19 +221,35 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
                 )}
               </button>
               
-              {/* Delete button */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(bg.id);
-                }}
-                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-              >
-                <X className="w-3 h-3" />
-              </button>
+              {/* Action buttons - top right corner */}
+              <div className="absolute -top-1.5 -right-1.5 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                {/* Edit button */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openEditDialog(bg);
+                  }}
+                  className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-200 transition-all hover:scale-110 shadow-sm"
+                  title="Редактировать"
+                >
+                  <Edit className="w-3 h-3" />
+                </button>
+                {/* Delete button */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(bg.id);
+                  }}
+                  className="w-5 h-5 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center hover:bg-rose-200 transition-all hover:scale-110 shadow-sm"
+                  title="Удалить"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </button>
+              </div>
 
-              {/* Set default button */}
+              {/* Set default button - bottom */}
               {!isDefault && (
                 <button
                   type="button"
@@ -233,7 +257,8 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
                     e.stopPropagation();
                     setAsDefault(bg.id);
                   }}
-                  className="absolute -bottom-1.5 right-1/2 translate-x-1/2 px-1.5 py-0.5 rounded bg-primary text-primary-foreground text-[9px] font-medium opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                  className="absolute -bottom-1.5 right-1/2 translate-x-1/2 px-1.5 py-0.5 rounded bg-primary text-primary-foreground text-[9px] font-medium opacity-0 group-hover:opacity-100 transition-all hover:scale-105 shadow-sm"
+                  title="Применить ко всем блокам курса"
                 >
                   По умолч.
                 </button>
