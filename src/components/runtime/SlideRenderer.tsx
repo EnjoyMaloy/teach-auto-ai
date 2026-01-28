@@ -848,7 +848,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
       {/* Нижняя навигация */}
       <div 
         className="p-4 border-t flex-shrink-0"
-        style={{ borderColor: `hsl(${ds.mutedColor})` }}
+        style={{ 
+          borderColor: `hsl(${ds.mutedColor})`,
+          backgroundColor: `hsl(${ds.backgroundColor})`,
+        }}
       >
         {isInteractive && answerState === 'idle' ? (
           <button
