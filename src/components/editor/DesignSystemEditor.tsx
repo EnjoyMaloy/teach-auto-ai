@@ -371,11 +371,18 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
     const saved = localStorage.getItem('customBackgrounds');
     return saved ? JSON.parse(saved) : [];
   });
+
+  // Hidden built-in themes (admin can hide them)
+  const [hiddenBuiltInThemes, setHiddenBuiltInThemes] = useState<string[]>(() => {
+    const saved = localStorage.getItem('hiddenBuiltInThemes');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const [isCreateBgDialogOpen, setIsCreateBgDialogOpen] = useState(false);
   const [newBgName, setNewBgName] = useState('');
 
-  // Use only base themes (Google, Notion, Apple, Duolingo)
-  const allThemes = BASE_THEMES;
+  // Use only base themes (Google, Notion, Apple, Duolingo), filter out hidden ones
+  const allThemes = BASE_THEMES.filter(t => !hiddenBuiltInThemes.includes(t.id));
 
   const updateConfig = (updates: Partial<DesignSystemConfig>) => {
     // Keep themeId and don't reset activePreset - user is just customizing within the theme
@@ -383,7 +390,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   };
 
   const applyPreset = (presetId: string) => {
-    const preset = allThemes.find(p => p.id === presetId);
+    const preset = BASE_THEMES.find(p => p.id === presetId);
     if (preset) {
       onChange({ ...DEFAULT_DESIGN_SYSTEM, ...preset.config, themeId: presetId });
       setActivePreset(presetId);
@@ -394,10 +401,22 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
     setActivePreset(null);
   };
 
+  // Hide built-in theme (admin only)
+  const handleBuiltInThemeDelete = (themeId: string) => {
+    const updated = [...hiddenBuiltInThemes, themeId];
+    setHiddenBuiltInThemes(updated);
+    localStorage.setItem('hiddenBuiltInThemes', JSON.stringify(updated));
+    
+    // If this theme was active, reset
+    if (activePreset === themeId || config.themeId === themeId) {
+      resetToDefault();
+    }
+  };
+
   // Custom background functions
   // Get theme-specific presets using themeId from config (persisted) or activePreset (local state)
   const currentThemeId = config.themeId || activePreset;
-  const activeTheme = allThemes.find(t => t.id === currentThemeId);
+  const activeTheme = BASE_THEMES.find(t => t.id === currentThemeId);
   const themeBackgroundPresets = activeTheme?.backgroundPresets || BACKGROUND_PRESETS;
   const allBackgrounds = [...themeBackgroundPresets, ...customBackgrounds];
 
@@ -482,6 +501,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
             applyPreset(presetId);
             onBaseSystemSelect?.(null);
           }}
+          onBuiltInThemeDelete={isAdmin ? handleBuiltInThemeDelete : undefined}
         />
       </div>
 
