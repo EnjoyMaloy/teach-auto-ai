@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BaseDesignSystem, useBaseDesignSystems } from '@/hooks/useBaseDesignSystems';
-import { UserDesignSystem, useUserDesignSystems } from '@/hooks/useUserDesignSystems';
+import { UserDesignSystem } from '@/hooks/useUserDesignSystems';
 import { DesignSystemConfig } from '@/types/designSystem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,6 +31,12 @@ interface BaseDesignSystemSelectorProps {
   onSelect: (system: BaseDesignSystem | UserDesignSystem, isPersonalTheme: boolean) => void;
   isAdmin: boolean;
   currentConfig?: DesignSystemConfig;
+  // Pass user systems from parent to ensure state sync
+  userSystems: UserDesignSystem[];
+  isLoadingUserSystems: boolean;
+  onCreateUserSystem: (name: string, description: string, config: DesignSystemConfig) => Promise<UserDesignSystem | null>;
+  onUpdateUserSystem: (id: string, updates: Partial<Omit<UserDesignSystem, 'id' | 'created_at' | 'updated_at' | 'user_id'>>) => Promise<boolean>;
+  onDeleteUserSystem: (id: string) => Promise<boolean>;
 }
 
 export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> = ({
@@ -38,6 +44,11 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
   onSelect,
   isAdmin,
   currentConfig,
+  userSystems,
+  isLoadingUserSystems,
+  onCreateUserSystem,
+  onUpdateUserSystem,
+  onDeleteUserSystem,
 }) => {
   const { 
     systems: baseSystems, 
@@ -46,14 +57,6 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
     updateSystem: updateBaseSystem, 
     deleteSystem: deleteBaseSystem,
   } = useBaseDesignSystems();
-  
-  const { 
-    systems: userSystems, 
-    isLoading: isLoadingUser, 
-    createSystem: createUserSystem, 
-    updateSystem: updateUserSystem, 
-    deleteSystem: deleteUserSystem 
-  } = useUserDesignSystems();
 
   const [isCreateBaseDialogOpen, setIsCreateBaseDialogOpen] = useState(false);
   const [isCreateUserDialogOpen, setIsCreateUserDialogOpen] = useState(false);
@@ -65,7 +68,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
   const [editName, setEditName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-  const isLoading = isLoadingBase || isLoadingUser;
+  const isLoading = isLoadingBase || isLoadingUserSystems;
 
   const handleCreateBase = async () => {
     if (!newName.trim() || !currentConfig) return;
@@ -85,7 +88,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
     
     setIsSaving(true);
     try {
-      await createUserSystem(newName.trim(), '', currentConfig);
+      await onCreateUserSystem(newName.trim(), '', currentConfig);
       setNewName('');
       setIsCreateUserDialogOpen(false);
     } finally {
@@ -109,7 +112,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
           name: editName.trim()
         });
       } else {
-        await updateUserSystem(selectedForEdit.system.id, { 
+        await onUpdateUserSystem(selectedForEdit.system.id, { 
           name: editName.trim()
         });
       }
@@ -128,7 +131,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
       if (selectedForDelete.isBase) {
         await deleteBaseSystem(selectedForDelete.system.id);
       } else {
-        await deleteUserSystem(selectedForDelete.system.id);
+        await onDeleteUserSystem(selectedForDelete.system.id);
       }
       setSelectedForDelete(null);
       setIsDeleteDialogOpen(false);
