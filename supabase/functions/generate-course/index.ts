@@ -158,7 +158,7 @@ const CONTENT_PROMPT = `Ты — контент-мейкер для мобиль
   "type": "badge",
   "order": 1,
   "badges": [
-    {"id": "1", "text": "Урок 1", "iconType": "emoji|lucide|none", "iconValue": "📚|Star"}
+    {"id": "1", "text": "Урок 1", "iconType": "lucide", "iconValue": "BookOpen"}
   ],
   "badgeVariant": "square|oval|contrast|pastel",
   "badgeSize": "small|medium|large",
@@ -166,6 +166,8 @@ const CONTENT_PROMPT = `Ты — контент-мейкер для мобиль
   "textAlign": "left|center|right",
   "padding": "none|small|medium|large"
 }
+
+ВАЖНО для бейджей: используй ТОЛЬКО iconType: "lucide" или "none"! НЕ используй emoji!
 
 #### button (кнопка со ссылкой)
 {
@@ -200,11 +202,11 @@ const CONTENT_PROMPT = `Ты — контент-мейкер для мобиль
   "padding": "none|small|medium|large"
 }
 
-#### divider (разделитель)
+**Пример ВВОДНОГО design блока (с картинкой — ОБЯЗАТЕЛЬНО!):**
 {
   "type": "design",
   "subBlocks": [
-    { "type": "badge", "order": 1, "badges": [{"id": "1", "text": "Урок 1", "iconType": "emoji", "iconValue": "📚"}], "badgeVariant": "oval", "textAlign": "center", "padding": "small" },
+    { "type": "badge", "order": 1, "badges": [{"id": "1", "text": "Урок 1", "iconType": "lucide", "iconValue": "BookOpen"}], "badgeVariant": "oval", "textAlign": "center", "padding": "small" },
     { "type": "heading", "order": 2, "content": "Добро пожаловать!", "textAlign": "center", "textSize": "xlarge", "fontWeight": "bold" },
     { "type": "text", "order": 3, "content": "В этом уроке вы узнаете основы", "textAlign": "center", "textSize": "medium" },
     { "type": "image", "order": 4, "imageDescription": "A welcoming illustration of a person starting a new learning journey with books and light bulbs", "imageSize": "medium", "textAlign": "center", "padding": "small" }
