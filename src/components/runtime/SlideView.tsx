@@ -410,12 +410,12 @@ export const SlideView: React.FC<SlideViewProps> = ({
             backgroundColor: answerState === 'correct' 
               ? `hsl(${ds.successColor} / 0.15)` 
               : answerState === 'partial'
-                ? `hsl(45 93% 47% / 0.15)`
+                ? `hsl(48 100% 90%)`
                 : `hsl(${ds.destructiveColor} / 0.15)`,
             color: answerState === 'correct' 
               ? `hsl(${ds.successColor})` 
               : answerState === 'partial'
-                ? `hsl(45 93% 47%)`
+                ? `hsl(35 80% 35%)`
                 : `hsl(${ds.destructiveColor})`,
           }}
         >
@@ -444,12 +444,16 @@ export const SlideView: React.FC<SlideViewProps> = ({
       <div 
         className="absolute bottom-0 left-0 right-0 h-20 border-t flex items-center justify-center gap-3 px-4"
         style={{ 
-          borderColor: answerState === 'correct' ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
-          backgroundColor: answerState === 'correct' ? `hsl(${ds.successColor} / 0.15)` : 'transparent',
+          borderColor: (answerState === 'correct' || answerState === 'partial') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
+          backgroundColor: answerState === 'correct' 
+            ? `hsl(${ds.successColor} / 0.15)` 
+            : answerState === 'partial'
+              ? `hsl(48 100% 90%)`
+              : 'transparent',
         }}
       >
-        {/* Show retry button only for incorrect/partial answers */}
-        {isInteractive && answerState !== 'idle' && answerState !== 'correct' && (
+        {/* Show retry button only for incorrect answers */}
+        {isInteractive && answerState === 'incorrect' && (
           <button
             type="button"
             onClick={resetState}
@@ -479,14 +483,18 @@ export const SlideView: React.FC<SlideViewProps> = ({
           style={{
             backgroundColor: answerState === 'correct' 
               ? `hsl(${ds.successColor})` 
-              : `hsl(${ds.primaryColor})`,
-            color: answerState === 'correct' 
+              : answerState === 'partial'
+                ? `hsl(45 93% 47%)`
+                : `hsl(${ds.primaryColor})`,
+            color: answerState === 'correct' || answerState === 'partial'
               ? `hsl(0 0% 100%)` 
               : `hsl(${ds.primaryForeground})`,
             borderRadius: getButtonRadius(),
             ...(answerState === 'correct' 
               ? getRaisedButtonStyle(ds.successColor) 
-              : getRaisedButtonStyle(ds.primaryColor)),
+              : answerState === 'partial'
+                ? getRaisedButtonStyle('45 93% 47%')
+                : getRaisedButtonStyle(ds.primaryColor)),
           }}
         >
           {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ДАЛЕЕ'}

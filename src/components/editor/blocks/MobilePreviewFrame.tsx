@@ -1058,6 +1058,11 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     </div>
   );
 
+  // Partial answer colors
+  const partialButtonColor = '45 93% 47%'; // Amber button
+  const partialBgTint = '48 100% 90%'; // Pastel yellow background
+  const partialTextColor = '35 80% 35%'; // Darker amber for text
+
   const resultFeedback = answerState !== 'idle' && (
     <div 
       className="px-4 py-3 text-center text-sm font-medium shrink-0"
@@ -1065,12 +1070,12 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         backgroundColor: answerState === 'correct' 
           ? `hsl(${ds.successColor} / 0.15)` 
           : answerState === 'partial'
-            ? `hsl(45 93% 47% / 0.15)` // Warning yellow
+            ? `hsl(${partialBgTint})`
             : `hsl(${ds.destructiveColor} / 0.15)`,
         color: answerState === 'correct' 
           ? `hsl(${ds.successColor})` 
           : answerState === 'partial'
-            ? `hsl(45 93% 40%)` // Warning yellow darker
+            ? `hsl(${partialTextColor})`
             : `hsl(${ds.destructiveColor})`,
       }}
     >
@@ -1159,19 +1164,27 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     </button>
   );
 
+  // Partial answer color (amber/yellow)
+  const partialColor = '45 93% 47%';
+  const partialBgColor = '48 100% 90%'; // Pastel yellow background
+  
   const bottomNavigation = (
     <div 
       className="h-20 border-t flex items-center justify-center gap-3 px-4 shrink-0 relative z-10"
       style={{ 
-        borderColor: answerState === 'correct' ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
-        backgroundColor: answerState === 'correct' ? `hsl(${ds.successColor} / 0.15)` : 'transparent',
+        borderColor: (answerState === 'correct' || answerState === 'partial') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
+        backgroundColor: answerState === 'correct' 
+          ? `hsl(${ds.successColor} / 0.15)` 
+          : answerState === 'partial'
+            ? `hsl(${partialBgColor})`
+            : 'transparent',
       }}
     >
       {/* Hint button - only when idle and has more hints */}
       {hintButton}
       
-      {/* Show retry button only for incorrect/partial answers */}
-      {isInteractive && answerState !== 'idle' && answerState !== 'correct' && (
+      {/* Show retry button only for incorrect answers (not for correct or partial) */}
+      {isInteractive && answerState === 'incorrect' && (
         <button
           type="button"
           onClick={resetState}
@@ -1206,18 +1219,22 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         )}
         disabled={isInteractive && answerState === 'idle' && !canCheck()}
         style={{
-          // Use success color for correct answer, primary for others
+          // Use success color for correct, amber for partial, primary for others
           backgroundColor: answerState === 'correct' 
             ? `hsl(${ds.successColor})` 
-            : `hsl(${ds.primaryColor})`,
-          color: answerState === 'correct' 
+            : answerState === 'partial'
+              ? `hsl(${partialColor})`
+              : `hsl(${ds.primaryColor})`,
+          color: answerState === 'correct' || answerState === 'partial'
             ? `hsl(0 0% 100%)` 
             : `hsl(${ds.primaryForeground})`,
           // Keep button shape from design system
           borderRadius: getButtonRadius(),
           ...(answerState === 'correct' 
             ? getRaisedButtonStyle(ds.successColor) 
-            : getRaisedButtonStyle(ds.primaryColor)),
+            : answerState === 'partial'
+              ? getRaisedButtonStyle(partialColor)
+              : getRaisedButtonStyle(ds.primaryColor)),
         }}
       >
         {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ДАЛЕЕ'}
@@ -1250,15 +1267,19 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         <div 
           className="h-20 border-t flex items-center justify-center gap-3 px-4 shrink-0"
           style={{ 
-            borderColor: answerState === 'correct' ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
-            backgroundColor: answerState === 'correct' ? `hsl(${ds.successColor} / 0.15)` : 'transparent',
+            borderColor: (answerState === 'correct' || answerState === 'partial') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
+            backgroundColor: answerState === 'correct' 
+              ? `hsl(${ds.successColor} / 0.15)` 
+              : answerState === 'partial'
+                ? `hsl(${partialBgTint})`
+                : 'transparent',
           }}
         >
           {/* Hint button - only when idle and has more hints */}
           {hintButton}
           
-          {/* Show retry button only for incorrect/partial answers */}
-          {isInteractive && answerState !== 'idle' && answerState !== 'correct' && (
+          {/* Show retry button only for incorrect answers (not for correct or partial) */}
+          {isInteractive && answerState === 'incorrect' && (
             <button
               type="button"
               onClick={resetState}
@@ -1295,14 +1316,18 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             style={{
               backgroundColor: answerState === 'correct' 
                 ? `hsl(${ds.successColor})` 
-                : `hsl(${ds.primaryColor})`,
-              color: answerState === 'correct' 
+                : answerState === 'partial'
+                  ? `hsl(${partialButtonColor})`
+                  : `hsl(${ds.primaryColor})`,
+              color: answerState === 'correct' || answerState === 'partial'
                 ? `hsl(0 0% 100%)` 
                 : `hsl(${ds.primaryForeground})`,
               borderRadius: getButtonRadius(),
               ...(answerState === 'correct' 
                 ? getRaisedButtonStyle(ds.successColor) 
-                : getRaisedButtonStyle(ds.primaryColor)),
+                : answerState === 'partial'
+                  ? getRaisedButtonStyle(partialButtonColor)
+                  : getRaisedButtonStyle(ds.primaryColor)),
             }}
           >
             {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ДАЛЕЕ'}
