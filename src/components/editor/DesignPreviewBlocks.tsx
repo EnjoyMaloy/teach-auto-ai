@@ -75,7 +75,7 @@ const slideToBlock = (slide: Slide): Block => ({
 const createSampleSlides = (): Slide[] => {
   const now = new Date();
   return [
-    // Design block intro
+    // Design block with ALL sub-block types
     {
       id: 'sample-design-intro',
       lessonId: 'sample',
@@ -83,29 +83,76 @@ const createSampleSlides = (): Slide[] => {
       order: 1,
       content: '',
       subBlocks: [
+        // Badge
         {
           id: 'sub-badge',
           type: 'badge',
           order: 1,
-          badges: [{ id: '1', text: '🎨 Урок 1', iconType: 'none' }],
+          badges: [
+            { id: '1', text: '🎨 Дизайн', iconType: 'none' },
+            { id: '2', text: '✨ Новое', iconType: 'none' },
+          ],
           badgeVariant: 'oval',
+          badgeLayout: 'horizontal',
           textAlign: 'center',
         } as SubBlock,
+        // Heading
         {
           id: 'sub-heading',
           type: 'heading',
           order: 2,
-          content: 'Введение в курс',
+          content: 'Все типы суб-блоков',
           textSize: 'xlarge',
           fontWeight: 'bold',
           textAlign: 'center',
         } as SubBlock,
+        // Image
+        {
+          id: 'sub-image',
+          type: 'image',
+          order: 3,
+          imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&q=80',
+          imageSize: 'medium',
+          textAlign: 'center',
+        } as SubBlock,
+        // Text
         {
           id: 'sub-text',
           type: 'text',
-          order: 3,
-          content: 'Добро пожаловать! Сегодня мы изучим основы веб-разработки.',
+          order: 4,
+          content: 'Это **текстовый блок** с поддержкой _форматирования_ и выделения.',
           textSize: 'medium',
+          textAlign: 'center',
+        } as SubBlock,
+        // Divider
+        {
+          id: 'sub-divider',
+          type: 'divider',
+          order: 5,
+          dividerStyle: 'medium',
+        } as SubBlock,
+        // Table
+        {
+          id: 'sub-table',
+          type: 'table',
+          order: 6,
+          tableData: [
+            [{ id: 't1', content: 'Тип' }, { id: 't2', content: 'Описание' }],
+            [{ id: 't3', content: 'Badge' }, { id: 't4', content: 'Метка' }],
+            [{ id: 't5', content: 'Button' }, { id: 't6', content: 'Кнопка' }],
+          ],
+          tableStyle: 'striped',
+          tableTextSize: 'small',
+          textAlign: 'left',
+        } as SubBlock,
+        // Button
+        {
+          id: 'sub-button',
+          type: 'button',
+          order: 7,
+          buttonLabel: 'Подробнее',
+          buttonVariant: 'primary',
+          buttonUrl: 'https://example.com',
           textAlign: 'center',
         } as SubBlock,
       ],
