@@ -424,7 +424,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
 
           <button 
             onClick={fullscreen ? handleRestart : handleClose} 
-            className={cn("w-full h-11 font-bold uppercase tracking-wide", pressAnimationClass)}
+            className={cn("w-full h-11 font-bold uppercase tracking-wide transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]", pressAnimationClass)}
             style={{
               backgroundColor: `hsl(var(--ds-primary, var(--primary)))`,
               color: `hsl(var(--ds-primary-foreground, var(--primary-foreground)))`,

@@ -1179,7 +1179,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           }
         }}
         className={cn(
-          "flex-1 h-11 max-w-md font-bold uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed",
+          "flex-1 h-11 max-w-md font-bold uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]",
           pressAnimationClass
         )}
         disabled={isInteractive && answerState === 'idle' && !canCheck()}
