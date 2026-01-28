@@ -1224,13 +1224,13 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         className="h-full w-full flex flex-col"
         style={{ 
           fontFamily: ds.fontFamily,
+          ...getBackgroundStyle(ds),
         }}
       >
         {progressBar}
         {/* Content area - flex-1 to fill space, min-h-0 for scroll, centered */}
         <div 
           className="flex-1 min-h-0 overflow-auto flex flex-col justify-center items-center px-4 py-4"
-          style={getBackgroundStyle(ds)}
         >
           {renderContent()}
         </div>
@@ -1305,6 +1305,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         className="relative h-full w-full overflow-hidden"
         style={{ 
           fontFamily: ds.fontFamily,
+          ...getBackgroundStyle(ds),
         }}
       >
         {/* Header/progress bar - absolute at top */}
@@ -1347,7 +1348,6 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           style={{ 
             top: `${HEADER_HEIGHT}px`,
             bottom: `${NAV_HEIGHT}px`,
-            ...getBackgroundStyle(ds),
           }}
         >
           {renderContent()}
