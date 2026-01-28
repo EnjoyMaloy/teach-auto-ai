@@ -53,6 +53,7 @@ export interface Block {
   explanation?: string; // For incorrect answers
   explanationPartial?: string; // For partially correct answers (multiple choice)
   explanationCorrect?: string; // For correct answers
+  hints?: { id: string; text: string; order: number }[];
   
   // Fill blank
   blankWord?: string;
