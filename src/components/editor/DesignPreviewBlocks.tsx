@@ -99,40 +99,6 @@ const createSampleSlides = (): Slide[] => {
           badgeLayout: 'horizontal',
           textAlign: 'center',
         } as SubBlock,
-        // Дополнительные бейджи для показа всех вариантов
-        {
-          id: 'sub-badge-square',
-          type: 'badge',
-          order: 2,
-          badges: [
-            { id: '1', text: 'Square стиль', iconType: 'lucide', iconValue: 'Star' },
-          ],
-          badgeVariant: 'square',
-          badgeSize: 'large',
-          textAlign: 'center',
-        } as SubBlock,
-        {
-          id: 'sub-badge-contrast',
-          type: 'badge',
-          order: 3,
-          badges: [
-            { id: '1', text: 'Contrast стиль', iconType: 'lucide', iconValue: 'Award' },
-          ],
-          badgeVariant: 'contrast',
-          badgeSize: 'large',
-          textAlign: 'center',
-        } as SubBlock,
-        {
-          id: 'sub-badge-pastel',
-          type: 'badge',
-          order: 4,
-          badges: [
-            { id: '1', text: 'Pastel стиль', iconType: 'lucide', iconValue: 'Palette' },
-          ],
-          badgeVariant: 'pastel',
-          badgeSize: 'large',
-          textAlign: 'center',
-        } as SubBlock,
         // Heading
         {
           id: 'sub-heading',
