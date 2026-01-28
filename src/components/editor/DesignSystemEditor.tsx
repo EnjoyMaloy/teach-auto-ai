@@ -416,8 +416,8 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
         </div>
       )}
 
-      {/* Detailed Settings - disabled for non-admins with base system or built-in theme selected */}
-      <div className={cn("space-y-4", isEditingRestricted && "opacity-50 pointer-events-none")}>
+      {/* Detailed Settings - view-only for non-admins with base system selected */}
+      <div className={cn("space-y-4", isEditingRestricted && "opacity-60 [&_input]:pointer-events-none [&_input]:opacity-50 [&_button:not([data-radix-collection-item])]:pointer-events-none [&_button:not([data-radix-collection-item])]:opacity-50 [&_select]:pointer-events-none [&_textarea]:pointer-events-none [&_[role=slider]]:pointer-events-none [&_[role=switch]]:pointer-events-none [&_[type=color]]:pointer-events-none")}>
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-foreground">Детальные настройки</h3>
           <Button 
