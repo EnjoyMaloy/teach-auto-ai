@@ -18,7 +18,7 @@ interface UseUserDesignSystemsResult {
   systems: UserDesignSystem[];
   isLoading: boolean;
   createSystem: (name: string, description: string, config: DesignSystemConfig) => Promise<UserDesignSystem | null>;
-  updateSystem: (id: string, updates: Partial<Omit<UserDesignSystem, 'id' | 'created_at' | 'updated_at' | 'user_id'>>) => Promise<boolean>;
+  updateSystem: (id: string, updates: Partial<Omit<UserDesignSystem, 'id' | 'created_at' | 'updated_at' | 'user_id'>>, silent?: boolean) => Promise<boolean>;
   deleteSystem: (id: string) => Promise<boolean>;
   refetch: () => Promise<void>;
 }
@@ -100,7 +100,8 @@ export const useUserDesignSystems = (): UseUserDesignSystemsResult => {
 
   const updateSystem = async (
     id: string,
-    updates: Partial<Omit<UserDesignSystem, 'id' | 'created_at' | 'updated_at' | 'user_id'>>
+    updates: Partial<Omit<UserDesignSystem, 'id' | 'created_at' | 'updated_at' | 'user_id'>>,
+    silent: boolean = false
   ): Promise<boolean> => {
     try {
       const updateData: Record<string, unknown> = {};
@@ -122,7 +123,9 @@ export const useUserDesignSystems = (): UseUserDesignSystemsResult => {
           : s
       ));
 
-      toast.success('Личная тема обновлена');
+      if (!silent) {
+        toast.success('Личная тема обновлена');
+      }
       return true;
     } catch (err) {
       console.error('Error updating user design system:', err);
