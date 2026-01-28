@@ -1014,7 +1014,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     inactive: designSystem?.designBlock?.progressInactiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressInactiveColor,
     backdrop: designSystem?.designBlock?.progressBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressBackdropColor,
   };
-  const buttonBackdropColor = designSystem?.designBlock?.buttonBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.buttonBackdropColor;
+  const buttonBackdropColor = ds.backgroundColor;
 
   const progressBar = !hideHeader && (
     <div 

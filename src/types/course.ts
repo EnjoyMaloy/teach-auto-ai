@@ -139,8 +139,6 @@ export interface CourseDesignSystem {
     progressInactiveColor?: string;
     progressCompletedColor?: string;
     progressBackdropColor?: string;
-    // Button backdrop
-    buttonBackdropColor?: string;
   };
   mascot?: MascotSettings;
 }
