@@ -1,3 +1,4 @@
+// Theme selector component - synced with parent state
 import React, { useState } from 'react';
 import { BaseDesignSystem, useBaseDesignSystems } from '@/hooks/useBaseDesignSystems';
 import { UserDesignSystem } from '@/hooks/useUserDesignSystems';
