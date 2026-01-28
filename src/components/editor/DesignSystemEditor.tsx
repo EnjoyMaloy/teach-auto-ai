@@ -374,9 +374,10 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   };
 
   // Handler for base system selection
-  const handleBaseSystemSelect = (system: BaseDesignSystem) => {
+  const handleBaseSystemSelect = (system: BaseDesignSystem, isPersonalTheme: boolean) => {
     onChange(system.config);
-    onBaseSystemSelect?.(system.id);
+    // Only set base system ID for common themes, not for personal themes
+    onBaseSystemSelect?.(isPersonalTheme ? null : system.id);
     setActivePreset(null);
   };
 
