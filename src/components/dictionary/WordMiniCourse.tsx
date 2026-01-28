@@ -6,6 +6,18 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { CheckCircle2, XCircle, ArrowRight, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import DOMPurify from 'dompurify';
+
+// Configure DOMPurify to allow only safe formatting tags
+const DOMPURIFY_CONFIG = {
+  ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'span', 'br', 'p'],
+  ALLOWED_ATTR: ['class'],
+  KEEP_CONTENT: true,
+};
+
+const sanitizeContent = (html: string): string => {
+  return DOMPurify.sanitize(html, DOMPURIFY_CONFIG);
+};
 
 interface WordMiniCourseProps {
   word: {
@@ -184,9 +196,11 @@ const WordMiniCourse: React.FC<WordMiniCourseProps> = ({
             <div 
               className="text-base leading-relaxed text-foreground/90"
               dangerouslySetInnerHTML={{ 
-                __html: slide.content
-                  .replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>')
-                  .replace(/\n/g, '<br/>')
+                __html: sanitizeContent(
+                  slide.content
+                    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>')
+                    .replace(/\n/g, '<br/>')
+                )
               }}
             />
           </div>
@@ -242,7 +256,9 @@ const WordMiniCourse: React.FC<WordMiniCourseProps> = ({
               <div 
                 className="text-base leading-relaxed"
                 dangerouslySetInnerHTML={{ 
-                  __html: slide.content.replace(/___/g, '<span class="inline-block w-28 border-b-2 border-primary/50 mx-1"></span>')
+                  __html: sanitizeContent(
+                    slide.content.replace(/___/g, '<span class="inline-block w-28 border-b-2 border-primary/50 mx-1"></span>')
+                  )
                 }}
               />
             )}
