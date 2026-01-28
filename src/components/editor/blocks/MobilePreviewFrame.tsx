@@ -1161,7 +1161,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
   const bottomNavigation = (
     <div 
-      className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0 relative z-10"
+      className="h-20 border-t flex items-center justify-center gap-3 px-4 shrink-0 relative z-10"
       style={{ 
         borderColor: `hsl(${ds.mutedColor} / 0.3)`,
       }}
@@ -1238,7 +1238,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         {resultFeedback}
         {/* Bottom navigation - shrink-0 to stay fixed at bottom */}
         <div 
-          className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0"
+          className="h-20 border-t flex items-center justify-center gap-3 px-4 shrink-0"
           style={{ 
             borderColor: `hsl(${ds.mutedColor} / 0.3)`,
           }}
@@ -1297,7 +1297,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   // fillContainer mode - fills parent 100% without zoom, for fullscreen/public view
   // Uses absolute positioning to ensure button is always at bottom
   if (fillContainer) {
-    const NAV_HEIGHT = 64; // h-16 = 64px
+    const NAV_HEIGHT = 80; // h-20 = 80px
     const HEADER_HEIGHT = hideHeader ? 0 : 40; // h-10 = 40px
     
     return (
@@ -1390,7 +1390,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         
         {/* Bottom nav - absolute at bottom */}
         <div 
-          className="absolute bottom-0 left-0 right-0 h-16 border-t flex items-center justify-center gap-3 px-4 z-10"
+          className="absolute bottom-0 left-0 right-0 h-20 border-t flex items-center justify-center gap-3 px-4 z-10"
           style={{ 
             borderColor: `hsl(${ds.mutedColor} / 0.3)`,
           }}
