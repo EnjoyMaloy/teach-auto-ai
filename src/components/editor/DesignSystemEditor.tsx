@@ -14,6 +14,7 @@ import { playSound, SOUND_THEME_OPTIONS } from '@/lib/sounds';
 import { BaseDesignSystemSelector } from './BaseDesignSystemSelector';
 import { ThemeBackgroundsEditor } from './ThemeBackgroundsEditor';
 import { useBaseDesignSystems, BaseDesignSystem } from '@/hooks/useBaseDesignSystems';
+import { useUserDesignSystems } from '@/hooks/useUserDesignSystems';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -373,18 +374,22 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
     setActivePreset(null);
   };
 
+  // Get user's personal themes to check if selected theme is personal
+  const { systems: userSystems } = useUserDesignSystems();
+
   // Handler for base system selection
   const handleBaseSystemSelect = (system: BaseDesignSystem, isPersonalTheme: boolean) => {
     onChange(system.config);
-    // Only set base system ID for common themes, not for personal themes
-    onBaseSystemSelect?.(isPersonalTheme ? null : system.id);
+    // Always pass the system ID for visual selection
+    onBaseSystemSelect?.(system.id);
     setActivePreset(null);
   };
 
-  // Check if user is restricted from editing (non-admin with selected base system from the common themes)
-  // User design systems (personal themes) should NOT be restricted
-  const hasBaseSystemSelected = !!selectedBaseSystemId;
-  const isEditingRestricted = !isAdmin && hasBaseSystemSelected;
+  // Check if user is restricted from editing (non-admin with selected COMMON theme)
+  // Personal themes should NOT be restricted - check if selectedBaseSystemId is in user's personal themes
+  const isPersonalThemeSelected = userSystems.some(s => s.id === selectedBaseSystemId);
+  const hasCommonThemeSelected = !!selectedBaseSystemId && !isPersonalThemeSelected;
+  const isEditingRestricted = !isAdmin && hasCommonThemeSelected;
 
   return (
     <div className="space-y-6">
