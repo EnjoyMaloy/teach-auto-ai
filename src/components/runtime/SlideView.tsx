@@ -381,7 +381,7 @@ export const SlideView: React.FC<SlideViewProps> = ({
   );
 
   // Bottom nav height
-  const NAV_HEIGHT = 64; // h-16 = 64px
+  const NAV_HEIGHT = 80; // h-20 = 80px
 
   return (
     <div 
@@ -438,7 +438,7 @@ export const SlideView: React.FC<SlideViewProps> = ({
 
       {/* Bottom nav - absolute positioned at bottom */}
       <div 
-        className="absolute bottom-0 left-0 right-0 h-16 border-t flex items-center justify-center gap-3 px-4"
+        className="absolute bottom-0 left-0 right-0 h-20 border-t flex items-center justify-center gap-3 px-4"
         style={{ 
           borderColor: `hsl(${ds.mutedColor} / 0.3)`,
         }}

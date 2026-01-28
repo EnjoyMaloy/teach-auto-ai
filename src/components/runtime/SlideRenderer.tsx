@@ -847,7 +847,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
       {/* Нижняя навигация */}
       <div 
-        className="p-4 border-t flex-shrink-0"
+        className="p-5 border-t flex-shrink-0"
         style={{ 
           borderColor: `hsl(${ds.mutedColor} / 0.3)`,
         }}
