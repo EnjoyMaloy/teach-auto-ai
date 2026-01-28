@@ -8,14 +8,13 @@ import { DesignSystemConfig } from '@/types/designSystem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PublishDialog } from './PublishDialog';
-import { DesignSystemEditor } from './DesignSystemEditor';
 import { AIGeneratorDialog } from './AIGeneratorDialog';
+import { FullscreenDesignEditor } from './FullscreenDesignEditor';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { useUserRole } from '@/hooks/useUserRole';
 
@@ -268,55 +267,15 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           </nav>
 
           {/* Design System Button */}
-          <Popover open={showDesignSystem} onOpenChange={setShowDesignSystem}>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="ml-4">
-                <Palette className="w-4 h-4 mr-1" />
-                Дизайн
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent 
-              className="w-[500px] p-0" 
-              align="start"
-              side="bottom"
-              sideOffset={8}
-            >
-              <ScrollArea className="h-[70vh]">
-                <div className="p-4">
-                  <DesignSystemEditor
-                    config={{
-                      primaryColor: course.designSystem?.primaryColor || '262 83% 58%',
-                      primaryForeground: course.designSystem?.primaryForeground || '0 0% 100%',
-                      backgroundColor: course.designSystem?.backgroundColor || '0 0% 100%',
-                      foregroundColor: course.designSystem?.foregroundColor || '240 10% 4%',
-                      cardColor: course.designSystem?.cardColor || '0 0% 100%',
-                      mutedColor: course.designSystem?.mutedColor || '240 5% 96%',
-                      accentColor: course.designSystem?.accentColor || '240 5% 96%',
-                      successColor: course.designSystem?.successColor || '142 71% 45%',
-                      destructiveColor: course.designSystem?.destructiveColor || '0 84% 60%',
-                      fontFamily: course.designSystem?.fontFamily || 'Inter, system-ui, sans-serif',
-                      headingFontFamily: course.designSystem?.headingFontFamily || 'Inter, system-ui, sans-serif',
-                      borderRadius: course.designSystem?.borderRadius || '0.75rem',
-                      buttonStyle: course.designSystem?.buttonStyle || 'rounded',
-                      buttonDepth: course.designSystem?.buttonDepth || 'raised',
-                      backgroundPresetId: course.designSystem?.backgroundPresetId || 'white',
-                      backgroundType: course.designSystem?.backgroundType || 'solid',
-                      gradientFrom: course.designSystem?.gradientFrom || '262 83% 95%',
-                      gradientTo: course.designSystem?.gradientTo || '200 83% 95%',
-                      gradientAngle: course.designSystem?.gradientAngle || 135,
-                      sound: course.designSystem?.sound,
-                      designBlock: course.designSystem?.designBlock,
-                      mascot: course.designSystem?.mascot,
-                    }}
-                    onChange={onUpdateDesignSystem}
-                    isAdmin={isAdmin}
-                    selectedBaseSystemId={selectedBaseSystemId}
-                    onBaseSystemSelect={setSelectedBaseSystemId}
-                  />
-                </div>
-              </ScrollArea>
-            </PopoverContent>
-          </Popover>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="ml-4"
+            onClick={() => setShowDesignSystem(true)}
+          >
+            <Palette className="w-4 h-4 mr-1" />
+            Дизайн
+          </Button>
 
           {/* Map Settings Button */}
           {onUpdateLessonsDisplayType && (
@@ -445,6 +404,42 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         moderationComment={(course as any).moderationComment || null}
         onUpdate={() => window.location.reload()}
       />
+
+      {/* Fullscreen Design Editor */}
+      {showDesignSystem && (
+        <FullscreenDesignEditor
+          config={{
+            primaryColor: course.designSystem?.primaryColor || '262 83% 58%',
+            primaryForeground: course.designSystem?.primaryForeground || '0 0% 100%',
+            backgroundColor: course.designSystem?.backgroundColor || '0 0% 100%',
+            foregroundColor: course.designSystem?.foregroundColor || '240 10% 4%',
+            cardColor: course.designSystem?.cardColor || '0 0% 100%',
+            mutedColor: course.designSystem?.mutedColor || '240 5% 96%',
+            accentColor: course.designSystem?.accentColor || '240 5% 96%',
+            successColor: course.designSystem?.successColor || '142 71% 45%',
+            destructiveColor: course.designSystem?.destructiveColor || '0 84% 60%',
+            fontFamily: course.designSystem?.fontFamily || 'Inter, system-ui, sans-serif',
+            headingFontFamily: course.designSystem?.headingFontFamily || 'Inter, system-ui, sans-serif',
+            borderRadius: course.designSystem?.borderRadius || '0.75rem',
+            buttonStyle: course.designSystem?.buttonStyle || 'rounded',
+            buttonDepth: course.designSystem?.buttonDepth || 'raised',
+            backgroundPresetId: course.designSystem?.backgroundPresetId || 'white',
+            backgroundType: course.designSystem?.backgroundType || 'solid',
+            gradientFrom: course.designSystem?.gradientFrom || '262 83% 95%',
+            gradientTo: course.designSystem?.gradientTo || '200 83% 95%',
+            gradientAngle: course.designSystem?.gradientAngle || 135,
+            sound: course.designSystem?.sound,
+            designBlock: course.designSystem?.designBlock,
+            mascot: course.designSystem?.mascot,
+          }}
+          onChange={onUpdateDesignSystem}
+          onClose={() => setShowDesignSystem(false)}
+          isAdmin={isAdmin}
+          courseTitle={course.title}
+          selectedBaseSystemId={selectedBaseSystemId}
+          onBaseSystemSelect={setSelectedBaseSystemId}
+        />
+      )}
 
       {/* AI Generator Dialog */}
       {onAIGenerate && (
