@@ -10,6 +10,24 @@ export interface SoundSettings {
 
 export type ButtonDepth = 'flat' | 'raised';
 
+// Preset gradient options
+export interface GradientPreset {
+  id: string;
+  name: string;
+  from: string;
+  to: string;
+  angle: number;
+}
+
+export const GRADIENT_PRESETS: GradientPreset[] = [
+  { id: 'lavender', name: 'Лаванда', from: '262 83% 95%', to: '200 83% 95%', angle: 135 },
+  { id: 'peach', name: 'Персик', from: '30 100% 94%', to: '350 100% 94%', angle: 135 },
+  { id: 'mint', name: 'Мята', from: '160 60% 92%', to: '200 60% 94%', angle: 135 },
+  { id: 'sunset', name: 'Закат', from: '30 100% 92%', to: '280 80% 92%', angle: 135 },
+  { id: 'ocean', name: 'Океан', from: '200 80% 92%', to: '220 70% 88%', angle: 135 },
+  { id: 'rose', name: 'Роза', from: '340 80% 94%', to: '300 60% 92%', angle: 135 },
+];
+
 // Design block backdrop options
 export interface DesignBlockSettings {
   // Text sub-block backdrop colors (HSL values)
@@ -83,6 +101,8 @@ export const DEFAULT_DESIGN_BLOCK_SETTINGS: Required<DesignBlockSettings> = {
   highlightWavyColor: '0 84% 60%',
 };
 
+export type BackgroundType = 'solid' | 'gradient';
+
 export interface DesignSystemConfig {
   // Colors (HSL values as strings, e.g., "262 83% 58%")
   primaryColor: string;
@@ -94,6 +114,12 @@ export interface DesignSystemConfig {
   accentColor: string;
   successColor: string;
   destructiveColor: string;
+  
+  // Background style
+  backgroundType?: BackgroundType;
+  gradientFrom?: string; // HSL value for gradient start
+  gradientTo?: string;   // HSL value for gradient end
+  gradientAngle?: number; // Gradient angle in degrees (0-360)
   
   // Typography
   fontFamily: string;
@@ -134,6 +160,10 @@ export const DEFAULT_DESIGN_SYSTEM: DesignSystemConfig = {
   accentColor: '240 5% 96%',
   successColor: '142 71% 45%',
   destructiveColor: '0 84% 60%',
+  backgroundType: 'solid',
+  gradientFrom: '262 83% 95%',
+  gradientTo: '200 83% 95%',
+  gradientAngle: 135,
   fontFamily: 'Inter, system-ui, sans-serif',
   headingFontFamily: 'Inter, system-ui, sans-serif',
   borderRadius: '0.75rem',

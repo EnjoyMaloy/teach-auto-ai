@@ -10,7 +10,9 @@ import {
   FONT_OPTIONS,
   BORDER_RADIUS_OPTIONS,
   SoundTheme,
-  ButtonDepth
+  ButtonDepth,
+  BackgroundType,
+  GRADIENT_PRESETS
 } from '@/types/designSystem';
 import { playSound, SOUND_THEME_OPTIONS } from '@/lib/sounds';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -593,7 +595,12 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
         <h3 className="font-semibold text-foreground">Предпросмотр</h3>
         <div 
           className="p-4 rounded-xl border border-border"
-          style={{ backgroundColor: `hsl(${config.backgroundColor})` }}
+          style={{ 
+            ...(config.backgroundType === 'gradient' && config.gradientFrom && config.gradientTo
+              ? { background: `linear-gradient(${config.gradientAngle || 135}deg, hsl(${config.gradientFrom}), hsl(${config.gradientTo}))` }
+              : { backgroundColor: `hsl(${config.backgroundColor})` }
+            )
+          }}
         >
           <PreviewCard />
         </div>
@@ -633,6 +640,64 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
           <div className="mt-4">
 
             <TabsContent value="colors" className="space-y-4">
+              {/* Background Type Selector */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Тип фона</Label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => updateConfig({ backgroundType: 'solid' })}
+                    className={cn(
+                      "flex-1 py-2 px-3 rounded-lg text-sm transition-colors border-2",
+                      (config.backgroundType || 'solid') === 'solid'
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-muted/50 hover:bg-muted"
+                    )}
+                  >
+                    Сплошной
+                  </button>
+                  <button
+                    onClick={() => updateConfig({ backgroundType: 'gradient' })}
+                    className={cn(
+                      "flex-1 py-2 px-3 rounded-lg text-sm transition-colors border-2",
+                      config.backgroundType === 'gradient'
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-muted/50 hover:bg-muted"
+                    )}
+                  >
+                    Градиент
+                  </button>
+                </div>
+
+                {/* Gradient Presets */}
+                {config.backgroundType === 'gradient' && (
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Готовые градиенты</Label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {GRADIENT_PRESETS.map((preset) => (
+                        <button
+                          key={preset.id}
+                          onClick={() => updateConfig({
+                            gradientFrom: preset.from,
+                            gradientTo: preset.to,
+                            gradientAngle: preset.angle,
+                          })}
+                          className={cn(
+                            "h-12 rounded-lg border-2 transition-all",
+                            config.gradientFrom === preset.from && config.gradientTo === preset.to
+                              ? "border-primary ring-2 ring-primary/20"
+                              : "border-border hover:border-primary/50"
+                          )}
+                          style={{
+                            background: `linear-gradient(${preset.angle}deg, hsl(${preset.from}), hsl(${preset.to}))`,
+                          }}
+                          title={preset.name}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <ColorInput
                   label="Основной цвет"
@@ -646,11 +711,26 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                   onChange={(v) => updateConfig({ primaryForeground: v })}
                   description="Цвет текста на кнопках"
                 />
-                <ColorInput
-                  label="Фон"
-                  value={config.backgroundColor}
-                  onChange={(v) => updateConfig({ backgroundColor: v })}
-                />
+                {(config.backgroundType || 'solid') === 'solid' ? (
+                  <ColorInput
+                    label="Фон"
+                    value={config.backgroundColor}
+                    onChange={(v) => updateConfig({ backgroundColor: v })}
+                  />
+                ) : (
+                  <>
+                    <ColorInput
+                      label="Градиент: начало"
+                      value={config.gradientFrom || '262 83% 95%'}
+                      onChange={(v) => updateConfig({ gradientFrom: v })}
+                    />
+                    <ColorInput
+                      label="Градиент: конец"
+                      value={config.gradientTo || '200 83% 95%'}
+                      onChange={(v) => updateConfig({ gradientTo: v })}
+                    />
+                  </>
+                )}
                 <ColorInput
                   label="Текст"
                   value={config.foregroundColor}
