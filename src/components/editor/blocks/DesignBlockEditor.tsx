@@ -545,7 +545,7 @@ const SortableSubBlockItem: React.FC<{
         const badgeVariantStyles = {
           square: { backgroundColor: `hsl(${ds.primaryColor})`, color: 'white' },
           oval: { backgroundColor: `hsl(${ds.primaryColor} / 0.15)`, color: `hsl(${ds.primaryColor})` },
-          contrast: { backgroundColor: `hsl(${ds.foregroundColor})`, color: `hsl(${ds.mutedColor})` },
+          contrast: { backgroundColor: `hsl(${ds.primaryColor})`, color: 'white', border: `2px solid hsl(${ds.primaryColor})` },
           pastel: { backgroundColor: `hsl(${ds.primaryColor} / 0.08)`, color: `hsl(${ds.primaryColor} / 0.9)`, border: `1px solid hsl(${ds.primaryColor} / 0.2)` },
         }[badgeVariant];
 
