@@ -380,7 +380,9 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   const { 
     systems: baseSystems,
     isLoading: isLoadingBaseSystems,
+    createSystem: createBaseSystem,
     updateSystem: updateBaseSystem,
+    deleteSystem: deleteBaseSystem,
   } = useBaseDesignSystems();
 
   // Get user's personal themes to check if selected theme is personal
@@ -548,6 +550,11 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
           onSelect={handleBaseSystemSelect}
           isAdmin={isAdmin}
           currentConfig={config}
+          baseSystems={baseSystems}
+          isLoadingBaseSystems={isLoadingBaseSystems}
+          onCreateBaseSystem={createBaseSystem}
+          onUpdateBaseSystem={updateBaseSystem}
+          onDeleteBaseSystem={deleteBaseSystem}
           userSystems={userSystems}
           isLoadingUserSystems={isLoadingUserSystems}
           onCreateUserSystem={createUserSystem}
