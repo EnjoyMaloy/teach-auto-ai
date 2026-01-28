@@ -455,7 +455,13 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
     currentThemeIdRef.current = system.id;
     lastSavedConfigRef.current = JSON.stringify(system.config);
     
-    onChange(system.config);
+    // Apply the theme's config with themeId to track which theme is selected
+    const newConfig = {
+      ...system.config,
+      themeId: system.id,
+    };
+    
+    onChange(newConfig);
     // Always pass the system ID for visual selection
     onBaseSystemSelect?.(system.id);
     setActivePreset(null);
