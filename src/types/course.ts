@@ -120,6 +120,13 @@ export interface CourseDesignSystem {
     highlightMarkerColor?: string;
     highlightUnderlineColor?: string;
     highlightWavyColor?: string;
+    // Progress bar colors
+    progressActiveColor?: string;
+    progressInactiveColor?: string;
+    progressCompletedColor?: string;
+    progressBackdropColor?: string;
+    // Button backdrop
+    buttonBackdropColor?: string;
   };
   mascot?: MascotSettings;
 }

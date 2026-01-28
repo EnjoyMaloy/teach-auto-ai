@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { AudioPlayer } from './AudioPlayer';
 import { DesignBlockEditor } from './DesignBlockEditor';
 import { playSound, SoundConfig } from '@/lib/sounds';
-import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
+import { DEFAULT_SOUND_SETTINGS, DEFAULT_DESIGN_BLOCK_SETTINGS } from '@/types/designSystem';
 import { RiveMascot } from '@/components/runtime/RiveMascot';
 
 // Fixed preview dimensions (simulating a mobile screen at 100% browser zoom)
@@ -980,12 +980,20 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     }
   };
 
-  // Content that can be shared between embedded and normal mode
+  // Get progress bar colors from design system
+  const progressColors = {
+    active: designSystem?.designBlock?.progressActiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressActiveColor,
+    completed: designSystem?.designBlock?.progressCompletedColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressCompletedColor,
+    inactive: designSystem?.designBlock?.progressInactiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressInactiveColor,
+    backdrop: designSystem?.designBlock?.progressBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressBackdropColor,
+  };
+  const buttonBackdropColor = designSystem?.designBlock?.buttonBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.buttonBackdropColor;
+
   const progressBar = !hideHeader && (
     <div 
       className="h-10 flex items-center justify-center px-4 border-b shrink-0"
       style={{ 
-        backgroundColor: `hsl(${ds.mutedColor} / 0.3)`,
+        backgroundColor: `hsl(${progressColors.backdrop})`,
         borderColor: `hsl(${ds.mutedColor})`,
       }}
     >
@@ -997,9 +1005,11 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             style={{
               height: '6px',
               width: i === blockIndex ? '24px' : '8px',
-              backgroundColor: i <= blockIndex 
-                ? `hsl(${ds.primaryColor}${i < blockIndex ? ' / 0.5' : ''})` 
-                : `hsl(${ds.mutedColor})`,
+              backgroundColor: i === blockIndex 
+                ? `hsl(${progressColors.active})` 
+                : i < blockIndex 
+                  ? `hsl(${progressColors.completed})` 
+                  : `hsl(${progressColors.inactive})`,
             }}
           />
         ))}
@@ -1071,7 +1081,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     <div 
       className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0 relative z-10"
       style={{ 
-        backgroundColor: `hsl(${ds.cardColor})`,
+        backgroundColor: `hsl(${buttonBackdropColor})`,
         borderColor: `hsl(${ds.mutedColor})`,
       }}
     >
@@ -1143,7 +1153,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         <div 
           className="h-16 border-t flex items-center justify-center gap-3 px-4 shrink-0"
           style={{ 
-            backgroundColor: `hsl(${ds.cardColor})`,
+            backgroundColor: `hsl(${buttonBackdropColor})`,
             borderColor: `hsl(${ds.mutedColor})`,
           }}
         >
@@ -1214,7 +1224,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           <div 
             className="absolute top-0 left-0 right-0 h-10 flex items-center justify-center px-4 border-b z-10"
             style={{ 
-              backgroundColor: `hsl(${ds.mutedColor} / 0.3)`,
+              backgroundColor: `hsl(${progressColors.backdrop})`,
               borderColor: `hsl(${ds.mutedColor})`,
             }}
           >
@@ -1226,9 +1236,11 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                   style={{
                     height: '6px',
                     width: i === blockIndex ? '24px' : '8px',
-                    backgroundColor: i <= blockIndex 
-                      ? `hsl(${ds.primaryColor}${i < blockIndex ? ' / 0.5' : ''})` 
-                      : `hsl(${ds.mutedColor})`,
+                    backgroundColor: i === blockIndex 
+                      ? `hsl(${progressColors.active})` 
+                      : i < blockIndex 
+                        ? `hsl(${progressColors.completed})` 
+                        : `hsl(${progressColors.inactive})`,
                   }}
                 />
               ))}
@@ -1291,7 +1303,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         <div 
           className="absolute bottom-0 left-0 right-0 h-16 border-t flex items-center justify-center gap-3 px-4 z-10"
           style={{ 
-            backgroundColor: `hsl(${ds.cardColor})`,
+            backgroundColor: `hsl(${buttonBackdropColor})`,
             borderColor: `hsl(${ds.mutedColor})`,
           }}
         >
