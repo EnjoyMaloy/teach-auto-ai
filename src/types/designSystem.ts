@@ -135,6 +135,9 @@ export interface DesignSystemConfig {
   successColor: string;
   destructiveColor: string;
   
+  // Theme ID (to persist which theme is selected)
+  themeId?: string;
+  
   // Background style
   backgroundPresetId?: string; // ID of selected preset or 'custom'
   backgroundType?: BackgroundType;
