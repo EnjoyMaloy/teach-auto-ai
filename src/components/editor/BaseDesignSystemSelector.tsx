@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { BaseDesignSystem, useBaseDesignSystems } from '@/hooks/useBaseDesignSystems';
 import { UserDesignSystem, useUserDesignSystems } from '@/hooks/useUserDesignSystems';
-import { DesignSystemConfig } from '@/types/designSystem';
+import { DesignSystemConfig, ThemePreset } from '@/types/designSystem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -23,7 +24,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Check, Edit, Trash2, Plus, Star, Loader2, Palette, Users, User } from 'lucide-react';
+import { Check, Edit, Trash2, Plus, Star, Loader2, Palette, Users, User, Wand2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BaseDesignSystemSelectorProps {
@@ -31,6 +32,9 @@ interface BaseDesignSystemSelectorProps {
   onSelect: (system: BaseDesignSystem | UserDesignSystem) => void;
   isAdmin: boolean;
   currentConfig?: DesignSystemConfig;
+  builtInThemes?: ThemePreset[];
+  activePresetId?: string | null;
+  onPresetSelect?: (presetId: string) => void;
 }
 
 export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> = ({
@@ -38,6 +42,9 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
   onSelect,
   isAdmin,
   currentConfig,
+  builtInThemes = [],
+  activePresetId,
+  onPresetSelect,
 }) => {
   const { 
     systems: baseSystems, 
@@ -140,9 +147,10 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
 
   const hasBaseSystems = baseSystems.length > 0;
   const hasUserSystems = userSystems.length > 0;
+  const hasBuiltInThemes = builtInThemes.length > 0;
 
   // If no systems at all and not admin, still show option to create personal theme
-  if (!hasBaseSystems && !hasUserSystems && !isAdmin) {
+  if (!hasBaseSystems && !hasUserSystems && !hasBuiltInThemes && !isAdmin) {
     return (
       <div className="space-y-3">
         <Button
@@ -151,15 +159,15 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
           onClick={() => setIsCreateUserDialogOpen(true)}
         >
           <Plus className="w-4 h-4" />
-          <User className="w-4 h-4" />
-          Сохранить как личную тему
+          <Wand2 className="w-4 h-4" />
+          Создать свою тему
         </Button>
         
         {/* User Create Dialog */}
         <CreateThemeDialog
           open={isCreateUserDialogOpen}
           onOpenChange={setIsCreateUserDialogOpen}
-          title="Сохранить личную тему"
+          title="Создать свою тему"
           description="Эта тема будет доступна только вам в вашем аккаунте."
           name={newName}
           onNameChange={setNewName}
@@ -174,14 +182,48 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
 
   return (
     <div className="space-y-4">
-      {/* Base systems (admin-managed, visible to all) */}
-      {hasBaseSystems && (
+      {/* Base systems + built-in themes (admin-managed, visible to all) */}
+      {(hasBaseSystems || hasBuiltInThemes) && (
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Palette className="w-3.5 h-3.5" />
             <span>Общие темы</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
+            {/* Built-in preset themes (Google, Notion, Apple, Duolingo) */}
+            {builtInThemes.map((preset) => (
+              <div
+                key={preset.id}
+                onClick={() => onPresetSelect?.(preset.id)}
+                className={cn(
+                  "relative p-3 rounded-xl border-2 transition-all text-left bg-card group cursor-pointer",
+                  activePresetId === preset.id && !selectedId
+                    ? "border-primary bg-primary/5" 
+                    : "border-border hover:border-primary/50"
+                )}
+              >
+                <div className="flex gap-1 mb-2">
+                  <div 
+                    className="w-5 h-5 rounded-full border border-border/50"
+                    style={{ backgroundColor: `hsl(${preset.config.primaryColor || '262 83% 58%'})` }}
+                  />
+                  <div 
+                    className="w-5 h-5 rounded-full border border-border/50"
+                    style={{ backgroundColor: `hsl(${preset.config.backgroundColor || '0 0% 100%'})` }}
+                  />
+                  <div 
+                    className="w-5 h-5 rounded-full border border-border/50"
+                    style={{ backgroundColor: `hsl(${preset.config.foregroundColor || '240 10% 4%'})` }}
+                  />
+                </div>
+                <p className="text-sm font-medium text-foreground">{preset.name}</p>
+                {activePresetId === preset.id && !selectedId && (
+                  <Check className="absolute top-2 right-2 w-4 h-4 text-primary" />
+                )}
+              </div>
+            ))}
+            
+            {/* Database-stored base systems */}
             {baseSystems.map((system) => (
               <ThemeCard
                 key={system.id}
@@ -235,12 +277,17 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
         {isAdmin && (
           <Button
             variant="outline"
-            className="w-full justify-start gap-2 text-sm"
+            className="w-full justify-between text-sm"
             onClick={() => setIsCreateBaseDialogOpen(true)}
           >
-            <Plus className="w-4 h-4" />
-            <Users className="w-4 h-4" />
-            Добавить общую тему
+            <span className="flex items-center gap-2">
+              <Plus className="w-4 h-4" />
+              <Users className="w-4 h-4" />
+              Добавить общую тему
+            </span>
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-primary/10 text-primary">
+              Admin Mode
+            </Badge>
           </Button>
         )}
         <Button
@@ -249,8 +296,8 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
           onClick={() => setIsCreateUserDialogOpen(true)}
         >
           <Plus className="w-4 h-4" />
-          <User className="w-4 h-4" />
-          Сохранить как личную тему
+          <Wand2 className="w-4 h-4" />
+          Создать свою тему
         </Button>
       </div>
 
@@ -272,7 +319,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
       <CreateThemeDialog
         open={isCreateUserDialogOpen}
         onOpenChange={setIsCreateUserDialogOpen}
-        title="Сохранить личную тему"
+        title="Создать свою тему"
         description="Эта тема будет доступна только вам в вашем аккаунте."
         name={newName}
         onNameChange={setNewName}
