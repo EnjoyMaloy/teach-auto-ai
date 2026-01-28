@@ -66,14 +66,19 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
     course.designSystem?.themeId || null
   );
 
-  // Sync selectedBaseSystemId with designSystem when theme is selected
+  // Sync selectedBaseSystemId with course.designSystem.themeId when it changes
+  React.useEffect(() => {
+    const themeId = course.designSystem?.themeId || null;
+    if (themeId !== selectedBaseSystemId) {
+      setSelectedBaseSystemId(themeId);
+    }
+  }, [course.designSystem?.themeId]);
+
+  // Theme selection is now handled by DesignSystemEditor which calls onChange with full config
   const handleBaseSystemSelect = (id: string | null) => {
     setSelectedBaseSystemId(id);
-    // Also save to designSystem to persist the selection
-    onUpdateDesignSystem({
-      ...course.designSystem,
-      themeId: id || undefined,
-    } as DesignSystemConfig);
+    // Note: The actual config is applied by DesignSystemEditor.handleBaseSystemSelect
+    // which calls onChange with the full theme config including themeId
   };
 
   const handleStartEditing = () => {
