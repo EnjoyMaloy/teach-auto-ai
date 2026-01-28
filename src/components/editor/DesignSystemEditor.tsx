@@ -756,6 +756,18 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     onChange={(v) => updateConfig({ primaryForeground: v })}
                     description="Цвет текста на кнопках"
                   />
+                  <ColorInput
+                    label="Подложка кнопки"
+                    value={config.designBlock?.buttonBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.buttonBackdropColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        buttonBackdropColor: v 
+                      } 
+                    })}
+                    description="Фон области с кнопкой"
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -805,54 +817,34 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     ))}
                   </div>
                 </div>
-              </div>
 
-              {/* Button Backdrop */}
-              <div className="border-t pt-6 space-y-2">
-                <Label className="text-base font-semibold">Подложка кнопки</Label>
-                <p className="text-sm text-muted-foreground">
-                  Фон области с кнопкой навигации
-                </p>
-              </div>
-              <ColorInput
-                label="Цвет подложки"
-                value={config.designBlock?.buttonBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.buttonBackdropColor}
-                onChange={(v) => updateConfig({ 
-                  designBlock: { 
-                    ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                    ...config.designBlock, 
-                    buttonBackdropColor: v 
-                  } 
-                })}
-                description="Фон области с кнопкой внизу экрана"
-              />
-
-              {/* Button Preview */}
-              <div className="mt-4 p-4 rounded-xl border bg-muted/30">
-                <p className="text-xs text-muted-foreground mb-3">Превью кнопки</p>
-                <div 
-                  className="rounded-lg p-4"
-                  style={{ 
-                    backgroundColor: `hsl(${config.designBlock?.buttonBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.buttonBackdropColor})` 
-                  }}
-                >
-                  <button
-                    className="w-full py-3 font-bold uppercase tracking-wide text-sm transition-all"
-                    style={{
-                      backgroundColor: `hsl(${config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor})`,
-                      color: `hsl(${config.primaryForeground || DEFAULT_DESIGN_SYSTEM.primaryForeground})`,
-                      borderRadius: config.buttonStyle === 'pill' 
-                        ? '9999px' 
-                        : config.buttonStyle === 'square' 
-                          ? '0.5rem' 
-                          : '0.75rem',
-                      boxShadow: (config.buttonDepth ?? 'raised') === 'raised'
-                        ? `0 4px 0 0 hsl(${config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor} / 0.4), 0 6px 12px -2px hsl(${config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor} / 0.25)`
-                        : 'none',
+                {/* Button Preview */}
+                <div className="p-4 rounded-xl border bg-muted/30">
+                  <p className="text-xs text-muted-foreground mb-3">Превью кнопки</p>
+                  <div 
+                    className="rounded-lg p-4"
+                    style={{ 
+                      backgroundColor: `hsl(${config.designBlock?.buttonBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.buttonBackdropColor})` 
                     }}
                   >
-                    ПРОДОЛЖИТЬ
-                  </button>
+                    <button
+                      className="w-full py-3 font-bold uppercase tracking-wide text-sm transition-all"
+                      style={{
+                        backgroundColor: `hsl(${config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor})`,
+                        color: `hsl(${config.primaryForeground || DEFAULT_DESIGN_SYSTEM.primaryForeground})`,
+                        borderRadius: config.buttonStyle === 'pill' 
+                          ? '9999px' 
+                          : config.buttonStyle === 'square' 
+                            ? '0.5rem' 
+                            : '0.75rem',
+                        boxShadow: (config.buttonDepth ?? 'raised') === 'raised'
+                          ? `0 4px 0 0 hsl(${config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor} / 0.4), 0 6px 12px -2px hsl(${config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor} / 0.25)`
+                          : 'none',
+                      }}
+                    >
+                      ПРОДОЛЖИТЬ
+                    </button>
+                  </div>
                 </div>
               </div>
             </TabsContent>
