@@ -1454,7 +1454,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     >
       {/* Inner container with fixed dimensions, scaled to fit using CSS zoom for crisp rendering */}
       <div 
-        className="flex flex-col overflow-hidden"
+        className="flex flex-col overflow-hidden rounded-3xl"
         style={{ 
           fontFamily: ds.fontFamily,
           // Fixed internal dimensions (mobile screen size)
@@ -1462,6 +1462,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           height: `${PREVIEW_BASE_HEIGHT}px`,
           // Use CSS zoom instead of transform for crisp text and images
           zoom: previewScale,
+          ...getBackgroundStyle(ds),
         }}
       >
         {progressBar}
