@@ -356,8 +356,14 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
     const saved = localStorage.getItem('customThemes');
     return saved ? JSON.parse(saved) : [];
   });
+  const [customBackgrounds, setCustomBackgrounds] = useState<BackgroundPreset[]>(() => {
+    const saved = localStorage.getItem('customBackgrounds');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isCreateBgDialogOpen, setIsCreateBgDialogOpen] = useState(false);
   const [newThemeName, setNewThemeName] = useState('');
+  const [newBgName, setNewBgName] = useState('');
 
   // Combined themes: base + custom
   const allThemes = [...BASE_THEMES, ...customThemes];
@@ -408,6 +414,45 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   const resetToDefault = () => {
     onChange(DEFAULT_DESIGN_SYSTEM);
     setActivePreset(null);
+  };
+
+  // Custom background functions
+  const allBackgrounds = [...BACKGROUND_PRESETS, ...customBackgrounds];
+
+  const saveCustomBackgrounds = (backgrounds: BackgroundPreset[]) => {
+    setCustomBackgrounds(backgrounds);
+    localStorage.setItem('customBackgrounds', JSON.stringify(backgrounds));
+  };
+
+  const createCustomBackground = () => {
+    if (!newBgName.trim()) return;
+    
+    const newBg: BackgroundPreset = {
+      id: `custom-bg-${Date.now()}`,
+      name: newBgName.trim(),
+      type: config.backgroundType || 'solid',
+      ...(config.backgroundType === 'gradient' 
+        ? { 
+            from: config.gradientFrom || '262 83% 95%', 
+            to: config.gradientTo || '200 83% 95%', 
+            angle: config.gradientAngle || 135 
+          }
+        : { color: config.backgroundColor }),
+    };
+    
+    saveCustomBackgrounds([...customBackgrounds, newBg]);
+    updateConfig({ backgroundPresetId: newBg.id });
+    setNewBgName('');
+    setIsCreateBgDialogOpen(false);
+  };
+
+  const deleteCustomBackground = (bgId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const updated = customBackgrounds.filter(b => b.id !== bgId);
+    saveCustomBackgrounds(updated);
+    if (config.backgroundPresetId === bgId) {
+      updateConfig({ backgroundPresetId: 'white' });
+    }
   };
 
   // Preview component
@@ -591,6 +636,48 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
         </DialogContent>
       </Dialog>
 
+      {/* Create Background Preset Dialog */}
+      <Dialog open={isCreateBgDialogOpen} onOpenChange={setIsCreateBgDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Сохранить фон</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Название</Label>
+              <Input
+                value={newBgName}
+                onChange={(e) => setNewBgName(e.target.value)}
+                placeholder="Например: Мой градиент"
+                onKeyDown={(e) => e.key === 'Enter' && createCustomBackground()}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Предпросмотр</Label>
+              <div 
+                className="h-16 rounded-lg border border-border"
+                style={
+                  config.backgroundType === 'gradient' 
+                    ? { background: `linear-gradient(${config.gradientAngle || 135}deg, hsl(${config.gradientFrom || '262 83% 95%'}), hsl(${config.gradientTo || '200 83% 95%'}))` }
+                    : { backgroundColor: `hsl(${config.backgroundColor})` }
+                }
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setIsCreateBgDialogOpen(false);
+              setNewBgName('');
+            }}>
+              Отмена
+            </Button>
+            <Button onClick={createCustomBackground} disabled={!newBgName.trim()}>
+              Сохранить
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Preview */}
       <div className="space-y-3">
         <h3 className="font-semibold text-foreground">Предпросмотр</h3>
@@ -644,6 +731,8 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
               {/* Background Selector - 5 presets + custom */}
               <div className="space-y-3">
                 <Label className="text-sm font-medium">Фон курса</Label>
+                
+                {/* Default presets */}
                 <div className="grid grid-cols-5 gap-2">
                   {BACKGROUND_PRESETS.map((preset) => {
                     const isSelected = config.backgroundPresetId === preset.id;
@@ -656,7 +745,6 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                         key={preset.id}
                         type="button"
                         onClick={() => {
-                          console.log('Preset clicked:', preset.id, preset.type);
                           if (preset.type === 'gradient') {
                             updateConfig({
                               backgroundPresetId: preset.id,
@@ -689,13 +777,71 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     );
                   })}
                 </div>
+
+                {/* Custom saved backgrounds */}
+                {customBackgrounds.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Сохранённые</Label>
+                    <div className="grid grid-cols-5 gap-2">
+                      {customBackgrounds.map((preset) => {
+                        const isSelected = config.backgroundPresetId === preset.id;
+                        const bgStyle = preset.type === 'gradient' 
+                          ? { background: `linear-gradient(${preset.angle || 135}deg, hsl(${preset.from}), hsl(${preset.to}))` }
+                          : { backgroundColor: `hsl(${preset.color})` };
+                        
+                        return (
+                          <div key={preset.id} className="relative group">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (preset.type === 'gradient') {
+                                  updateConfig({
+                                    backgroundPresetId: preset.id,
+                                    backgroundType: 'gradient',
+                                    gradientFrom: preset.from,
+                                    gradientTo: preset.to,
+                                    gradientAngle: preset.angle,
+                                  });
+                                } else {
+                                  updateConfig({
+                                    backgroundPresetId: preset.id,
+                                    backgroundType: 'solid',
+                                    backgroundColor: preset.color!,
+                                  });
+                                }
+                              }}
+                              className={cn(
+                                "w-full h-14 rounded-lg border-2 transition-all flex items-end justify-center pb-1",
+                                isSelected
+                                  ? "border-primary ring-2 ring-primary/20"
+                                  : "border-border hover:border-primary/50"
+                              )}
+                              style={bgStyle}
+                              title={preset.name}
+                            >
+                              <span className="text-[10px] font-medium text-foreground/70 bg-white/80 px-1.5 py-0.5 rounded truncate max-w-full">
+                                {preset.name}
+                              </span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => deleteCustomBackground(preset.id, e)}
+                              className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
                 
                 {/* Custom background option */}
                 <div className="flex items-center gap-2 pt-2">
                   <button
                     type="button"
                     onClick={() => {
-                      console.log('Custom button clicked');
                       updateConfig({ backgroundPresetId: 'custom' });
                     }}
                     className={cn(
@@ -759,6 +905,18 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                         />
                       </div>
                     )}
+
+                    {/* Save custom background button */}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => setIsCreateBgDialogOpen(true)}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Сохранить как пресет
+                    </Button>
                   </div>
                 )}
               </div>
