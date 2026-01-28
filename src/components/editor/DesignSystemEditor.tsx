@@ -693,43 +693,40 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
               </div>
 
               {/* Progress Bar Preview */}
-              <div className="mt-4 p-4 rounded-xl border bg-muted/30">
-                <p className="text-xs text-muted-foreground mb-3">Превью прогресс-бара</p>
-                <div 
-                  className="rounded-lg px-3 py-2"
-                  style={{ 
-                    backgroundColor: `hsl(${config.designBlock?.progressBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressBackdropColor})` 
-                  }}
-                >
-                  <div className="flex gap-1.5">
-                    {/* Completed slides */}
-                    {[0, 1].map((i) => (
-                      <div 
-                        key={`completed-${i}`}
-                        className="h-1.5 flex-1 rounded-full transition-colors"
-                        style={{ 
-                          backgroundColor: `hsl(${config.designBlock?.progressCompletedColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressCompletedColor})` 
-                        }}
-                      />
-                    ))}
-                    {/* Active slide */}
+              <div 
+                className="mt-4 rounded-lg px-3 py-2"
+                style={{ 
+                  backgroundColor: `hsl(${config.designBlock?.progressBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressBackdropColor})` 
+                }}
+              >
+                <div className="flex gap-1">
+                  {/* Completed slides */}
+                  {[0, 1].map((i) => (
                     <div 
-                      className="h-1.5 flex-1 rounded-full transition-colors"
+                      key={`completed-${i}`}
+                      className="h-1 flex-1 rounded-sm transition-colors"
                       style={{ 
-                        backgroundColor: `hsl(${config.designBlock?.progressActiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressActiveColor})` 
+                        backgroundColor: `hsl(${config.designBlock?.progressCompletedColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressCompletedColor})` 
                       }}
                     />
-                    {/* Inactive slides */}
-                    {[0, 1, 2].map((i) => (
-                      <div 
-                        key={`inactive-${i}`}
-                        className="h-1.5 flex-1 rounded-full transition-colors"
-                        style={{ 
-                          backgroundColor: `hsl(${config.designBlock?.progressInactiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressInactiveColor})` 
-                        }}
-                      />
-                    ))}
-                  </div>
+                  ))}
+                  {/* Active slide */}
+                  <div 
+                    className="h-1 flex-1 rounded-sm transition-colors"
+                    style={{ 
+                      backgroundColor: `hsl(${config.designBlock?.progressActiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressActiveColor})` 
+                    }}
+                  />
+                  {/* Inactive slides */}
+                  {[0, 1, 2].map((i) => (
+                    <div 
+                      key={`inactive-${i}`}
+                      className="h-1 flex-1 rounded-sm transition-colors"
+                      style={{ 
+                        backgroundColor: `hsl(${config.designBlock?.progressInactiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressInactiveColor})` 
+                      }}
+                    />
+                  ))}
                 </div>
               </div>
 
