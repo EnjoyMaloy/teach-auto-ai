@@ -1141,7 +1141,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                   {/* Sound theme */}
                   <div className="space-y-3">
                     <Label>Тема звуков</Label>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-3 gap-2">
                       {SOUND_THEME_OPTIONS.map((theme) => {
                         const currentTheme = config.sound?.theme ?? 'duolingo';
                         
@@ -1166,21 +1166,13 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                               }
                             }}
                             className={cn(
-                              "p-4 rounded-xl border-2 text-left transition-all",
+                              "p-2 rounded-lg border-2 text-center transition-all text-sm",
                               currentTheme === theme.value
                                 ? "border-primary bg-primary/5"
                                 : "border-border hover:border-primary/50"
                             )}
                           >
-                            <div className="flex items-center gap-2 mb-1">
-                              {theme.value === 'none' ? (
-                                <VolumeX className="w-4 h-4 text-muted-foreground" />
-                              ) : (
-                                <Volume2 className="w-4 h-4 text-primary" />
-                              )}
-                              <span className="font-medium">{theme.label}</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground">{theme.description}</p>
+                            {theme.label}
                           </button>
                         );
                       })}

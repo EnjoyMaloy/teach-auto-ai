@@ -1,6 +1,30 @@
 // Design System configuration for courses
 
-export type SoundTheme = 'duolingo' | 'minimal' | 'playful' | 'none';
+export type SoundTheme = 
+  | 'duolingo' 
+  | 'minimal' 
+  | 'playful' 
+  | 'retro' 
+  | 'nature' 
+  | 'synth' 
+  | 'arcade' 
+  | 'soft' 
+  | 'bright' 
+  | 'deep' 
+  | 'chime' 
+  | 'bubble' 
+  | 'marimba' 
+  | 'bell' 
+  | 'piano' 
+  | 'guitar' 
+  | 'whistle' 
+  | 'cosmic' 
+  | 'jazz' 
+  | 'electronic' 
+  | 'wooden' 
+  | 'crystal' 
+  | 'wind' 
+  | 'none';
 
 export interface SoundSettings {
   enabled: boolean;
