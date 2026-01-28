@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BaseDesignSystem, useBaseDesignSystems } from '@/hooks/useBaseDesignSystems';
 import { UserDesignSystem, useUserDesignSystems } from '@/hooks/useUserDesignSystems';
-import { DesignSystemConfig, ThemePreset } from '@/types/designSystem';
+import { DesignSystemConfig } from '@/types/designSystem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,10 +32,6 @@ interface BaseDesignSystemSelectorProps {
   onSelect: (system: BaseDesignSystem | UserDesignSystem) => void;
   isAdmin: boolean;
   currentConfig?: DesignSystemConfig;
-  builtInThemes?: ThemePreset[];
-  activePresetId?: string | null;
-  onPresetSelect?: (presetId: string) => void;
-  onBuiltInThemeDelete?: (presetId: string) => void;
 }
 
 export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> = ({
@@ -43,10 +39,6 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
   onSelect,
   isAdmin,
   currentConfig,
-  builtInThemes = [],
-  activePresetId,
-  onPresetSelect,
-  onBuiltInThemeDelete,
 }) => {
   const { 
     systems: baseSystems, 
@@ -163,10 +155,9 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
 
   const hasBaseSystems = baseSystems.length > 0;
   const hasUserSystems = userSystems.length > 0;
-  const hasBuiltInThemes = builtInThemes.length > 0;
 
   // If no systems at all and not admin, still show option to create personal theme
-  if (!hasBaseSystems && !hasUserSystems && !hasBuiltInThemes && !isAdmin) {
+  if (!hasBaseSystems && !hasUserSystems && !isAdmin) {
     return (
       <div className="space-y-3">
         <Button
@@ -198,63 +189,14 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
 
   return (
     <div className="space-y-4">
-      {/* Base systems + built-in themes (admin-managed, visible to all) */}
-      {(hasBaseSystems || hasBuiltInThemes) && (
+      {/* Base systems (admin-managed, visible to all) */}
+      {hasBaseSystems && (
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Palette className="w-3.5 h-3.5" />
             <span>Общие темы</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            {/* Built-in preset themes (Google, Notion, Apple, Duolingo) */}
-            {builtInThemes.map((preset) => (
-              <div
-                key={preset.id}
-                onClick={() => onPresetSelect?.(preset.id)}
-                className={cn(
-                  "relative p-3 rounded-xl border-2 transition-all text-left bg-card group cursor-pointer",
-                  activePresetId === preset.id && !selectedId
-                    ? "border-primary bg-primary/5" 
-                    : "border-border hover:border-primary/50"
-                )}
-              >
-                <div className="flex gap-1 mb-2">
-                  <div 
-                    className="w-5 h-5 rounded-full border border-border/50"
-                    style={{ backgroundColor: `hsl(${preset.config.primaryColor || '262 83% 58%'})` }}
-                  />
-                  <div 
-                    className="w-5 h-5 rounded-full border border-border/50"
-                    style={{ backgroundColor: `hsl(${preset.config.backgroundColor || '0 0% 100%'})` }}
-                  />
-                  <div 
-                    className="w-5 h-5 rounded-full border border-border/50"
-                    style={{ backgroundColor: `hsl(${preset.config.foregroundColor || '240 10% 4%'})` }}
-                  />
-                </div>
-                <p className="text-sm font-medium text-foreground">{preset.name}</p>
-                {activePresetId === preset.id && !selectedId && (
-                  <Check className="absolute top-2 right-2 w-4 h-4 text-primary" />
-                )}
-                
-                {/* Delete button for admins on built-in themes */}
-                {isAdmin && onBuiltInThemeDelete && (
-                  <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onBuiltInThemeDelete(preset.id);
-                      }}
-                      className="w-6 h-6 rounded-full bg-destructive/10 text-destructive flex items-center justify-center hover:bg-destructive/20 transition-colors"
-                      title="Удалить"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
-            
             {/* Database-stored base systems */}
             {baseSystems.map((system) => (
               <ThemeCard
