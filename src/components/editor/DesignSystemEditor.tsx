@@ -818,39 +818,11 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
 
                 {/* Button Preview */}
                 <div 
-                  className="rounded-lg p-3 space-y-3"
+                  className="rounded-lg p-3"
                   style={{ 
                     backgroundColor: `hsl(${config.designBlock?.buttonBackdropColor || DEFAULT_DESIGN_BLOCK_SETTINGS.buttonBackdropColor})` 
                   }}
                 >
-                  {/* Progress bar */}
-                  <div className="flex gap-1">
-                    {[0, 1].map((i) => (
-                      <div 
-                        key={`completed-${i}`}
-                        className="h-1 flex-1 rounded-sm"
-                        style={{ 
-                          backgroundColor: `hsl(${config.designBlock?.progressCompletedColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressCompletedColor})` 
-                        }}
-                      />
-                    ))}
-                    <div 
-                      className="h-1 flex-1 rounded-sm"
-                      style={{ 
-                        backgroundColor: `hsl(${config.designBlock?.progressActiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressActiveColor})` 
-                      }}
-                    />
-                    {[0, 1, 2].map((i) => (
-                      <div 
-                        key={`inactive-${i}`}
-                        className="h-1 flex-1 rounded-sm"
-                        style={{ 
-                          backgroundColor: `hsl(${config.designBlock?.progressInactiveColor || DEFAULT_DESIGN_BLOCK_SETTINGS.progressInactiveColor})` 
-                        }}
-                      />
-                    ))}
-                  </div>
-                  {/* Button */}
                   <button
                     className="w-full py-3 font-bold uppercase tracking-wide text-sm transition-all"
                     style={{
