@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   DesignSystemConfig, 
   DEFAULT_DESIGN_SYSTEM,
@@ -375,21 +375,74 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   };
 
   // Get user's personal themes to check if selected theme is personal
-  const { systems: userSystems } = useUserDesignSystems();
+  const { systems: userSystems, updateSystem: updateUserSystem } = useUserDesignSystems();
+
+  // Check if the selected theme is a personal theme
+  const isPersonalThemeSelected = userSystems.some(s => s.id === selectedBaseSystemId);
+  const hasCommonThemeSelected = !!selectedBaseSystemId && !isPersonalThemeSelected;
+  const isEditingRestricted = !isAdmin && hasCommonThemeSelected;
+
+  // Auto-save personal theme changes with debounce
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSavedConfigRef = useRef<string>('');
+  const isInitialLoadRef = useRef(true);
+
+  // Auto-save effect for personal themes
+  useEffect(() => {
+    // Skip initial load
+    if (isInitialLoadRef.current) {
+      isInitialLoadRef.current = false;
+      lastSavedConfigRef.current = JSON.stringify(config);
+      return;
+    }
+
+    // Only auto-save if a personal theme is selected
+    if (!isPersonalThemeSelected || !selectedBaseSystemId) {
+      return;
+    }
+
+    const currentConfigStr = JSON.stringify(config);
+    
+    // Skip if config hasn't changed
+    if (currentConfigStr === lastSavedConfigRef.current) {
+      return;
+    }
+
+    // Clear previous timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    // Debounce save - wait 1 second after last change
+    saveTimeoutRef.current = setTimeout(async () => {
+      await updateUserSystem(selectedBaseSystemId, { config });
+      lastSavedConfigRef.current = currentConfigStr;
+    }, 1000);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [config, isPersonalThemeSelected, selectedBaseSystemId, updateUserSystem]);
+
+  // Reset initial load flag when theme changes
+  useEffect(() => {
+    isInitialLoadRef.current = true;
+    lastSavedConfigRef.current = JSON.stringify(config);
+  }, [selectedBaseSystemId]);
 
   // Handler for base system selection
   const handleBaseSystemSelect = (system: BaseDesignSystem, isPersonalTheme: boolean) => {
+    // Mark as initial load to prevent auto-save of the loaded config
+    isInitialLoadRef.current = true;
+    lastSavedConfigRef.current = JSON.stringify(system.config);
+    
     onChange(system.config);
     // Always pass the system ID for visual selection
     onBaseSystemSelect?.(system.id);
     setActivePreset(null);
   };
-
-  // Check if user is restricted from editing (non-admin with selected COMMON theme)
-  // Personal themes should NOT be restricted - check if selectedBaseSystemId is in user's personal themes
-  const isPersonalThemeSelected = userSystems.some(s => s.id === selectedBaseSystemId);
-  const hasCommonThemeSelected = !!selectedBaseSystemId && !isPersonalThemeSelected;
-  const isEditingRestricted = !isAdmin && hasCommonThemeSelected;
 
   return (
     <div className="space-y-6">
