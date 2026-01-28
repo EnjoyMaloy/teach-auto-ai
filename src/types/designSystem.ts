@@ -154,19 +154,25 @@ export interface DesignSystemConfig {
   // Theme ID (to persist which theme is selected)
   themeId?: string;
   
-  // Background style
-  backgroundPresetId?: string; // ID of selected preset or 'custom'
+  // Theme backgrounds - up to 5 backgrounds that can be used in blocks
+  themeBackgrounds?: BackgroundPreset[];
+  
+  // Default background for new blocks (references themeBackgrounds by id)
+  defaultBackgroundId?: string;
+  
+  // Legacy background fields (kept for backward compatibility)
+  backgroundPresetId?: string;
   backgroundType?: BackgroundType;
-  gradientFrom?: string; // HSL value for gradient start
-  gradientTo?: string;   // HSL value for gradient end
-  gradientAngle?: number; // Gradient angle in degrees (0-360)
+  gradientFrom?: string;
+  gradientTo?: string;
+  gradientAngle?: number;
   
   // Typography
   fontFamily: string;
   headingFontFamily: string;
   
   // Border radius
-  borderRadius: string; // e.g., "0.5rem", "1rem", "1.5rem"
+  borderRadius: string;
   
   // Button style
   buttonStyle: 'rounded' | 'pill' | 'square';

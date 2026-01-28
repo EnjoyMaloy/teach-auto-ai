@@ -675,6 +675,7 @@ const Editor: React.FC = () => {
               onDelete={handleDeleteBlock}
               selectedSubBlockId={selectedSubBlockId}
               onSelectSubBlock={setSelectedSubBlockId}
+              themeBackgrounds={(course.designSystem as any)?.themeBackgrounds || []}
             />
           ) : (
             <div className="h-full flex items-center justify-center p-8 text-center">

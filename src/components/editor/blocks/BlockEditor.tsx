@@ -1,8 +1,10 @@
 import React from 'react';
 import { Block, BlockType, BLOCK_CONFIGS, BlockOption } from '@/types/blocks';
 import { SubBlock, SubBlockType, SUB_BLOCK_CONFIGS, createSubBlock } from '@/types/designBlock';
+import { BackgroundPreset } from '@/types/designSystem';
 import { SubBlockSettingsEditor } from './SubBlockSettingsEditor';
 import { DesignAIChat } from './DesignAIChat';
+import { BlockBackgroundSelector } from './BlockBackgroundSelector';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,6 +37,7 @@ interface BlockEditorProps {
   onDelete: () => void;
   selectedSubBlockId?: string | null;
   onSelectSubBlock?: (id: string | null) => void;
+  themeBackgrounds?: BackgroundPreset[];
 }
 
 export const BlockEditor: React.FC<BlockEditorProps> = ({
@@ -43,6 +46,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
   onDelete,
   selectedSubBlockId,
   onSelectSubBlock,
+  themeBackgrounds = [],
 }) => {
   const config = BLOCK_CONFIGS[block.type];
   
@@ -157,6 +161,15 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
 
       {/* Editor content */}
       <div className="flex-1 overflow-y-auto p-5 space-y-5">
+        {/* Background selector - show if theme has backgrounds */}
+        {themeBackgrounds.length > 0 && (
+          <BlockBackgroundSelector
+            backgrounds={themeBackgrounds}
+            selectedBackgroundId={block.backgroundId}
+            onChange={(backgroundId) => onUpdate({ backgroundId })}
+          />
+        )}
+        
         {/* Content field */}
         {['heading', 'text', 'image_text', 'single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'matching', 'ordering', 'slider'].includes(block.type) && (
           <div className="space-y-2">

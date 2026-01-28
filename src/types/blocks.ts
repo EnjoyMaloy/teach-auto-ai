@@ -79,6 +79,9 @@ export interface Block {
   textColor?: string;
   textSize?: 'small' | 'medium' | 'large' | 'xlarge';
   
+  // Background from theme (references themeBackgrounds by id)
+  backgroundId?: string;
+  
   // Timestamps
   createdAt: Date;
   updatedAt: Date;

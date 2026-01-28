@@ -17,6 +17,7 @@ import {
 } from '@/types/designSystem';
 import { playSound, SOUND_THEME_OPTIONS } from '@/lib/sounds';
 import { BaseDesignSystemSelector } from './BaseDesignSystemSelector';
+import { ThemeBackgroundsEditor } from './ThemeBackgroundsEditor';
 import { useBaseDesignSystems, BaseDesignSystem } from '@/hooks/useBaseDesignSystems';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -367,19 +368,11 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
       setActivePreset(config.themeId);
     }
   }, [config.themeId]);
-  const [customBackgrounds, setCustomBackgrounds] = useState<BackgroundPreset[]>(() => {
-    const saved = localStorage.getItem('customBackgrounds');
-    return saved ? JSON.parse(saved) : [];
-  });
-
   // Hidden built-in themes (admin can hide them)
   const [hiddenBuiltInThemes, setHiddenBuiltInThemes] = useState<string[]>(() => {
     const saved = localStorage.getItem('hiddenBuiltInThemes');
     return saved ? JSON.parse(saved) : [];
   });
-
-  const [isCreateBgDialogOpen, setIsCreateBgDialogOpen] = useState(false);
-  const [newBgName, setNewBgName] = useState('');
 
   // Use only base themes (Google, Notion, Apple, Duolingo), filter out hidden ones
   const allThemes = BASE_THEMES.filter(t => !hiddenBuiltInThemes.includes(t.id));
@@ -396,6 +389,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
       setActivePreset(presetId);
     }
   };
+  
   const resetToDefault = () => {
     onChange(DEFAULT_DESIGN_SYSTEM);
     setActivePreset(null);
@@ -410,49 +404,6 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
     // If this theme was active, reset
     if (activePreset === themeId || config.themeId === themeId) {
       resetToDefault();
-    }
-  };
-
-  // Custom background functions
-  // Get theme-specific presets using themeId from config (persisted) or activePreset (local state)
-  const currentThemeId = config.themeId || activePreset;
-  const activeTheme = BASE_THEMES.find(t => t.id === currentThemeId);
-  const themeBackgroundPresets = activeTheme?.backgroundPresets || BACKGROUND_PRESETS;
-  const allBackgrounds = [...themeBackgroundPresets, ...customBackgrounds];
-
-  const saveCustomBackgrounds = (backgrounds: BackgroundPreset[]) => {
-    setCustomBackgrounds(backgrounds);
-    localStorage.setItem('customBackgrounds', JSON.stringify(backgrounds));
-  };
-
-  const createCustomBackground = () => {
-    if (!newBgName.trim()) return;
-    
-    const newBg: BackgroundPreset = {
-      id: `custom-bg-${Date.now()}`,
-      name: newBgName.trim(),
-      type: config.backgroundType || 'solid',
-      ...(config.backgroundType === 'gradient' 
-        ? { 
-            from: config.gradientFrom || '262 83% 95%', 
-            to: config.gradientTo || '200 83% 95%', 
-            angle: config.gradientAngle || 135 
-          }
-        : { color: config.backgroundColor }),
-    };
-    
-    saveCustomBackgrounds([...customBackgrounds, newBg]);
-    updateConfig({ backgroundPresetId: newBg.id });
-    setNewBgName('');
-    setIsCreateBgDialogOpen(false);
-  };
-
-  const deleteCustomBackground = (bgId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const updated = customBackgrounds.filter(b => b.id !== bgId);
-    saveCustomBackgrounds(updated);
-    if (config.backgroundPresetId === bgId) {
-      updateConfig({ backgroundPresetId: 'white' });
     }
   };
 
@@ -506,48 +457,6 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
         </div>
       )}
 
-      {/* Create Background Preset Dialog */}
-      <Dialog open={isCreateBgDialogOpen} onOpenChange={setIsCreateBgDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Сохранить фон</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>Название</Label>
-              <Input
-                value={newBgName}
-                onChange={(e) => setNewBgName(e.target.value)}
-                placeholder="Например: Мой градиент"
-                onKeyDown={(e) => e.key === 'Enter' && createCustomBackground()}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs text-muted-foreground">Предпросмотр</Label>
-              <div 
-                className="h-16 rounded-lg border border-border"
-                style={
-                  config.backgroundType === 'gradient' 
-                    ? { background: `linear-gradient(${config.gradientAngle || 135}deg, hsl(${config.gradientFrom || '262 83% 95%'}), hsl(${config.gradientTo || '200 83% 95%'}))` }
-                    : { backgroundColor: `hsl(${config.backgroundColor})` }
-                }
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => {
-              setIsCreateBgDialogOpen(false);
-              setNewBgName('');
-            }}>
-              Отмена
-            </Button>
-            <Button onClick={createCustomBackground} disabled={!newBgName.trim()}>
-              Сохранить
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
       {/* Detailed Settings - disabled for non-admins with base system or built-in theme selected */}
       <div className={cn("space-y-4", isEditingRestricted && "opacity-50 pointer-events-none")}>
         <div className="flex items-center justify-between">
@@ -594,198 +503,14 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
           <div className="mt-4">
 
             <TabsContent value="colors" className="space-y-4">
-              {/* Background Selector - 5 presets + custom */}
-              <div className="space-y-3">
-                <Label className="text-sm font-medium">Фон курса</Label>
-                
-                {/* Default presets */}
-                <div className="grid grid-cols-5 gap-2">
-                  {themeBackgroundPresets.map((preset) => {
-                    const isSelected = config.backgroundPresetId === preset.id;
-                    const bgStyle = preset.type === 'gradient'
-                      ? { background: `linear-gradient(${preset.angle || 135}deg, hsl(${preset.from}), hsl(${preset.to}))` }
-                      : { backgroundColor: `hsl(${preset.color})` };
-                    
-                    return (
-                      <button
-                        key={preset.id}
-                        type="button"
-                        onClick={() => {
-                          if (preset.type === 'gradient') {
-                            updateConfig({
-                              backgroundPresetId: preset.id,
-                              backgroundType: 'gradient',
-                              gradientFrom: preset.from,
-                              gradientTo: preset.to,
-                              gradientAngle: preset.angle,
-                            });
-                          } else {
-                            updateConfig({
-                              backgroundPresetId: preset.id,
-                              backgroundType: 'solid',
-                              backgroundColor: preset.color!,
-                            });
-                          }
-                        }}
-                        className={cn(
-                          "h-14 rounded-lg border-2 transition-all flex items-end justify-center pb-1",
-                          isSelected
-                            ? "border-primary ring-2 ring-primary/20"
-                            : "border-border hover:border-primary/50"
-                        )}
-                        style={bgStyle}
-                        title={preset.name}
-                      >
-                        <span className="text-[10px] font-medium text-foreground/70 bg-white/80 px-1.5 py-0.5 rounded">
-                          {preset.name}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Custom saved backgrounds */}
-                {customBackgrounds.length > 0 && (
-                  <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">Сохранённые</Label>
-                    <div className="grid grid-cols-5 gap-2">
-                      {customBackgrounds.map((preset) => {
-                        const isSelected = config.backgroundPresetId === preset.id;
-                        const bgStyle = preset.type === 'gradient' 
-                          ? { background: `linear-gradient(${preset.angle || 135}deg, hsl(${preset.from}), hsl(${preset.to}))` }
-                          : { backgroundColor: `hsl(${preset.color})` };
-                        
-                        return (
-                          <div key={preset.id} className="relative group">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (preset.type === 'gradient') {
-                                  updateConfig({
-                                    backgroundPresetId: preset.id,
-                                    backgroundType: 'gradient',
-                                    gradientFrom: preset.from,
-                                    gradientTo: preset.to,
-                                    gradientAngle: preset.angle,
-                                  });
-                                } else {
-                                  updateConfig({
-                                    backgroundPresetId: preset.id,
-                                    backgroundType: 'solid',
-                                    backgroundColor: preset.color!,
-                                  });
-                                }
-                              }}
-                              className={cn(
-                                "w-full h-14 rounded-lg border-2 transition-all flex items-end justify-center pb-1",
-                                isSelected
-                                  ? "border-primary ring-2 ring-primary/20"
-                                  : "border-border hover:border-primary/50"
-                              )}
-                              style={bgStyle}
-                              title={preset.name}
-                            >
-                              <span className="text-[10px] font-medium text-foreground/70 bg-white/80 px-1.5 py-0.5 rounded truncate max-w-full">
-                                {preset.name}
-                              </span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => deleteCustomBackground(preset.id, e)}
-                              className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-                
-                {/* Custom background option */}
-                <div className="flex items-center gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      updateConfig({ backgroundPresetId: 'custom' });
-                    }}
-                    className={cn(
-                      "flex-1 py-2 px-3 rounded-lg text-sm transition-colors border-2 text-left",
-                      config.backgroundPresetId === 'custom'
-                        ? "border-primary bg-primary/10"
-                        : "border-dashed border-border hover:border-primary/50"
-                    )}
-                  >
-                    <span className="text-muted-foreground">+ Свой цвет</span>
-                  </button>
-                </div>
-
-                {/* Custom color inputs - show when custom is selected */}
-                {config.backgroundPresetId === 'custom' && (
-                  <div className="space-y-3 p-3 rounded-lg border border-border bg-muted/30">
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => updateConfig({ backgroundType: 'solid' })}
-                        className={cn(
-                          "flex-1 py-1.5 px-2 rounded text-xs transition-colors",
-                          (config.backgroundType || 'solid') === 'solid'
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted hover:bg-muted/80"
-                        )}
-                      >
-                        Сплошной
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => updateConfig({ backgroundType: 'gradient' })}
-                        className={cn(
-                          "flex-1 py-1.5 px-2 rounded text-xs transition-colors",
-                          config.backgroundType === 'gradient'
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted hover:bg-muted/80"
-                        )}
-                      >
-                        Градиент
-                      </button>
-                    </div>
-                    
-                    {(config.backgroundType || 'solid') === 'solid' ? (
-                      <ColorInput
-                        label="Цвет фона"
-                        value={config.backgroundColor}
-                        onChange={(v) => updateConfig({ backgroundColor: v })}
-                      />
-                    ) : (
-                      <div className="grid grid-cols-2 gap-2">
-                        <ColorInput
-                          label="Начало"
-                          value={config.gradientFrom || '262 83% 95%'}
-                          onChange={(v) => updateConfig({ gradientFrom: v })}
-                        />
-                        <ColorInput
-                          label="Конец"
-                          value={config.gradientTo || '200 83% 95%'}
-                          onChange={(v) => updateConfig({ gradientTo: v })}
-                        />
-                      </div>
-                    )}
-
-                    {/* Save custom background button */}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => setIsCreateBgDialogOpen(true)}
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Сохранить как пресет
-                    </Button>
-                  </div>
-                )}
-              </div>
+              {/* Theme Backgrounds - up to 5 backgrounds for the course */}
+              <ThemeBackgroundsEditor 
+                backgrounds={config.themeBackgrounds || []}
+                onChange={(backgrounds) => updateConfig({ themeBackgrounds: backgrounds })}
+                defaultBackgroundId={config.defaultBackgroundId}
+                onDefaultChange={(id) => updateConfig({ defaultBackgroundId: id })}
+                maxBackgrounds={5}
+              />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <ColorInput
