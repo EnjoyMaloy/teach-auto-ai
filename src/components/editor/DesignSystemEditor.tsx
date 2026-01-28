@@ -615,25 +615,6 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
               
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Скругление углов</Label>
-                  <Select
-                    value={config.borderRadius}
-                    onValueChange={(v) => updateConfig({ borderRadius: v })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {BORDER_RADIUS_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
                   <Label>Стиль кнопок</Label>
                   <div className="grid grid-cols-3 gap-2">
                     {[
