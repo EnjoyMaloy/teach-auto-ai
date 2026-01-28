@@ -308,7 +308,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
         {isAdmin && (
           <Button
             variant="outline"
-            className="w-full justify-between text-sm"
+            className="w-full justify-between text-sm border-2 border-pink-400 text-pink-600 hover:bg-pink-50 hover:text-pink-700"
             onClick={() => setIsCreateBaseDialogOpen(true)}
           >
             <span className="flex items-center gap-2">
@@ -316,14 +316,14 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
               <Users className="w-4 h-4" />
               Добавить общую тему
             </span>
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-primary/10 text-primary">
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-pink-100 text-pink-600 border-0">
               Admin Mode
             </Badge>
           </Button>
         )}
         <Button
-          variant="ghost"
-          className="w-full justify-start gap-2 text-sm text-muted-foreground hover:text-foreground"
+          variant="outline"
+          className="w-full justify-start gap-2 text-sm border-2 border-blue-400 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
           onClick={() => setIsCreateUserDialogOpen(true)}
         >
           <Plus className="w-4 h-4" />
