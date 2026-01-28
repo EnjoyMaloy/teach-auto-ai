@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRole } from '@/hooks/useUserRole';
 import { useCourses } from '@/hooks/useCourses';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -39,6 +40,7 @@ const CourseSettings: React.FC = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isAdmin } = useUserRole();
   const { fetchCourse, saveCourse } = useCourses();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -56,6 +58,7 @@ const CourseSettings: React.FC = () => {
   const [tagsInput, setTagsInput] = useState('');
   const [category, setCategory] = useState<string>('');
   const [designSystem, setDesignSystem] = useState<DesignSystemConfig>(DEFAULT_DESIGN_SYSTEM);
+  const [selectedBaseSystemId, setSelectedBaseSystemId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('general');
 
   useEffect(() => {
@@ -422,6 +425,9 @@ const CourseSettings: React.FC = () => {
             <DesignSystemEditor
               config={designSystem}
               onChange={setDesignSystem}
+              isAdmin={isAdmin}
+              selectedBaseSystemId={selectedBaseSystemId}
+              onBaseSystemSelect={setSelectedBaseSystemId}
             />
           </TabsContent>
         </Tabs>

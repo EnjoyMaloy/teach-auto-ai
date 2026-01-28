@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { useUserRole } from '@/hooks/useUserRole';
 
 interface EditorHeaderProps {
   course: Course;
@@ -55,12 +56,16 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   onAIGenerate,
   onBack,
 }) => {
+  const { isAdmin } = useUserRole();
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(course.title);
   const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [showDesignSystem, setShowDesignSystem] = useState(false);
   const [showMapSettings, setShowMapSettings] = useState(false);
   const [showAIGenerator, setShowAIGenerator] = useState(false);
+  const [selectedBaseSystemId, setSelectedBaseSystemId] = useState<string | null>(
+    (course.designSystem as any)?.baseSystemId || null
+  );
 
   const handleStartEditing = () => {
     setEditedTitle(course.title);
@@ -304,6 +309,9 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                       mascot: course.designSystem?.mascot,
                     }}
                     onChange={onUpdateDesignSystem}
+                    isAdmin={isAdmin}
+                    selectedBaseSystemId={selectedBaseSystemId}
+                    onBaseSystemSelect={setSelectedBaseSystemId}
                   />
                 </div>
               </ScrollArea>
