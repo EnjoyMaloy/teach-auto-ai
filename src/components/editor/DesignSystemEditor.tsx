@@ -16,6 +16,8 @@ import {
   BackgroundPreset
 } from '@/types/designSystem';
 import { playSound, SOUND_THEME_OPTIONS } from '@/lib/sounds';
+import { BaseDesignSystemSelector } from './BaseDesignSystemSelector';
+import { useBaseDesignSystems, BaseDesignSystem } from '@/hooks/useBaseDesignSystems';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -66,6 +68,9 @@ import { supabase } from '@/integrations/supabase/client';
 interface DesignSystemEditorProps {
   config: DesignSystemConfig;
   onChange: (config: DesignSystemConfig) => void;
+  isAdmin?: boolean;
+  selectedBaseSystemId?: string | null;
+  onBaseSystemSelect?: (id: string | null) => void;
 }
 
 const ColorInput: React.FC<{
@@ -349,6 +354,9 @@ const RiveFileUploader: React.FC<{
 export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   config,
   onChange,
+  isAdmin = false,
+  selectedBaseSystemId,
+  onBaseSystemSelect,
 }) => {
   // Initialize activePreset from config.themeId if available
   const [activePreset, setActivePreset] = useState<string | null>(config.themeId || null);
@@ -543,9 +551,37 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
     </div>
   );
 
+  // Handler for base system selection
+  const handleBaseSystemSelect = (system: BaseDesignSystem) => {
+    onChange(system.config);
+    onBaseSystemSelect?.(system.id);
+    setActivePreset(null);
+  };
+
+  // Check if user is restricted from editing (non-admin with selected base system)
+  const isEditingRestricted = !isAdmin && !!selectedBaseSystemId;
+
   return (
     <div className="space-y-6">
-      {/* Presets */}
+      {/* Base Design Systems - from admin */}
+      <BaseDesignSystemSelector
+        selectedId={selectedBaseSystemId || null}
+        onSelect={handleBaseSystemSelect}
+        isAdmin={isAdmin}
+        currentConfig={config}
+      />
+
+      {/* Show restriction message for non-admins */}
+      {isEditingRestricted && (
+        <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+          <p className="font-medium">Базовая тема выбрана</p>
+          <p className="text-xs mt-1 text-amber-600">
+            Вы не можете редактировать параметры базовой темы. Выберите другую тему или попросите администратора внести изменения.
+          </p>
+        </div>
+      )}
+
+      {/* Presets - shown always but only editable for admins or when no base system is selected */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
@@ -706,8 +742,8 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
         </div>
       </div>
 
-      {/* Detailed Settings */}
-      <div className="space-y-4">
+      {/* Detailed Settings - disabled for non-admins with base system selected */}
+      <div className={cn("space-y-4", isEditingRestricted && "opacity-50 pointer-events-none")}>
         <h3 className="font-semibold text-foreground">Детальные настройки</h3>
         <Tabs defaultValue="colors" className="w-full">
           <TabsList className="w-full grid grid-cols-6 h-auto p-1 bg-muted/50">
