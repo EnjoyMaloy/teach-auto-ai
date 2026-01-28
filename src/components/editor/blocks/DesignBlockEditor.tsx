@@ -122,6 +122,8 @@ const SortableSubBlockItem: React.FC<{
     mutedColor: designSystem?.mutedColor || '240 5% 96%',
     successColor: designSystem?.successColor || '142 71% 45%',
     borderRadius: designSystem?.borderRadius || '0.75rem',
+    // Heading font family
+    headingFontFamily: designSystem?.headingFontFamily || '"Inter", sans-serif',
     // Design block backdrop colors from design system
     backdropLightColor: designSystem?.designBlock?.backdropLightColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropLightColor,
     backdropDarkColor: designSystem?.designBlock?.backdropDarkColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkColor,
@@ -230,6 +232,7 @@ const SortableSubBlockItem: React.FC<{
                 )}
                 style={{ 
                   color: `hsl(${ds.foregroundColor})`,
+                  fontFamily: ds.headingFontFamily,
                   height: 'auto',
                   display: 'block',
                 }}
@@ -243,7 +246,10 @@ const SortableSubBlockItem: React.FC<{
             ) : (
               <h2 
                 className={cn(headingSizeClass, fontWeightClass, textAlignClass, 'break-words whitespace-pre-wrap leading-tight')}
-                style={{ color: `hsl(${ds.foregroundColor})` }}
+                style={{ 
+                  color: `hsl(${ds.foregroundColor})`,
+                  fontFamily: ds.headingFontFamily,
+                }}
               >
                 {subBlock.content || 'Заголовок'}
               </h2>
