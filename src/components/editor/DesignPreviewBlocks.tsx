@@ -83,14 +83,14 @@ const createSampleSlides = (): Slide[] => {
       order: 1,
       content: '',
       subBlocks: [
-        // Badge
+        // Badge (без эмодзи)
         {
           id: 'sub-badge',
           type: 'badge',
           order: 1,
           badges: [
-            { id: '1', text: '🎨 Дизайн', iconType: 'none' },
-            { id: '2', text: '✨ Новое', iconType: 'none' },
+            { id: '1', text: 'Дизайн', iconType: 'none' },
+            { id: '2', text: 'Новое', iconType: 'none' },
           ],
           badgeVariant: 'oval',
           badgeLayout: 'horizontal',
@@ -115,27 +115,62 @@ const createSampleSlides = (): Slide[] => {
           imageSize: 'medium',
           textAlign: 'center',
         } as SubBlock,
-        // Text
+        // Text с форматированием - подложка Light
         {
-          id: 'sub-text',
+          id: 'sub-text-light',
           type: 'text',
           order: 4,
-          content: 'Это **текстовый блок** с поддержкой _форматирования_ и выделения.',
+          content: '<p>Подложка <strong>Light</strong> — <em>светлый</em> фон с <u>подчёркиванием</u></p>',
           textSize: 'medium',
           textAlign: 'center',
+          backdrop: 'light',
+          backdropRounded: true,
+        } as SubBlock,
+        // Text - подложка Dark
+        {
+          id: 'sub-text-dark',
+          type: 'text',
+          order: 5,
+          content: '<p>Подложка <strong>Dark</strong> — <em>тёмный</em> фон</p>',
+          textSize: 'medium',
+          textAlign: 'center',
+          backdrop: 'dark',
+          backdropRounded: true,
+        } as SubBlock,
+        // Text - подложка Primary
+        {
+          id: 'sub-text-primary',
+          type: 'text',
+          order: 6,
+          content: '<p>Подложка <strong>Primary</strong> — акцентный цвет</p>',
+          textSize: 'medium',
+          textAlign: 'center',
+          backdrop: 'primary',
+          backdropRounded: true,
+        } as SubBlock,
+        // Text - подложка Blur
+        {
+          id: 'sub-text-blur',
+          type: 'text',
+          order: 7,
+          content: '<p>Подложка <strong>Blur</strong> — размытие</p>',
+          textSize: 'medium',
+          textAlign: 'center',
+          backdrop: 'blur',
+          backdropRounded: true,
         } as SubBlock,
         // Divider
         {
           id: 'sub-divider',
           type: 'divider',
-          order: 5,
+          order: 8,
           dividerStyle: 'medium',
         } as SubBlock,
         // Table
         {
           id: 'sub-table',
           type: 'table',
-          order: 6,
+          order: 9,
           tableData: [
             [{ id: 't1', content: 'Тип' }, { id: 't2', content: 'Описание' }],
             [{ id: 't3', content: 'Badge' }, { id: 't4', content: 'Метка' }],
@@ -149,7 +184,7 @@ const createSampleSlides = (): Slide[] => {
         {
           id: 'sub-button',
           type: 'button',
-          order: 7,
+          order: 10,
           buttonLabel: 'Подробнее',
           buttonVariant: 'primary',
           buttonUrl: 'https://example.com',
