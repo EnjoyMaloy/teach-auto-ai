@@ -352,6 +352,13 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
 }) => {
   // Initialize activePreset from config.themeId if available
   const [activePreset, setActivePreset] = useState<string | null>(config.themeId || null);
+  
+  // Sync activePreset with config.themeId when config changes from outside
+  React.useEffect(() => {
+    if (config.themeId && config.themeId !== activePreset) {
+      setActivePreset(config.themeId);
+    }
+  }, [config.themeId]);
   const [customThemes, setCustomThemes] = useState<ThemePreset[]>(() => {
     // Load custom themes from localStorage
     const saved = localStorage.getItem('customThemes');
@@ -565,7 +572,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
               onClick={() => applyPreset(preset.id)}
               className={cn(
                 "relative p-3 rounded-xl border-2 transition-all text-left bg-card group",
-                activePreset === preset.id 
+                (activePreset === preset.id || config.themeId === preset.id)
                   ? "border-primary bg-primary/5" 
                   : "border-border hover:border-primary/50"
               )}
@@ -585,7 +592,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 />
               </div>
               <p className="text-sm font-medium text-foreground">{preset.name}</p>
-              {activePreset === preset.id && (
+              {(activePreset === preset.id || config.themeId === preset.id) && (
                 <Check className="absolute top-2 right-2 w-4 h-4 text-primary" />
               )}
               {preset.isCustom && (
