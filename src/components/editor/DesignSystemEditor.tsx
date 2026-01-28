@@ -376,6 +376,13 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
     setActivePreset(null);
   };
 
+  // Get base design systems for admin editing
+  const { 
+    systems: baseSystems,
+    isLoading: isLoadingBaseSystems,
+    updateSystem: updateBaseSystem,
+  } = useBaseDesignSystems();
+
   // Get user's personal themes to check if selected theme is personal
   const { 
     systems: userSystems, 
@@ -387,10 +394,12 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
 
   // Check if the selected theme is a personal theme
   const isPersonalThemeSelected = userSystems.some(s => s.id === selectedBaseSystemId);
+  // Check if the selected theme is a base (common) theme
+  const isBaseThemeSelected = baseSystems.some(s => s.id === selectedBaseSystemId);
   const hasCommonThemeSelected = !!selectedBaseSystemId && !isPersonalThemeSelected && !isLoadingUserSystems;
   const isEditingRestricted = !isAdmin && hasCommonThemeSelected;
 
-  // Auto-save personal theme changes with debounce
+  // Auto-save theme changes with debounce
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedConfigRef = useRef<string>('');
   const currentThemeIdRef = useRef<string | null>(null);
@@ -404,6 +413,16 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
       lastSavedConfigRef.current = configStr;
     }
   }, [updateUserSystem]);
+
+  // Save changes to base theme (admin only)
+  const saveBaseTheme = useCallback(async (themeId: string, configToSave: DesignSystemConfig) => {
+    const configStr = JSON.stringify(configToSave);
+    if (configStr !== lastSavedConfigRef.current) {
+      console.log('Saving base theme:', themeId);
+      await updateBaseSystem(themeId, { config: configToSave });
+      lastSavedConfigRef.current = configStr;
+    }
+  }, [updateBaseSystem]);
 
   // Auto-save effect for personal themes
   useEffect(() => {
@@ -448,6 +467,50 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
       }
     };
   }, [config, selectedBaseSystemId, userSystems, isLoadingUserSystems, savePersonalTheme]);
+
+  // Auto-save effect for base themes (admin only)
+  useEffect(() => {
+    // Skip if not admin, still loading, or no theme selected
+    if (!isAdmin || isLoadingBaseSystems || !selectedBaseSystemId) {
+      return;
+    }
+
+    // Check if this is a base theme
+    const baseTheme = baseSystems.find(s => s.id === selectedBaseSystemId);
+    if (!baseTheme) {
+      return;
+    }
+
+    // If theme changed, update ref and don't save (it's a load, not a change)
+    if (currentThemeIdRef.current !== selectedBaseSystemId) {
+      currentThemeIdRef.current = selectedBaseSystemId;
+      lastSavedConfigRef.current = JSON.stringify(config);
+      return;
+    }
+
+    const currentConfigStr = JSON.stringify(config);
+    
+    // Skip if config hasn't changed
+    if (currentConfigStr === lastSavedConfigRef.current) {
+      return;
+    }
+
+    // Clear previous timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    // Debounce save - wait 800ms after last change
+    saveTimeoutRef.current = setTimeout(() => {
+      saveBaseTheme(selectedBaseSystemId, config);
+    }, 800);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [config, selectedBaseSystemId, baseSystems, isLoadingBaseSystems, isAdmin, saveBaseTheme]);
 
   // Handler for base system selection
   const handleBaseSystemSelect = (system: BaseDesignSystem, isPersonalTheme: boolean) => {
