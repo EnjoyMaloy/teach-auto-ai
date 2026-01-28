@@ -501,7 +501,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
       <div className={cn("space-y-4", isEditingRestricted && "opacity-60 [&_input]:pointer-events-none [&_input]:opacity-50 [&_button:not([data-radix-collection-item])]:pointer-events-none [&_button:not([data-radix-collection-item])]:opacity-50 [&_select]:pointer-events-none [&_textarea]:pointer-events-none [&_[role=slider]]:pointer-events-none [&_[role=switch]]:pointer-events-none [&_[type=color]]:pointer-events-none")}>
         <h3 className="font-semibold text-foreground">Детальные настройки</h3>
         <Tabs defaultValue="ui" className="w-full">
-          <TabsList className="w-full grid grid-cols-3 h-auto p-1 bg-muted/50">
+          <TabsList className="w-full grid grid-cols-3 grid-rows-2 h-auto p-1 bg-muted/50 gap-1">
             <TabsTrigger value="ui" className="text-xs py-2 px-1 data-[state=active]:bg-background">
               <Palette className="w-3.5 h-3.5 mr-1" />
               Фон и кнопки
@@ -513,6 +513,18 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
             <TabsTrigger value="blocks" className="text-xs py-2 px-1 data-[state=active]:bg-background">
               <Layers className="w-3.5 h-3.5 mr-1" />
               Блоки
+            </TabsTrigger>
+            <TabsTrigger value="typography" className="text-xs py-2 px-1 data-[state=active]:bg-background">
+              <Type className="w-3.5 h-3.5 mr-1" />
+              Шрифты
+            </TabsTrigger>
+            <TabsTrigger value="sound" className="text-xs py-2 px-1 data-[state=active]:bg-background">
+              <Volume2 className="w-3.5 h-3.5 mr-1" />
+              Звуки
+            </TabsTrigger>
+            <TabsTrigger value="mascot" className="text-xs py-2 px-1 data-[state=active]:bg-background">
+              <Bot className="w-3.5 h-3.5 mr-1" />
+              Маскот
             </TabsTrigger>
           </TabsList>
 
@@ -883,604 +895,575 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
               </div>
             </TabsContent>
 
+            {/* === TYPOGRAPHY TAB === */}
+            <TabsContent value="typography" className="space-y-4">
+              <div className="space-y-2">
+                <Label>Основной шрифт</Label>
+                <Select
+                  value={config.fontFamily}
+                  onValueChange={(v) => updateConfig({ fontFamily: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {FONT_OPTIONS.map((font) => (
+                      <SelectItem 
+                        key={font.value} 
+                        value={font.value}
+                        style={{ fontFamily: font.value }}
+                      >
+                        {font.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Шрифт заголовков</Label>
+                <Select
+                  value={config.headingFontFamily}
+                  onValueChange={(v) => updateConfig({ headingFontFamily: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {FONT_OPTIONS.map((font) => (
+                      <SelectItem 
+                        key={font.value} 
+                        value={font.value}
+                        style={{ fontFamily: font.value }}
+                      >
+                        {font.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </TabsContent>
+
+            {/* === SOUND TAB === */}
+            <TabsContent value="sound" className="space-y-6">
+              {/* Sound enabled toggle */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Звуковые эффекты</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Звуки при переходах и ответах
+                  </p>
+                </div>
+                <Switch
+                  checked={config.sound?.enabled !== false}
+                  onCheckedChange={(enabled) => 
+                    updateConfig({ 
+                      sound: { ...DEFAULT_SOUND_SETTINGS, ...config.sound, enabled } 
+                    })
+                  }
+                />
+              </div>
+
+              {/* Sound theme */}
+              <div className="space-y-3">
+                <Label>Тема звуков</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  {SOUND_THEME_OPTIONS.map((theme) => {
+                    const isEnabled = config.sound?.enabled !== false;
+                    const currentTheme = config.sound?.theme ?? 'duolingo';
+                    
+                    return (
+                      <button
+                        key={theme.value}
+                        onClick={() => {
+                          updateConfig({ 
+                            sound: { 
+                              ...DEFAULT_SOUND_SETTINGS, 
+                              ...config.sound, 
+                              theme: theme.value as SoundTheme 
+                            } 
+                          });
+                          // Play preview sound
+                          if (theme.value !== 'none') {
+                            playSound('tap', { 
+                              enabled: true, 
+                              theme: theme.value as SoundTheme, 
+                              volume: config.sound?.volume ?? 0.5 
+                            });
+                          }
+                        }}
+                        disabled={!isEnabled}
+                        className={cn(
+                          "p-4 rounded-xl border-2 text-left transition-all",
+                          currentTheme === theme.value
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:border-primary/50",
+                          !isEnabled && "opacity-50 cursor-not-allowed"
+                        )}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          {theme.value === 'none' ? (
+                            <VolumeX className="w-4 h-4 text-muted-foreground" />
+                          ) : (
+                            <Volume2 className="w-4 h-4 text-primary" />
+                          )}
+                          <span className="font-medium">{theme.label}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{theme.description}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Volume slider */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label>Громкость</Label>
+                  <span className="text-sm text-muted-foreground">
+                    {Math.round((config.sound?.volume ?? 0.5) * 100)}%
+                  </span>
+                </div>
+                <Slider
+                  value={[(config.sound?.volume ?? 0.5) * 100]}
+                  min={0}
+                  max={100}
+                  step={10}
+                  disabled={config.sound?.enabled === false || config.sound?.theme === 'none'}
+                  onValueChange={([value]) => {
+                    updateConfig({ 
+                      sound: { 
+                        ...DEFAULT_SOUND_SETTINGS, 
+                        ...config.sound, 
+                        volume: value / 100 
+                      } 
+                    });
+                  }}
+                  onValueCommit={() => {
+                    // Play preview sound when done sliding
+                    playSound('pop', { 
+                      enabled: true, 
+                      theme: config.sound?.theme ?? 'duolingo', 
+                      volume: config.sound?.volume ?? 0.5 
+                    });
+                  }}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Test sounds */}
+              <div className="space-y-3">
+                <Label>Проверить звуки</Label>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { type: 'swipe', label: 'Переход' },
+                    { type: 'correct', label: 'Верно' },
+                    { type: 'incorrect', label: 'Неверно' },
+                    { type: 'complete', label: 'Завершение' },
+                  ].map((sound) => (
+                    <Button
+                      key={sound.type}
+                      variant="outline"
+                      size="sm"
+                      disabled={config.sound?.enabled === false || config.sound?.theme === 'none'}
+                      onClick={() => playSound(sound.type as any, {
+                        enabled: true,
+                        theme: config.sound?.theme ?? 'duolingo',
+                        volume: config.sound?.volume ?? 0.5,
+                      })}
+                    >
+                      {sound.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* === MASCOT TAB === */}
+            <TabsContent value="mascot" className="space-y-6">
+              {/* Status banner */}
+              <div className={cn(
+                "p-4 rounded-xl border-2 flex items-start gap-3",
+                config.mascot?.isApproved 
+                  ? "bg-success/5 border-success/20" 
+                  : "bg-muted/50 border-border"
+              )}>
+                {config.mascot?.isApproved ? (
+                  <Lock className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
+                ) : (
+                  <Unlock className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                )}
+                <div className="flex-1">
+                  <p className="font-medium text-foreground">
+                    {config.mascot?.isApproved ? 'Маскот утверждён' : 'Маскот не утверждён'}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    {config.mascot?.isApproved 
+                      ? 'AI-агент будет использовать этого персонажа для генерации всех иллюстраций курса'
+                      : 'Опишите персонажа и утвердите его для использования в курсе'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Mascot name */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Имя персонажа</Label>
+                <Input
+                  value={config.mascot?.name || ''}
+                  onChange={(e) => updateConfig({ 
+                    mascot: { 
+                      ...DEFAULT_MASCOT_SETTINGS, 
+                      ...config.mascot, 
+                      name: e.target.value 
+                    } 
+                  })}
+                  placeholder="Например: Профессор Лис, Робот Эдди, Сова Мудрила..."
+                  disabled={config.mascot?.isApproved}
+                />
+              </div>
+
+              {/* AI Prompt */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Промт для ИИ</Label>
+                <Textarea
+                  value={config.mascot?.prompt || ''}
+                  onChange={(e) => updateConfig({ 
+                    mascot: { 
+                      ...DEFAULT_MASCOT_SETTINGS, 
+                      ...config.mascot, 
+                      prompt: e.target.value 
+                    } 
+                  })}
+                  placeholder="Опишите внешний вид персонажа: вид животного/существа, одежда, цвета, особенности...
+
+Пример: Дружелюбный лис-профессор в очках и твидовом пиджаке. Рыжий мех с белым пятном на груди. Большие добрые глаза. Всегда носит с собой книгу."
+                  className="min-h-[120px] resize-none"
+                  disabled={config.mascot?.isApproved}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Чем подробнее описание, тем лучше ИИ сможет генерировать консистентные изображения
+                </p>
+              </div>
+
+              {/* Style */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Стиль иллюстрации</Label>
+                <Select
+                  value={config.mascot?.style || 'flat vector illustration'}
+                  onValueChange={(v) => updateConfig({ 
+                    mascot: { 
+                      ...DEFAULT_MASCOT_SETTINGS, 
+                      ...config.mascot, 
+                      style: v 
+                    } 
+                  })}
+                  disabled={config.mascot?.isApproved}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="flat vector illustration">Плоская векторная иллюстрация</SelectItem>
+                    <SelectItem value="3D cartoon">3D мультяшный</SelectItem>
+                    <SelectItem value="pixel art">Пиксель-арт</SelectItem>
+                    <SelectItem value="watercolor illustration">Акварельная иллюстрация</SelectItem>
+                    <SelectItem value="anime style">Аниме стиль</SelectItem>
+                    <SelectItem value="minimalist line art">Минималистичный лайн-арт</SelectItem>
+                    <SelectItem value="cute kawaii">Милый кавай</SelectItem>
+                    <SelectItem value="realistic illustration">Реалистичная иллюстрация</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Personality */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Характер персонажа</Label>
+                <Textarea
+                  value={config.mascot?.personality || ''}
+                  onChange={(e) => updateConfig({ 
+                    mascot: { 
+                      ...DEFAULT_MASCOT_SETTINGS, 
+                      ...config.mascot, 
+                      personality: e.target.value 
+                    } 
+                  })}
+                  placeholder="Опишите характер: как персонаж говорит, какие эмоции выражает...
+
+Пример: Добрый и терпеливый учитель. Радуется успехам ученика, подбадривает при ошибках. Использует простые объяснения и шутки."
+                  className="min-h-[100px] resize-none"
+                  disabled={config.mascot?.isApproved}
+                />
+              </div>
+
+              {/* Approved Image - File Upload */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Референс изображение</Label>
+                <div className="flex gap-3">
+                  <div className={cn(
+                    "w-24 h-24 rounded-xl border-2 border-dashed flex items-center justify-center overflow-hidden bg-muted/30 relative",
+                    config.mascot?.approvedImageUrl ? "border-primary/30" : "border-border"
+                  )}>
+                    {config.mascot?.approvedImageUrl ? (
+                      <>
+                        <img 
+                          src={config.mascot.approvedImageUrl} 
+                          alt="Mascot" 
+                          className="w-full h-full object-cover"
+                        />
+                        {!config.mascot?.isApproved && (
+                          <button
+                            type="button"
+                            onClick={() => updateConfig({ 
+                              mascot: { 
+                                ...DEFAULT_MASCOT_SETTINGS, 
+                                ...config.mascot, 
+                                approvedImageUrl: '' 
+                              } 
+                            })}
+                            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-destructive/90 text-white flex items-center justify-center hover:bg-destructive"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    {config.mascot?.approvedImageUrl ? (
+                      <p className="text-sm text-foreground">Референс загружен</p>
+                    ) : (
+                      <label className={cn(
+                        "flex flex-col items-center justify-center gap-1 p-3 rounded-xl border-2 border-dashed transition-colors cursor-pointer",
+                        config.mascot?.isApproved 
+                          ? "border-muted bg-muted/20 cursor-not-allowed opacity-50" 
+                          : "border-border hover:border-primary/50 bg-muted/30"
+                      )}>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          disabled={config.mascot?.isApproved}
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            
+                            try {
+                              const fileName = `mascot-ref-${Date.now()}-${file.name}`;
+                              const { data, error } = await supabase.storage
+                                .from('mascots')
+                                .upload(fileName, file, { upsert: true });
+                              
+                              if (error) throw error;
+                              
+                              const { data: publicUrl } = supabase.storage
+                                .from('mascots')
+                                .getPublicUrl(data.path);
+                              
+                              updateConfig({ 
+                                mascot: { 
+                                  ...DEFAULT_MASCOT_SETTINGS, 
+                                  ...config.mascot, 
+                                  approvedImageUrl: publicUrl.publicUrl 
+                                } 
+                              });
+                            } catch (err) {
+                              console.error('Mascot upload error:', err);
+                            }
+                          }}
+                        />
+                        <Upload className="w-5 h-5 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">Загрузить изображение</span>
+                      </label>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      Загрузите референс изображение маскота
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Approve button */}
+              <div className="pt-4 border-t border-border">
+                <Button
+                  variant={config.mascot?.isApproved ? "outline" : "default"}
+                  onClick={() => updateConfig({ 
+                    mascot: { 
+                      ...DEFAULT_MASCOT_SETTINGS, 
+                      ...config.mascot, 
+                      isApproved: !config.mascot?.isApproved 
+                    } 
+                  })}
+                  className="w-full"
+                >
+                  {config.mascot?.isApproved ? (
+                    <>
+                      <Unlock className="w-4 h-4 mr-2" />
+                      Разблокировать для редактирования
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-4 h-4 mr-2" />
+                      Утвердить маскота
+                    </>
+                  )}
+                </Button>
+                {!config.mascot?.isApproved && (
+                  <p className="text-xs text-muted-foreground text-center mt-2">
+                    После утверждения ИИ-агент будет использовать эти настройки для генерации персонажа
+                  </p>
+                )}
+              </div>
+
+              {/* === RIVE MASCOT SECTION === */}
+              <div className="pt-6 border-t border-border space-y-4">
+                <div className="flex items-center gap-3">
+                  <Play className="w-5 h-5 text-primary" />
+                  <div>
+                    <h4 className="font-medium text-foreground">Rive-маскот для квизов</h4>
+                    <p className="text-xs text-muted-foreground">
+                      Анимированный персонаж с реакциями как в Duolingo
+                    </p>
+                  </div>
+                </div>
+
+                {/* Enable Rive mascot */}
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Включить Rive-маскота</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Показывать в блоках с вопросами
+                    </p>
+                  </div>
+                  <Switch
+                    checked={config.mascot?.riveEnabled === true}
+                    onCheckedChange={(enabled) => {
+                      const currentMascot = config.mascot || {};
+                      onChange({ 
+                        ...config,
+                        mascot: { 
+                          ...DEFAULT_MASCOT_SETTINGS, 
+                          ...currentMascot, 
+                          riveEnabled: enabled 
+                        } 
+                      });
+                    }}
+                  />
+                </div>
+
+                {config.mascot?.riveEnabled && (
+                  <>
+                    {/* Rive file upload */}
+                    <RiveFileUploader
+                      riveUrl={config.mascot?.riveUrl || ''}
+                      onUpload={(url) => updateConfig({
+                        mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveUrl: url }
+                      })}
+                      onRemove={() => updateConfig({
+                        mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveUrl: '' }
+                      })}
+                    />
+
+                    {/* State machine settings */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Настройки State Machine</Label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <Label className="text-xs text-muted-foreground">Имя State Machine</Label>
+                          <Input
+                            value={config.mascot?.riveStateMachine || 'State Machine 1'}
+                            onChange={(e) => updateConfig({
+                              mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveStateMachine: e.target.value }
+                            })}
+                            placeholder="State Machine 1"
+                            className="text-xs"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs text-muted-foreground">Триггер Idle</Label>
+                          <Input
+                            value={config.mascot?.riveIdleState || 'idle'}
+                            onChange={(e) => updateConfig({
+                              mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveIdleState: e.target.value }
+                            })}
+                            placeholder="idle"
+                            className="text-xs"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs text-muted-foreground">Триггер Correct</Label>
+                          <Input
+                            value={config.mascot?.riveCorrectState || 'correct'}
+                            onChange={(e) => updateConfig({
+                              mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveCorrectState: e.target.value }
+                            })}
+                            placeholder="correct"
+                            className="text-xs"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs text-muted-foreground">Триггер Incorrect</Label>
+                          <Input
+                            value={config.mascot?.riveIncorrectState || 'incorrect'}
+                            onChange={(e) => updateConfig({
+                              mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveIncorrectState: e.target.value }
+                            })}
+                            placeholder="incorrect"
+                            className="text-xs"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Position and size */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Позиция</Label>
+                        <Select
+                          value={config.mascot?.rivePosition || 'top'}
+                          onValueChange={(v) => updateConfig({
+                            mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, rivePosition: v as 'top' | 'bottom' | 'left' | 'right' }
+                          })}
+                        >
+                          <SelectTrigger className="text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="top">Сверху</SelectItem>
+                            <SelectItem value="bottom">Снизу</SelectItem>
+                            <SelectItem value="left">Слева</SelectItem>
+                            <SelectItem value="right">Справа</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Размер</Label>
+                        <Select
+                          value={config.mascot?.riveSize || 'medium'}
+                          onValueChange={(v) => updateConfig({
+                            mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveSize: v as 'small' | 'medium' | 'large' }
+                          })}
+                        >
+                          <SelectTrigger className="text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="small">Маленький</SelectItem>
+                            <SelectItem value="medium">Средний</SelectItem>
+                            <SelectItem value="large">Большой</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </TabsContent>
+
           </div>
         </Tabs>
       </div>
-
-      {/* === SEPARATE SECTIONS === */}
-      
-      {/* Typography Section */}
-      <Card className={cn(isEditingRestricted && "opacity-60 [&_select]:pointer-events-none")}>
-        <CardHeader className="py-3 px-4">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Type className="w-4 h-4 text-primary" />
-            Шрифты
-          </CardTitle>
-          <CardDescription className="text-xs">Типографика курса</CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0 px-4 pb-4 space-y-4">
-          <div className="space-y-2">
-            <Label>Основной шрифт</Label>
-            <Select
-              value={config.fontFamily}
-              onValueChange={(v) => updateConfig({ fontFamily: v })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {FONT_OPTIONS.map((font) => (
-                  <SelectItem 
-                    key={font.value} 
-                    value={font.value}
-                    style={{ fontFamily: font.value }}
-                  >
-                    {font.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Шрифт заголовков</Label>
-            <Select
-              value={config.headingFontFamily}
-              onValueChange={(v) => updateConfig({ headingFontFamily: v })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {FONT_OPTIONS.map((font) => (
-                  <SelectItem 
-                    key={font.value} 
-                    value={font.value}
-                    style={{ fontFamily: font.value }}
-                  >
-                    {font.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Sound Section */}
-      <Card className={cn(isEditingRestricted && "opacity-60 [&_*]:pointer-events-none")}>
-        <CardHeader className="py-3 px-4">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Volume2 className="w-4 h-4 text-primary" />
-            Звуки
-          </CardTitle>
-          <CardDescription className="text-xs">Звуковые эффекты курса</CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0 px-4 pb-4 space-y-6">
-          {/* Sound enabled toggle */}
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>Звуковые эффекты</Label>
-              <p className="text-sm text-muted-foreground">
-                Звуки при переходах и ответах
-              </p>
-            </div>
-            <Switch
-              checked={config.sound?.enabled !== false}
-              onCheckedChange={(enabled) => 
-                updateConfig({ 
-                  sound: { ...DEFAULT_SOUND_SETTINGS, ...config.sound, enabled } 
-                })
-              }
-            />
-          </div>
-
-          {/* Sound theme */}
-          <div className="space-y-3">
-            <Label>Тема звуков</Label>
-            <div className="grid grid-cols-2 gap-3">
-              {SOUND_THEME_OPTIONS.map((theme) => {
-                const isEnabled = config.sound?.enabled !== false;
-                const currentTheme = config.sound?.theme ?? 'duolingo';
-                
-                return (
-                  <button
-                    key={theme.value}
-                    onClick={() => {
-                      updateConfig({ 
-                        sound: { 
-                          ...DEFAULT_SOUND_SETTINGS, 
-                          ...config.sound, 
-                          theme: theme.value as SoundTheme 
-                        } 
-                      });
-                      // Play preview sound
-                      if (theme.value !== 'none') {
-                        playSound('tap', { 
-                          enabled: true, 
-                          theme: theme.value as SoundTheme, 
-                          volume: config.sound?.volume ?? 0.5 
-                        });
-                      }
-                    }}
-                    disabled={!isEnabled}
-                    className={cn(
-                      "p-4 rounded-xl border-2 text-left transition-all",
-                      currentTheme === theme.value
-                        ? "border-primary bg-primary/5"
-                        : "border-border hover:border-primary/50",
-                      !isEnabled && "opacity-50 cursor-not-allowed"
-                    )}
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      {theme.value === 'none' ? (
-                        <VolumeX className="w-4 h-4 text-muted-foreground" />
-                      ) : (
-                        <Volume2 className="w-4 h-4 text-primary" />
-                      )}
-                      <span className="font-medium">{theme.label}</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">{theme.description}</p>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Volume slider */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label>Громкость</Label>
-              <span className="text-sm text-muted-foreground">
-                {Math.round((config.sound?.volume ?? 0.5) * 100)}%
-              </span>
-            </div>
-            <Slider
-              value={[(config.sound?.volume ?? 0.5) * 100]}
-              min={0}
-              max={100}
-              step={10}
-              disabled={config.sound?.enabled === false || config.sound?.theme === 'none'}
-              onValueChange={([value]) => {
-                updateConfig({ 
-                  sound: { 
-                    ...DEFAULT_SOUND_SETTINGS, 
-                    ...config.sound, 
-                    volume: value / 100 
-                  } 
-                });
-              }}
-              onValueCommit={() => {
-                // Play preview sound when done sliding
-                playSound('pop', { 
-                  enabled: true, 
-                  theme: config.sound?.theme ?? 'duolingo', 
-                  volume: config.sound?.volume ?? 0.5 
-                });
-              }}
-              className="w-full"
-            />
-          </div>
-
-          {/* Test sounds */}
-          <div className="space-y-3">
-            <Label>Проверить звуки</Label>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { type: 'swipe', label: 'Переход' },
-                { type: 'correct', label: 'Верно' },
-                { type: 'incorrect', label: 'Неверно' },
-                { type: 'complete', label: 'Завершение' },
-              ].map((sound) => (
-                <Button
-                  key={sound.type}
-                  variant="outline"
-                  size="sm"
-                  disabled={config.sound?.enabled === false || config.sound?.theme === 'none'}
-                  onClick={() => playSound(sound.type as any, {
-                    enabled: true,
-                    theme: config.sound?.theme ?? 'duolingo',
-                    volume: config.sound?.volume ?? 0.5,
-                  })}
-                >
-                  {sound.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Mascot Section */}
-      <Card className={cn(isEditingRestricted && "opacity-60 [&_input]:pointer-events-none [&_textarea]:pointer-events-none [&_select]:pointer-events-none [&_[role=switch]]:pointer-events-none")}>
-        <CardHeader className="py-3 px-4">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Bot className="w-4 h-4 text-primary" />
-            Маскот
-          </CardTitle>
-          <CardDescription className="text-xs">AI-персонаж для иллюстраций</CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0 px-4 pb-4 space-y-6">
-          {/* Status banner */}
-          <div className={cn(
-            "p-4 rounded-xl border-2 flex items-start gap-3",
-            config.mascot?.isApproved 
-              ? "bg-success/5 border-success/20" 
-              : "bg-muted/50 border-border"
-          )}>
-            {config.mascot?.isApproved ? (
-              <Lock className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
-            ) : (
-              <Unlock className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
-            )}
-            <div className="flex-1">
-              <p className="font-medium text-foreground">
-                {config.mascot?.isApproved ? 'Маскот утверждён' : 'Маскот не утверждён'}
-              </p>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                {config.mascot?.isApproved 
-                  ? 'AI-агент будет использовать этого персонажа для генерации всех иллюстраций курса'
-                  : 'Опишите персонажа и утвердите его для использования в курсе'}
-              </p>
-            </div>
-          </div>
-
-          {/* Mascot name */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Имя персонажа</Label>
-            <Input
-              value={config.mascot?.name || ''}
-              onChange={(e) => updateConfig({ 
-                mascot: { 
-                  ...DEFAULT_MASCOT_SETTINGS, 
-                  ...config.mascot, 
-                  name: e.target.value 
-                } 
-              })}
-              placeholder="Например: Профессор Лис, Робот Эдди, Сова Мудрила..."
-              disabled={config.mascot?.isApproved}
-            />
-          </div>
-
-          {/* AI Prompt */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Промт для ИИ</Label>
-            <Textarea
-              value={config.mascot?.prompt || ''}
-              onChange={(e) => updateConfig({ 
-                mascot: { 
-                  ...DEFAULT_MASCOT_SETTINGS, 
-                  ...config.mascot, 
-                  prompt: e.target.value 
-                } 
-              })}
-              placeholder="Опишите внешний вид персонажа: вид животного/существа, одежда, цвета, особенности...
-
-Пример: Дружелюбный лис-профессор в очках и твидовом пиджаке. Рыжий мех с белым пятном на груди. Большие добрые глаза. Всегда носит с собой книгу."
-              className="min-h-[120px] resize-none"
-              disabled={config.mascot?.isApproved}
-            />
-            <p className="text-xs text-muted-foreground">
-              Чем подробнее описание, тем лучше ИИ сможет генерировать консистентные изображения
-            </p>
-          </div>
-
-          {/* Style */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Стиль иллюстрации</Label>
-            <Select
-              value={config.mascot?.style || 'flat vector illustration'}
-              onValueChange={(v) => updateConfig({ 
-                mascot: { 
-                  ...DEFAULT_MASCOT_SETTINGS, 
-                  ...config.mascot, 
-                  style: v 
-                } 
-              })}
-              disabled={config.mascot?.isApproved}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="flat vector illustration">Плоская векторная иллюстрация</SelectItem>
-                <SelectItem value="3D cartoon">3D мультяшный</SelectItem>
-                <SelectItem value="pixel art">Пиксель-арт</SelectItem>
-                <SelectItem value="watercolor illustration">Акварельная иллюстрация</SelectItem>
-                <SelectItem value="anime style">Аниме стиль</SelectItem>
-                <SelectItem value="minimalist line art">Минималистичный лайн-арт</SelectItem>
-                <SelectItem value="cute kawaii">Милый кавай</SelectItem>
-                <SelectItem value="realistic illustration">Реалистичная иллюстрация</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Personality */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Характер персонажа</Label>
-            <Textarea
-              value={config.mascot?.personality || ''}
-              onChange={(e) => updateConfig({ 
-                mascot: { 
-                  ...DEFAULT_MASCOT_SETTINGS, 
-                  ...config.mascot, 
-                  personality: e.target.value 
-                } 
-              })}
-              placeholder="Опишите характер: как персонаж говорит, какие эмоции выражает...
-
-Пример: Добрый и терпеливый учитель. Радуется успехам ученика, подбадривает при ошибках. Использует простые объяснения и шутки."
-              className="min-h-[100px] resize-none"
-              disabled={config.mascot?.isApproved}
-            />
-          </div>
-
-          {/* Approved Image - File Upload */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Референс изображение</Label>
-            <div className="flex gap-3">
-              <div className={cn(
-                "w-24 h-24 rounded-xl border-2 border-dashed flex items-center justify-center overflow-hidden bg-muted/30 relative",
-                config.mascot?.approvedImageUrl ? "border-primary/30" : "border-border"
-              )}>
-                {config.mascot?.approvedImageUrl ? (
-                  <>
-                    <img 
-                      src={config.mascot.approvedImageUrl} 
-                      alt="Mascot" 
-                      className="w-full h-full object-cover"
-                    />
-                    {!config.mascot?.isApproved && (
-                      <button
-                        type="button"
-                        onClick={() => updateConfig({ 
-                          mascot: { 
-                            ...DEFAULT_MASCOT_SETTINGS, 
-                            ...config.mascot, 
-                            approvedImageUrl: '' 
-                          } 
-                        })}
-                        className="absolute top-1 right-1 w-5 h-5 rounded-full bg-destructive/90 text-white flex items-center justify-center hover:bg-destructive"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    )}
-                  </>
-                ) : (
-                  <ImageIcon className="w-8 h-8 text-muted-foreground" />
-                )}
-              </div>
-              <div className="flex-1 space-y-2">
-                {config.mascot?.approvedImageUrl ? (
-                  <p className="text-sm text-foreground">Референс загружен</p>
-                ) : (
-                  <label className={cn(
-                    "flex flex-col items-center justify-center gap-1 p-3 rounded-xl border-2 border-dashed transition-colors cursor-pointer",
-                    config.mascot?.isApproved 
-                      ? "border-muted bg-muted/20 cursor-not-allowed opacity-50" 
-                      : "border-border hover:border-primary/50 bg-muted/30"
-                  )}>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      disabled={config.mascot?.isApproved}
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        
-                        try {
-                          const fileName = `mascot-ref-${Date.now()}-${file.name}`;
-                          const { data, error } = await supabase.storage
-                            .from('mascots')
-                            .upload(fileName, file, { upsert: true });
-                          
-                          if (error) throw error;
-                          
-                          const { data: publicUrl } = supabase.storage
-                            .from('mascots')
-                            .getPublicUrl(data.path);
-                          
-                          updateConfig({ 
-                            mascot: { 
-                              ...DEFAULT_MASCOT_SETTINGS, 
-                              ...config.mascot, 
-                              approvedImageUrl: publicUrl.publicUrl 
-                            } 
-                          });
-                        } catch (err) {
-                          console.error('Mascot upload error:', err);
-                        }
-                      }}
-                    />
-                    <Upload className="w-5 h-5 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground">Загрузить изображение</span>
-                  </label>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  Загрузите референс изображение маскота
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Approve button */}
-          <div className="pt-4 border-t border-border">
-            <Button
-              variant={config.mascot?.isApproved ? "outline" : "default"}
-              onClick={() => updateConfig({ 
-                mascot: { 
-                  ...DEFAULT_MASCOT_SETTINGS, 
-                  ...config.mascot, 
-                  isApproved: !config.mascot?.isApproved 
-                } 
-              })}
-              className="w-full"
-            >
-              {config.mascot?.isApproved ? (
-                <>
-                  <Unlock className="w-4 h-4 mr-2" />
-                  Разблокировать для редактирования
-                </>
-              ) : (
-                <>
-                  <Lock className="w-4 h-4 mr-2" />
-                  Утвердить маскота
-                </>
-              )}
-            </Button>
-            {!config.mascot?.isApproved && (
-              <p className="text-xs text-muted-foreground text-center mt-2">
-                После утверждения ИИ-агент будет использовать эти настройки для генерации персонажа
-              </p>
-            )}
-          </div>
-
-          {/* === RIVE MASCOT SECTION === */}
-          <div className="pt-6 border-t border-border space-y-4">
-            <div className="flex items-center gap-3">
-              <Play className="w-5 h-5 text-primary" />
-              <div>
-                <h4 className="font-medium text-foreground">Rive-маскот для квизов</h4>
-                <p className="text-xs text-muted-foreground">
-                  Анимированный персонаж с реакциями как в Duolingo
-                </p>
-              </div>
-            </div>
-
-            {/* Enable Rive mascot */}
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Включить Rive-маскота</Label>
-                <p className="text-xs text-muted-foreground">
-                  Показывать в блоках с вопросами
-                </p>
-              </div>
-              <Switch
-                checked={config.mascot?.riveEnabled === true}
-                onCheckedChange={(enabled) => {
-                  const currentMascot = config.mascot || {};
-                  onChange({ 
-                    ...config,
-                    mascot: { 
-                      ...DEFAULT_MASCOT_SETTINGS, 
-                      ...currentMascot, 
-                      riveEnabled: enabled 
-                    } 
-                  });
-                }}
-              />
-            </div>
-
-            {config.mascot?.riveEnabled && (
-              <>
-                {/* Rive file upload */}
-                <RiveFileUploader
-                  riveUrl={config.mascot?.riveUrl || ''}
-                  onUpload={(url) => updateConfig({
-                    mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveUrl: url }
-                  })}
-                  onRemove={() => updateConfig({
-                    mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveUrl: '' }
-                  })}
-                />
-
-                {/* State machine settings */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium">Настройки State Machine</Label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <Label className="text-xs text-muted-foreground">Имя State Machine</Label>
-                      <Input
-                        value={config.mascot?.riveStateMachine || 'State Machine 1'}
-                        onChange={(e) => updateConfig({
-                          mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveStateMachine: e.target.value }
-                        })}
-                        placeholder="State Machine 1"
-                        className="text-xs"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs text-muted-foreground">Триггер Idle</Label>
-                      <Input
-                        value={config.mascot?.riveIdleState || 'idle'}
-                        onChange={(e) => updateConfig({
-                          mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveIdleState: e.target.value }
-                        })}
-                        placeholder="idle"
-                        className="text-xs"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs text-muted-foreground">Триггер Correct</Label>
-                      <Input
-                        value={config.mascot?.riveCorrectState || 'correct'}
-                        onChange={(e) => updateConfig({
-                          mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveCorrectState: e.target.value }
-                        })}
-                        placeholder="correct"
-                        className="text-xs"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs text-muted-foreground">Триггер Incorrect</Label>
-                      <Input
-                        value={config.mascot?.riveIncorrectState || 'incorrect'}
-                        onChange={(e) => updateConfig({
-                          mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveIncorrectState: e.target.value }
-                        })}
-                        placeholder="incorrect"
-                        className="text-xs"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Position and size */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">Позиция</Label>
-                    <Select
-                      value={config.mascot?.rivePosition || 'top'}
-                      onValueChange={(v) => updateConfig({
-                        mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, rivePosition: v as 'top' | 'bottom' | 'left' | 'right' }
-                      })}
-                    >
-                      <SelectTrigger className="text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="top">Сверху</SelectItem>
-                        <SelectItem value="bottom">Снизу</SelectItem>
-                        <SelectItem value="left">Слева</SelectItem>
-                        <SelectItem value="right">Справа</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">Размер</Label>
-                    <Select
-                      value={config.mascot?.riveSize || 'medium'}
-                      onValueChange={(v) => updateConfig({
-                        mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveSize: v as 'small' | 'medium' | 'large' }
-                      })}
-                    >
-                      <SelectTrigger className="text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="small">Маленький</SelectItem>
-                        <SelectItem value="medium">Средний</SelectItem>
-                        <SelectItem value="large">Большой</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };
