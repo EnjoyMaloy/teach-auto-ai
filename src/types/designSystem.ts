@@ -373,17 +373,28 @@ export const BASE_THEMES: ThemePreset[] = [
 // For backward compatibility
 export const PRESET_THEMES = BASE_THEMES;
 
+// Google Fonts with Cyrillic + Latin support
 export const FONT_OPTIONS = [
-  { value: 'Inter, system-ui, sans-serif', label: 'Inter' },
-  { value: 'system-ui, sans-serif', label: 'System UI' },
-  { value: '"SF Pro Display", system-ui, sans-serif', label: 'SF Pro' },
-  { value: '"Nunito", sans-serif', label: 'Nunito' },
-  { value: '"Poppins", sans-serif', label: 'Poppins' },
-  { value: '"Roboto", sans-serif', label: 'Roboto' },
-  { value: '"Open Sans", sans-serif', label: 'Open Sans' },
-  { value: '"Montserrat", sans-serif', label: 'Montserrat' },
-  { value: '"Raleway", sans-serif', label: 'Raleway' },
-  { value: '"Playfair Display", serif', label: 'Playfair Display' },
+  { value: '"Inter", sans-serif', label: 'Inter', preview: 'Аа Bb' },
+  { value: '"Roboto", sans-serif', label: 'Roboto', preview: 'Аа Bb' },
+  { value: '"Open Sans", sans-serif', label: 'Open Sans', preview: 'Аа Bb' },
+  { value: '"Montserrat", sans-serif', label: 'Montserrat', preview: 'Аа Bb' },
+  { value: '"Nunito", sans-serif', label: 'Nunito', preview: 'Аа Bb' },
+  { value: '"Rubik", sans-serif', label: 'Rubik', preview: 'Аа Bb' },
+  { value: '"Comfortaa", sans-serif', label: 'Comfortaa', preview: 'Аа Bb' },
+  { value: '"Raleway", sans-serif', label: 'Raleway', preview: 'Аа Bb' },
+  { value: '"Ubuntu", sans-serif', label: 'Ubuntu', preview: 'Аа Bb' },
+  { value: '"PT Sans", sans-serif', label: 'PT Sans', preview: 'Аа Bb' },
+  { value: '"PT Serif", serif', label: 'PT Serif', preview: 'Аа Bb' },
+  { value: '"Merriweather", serif', label: 'Merriweather', preview: 'Аа Bb' },
+  { value: '"Playfair Display", serif', label: 'Playfair Display', preview: 'Аа Bb' },
+  { value: '"Lora", serif', label: 'Lora', preview: 'Аа Bb' },
+  { value: '"Oswald", sans-serif', label: 'Oswald', preview: 'Аа Bb' },
+  { value: '"Fira Sans", sans-serif', label: 'Fira Sans', preview: 'Аа Bb' },
+  { value: '"Exo 2", sans-serif', label: 'Exo 2', preview: 'Аа Bb' },
+  { value: '"Jost", sans-serif', label: 'Jost', preview: 'Аа Bb' },
+  { value: '"Manrope", sans-serif', label: 'Manrope', preview: 'Аа Bb' },
+  { value: '"Mulish", sans-serif', label: 'Mulish', preview: 'Аа Bb' },
 ];
 
 export const BORDER_RADIUS_OPTIONS = [

@@ -1055,19 +1055,31 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     value={config.fontFamily}
                     onValueChange={(v) => updateConfig({ fontFamily: v })}
                   >
-                    <SelectTrigger className="w-full">
-                      <span style={{ fontFamily: config.fontFamily }}>
-                        {FONT_OPTIONS.find(f => f.value === config.fontFamily)?.label || 'Выберите шрифт'}
-                      </span>
+                    <SelectTrigger className="w-full h-12">
+                      <div className="flex items-center justify-between w-full">
+                        <span style={{ fontFamily: config.fontFamily }} className="text-base">
+                          {FONT_OPTIONS.find(f => f.value === config.fontFamily)?.label || 'Выберите шрифт'}
+                        </span>
+                        <span style={{ fontFamily: config.fontFamily }} className="text-muted-foreground text-sm">
+                          Аа Bb
+                        </span>
+                      </div>
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="max-h-80">
                       {FONT_OPTIONS.map((font) => (
                         <SelectItem 
                           key={font.value} 
                           value={font.value}
-                          style={{ fontFamily: font.value }}
+                          className="py-3"
                         >
-                          {font.label}
+                          <div className="flex items-center justify-between w-full gap-4">
+                            <span style={{ fontFamily: font.value }} className="text-base">
+                              {font.label}
+                            </span>
+                            <span style={{ fontFamily: font.value }} className="text-muted-foreground text-lg">
+                              Аа Bb
+                            </span>
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -1077,7 +1089,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     className="p-3 rounded-lg border bg-muted/30 text-sm"
                     style={{ fontFamily: config.fontFamily }}
                   >
-                    Пример текста с выбранным шрифтом
+                    Пример текста с выбранным шрифтом — The quick brown fox
                   </div>
                 </div>
 
@@ -1087,19 +1099,31 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     value={config.headingFontFamily}
                     onValueChange={(v) => updateConfig({ headingFontFamily: v })}
                   >
-                    <SelectTrigger className="w-full">
-                      <span style={{ fontFamily: config.headingFontFamily }}>
-                        {FONT_OPTIONS.find(f => f.value === config.headingFontFamily)?.label || 'Выберите шрифт'}
-                      </span>
+                    <SelectTrigger className="w-full h-12">
+                      <div className="flex items-center justify-between w-full">
+                        <span style={{ fontFamily: config.headingFontFamily }} className="text-base">
+                          {FONT_OPTIONS.find(f => f.value === config.headingFontFamily)?.label || 'Выберите шрифт'}
+                        </span>
+                        <span style={{ fontFamily: config.headingFontFamily }} className="text-muted-foreground text-sm">
+                          Аа Bb
+                        </span>
+                      </div>
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="max-h-80">
                       {FONT_OPTIONS.map((font) => (
                         <SelectItem 
                           key={font.value} 
                           value={font.value}
-                          style={{ fontFamily: font.value }}
+                          className="py-3"
                         >
-                          {font.label}
+                          <div className="flex items-center justify-between w-full gap-4">
+                            <span style={{ fontFamily: font.value }} className="text-base">
+                              {font.label}
+                            </span>
+                            <span style={{ fontFamily: font.value }} className="text-muted-foreground text-lg">
+                              Аа Bb
+                            </span>
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -1109,7 +1133,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     className="p-3 rounded-lg border bg-muted/30 text-lg font-bold"
                     style={{ fontFamily: config.headingFontFamily }}
                   >
-                    Заголовок с выбранным шрифтом
+                    Заголовок — Heading
                   </div>
                 </div>
               </div>
