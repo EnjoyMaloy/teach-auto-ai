@@ -406,22 +406,22 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   const lastSavedConfigRef = useRef<string>('');
   const currentThemeIdRef = useRef<string | null>(null);
 
-  // Save changes to personal theme
+  // Save changes to personal theme - silent to avoid toast spam
   const savePersonalTheme = useCallback(async (themeId: string, configToSave: DesignSystemConfig) => {
     const configStr = JSON.stringify(configToSave);
     if (configStr !== lastSavedConfigRef.current) {
       console.log('Saving personal theme:', themeId);
-      await updateUserSystem(themeId, { config: configToSave });
+      await updateUserSystem(themeId, { config: configToSave }, true);
       lastSavedConfigRef.current = configStr;
     }
   }, [updateUserSystem]);
 
-  // Save changes to base theme (admin only)
+  // Save changes to base theme (admin only) - silent to avoid toast spam
   const saveBaseTheme = useCallback(async (themeId: string, configToSave: DesignSystemConfig) => {
     const configStr = JSON.stringify(configToSave);
     if (configStr !== lastSavedConfigRef.current) {
       console.log('Saving base theme:', themeId);
-      await updateBaseSystem(themeId, { config: configToSave });
+      await updateBaseSystem(themeId, { config: configToSave }, true);
       lastSavedConfigRef.current = configStr;
     }
   }, [updateBaseSystem]);

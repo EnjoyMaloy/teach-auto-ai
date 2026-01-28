@@ -19,7 +19,7 @@ interface UseBaseDesignSystemsResult {
   systems: BaseDesignSystem[];
   isLoading: boolean;
   createSystem: (name: string, description: string, config: DesignSystemConfig) => Promise<BaseDesignSystem | null>;
-  updateSystem: (id: string, updates: Partial<Omit<BaseDesignSystem, 'id' | 'created_at' | 'updated_at'>>) => Promise<boolean>;
+  updateSystem: (id: string, updates: Partial<Omit<BaseDesignSystem, 'id' | 'created_at' | 'updated_at'>>, silent?: boolean) => Promise<boolean>;
   deleteSystem: (id: string) => Promise<boolean>;
   setDefault: (id: string) => Promise<boolean>;
   refetch: () => Promise<void>;
@@ -98,7 +98,8 @@ export const useBaseDesignSystems = (): UseBaseDesignSystemsResult => {
 
   const updateSystem = async (
     id: string, 
-    updates: Partial<Omit<BaseDesignSystem, 'id' | 'created_at' | 'updated_at'>>
+    updates: Partial<Omit<BaseDesignSystem, 'id' | 'created_at' | 'updated_at'>>,
+    silent: boolean = false
   ): Promise<boolean> => {
     try {
       const updateData: Record<string, unknown> = {};
@@ -121,7 +122,9 @@ export const useBaseDesignSystems = (): UseBaseDesignSystemsResult => {
           : s
       ));
       
-      toast.success('Дизайн-система обновлена');
+      if (!silent) {
+        toast.success('Дизайн-система обновлена');
+      }
       return true;
     } catch (err) {
       console.error('Error updating base design system:', err);
