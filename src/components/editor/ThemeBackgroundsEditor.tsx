@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Plus, Trash2, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AnglePicker } from './AnglePicker';
 
 interface ThemeBackgroundsEditorProps {
   backgrounds: BackgroundPreset[];
@@ -320,18 +321,10 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
                   onChange={setNewGradientTo} 
                   label="Конец"
                 />
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground w-16">Угол</span>
-                  <Input
-                    type="number"
-                    value={newGradientAngle}
-                    onChange={(e) => setNewGradientAngle(Number(e.target.value))}
-                    min={0}
-                    max={360}
-                    className="w-20"
-                  />
-                  <span className="text-xs text-muted-foreground">°</span>
-                </div>
+                <AnglePicker 
+                  value={newGradientAngle} 
+                  onChange={setNewGradientAngle} 
+                />
               </div>
             )}
 
