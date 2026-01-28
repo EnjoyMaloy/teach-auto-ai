@@ -90,6 +90,26 @@ const DEFAULT_DS = {
   headingFontFamily: 'Inter, system-ui, sans-serif',
   borderRadius: '0.75rem',
   buttonStyle: 'rounded' as const,
+  backgroundType: 'solid' as 'solid' | 'gradient',
+  gradientFrom: '262 83% 95%',
+  gradientTo: '200 83% 95%',
+  gradientAngle: 135,
+};
+
+// Calculate background style based on design system
+const getBackgroundStyle = (ds: { 
+  backgroundColor: string; 
+  backgroundType?: 'solid' | 'gradient'; 
+  gradientFrom?: string; 
+  gradientTo?: string; 
+  gradientAngle?: number;
+}): React.CSSProperties => {
+  if (ds.backgroundType === 'gradient' && ds.gradientFrom && ds.gradientTo) {
+    return {
+      background: `linear-gradient(${ds.gradientAngle || 135}deg, hsl(${ds.gradientFrom}), hsl(${ds.gradientTo}))`,
+    };
+  }
+  return { backgroundColor: `hsl(${ds.backgroundColor})` };
 };
 
 export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
@@ -261,7 +281,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       <div 
         className="h-full w-full flex items-center justify-center"
         style={{ 
-          backgroundColor: `hsl(${ds.backgroundColor})`,
+          ...getBackgroundStyle(ds),
           fontFamily: ds.fontFamily,
         }}
       >
@@ -1109,7 +1129,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         ref={containerRef}
         className="h-full w-full flex flex-col"
         style={{ 
-          backgroundColor: `hsl(${ds.backgroundColor})`,
+          ...getBackgroundStyle(ds),
           fontFamily: ds.fontFamily,
         }}
       >
@@ -1185,7 +1205,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       <div 
         className="relative h-full w-full overflow-hidden"
         style={{ 
-          backgroundColor: `hsl(${ds.backgroundColor})`,
+          ...getBackgroundStyle(ds),
           fontFamily: ds.fontFamily,
         }}
       >
@@ -1336,7 +1356,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       <div 
         className="flex flex-col overflow-hidden"
         style={{ 
-          backgroundColor: `hsl(${ds.backgroundColor})`,
+          ...getBackgroundStyle(ds),
           fontFamily: ds.fontFamily,
           // Fixed internal dimensions (mobile screen size)
           width: `${PREVIEW_BASE_WIDTH}px`,
