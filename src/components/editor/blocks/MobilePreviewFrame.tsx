@@ -1071,8 +1071,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   const incorrectBgTint = '0 100% 95%'; // Pastel pink background
   const incorrectTextColor = ds.destructiveColor; // Red text
   
-  // Correct answer colors (solid, no transparency)
-  const correctBgTint = '142 76% 92%'; // Pastel green background
+  // Correct answer colors (solid lime green like the reference)
+  const correctBgTint = '88 62% 85%'; // Light lime green background
 
   const resultFeedback = answerState !== 'idle' && (
     <div 
