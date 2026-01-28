@@ -556,7 +556,6 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
           onCreateBaseSystem={createBaseSystem}
           onUpdateBaseSystem={updateBaseSystem}
           onDeleteBaseSystem={deleteBaseSystem}
-          onSetDefaultBaseSystem={setDefaultBaseSystem}
           userSystems={userSystems}
           isLoadingUserSystems={isLoadingUserSystems}
           onCreateUserSystem={createUserSystem}
