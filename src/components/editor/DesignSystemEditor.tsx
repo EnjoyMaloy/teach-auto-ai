@@ -367,6 +367,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   }, [config.themeId]);
   const updateConfig = (updates: Partial<DesignSystemConfig>) => {
     // Keep themeId and don't reset activePreset - user is just customizing within the theme
+    console.log('updateConfig called with:', Object.keys(updates));
     onChange({ ...config, ...updates });
   };
   
