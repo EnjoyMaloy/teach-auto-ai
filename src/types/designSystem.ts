@@ -10,22 +10,26 @@ export interface SoundSettings {
 
 export type ButtonDepth = 'flat' | 'raised';
 
-// Preset gradient options
-export interface GradientPreset {
+// Background preset - can be solid or gradient
+export interface BackgroundPreset {
   id: string;
   name: string;
-  from: string;
-  to: string;
-  angle: number;
+  type: 'solid' | 'gradient';
+  // For solid backgrounds
+  color?: string;
+  // For gradient backgrounds
+  from?: string;
+  to?: string;
+  angle?: number;
 }
 
-export const GRADIENT_PRESETS: GradientPreset[] = [
-  { id: 'lavender', name: 'Лаванда', from: '262 83% 95%', to: '200 83% 95%', angle: 135 },
-  { id: 'peach', name: 'Персик', from: '30 100% 94%', to: '350 100% 94%', angle: 135 },
-  { id: 'mint', name: 'Мята', from: '160 60% 92%', to: '200 60% 94%', angle: 135 },
-  { id: 'sunset', name: 'Закат', from: '30 100% 92%', to: '280 80% 92%', angle: 135 },
-  { id: 'ocean', name: 'Океан', from: '200 80% 92%', to: '220 70% 88%', angle: 135 },
-  { id: 'rose', name: 'Роза', from: '340 80% 94%', to: '300 60% 92%', angle: 135 },
+// 5 default background presets (mix of solid and gradient)
+export const BACKGROUND_PRESETS: BackgroundPreset[] = [
+  { id: 'white', name: 'Белый', type: 'solid', color: '0 0% 100%' },
+  { id: 'cream', name: 'Кремовый', type: 'solid', color: '40 30% 97%' },
+  { id: 'lavender', name: 'Лаванда', type: 'gradient', from: '262 83% 96%', to: '220 70% 96%', angle: 135 },
+  { id: 'peach', name: 'Персик', type: 'gradient', from: '30 100% 96%', to: '350 80% 96%', angle: 135 },
+  { id: 'mint', name: 'Мята', type: 'gradient', from: '160 50% 94%', to: '200 50% 96%', angle: 135 },
 ];
 
 // Design block backdrop options
@@ -116,6 +120,7 @@ export interface DesignSystemConfig {
   destructiveColor: string;
   
   // Background style
+  backgroundPresetId?: string; // ID of selected preset or 'custom'
   backgroundType?: BackgroundType;
   gradientFrom?: string; // HSL value for gradient start
   gradientTo?: string;   // HSL value for gradient end
@@ -160,6 +165,7 @@ export const DEFAULT_DESIGN_SYSTEM: DesignSystemConfig = {
   accentColor: '240 5% 96%',
   successColor: '142 71% 45%',
   destructiveColor: '0 84% 60%',
+  backgroundPresetId: 'white',
   backgroundType: 'solid',
   gradientFrom: '262 83% 95%',
   gradientTo: '200 83% 95%',
