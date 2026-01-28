@@ -380,10 +380,10 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
     setActivePreset(null);
   };
 
-  // Check if user is restricted from editing (non-admin with selected base system or built-in theme)
-  const hasBuiltInThemeSelected = !!(activePreset || config.themeId);
+  // Check if user is restricted from editing (non-admin with selected base system from the common themes)
+  // User design systems (personal themes) should NOT be restricted
   const hasBaseSystemSelected = !!selectedBaseSystemId;
-  const isEditingRestricted = !isAdmin && (hasBaseSystemSelected || hasBuiltInThemeSelected);
+  const isEditingRestricted = !isAdmin && hasBaseSystemSelected;
 
   return (
     <div className="space-y-6">
