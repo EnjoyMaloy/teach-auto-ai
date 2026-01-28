@@ -83,24 +83,61 @@ const createSampleSlides = (): Slide[] => {
       order: 1,
       content: '',
       subBlocks: [
-        // Badge (без эмодзи)
+        // Badge - 4 варианта с иконками Lucide
         {
           id: 'sub-badge',
           type: 'badge',
           order: 1,
           badges: [
-            { id: '1', text: 'Дизайн', iconType: 'none' },
-            { id: '2', text: 'Новое', iconType: 'none' },
+            { id: '1', text: 'Square', iconType: 'lucide', iconValue: 'BookOpen' },
+            { id: '2', text: 'Oval', iconType: 'lucide', iconValue: 'Sparkles' },
+            { id: '3', text: 'Contrast', iconType: 'lucide', iconValue: 'Zap' },
+            { id: '4', text: 'Pastel', iconType: 'lucide', iconValue: 'Heart' },
           ],
           badgeVariant: 'oval',
+          badgeSize: 'large',
           badgeLayout: 'horizontal',
+          textAlign: 'center',
+        } as SubBlock,
+        // Дополнительные бейджи для показа всех вариантов
+        {
+          id: 'sub-badge-square',
+          type: 'badge',
+          order: 2,
+          badges: [
+            { id: '1', text: 'Square стиль', iconType: 'lucide', iconValue: 'Star' },
+          ],
+          badgeVariant: 'square',
+          badgeSize: 'large',
+          textAlign: 'center',
+        } as SubBlock,
+        {
+          id: 'sub-badge-contrast',
+          type: 'badge',
+          order: 3,
+          badges: [
+            { id: '1', text: 'Contrast стиль', iconType: 'lucide', iconValue: 'Award' },
+          ],
+          badgeVariant: 'contrast',
+          badgeSize: 'large',
+          textAlign: 'center',
+        } as SubBlock,
+        {
+          id: 'sub-badge-pastel',
+          type: 'badge',
+          order: 4,
+          badges: [
+            { id: '1', text: 'Pastel стиль', iconType: 'lucide', iconValue: 'Palette' },
+          ],
+          badgeVariant: 'pastel',
+          badgeSize: 'large',
           textAlign: 'center',
         } as SubBlock,
         // Heading
         {
           id: 'sub-heading',
           type: 'heading',
-          order: 2,
+          order: 5,
           content: 'Все типы суб-блоков',
           textSize: 'xlarge',
           fontWeight: 'bold',
@@ -110,7 +147,7 @@ const createSampleSlides = (): Slide[] => {
         {
           id: 'sub-image',
           type: 'image',
-          order: 3,
+          order: 6,
           imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&q=80',
           imageSize: 'medium',
           textAlign: 'center',
@@ -119,7 +156,7 @@ const createSampleSlides = (): Slide[] => {
         {
           id: 'sub-text-light',
           type: 'text',
-          order: 4,
+          order: 7,
           content: '<p>Подложка <strong>Light</strong> — <em>светлый</em> фон с <u>подчёркиванием</u></p>',
           textSize: 'medium',
           textAlign: 'center',
@@ -130,7 +167,7 @@ const createSampleSlides = (): Slide[] => {
         {
           id: 'sub-text-dark',
           type: 'text',
-          order: 5,
+          order: 8,
           content: '<p>Подложка <strong>Dark</strong> — <em>тёмный</em> фон</p>',
           textSize: 'medium',
           textAlign: 'center',
@@ -141,7 +178,7 @@ const createSampleSlides = (): Slide[] => {
         {
           id: 'sub-text-primary',
           type: 'text',
-          order: 6,
+          order: 9,
           content: '<p>Подложка <strong>Primary</strong> — акцентный цвет</p>',
           textSize: 'medium',
           textAlign: 'center',
@@ -152,7 +189,7 @@ const createSampleSlides = (): Slide[] => {
         {
           id: 'sub-text-blur',
           type: 'text',
-          order: 7,
+          order: 10,
           content: '<p>Подложка <strong>Blur</strong> — размытие</p>',
           textSize: 'medium',
           textAlign: 'center',
@@ -163,14 +200,14 @@ const createSampleSlides = (): Slide[] => {
         {
           id: 'sub-divider',
           type: 'divider',
-          order: 8,
+          order: 11,
           dividerStyle: 'medium',
         } as SubBlock,
         // Table
         {
           id: 'sub-table',
           type: 'table',
-          order: 9,
+          order: 12,
           tableData: [
             [{ id: 't1', content: 'Тип' }, { id: 't2', content: 'Описание' }],
             [{ id: 't3', content: 'Badge' }, { id: 't4', content: 'Метка' }],
@@ -184,7 +221,7 @@ const createSampleSlides = (): Slide[] => {
         {
           id: 'sub-button',
           type: 'button',
-          order: 10,
+          order: 13,
           buttonLabel: 'Подробнее',
           buttonVariant: 'primary',
           buttonUrl: 'https://example.com',
