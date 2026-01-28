@@ -150,45 +150,45 @@ const createSampleSlides = (): Slide[] => {
           imageSize: 'medium',
           textAlign: 'center',
         } as SubBlock,
-        // Text с форматированием - подложка Light
+        // Text - подложка Light с форматированием
         {
           id: 'sub-text-light',
           type: 'text',
           order: 7,
-          content: '<p>Подложка <strong>Light</strong> — <em>светлый</em> фон с <u>подчёркиванием</u></p>',
+          content: '<p><strong>Light</strong>: <mark data-highlight="marker">маркер</mark>, <mark data-highlight="underline">подчёркивание</mark>, <mark data-highlight="wavy">волнистая</mark></p>',
           textSize: 'medium',
           textAlign: 'center',
           backdrop: 'light',
           backdropRounded: true,
         } as SubBlock,
-        // Text - подложка Dark
+        // Text - подложка Dark с форматированием
         {
           id: 'sub-text-dark',
           type: 'text',
           order: 8,
-          content: '<p>Подложка <strong>Dark</strong> — <em>тёмный</em> фон</p>',
+          content: '<p><strong>Dark</strong>: <mark data-highlight="marker">маркер</mark>, <mark data-highlight="underline">подчёркивание</mark>, <mark data-highlight="wavy">волнистая</mark></p>',
           textSize: 'medium',
           textAlign: 'center',
           backdrop: 'dark',
           backdropRounded: true,
         } as SubBlock,
-        // Text - подложка Primary
+        // Text - подложка Primary с форматированием
         {
           id: 'sub-text-primary',
           type: 'text',
           order: 9,
-          content: '<p>Подложка <strong>Primary</strong> — акцентный цвет</p>',
+          content: '<p><strong>Primary</strong>: <mark data-highlight="marker">маркер</mark>, <mark data-highlight="underline">подчёркивание</mark>, <mark data-highlight="wavy">волнистая</mark></p>',
           textSize: 'medium',
           textAlign: 'center',
           backdrop: 'primary',
           backdropRounded: true,
         } as SubBlock,
-        // Text - подложка Blur
+        // Text - подложка Blur с форматированием
         {
           id: 'sub-text-blur',
           type: 'text',
           order: 10,
-          content: '<p>Подложка <strong>Blur</strong> — размытие</p>',
+          content: '<p><strong>Blur</strong>: <mark data-highlight="marker">маркер</mark>, <mark data-highlight="underline">подчёркивание</mark>, <mark data-highlight="wavy">волнистая</mark></p>',
           textSize: 'medium',
           textAlign: 'center',
           backdrop: 'blur',
