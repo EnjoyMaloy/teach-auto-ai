@@ -63,8 +63,18 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   const [showMapSettings, setShowMapSettings] = useState(false);
   const [showAIGenerator, setShowAIGenerator] = useState(false);
   const [selectedBaseSystemId, setSelectedBaseSystemId] = useState<string | null>(
-    (course.designSystem as any)?.baseSystemId || null
+    course.designSystem?.themeId || null
   );
+
+  // Sync selectedBaseSystemId with designSystem when theme is selected
+  const handleBaseSystemSelect = (id: string | null) => {
+    setSelectedBaseSystemId(id);
+    // Also save to designSystem to persist the selection
+    onUpdateDesignSystem({
+      ...course.designSystem,
+      themeId: id || undefined,
+    } as DesignSystemConfig);
+  };
 
   const handleStartEditing = () => {
     setEditedTitle(course.title);
@@ -440,7 +450,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           isAdmin={isAdmin}
           courseTitle={course.title}
           selectedBaseSystemId={selectedBaseSystemId}
-          onBaseSystemSelect={setSelectedBaseSystemId}
+          onBaseSystemSelect={handleBaseSystemSelect}
         />
       )}
 
