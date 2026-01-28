@@ -473,7 +473,7 @@ export const SlideView: React.FC<SlideViewProps> = ({
               handleContinue();
             }
           }}
-          className={cn("flex-1 h-11 max-w-md font-bold uppercase tracking-wide disabled:opacity-50", pressAnimationClass)}
+          className={cn("flex-1 h-11 max-w-md font-bold uppercase tracking-wide disabled:opacity-50 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]", pressAnimationClass)}
           disabled={isInteractive && answerState === 'idle' && !canCheck()}
           style={{
             backgroundColor: `hsl(${ds.primaryColor})`,
