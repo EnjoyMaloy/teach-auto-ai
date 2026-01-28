@@ -437,82 +437,6 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
     }
   };
 
-  // Preview component
-  const PreviewCard = () => (
-    <div 
-      className="rounded-2xl border overflow-hidden"
-      style={{ 
-        backgroundColor: `hsl(${config.cardColor})`,
-        borderColor: `hsl(${config.mutedColor})`,
-        borderRadius: config.borderRadius,
-        fontFamily: config.fontFamily,
-      }}
-    >
-      <div className="p-4 space-y-3">
-        <h3 
-          className="font-bold text-lg"
-          style={{ 
-            color: `hsl(${config.foregroundColor})`,
-            fontFamily: config.headingFontFamily,
-          }}
-        >
-          Предпросмотр
-        </h3>
-        <p 
-          className="text-sm"
-          style={{ color: `hsl(${config.foregroundColor})`, opacity: 0.7 }}
-        >
-          Так будет выглядеть ваш курс для учеников
-        </p>
-        <div className="flex gap-2">
-          <button
-            className="px-4 py-2 text-sm font-medium transition-all"
-            style={{ 
-              backgroundColor: `hsl(${config.primaryColor})`,
-              color: `hsl(${config.primaryForeground})`,
-              borderRadius: config.buttonStyle === 'pill' ? '9999px' : 
-                           config.buttonStyle === 'square' ? '0' : config.borderRadius,
-            }}
-          >
-            Начать
-          </button>
-          <button
-            className="px-4 py-2 text-sm font-medium border transition-all"
-            style={{ 
-              backgroundColor: 'transparent',
-              color: `hsl(${config.primaryColor})`,
-              borderColor: `hsl(${config.primaryColor})`,
-              borderRadius: config.buttonStyle === 'pill' ? '9999px' : 
-                           config.buttonStyle === 'square' ? '0' : config.borderRadius,
-            }}
-          >
-            Подробнее
-          </button>
-        </div>
-        <div className="flex gap-2 mt-2">
-          <span 
-            className="px-2 py-1 text-xs rounded-full"
-            style={{ 
-              backgroundColor: `hsl(${config.successColor} / 0.1)`,
-              color: `hsl(${config.successColor})`,
-            }}
-          >
-            ✓ Правильно
-          </span>
-          <span 
-            className="px-2 py-1 text-xs rounded-full"
-            style={{ 
-              backgroundColor: `hsl(${config.destructiveColor} / 0.1)`,
-              color: `hsl(${config.destructiveColor})`,
-            }}
-          >
-            ✗ Неправильно
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-
   // Handler for base system selection
   const handleBaseSystemSelect = (system: BaseDesignSystem) => {
     onChange(system.config);
@@ -644,22 +568,6 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Preview */}
-      <div className="space-y-3">
-        <h3 className="font-semibold text-foreground">Предпросмотр</h3>
-        <div 
-          className="p-4 rounded-xl border border-border"
-          style={{ 
-            ...(config.backgroundType === 'gradient' && config.gradientFrom && config.gradientTo
-              ? { background: `linear-gradient(${config.gradientAngle || 135}deg, hsl(${config.gradientFrom}), hsl(${config.gradientTo}))` }
-              : { backgroundColor: `hsl(${config.backgroundColor})` }
-            )
-          }}
-        >
-          <PreviewCard />
-        </div>
-      </div>
 
       {/* Detailed Settings - disabled for non-admins with base system selected */}
       <div className={cn("space-y-4", isEditingRestricted && "opacity-50 pointer-events-none")}>
@@ -1111,39 +1019,6 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                   />
                 </div>
 
-                {/* Preview of backdrops */}
-                <div className="space-y-2">
-                  <Label>Предпросмотр подложек</Label>
-                  <div 
-                    className="p-4 rounded-xl space-y-3"
-                    style={{ backgroundColor: `hsl(${config.backgroundColor})` }}
-                  >
-                    <div 
-                      className="p-3 rounded-xl text-center text-sm"
-                      style={{ backgroundColor: `hsl(${config.designBlock?.backdropLightColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropLightColor})` }}
-                    >
-                      <span style={{ color: `hsl(${config.foregroundColor})` }}>Светлая подложка</span>
-                    </div>
-                    <div 
-                      className="p-3 rounded-xl text-center text-sm"
-                      style={{ backgroundColor: `hsl(${config.designBlock?.backdropDarkColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkColor})` }}
-                    >
-                      <span className="text-white">Тёмная подложка</span>
-                    </div>
-                    <div 
-                      className="p-3 rounded-xl text-center text-sm"
-                      style={{ backgroundColor: `hsl(${config.designBlock?.backdropPrimaryColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryColor})` }}
-                    >
-                      <span style={{ color: `hsl(${config.primaryColor})` }}>Акцентная подложка</span>
-                    </div>
-                    <div 
-                      className="p-3 rounded-xl text-center text-sm backdrop-blur-sm"
-                      style={{ backgroundColor: `hsl(${config.designBlock?.backdropBlurColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurColor})` }}
-                    >
-                      <span style={{ color: `hsl(${config.foregroundColor})` }}>Blur-подложка</span>
-                    </div>
-                  </div>
-                </div>
 
                 {/* Highlight settings */}
                 <div className="border-t pt-6 space-y-2">
@@ -1192,51 +1067,6 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                   />
                 </div>
 
-                {/* Preview of highlights */}
-                <div className="space-y-2">
-                  <Label>Предпросмотр выделений</Label>
-                  <div 
-                    className="p-4 rounded-xl space-y-4"
-                    style={{ backgroundColor: `hsl(${config.backgroundColor})` }}
-                  >
-                    <div className="text-center">
-                      <span 
-                        className="text-lg px-1"
-                        style={{ 
-                          backgroundColor: `hsl(${config.designBlock?.highlightMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightMarkerColor})`,
-                          color: `hsl(${config.foregroundColor})`
-                        }}
-                      >
-                        Текст с маркером
-                      </span>
-                    </div>
-                    <div className="text-center">
-                      <span 
-                        className="text-lg border-b-2 pb-0.5"
-                        style={{ 
-                          borderColor: `hsl(${config.designBlock?.highlightUnderlineColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightUnderlineColor})`,
-                          color: `hsl(${config.foregroundColor})`
-                        }}
-                      >
-                        Текст с подчёркиванием
-                      </span>
-                    </div>
-                    <div className="text-center">
-                      <span 
-                        className="text-lg"
-                        style={{ 
-                          color: `hsl(${config.foregroundColor})`,
-                          textDecorationLine: 'underline',
-                          textDecorationStyle: 'wavy',
-                          textDecorationColor: `hsl(${config.designBlock?.highlightWavyColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightWavyColor})`,
-                          textUnderlineOffset: '4px',
-                        }}
-                      >
-                        Текст с волнистой линией
-                      </span>
-                    </div>
-                  </div>
-                </div>
               </div>
             </TabsContent>
 
