@@ -1538,39 +1538,90 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                   />
                 </div>
 
-                {/* Approved Image */}
+                {/* Approved Image - File Upload */}
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Референс изображение</Label>
                   <div className="flex gap-3">
                     <div className={cn(
-                      "w-24 h-24 rounded-xl border-2 border-dashed flex items-center justify-center overflow-hidden bg-muted/30",
+                      "w-24 h-24 rounded-xl border-2 border-dashed flex items-center justify-center overflow-hidden bg-muted/30 relative",
                       config.mascot?.approvedImageUrl ? "border-primary/30" : "border-border"
                     )}>
                       {config.mascot?.approvedImageUrl ? (
-                        <img 
-                          src={config.mascot.approvedImageUrl} 
-                          alt="Mascot" 
-                          className="w-full h-full object-cover"
-                        />
+                        <>
+                          <img 
+                            src={config.mascot.approvedImageUrl} 
+                            alt="Mascot" 
+                            className="w-full h-full object-cover"
+                          />
+                          {!config.mascot?.isApproved && (
+                            <button
+                              type="button"
+                              onClick={() => updateConfig({ 
+                                mascot: { 
+                                  ...DEFAULT_MASCOT_SETTINGS, 
+                                  ...config.mascot, 
+                                  approvedImageUrl: '' 
+                                } 
+                              })}
+                              className="absolute top-1 right-1 w-5 h-5 rounded-full bg-destructive/90 text-white flex items-center justify-center hover:bg-destructive"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          )}
+                        </>
                       ) : (
                         <ImageIcon className="w-8 h-8 text-muted-foreground" />
                       )}
                     </div>
                     <div className="flex-1 space-y-2">
-                      <Input
-                        value={config.mascot?.approvedImageUrl || ''}
-                        onChange={(e) => updateConfig({ 
-                          mascot: { 
-                            ...DEFAULT_MASCOT_SETTINGS, 
-                            ...config.mascot, 
-                            approvedImageUrl: e.target.value 
-                          } 
-                        })}
-                        placeholder="URL изображения маскота"
-                        disabled={config.mascot?.isApproved}
-                      />
+                      {config.mascot?.approvedImageUrl ? (
+                        <p className="text-sm text-foreground">Референс загружен</p>
+                      ) : (
+                        <label className={cn(
+                          "flex flex-col items-center justify-center gap-1 p-3 rounded-xl border-2 border-dashed transition-colors cursor-pointer",
+                          config.mascot?.isApproved 
+                            ? "border-muted bg-muted/20 cursor-not-allowed opacity-50" 
+                            : "border-border hover:border-primary/50 bg-muted/30"
+                        )}>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            disabled={config.mascot?.isApproved}
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              
+                              try {
+                                const fileName = `mascot-ref-${Date.now()}-${file.name}`;
+                                const { data, error } = await supabase.storage
+                                  .from('mascots')
+                                  .upload(fileName, file, { upsert: true });
+                                
+                                if (error) throw error;
+                                
+                                const { data: publicUrl } = supabase.storage
+                                  .from('mascots')
+                                  .getPublicUrl(data.path);
+                                
+                                updateConfig({ 
+                                  mascot: { 
+                                    ...DEFAULT_MASCOT_SETTINGS, 
+                                    ...config.mascot, 
+                                    approvedImageUrl: publicUrl.publicUrl 
+                                  } 
+                                });
+                              } catch (err) {
+                                console.error('Mascot upload error:', err);
+                              }
+                            }}
+                          />
+                          <Upload className="w-5 h-5 text-muted-foreground" />
+                          <span className="text-xs text-muted-foreground">Загрузить изображение</span>
+                        </label>
+                      )}
                       <p className="text-xs text-muted-foreground">
-                        Загрузите или вставьте ссылку на референс изображение
+                        Загрузите референс изображение маскота
                       </p>
                     </div>
                   </div>
