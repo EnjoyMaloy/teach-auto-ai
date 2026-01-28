@@ -403,10 +403,14 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                   let bgColor = `hsl(${ds.cardColor})`;
                   let textColor = `hsl(${ds.foregroundColor})`;
                   
+                  // For partial state, use amber/yellow for correct answers instead of green
+                  const correctColor = answerState === 'partial' ? '45 93% 47%' : ds.successColor;
+                  const correctBgColor = answerState === 'partial' ? '48 100% 90%' : `${ds.successColor} / 0.1`;
+                  
                   if (showResult && option.isCorrect) {
-                    borderColor = `hsl(${ds.successColor})`;
-                    bgColor = `hsl(${ds.successColor} / 0.1)`;
-                    textColor = `hsl(${ds.successColor})`;
+                    borderColor = `hsl(${correctColor})`;
+                    bgColor = `hsl(${correctBgColor})`;
+                    textColor = `hsl(${correctColor})`;
                   } else if (showResult && isSelected && !option.isCorrect) {
                     borderColor = `hsl(${ds.destructiveColor})`;
                     bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
