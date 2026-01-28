@@ -694,7 +694,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
 
               {/* Button Backdrop */}
               <div className="border-t pt-6 space-y-2">
-                <Label className="text-base font-semibold">Подложка кнопки «Продолжить»</Label>
+                <Label className="text-base font-semibold">Подложка кнопки</Label>
                 <p className="text-sm text-muted-foreground">
                   Фон области с кнопкой навигации
                 </p>
