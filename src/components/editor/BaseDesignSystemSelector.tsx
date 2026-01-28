@@ -24,7 +24,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Check, Edit, Trash2, Plus, Star, Loader2, Palette, Users, User, Wand2 } from 'lucide-react';
+import { Check, Edit, Trash2, Plus, Loader2, Palette, Users, User, Wand2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BaseDesignSystemSelectorProps {
@@ -35,6 +35,7 @@ interface BaseDesignSystemSelectorProps {
   builtInThemes?: ThemePreset[];
   activePresetId?: string | null;
   onPresetSelect?: (presetId: string) => void;
+  onBuiltInThemeDelete?: (presetId: string) => void;
 }
 
 export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> = ({
@@ -45,14 +46,14 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
   builtInThemes = [],
   activePresetId,
   onPresetSelect,
+  onBuiltInThemeDelete,
 }) => {
   const { 
     systems: baseSystems, 
     isLoading: isLoadingBase, 
     createSystem: createBaseSystem, 
     updateSystem: updateBaseSystem, 
-    deleteSystem: deleteBaseSystem, 
-    setDefault 
+    deleteSystem: deleteBaseSystem,
   } = useBaseDesignSystems();
   
   const { 
@@ -66,9 +67,13 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
   const [isCreateBaseDialogOpen, setIsCreateBaseDialogOpen] = useState(false);
   const [isCreateUserDialogOpen, setIsCreateUserDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedForDelete, setSelectedForDelete] = useState<{ system: BaseDesignSystem | UserDesignSystem; isBase: boolean } | null>(null);
+  const [selectedForEdit, setSelectedForEdit] = useState<{ system: BaseDesignSystem | UserDesignSystem; isBase: boolean } | null>(null);
   const [newName, setNewName] = useState('');
   const [newDescription, setNewDescription] = useState('');
+  const [editName, setEditName] = useState('');
+  const [editDescription, setEditDescription] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
   const isLoading = isLoadingBase || isLoadingUser;
@@ -101,16 +106,31 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
     }
   };
 
-  const handleUpdateConfig = async (system: BaseDesignSystem | UserDesignSystem, isBase: boolean) => {
-    if (!currentConfig) return;
+  const handleEditOpen = (system: BaseDesignSystem | UserDesignSystem, isBase: boolean) => {
+    setSelectedForEdit({ system, isBase });
+    setEditName(system.name);
+    setEditDescription(system.description || '');
+    setIsEditDialogOpen(true);
+  };
+
+  const handleEditSave = async () => {
+    if (!selectedForEdit || !editName.trim()) return;
     
     setIsSaving(true);
     try {
-      if (isBase) {
-        await updateBaseSystem(system.id, { config: currentConfig });
+      if (selectedForEdit.isBase) {
+        await updateBaseSystem(selectedForEdit.system.id, { 
+          name: editName.trim(), 
+          description: editDescription.trim() 
+        });
       } else {
-        await updateUserSystem(system.id, { config: currentConfig });
+        await updateUserSystem(selectedForEdit.system.id, { 
+          name: editName.trim(), 
+          description: editDescription.trim() 
+        });
       }
+      setIsEditDialogOpen(false);
+      setSelectedForEdit(null);
     } finally {
       setIsSaving(false);
     }
@@ -131,10 +151,6 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const handleSetDefault = async (id: string) => {
-    await setDefault(id);
   };
 
   if (isLoading) {
@@ -220,6 +236,22 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
                 {activePresetId === preset.id && !selectedId && (
                   <Check className="absolute top-2 right-2 w-4 h-4 text-primary" />
                 )}
+                
+                {/* Delete button for admins on built-in themes */}
+                {isAdmin && onBuiltInThemeDelete && (
+                  <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onBuiltInThemeDelete(preset.id);
+                      }}
+                      className="w-6 h-6 rounded-full bg-destructive/10 text-destructive flex items-center justify-center hover:bg-destructive/20 transition-colors"
+                      title="Удалить"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
             
@@ -232,8 +264,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
                 onSelect={() => onSelect(system)}
                 isAdmin={isAdmin}
                 isBase={true}
-                onSetDefault={() => handleSetDefault(system.id)}
-                onUpdateConfig={() => handleUpdateConfig(system, true)}
+                onEdit={() => handleEditOpen(system, true)}
                 onDelete={() => {
                   setSelectedForDelete({ system, isBase: true });
                   setIsDeleteDialogOpen(true);
@@ -261,7 +292,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
                 isAdmin={false}
                 isBase={false}
                 isOwner={true}
-                onUpdateConfig={() => handleUpdateConfig(system, false)}
+                onEdit={() => handleEditOpen(system, false)}
                 onDelete={() => {
                   setSelectedForDelete({ system, isBase: false });
                   setIsDeleteDialogOpen(true);
@@ -329,6 +360,43 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
         isSaving={isSaving}
       />
 
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Редактировать тему</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Название</Label>
+              <Input
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="Название темы"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Описание</Label>
+              <Textarea
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                placeholder="Описание темы"
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Отмена
+            </Button>
+            <Button onClick={handleEditSave} disabled={isSaving || !editName.trim()}>
+              {isSaving && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+              Сохранить
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Delete Confirmation */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
@@ -363,8 +431,7 @@ interface ThemeCardProps {
   isAdmin: boolean;
   isBase: boolean;
   isOwner?: boolean;
-  onSetDefault?: () => void;
-  onUpdateConfig: () => void;
+  onEdit: () => void;
   onDelete: () => void;
 }
 
@@ -375,12 +442,10 @@ const ThemeCard: React.FC<ThemeCardProps> = ({
   isAdmin,
   isBase,
   isOwner = false,
-  onSetDefault,
-  onUpdateConfig,
+  onEdit,
   onDelete,
 }) => {
   const canEdit = isBase ? isAdmin : isOwner;
-  const isDefault = 'is_default' in system && system.is_default;
 
   return (
     <div
@@ -408,12 +473,7 @@ const ThemeCard: React.FC<ThemeCardProps> = ({
         />
       </div>
       
-      <div className="flex items-center gap-1">
-        <p className="text-sm font-medium text-foreground truncate">{system.name}</p>
-        {isDefault && (
-          <Star className="w-3 h-3 text-amber-500 fill-amber-500 flex-shrink-0" />
-        )}
-      </div>
+      <p className="text-sm font-medium text-foreground truncate">{system.name}</p>
       
       {isSelected && (
         <Check className="absolute top-2 right-2 w-4 h-4 text-primary" />
@@ -422,25 +482,13 @@ const ThemeCard: React.FC<ThemeCardProps> = ({
       {/* Edit actions */}
       {canEdit && (
         <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          {isBase && !isDefault && onSetDefault && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onSetDefault();
-              }}
-              className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center hover:bg-amber-200 transition-colors"
-              title="Сделать по умолчанию"
-            >
-              <Star className="w-3 h-3" />
-            </button>
-          )}
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onUpdateConfig();
+              onEdit();
             }}
             className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition-colors"
-            title="Обновить конфигурацию"
+            title="Редактировать название"
           >
             <Edit className="w-3 h-3" />
           </button>
@@ -492,6 +540,7 @@ const CreateThemeDialog: React.FC<CreateThemeDialogProps> = ({
         <DialogTitle>{title}</DialogTitle>
       </DialogHeader>
       <div className="space-y-4 py-4">
+        <p className="text-sm text-muted-foreground">{description}</p>
         <div className="space-y-2">
           <Label>Название</Label>
           <Input
@@ -505,25 +554,20 @@ const CreateThemeDialog: React.FC<CreateThemeDialogProps> = ({
           <Textarea
             value={descriptionValue}
             onChange={(e) => onDescriptionChange(e.target.value)}
-            placeholder="Краткое описание темы..."
-            rows={2}
+            placeholder="Краткое описание темы"
+            rows={3}
           />
         </div>
-        <p className="text-sm text-muted-foreground">
-          {description}
-        </p>
       </div>
       <DialogFooter>
         <Button variant="outline" onClick={() => onOpenChange(false)}>
           Отмена
         </Button>
-        <Button onClick={onSubmit} disabled={!name.trim() || isSaving}>
-          {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-          Сохранить
+        <Button onClick={onSubmit} disabled={isSaving || !name.trim()}>
+          {isSaving && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+          Создать
         </Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
 );
-
-export default BaseDesignSystemSelector;
