@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { DesignSystemConfig } from '@/types/designSystem';
-import { DesignSystemProvider } from '@/components/runtime/DesignSystemProvider';
-import { SlideRenderer } from '@/components/runtime/SlideRenderer';
 import { Slide } from '@/types/course';
+import { Block, BlockType } from '@/types/blocks';
 import { SubBlock } from '@/types/designBlock';
+import { MobilePreviewFrame } from './blocks/MobilePreviewFrame';
 import { cn } from '@/lib/utils';
 import { 
-  Heading, Type, Image, Play, Volume2, LayoutList,
+  Heading, Type, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
   Link2, ListOrdered, SlidersHorizontal, Layers
 } from 'lucide-react';
@@ -15,8 +15,6 @@ const iconMap: Record<string, React.ElementType> = {
   heading: Heading,
   text: Type,
   image_text: LayoutList,
-  video: Play,
-  audio: Volume2,
   single_choice: CircleDot,
   multiple_choice: CheckSquare,
   true_false: ToggleLeft,
@@ -40,6 +38,38 @@ const blockLabels: Record<string, string> = {
   ordering: 'Порядок',
   slider: 'Ползунок',
 };
+
+// Convert Slide to Block for MobilePreviewFrame
+const slideToBlock = (slide: Slide): Block => ({
+  id: slide.id,
+  lessonId: slide.lessonId,
+  type: slide.type as BlockType,
+  order: slide.order,
+  content: slide.content,
+  imageUrl: slide.imageUrl,
+  videoUrl: slide.videoUrl,
+  audioUrl: slide.audioUrl,
+  options: slide.options,
+  correctAnswer: slide.correctAnswer,
+  explanation: slide.explanation,
+  explanationCorrect: slide.explanationCorrect,
+  explanationPartial: slide.explanationPartial,
+  blankWord: slide.blankWord,
+  matchingPairs: slide.matchingPairs,
+  sliderMin: slide.sliderMin,
+  sliderMax: slide.sliderMax,
+  sliderCorrect: slide.sliderCorrect,
+  sliderCorrectMax: slide.sliderCorrectMax,
+  sliderStep: slide.sliderStep,
+  orderingItems: slide.orderingItems,
+  correctOrder: slide.correctOrder,
+  subBlocks: (slide as any).subBlocks,
+  backgroundColor: slide.backgroundColor,
+  textColor: slide.textColor,
+  textSize: (slide as any).textSize,
+  createdAt: slide.createdAt,
+  updatedAt: slide.updatedAt,
+});
 
 // Sample slides demonstrating all block types
 const createSampleSlides = (): Slide[] => {
@@ -229,11 +259,13 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
   const sampleSlides = createSampleSlides();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const selectedSlide = sampleSlides[selectedIndex];
+  const selectedBlock = slideToBlock(selectedSlide);
 
-  // Compute background style
-  const bgStyle = config.backgroundType === 'gradient'
-    ? `linear-gradient(${config.gradientAngle || 135}deg, hsl(${config.gradientFrom}), hsl(${config.gradientTo}))`
-    : `hsl(${config.backgroundColor})`;
+  const handleContinue = () => {
+    if (selectedIndex < sampleSlides.length - 1) {
+      setSelectedIndex(selectedIndex + 1);
+    }
+  };
 
   return (
     <div className="h-full flex">
@@ -286,8 +318,8 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
         </div>
       </div>
 
-      {/* Right: Fast View Preview */}
-      <div className="flex-1 flex flex-col bg-muted/30">
+      {/* Right: Fast View using MobilePreviewFrame */}
+      <div className="flex-1 flex flex-col bg-muted/30 overflow-hidden">
         <div className="px-4 py-2 border-b border-border bg-card flex items-center justify-between">
           <span className="text-sm font-medium text-muted-foreground">Fast View</span>
           <span className="text-xs text-muted-foreground">
@@ -295,57 +327,17 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
           </span>
         </div>
         
-        <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
-          {/* Phone frame */}
-          <div 
-            className="w-full max-w-[390px] h-full max-h-[780px] rounded-[2.5rem] border-[6px] border-foreground/10 shadow-xl overflow-hidden flex flex-col"
-            style={{ background: bgStyle }}
-          >
-            {/* Status bar */}
-            <div className="h-10 flex items-center justify-center flex-shrink-0">
-              <div className="w-20 h-5 bg-foreground/10 rounded-full" />
-            </div>
-
-            {/* Progress bar */}
-            <div className="px-4 pb-2 flex-shrink-0">
-              <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden">
-                <div 
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{ 
-                    width: `${((selectedIndex + 1) / sampleSlides.length) * 100}%`,
-                    backgroundColor: `hsl(${config.primaryColor})`,
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Content */}
-            <DesignSystemProvider config={config}>
-              <div className="flex-1 min-h-0 overflow-hidden">
-                <SlideRenderer
-                  slide={selectedSlide}
-                  designSystem={config}
-                />
-              </div>
-            </DesignSystemProvider>
-
-            {/* Bottom button */}
-            <div className="p-4 pb-6 flex-shrink-0" style={{ background: bgStyle }}>
-              <div 
-                className="w-full py-3.5 text-center font-semibold text-sm"
-                style={{
-                  backgroundColor: `hsl(${config.primaryColor})`,
-                  color: `hsl(${config.primaryForeground})`,
-                  borderRadius: config.buttonStyle === 'pill' ? '9999px' : config.buttonStyle === 'square' ? '0' : config.borderRadius,
-                  boxShadow: config.buttonDepth === 'raised' 
-                    ? `0 4px 0 0 hsl(${config.primaryColor} / 0.4)` 
-                    : 'none',
-                }}
-              >
-                Продолжить
-              </div>
-            </div>
-          </div>
+        <div className="flex-1 overflow-hidden">
+          <MobilePreviewFrame
+            block={selectedBlock}
+            lessonTitle="Демо-урок"
+            blockIndex={selectedIndex}
+            totalBlocks={sampleSlides.length}
+            onContinue={handleContinue}
+            designSystem={config}
+            isReadOnly={true}
+            isMuted={true}
+          />
         </div>
       </div>
     </div>
