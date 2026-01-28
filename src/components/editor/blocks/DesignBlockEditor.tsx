@@ -882,7 +882,6 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
   };
 
   const ds = {
-    backgroundColor: designSystem?.backgroundColor || '0 0% 100%',
     foregroundColor: designSystem?.foregroundColor || '240 10% 4%',
   };
 
@@ -891,7 +890,6 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
     return (
       <div 
         className="h-full flex flex-col items-center justify-center p-6"
-        style={{ backgroundColor: `hsl(${ds.backgroundColor})` }}
       >
         <p className="text-muted-foreground text-sm">Нет контента</p>
       </div>
@@ -903,7 +901,6 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
     return (
       <div 
         className="h-full flex flex-col items-center justify-center p-6"
-        style={{ backgroundColor: `hsl(${ds.backgroundColor})` }}
       >
         <div className="w-14 h-14 rounded-2xl bg-primary/10 mb-4 flex items-center justify-center">
           <Layers className="w-7 h-7 text-primary" />
@@ -920,7 +917,6 @@ export const DesignBlockEditor: React.FC<DesignBlockEditorProps> = ({
         "h-full flex flex-col p-4 overflow-auto w-full relative",
         isEditing && isOverflowing && "ring-2 ring-yellow-500 ring-inset"
       )}
-      style={{ backgroundColor: `hsl(${ds.backgroundColor})` }}
       onClick={() => {
         // Deselect when clicking empty space
         if (isEditing) {
