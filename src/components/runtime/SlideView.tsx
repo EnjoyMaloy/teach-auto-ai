@@ -291,9 +291,11 @@ export const SlideView: React.FC<SlideViewProps> = ({
                 const showResult = answerState !== 'idle';
                 const isCorrectOption = block.correctAnswer === value;
 
+                const accentColor = designSystem?.designBlock?.accentElementColor || ds.primaryColor;
+                
                 let btnStyle: React.CSSProperties = {
-                  borderColor: isSelected ? `hsl(${ds.primaryColor})` : `hsl(${ds.mutedColor})`,
-                  backgroundColor: isSelected ? `hsl(${ds.primaryColor} / 0.1)` : 'transparent',
+                  borderColor: isSelected ? `hsl(${accentColor})` : `hsl(${ds.mutedColor})`,
+                  backgroundColor: isSelected ? `hsl(${accentColor} / 0.1)` : 'transparent',
                 };
 
                 if (showResult) {
