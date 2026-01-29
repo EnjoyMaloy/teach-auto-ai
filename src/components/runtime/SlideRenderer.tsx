@@ -758,12 +758,15 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
     if (answerState === 'idle') return null;
     
     // Helper to create soft pastel version of HSL color
+    // Input format: "220 70% 50%" or "220 70 50"
     const getSoftColor = (hslColor: string, lightness: number = 90) => {
       const parts = hslColor.split(' ');
       if (parts.length >= 2) {
         const hue = parts[0];
-        const sat = parseInt(parts[1]) * 0.6; // Reduce saturation for softer look
-        return `hsl(${hue} ${sat}% ${lightness}%)`;
+        // Remove % sign if present before parsing
+        const satValue = parseInt(parts[1].replace('%', ''));
+        const softSat = Math.round(satValue * 0.5); // Reduce saturation for softer look
+        return `hsl(${hue} ${softSat}% ${lightness}%)`;
       }
       return `hsl(${hslColor} / 0.15)`;
     };
