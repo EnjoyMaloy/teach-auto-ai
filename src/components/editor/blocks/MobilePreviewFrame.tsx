@@ -1132,18 +1132,15 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         {answerState === 'partial' && (
           <span className="text-sm font-medium opacity-80 mt-1">Подумай ещё чуть-чуть</span>
         )}
-        {answerState === 'incorrect' && (
-          <span className="text-sm font-medium opacity-80 mt-1">Попробуй в следующий раз</span>
+        {answerState === 'incorrect' && block?.explanation && (
+          <span className="text-sm font-medium opacity-80 mt-1">{block.explanation}</span>
         )}
         {/* Для multiple_choice не показываем explanationCorrect */}
         {answerState === 'correct' && block?.type !== 'multiple_choice' && block?.explanationCorrect && (
-          <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanationCorrect}</p>
+          <p className="text-sm font-medium opacity-80 mt-1 text-center px-2">{block.explanationCorrect}</p>
         )}
         {answerState === 'correct' && block?.type === 'multiple_choice' && block?.explanation && (
-          <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanation}</p>
-        )}
-        {answerState === 'incorrect' && block?.explanation && (
-          <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanation}</p>
+          <p className="text-sm font-medium opacity-80 mt-1 text-center px-2">{block.explanation}</p>
         )}
       </div>
     </div>
@@ -1492,8 +1489,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
               {answerState === 'partial' && (
                 <span className="text-sm font-medium opacity-80 mt-1">Подумай ещё чуть-чуть</span>
               )}
-              {answerState === 'incorrect' && (
-                <span className="text-sm font-medium opacity-80 mt-1">Попробуй в следующий раз</span>
+              {answerState === 'incorrect' && block?.explanation && (
+                <span className="text-sm font-medium opacity-80 mt-1">{block.explanation}</span>
               )}
             </div>
           </div>
