@@ -86,11 +86,27 @@ export const EnhancedColorInput: React.FC<EnhancedColorInputProps> = ({
   }, [value, isFocused]);
 
   const handleHexChange = (newHex: string) => {
-    const cleaned = newHex.replace(/[^0-9A-Fa-f]/g, '').slice(0, 6);
+    // Remove # and any non-hex characters, then take first 6 chars
+    const cleaned = newHex.replace(/^#/, '').replace(/[^0-9A-Fa-f]/g, '').slice(0, 6);
     setHexValue(cleaned.toUpperCase());
     
+    // Save immediately when we have a valid 6-character hex
     if (cleaned.length === 6) {
       onChange(hexToHsl(cleaned));
+    }
+  };
+
+  // Handle paste event to immediately apply pasted color
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text');
+    const cleaned = pasted.replace(/^#/, '').replace(/[^0-9A-Fa-f]/g, '').slice(0, 6);
+    
+    if (cleaned.length === 6) {
+      setHexValue(cleaned.toUpperCase());
+      onChange(hexToHsl(cleaned));
+    } else if (cleaned.length > 0) {
+      setHexValue(cleaned.toUpperCase());
     }
   };
 
@@ -132,6 +148,7 @@ export const EnhancedColorInput: React.FC<EnhancedColorInputProps> = ({
           <Input
             value={hexValue}
             onChange={(e) => handleHexChange(e.target.value)}
+            onPaste={handlePaste}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             className="pl-7 pr-10 font-mono text-sm uppercase tracking-wider bg-background"
