@@ -235,6 +235,7 @@ export interface DesignSystemConfig {
   mutedColor: string;
   accentColor: string;
   successColor: string;
+  partialColor?: string;  // "Almost" / "Почти" answer color
   destructiveColor: string;
   
   // Theme ID (to persist which theme is selected)
@@ -300,6 +301,7 @@ export const DEFAULT_DESIGN_SYSTEM: DesignSystemConfig = {
   mutedColor: '240 5% 96%',
   accentColor: '240 5% 96%',
   successColor: '142 71% 45%',
+  partialColor: '35 92% 50%',  // Amber/yellow for "Almost"
   destructiveColor: '0 84% 60%',
   backgroundPresetId: 'white',
   backgroundType: 'solid',

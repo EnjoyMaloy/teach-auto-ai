@@ -35,6 +35,7 @@ const DEFAULT_DS: {
   cardColor: string;
   mutedColor: string;
   successColor: string;
+  partialColor: string;
   destructiveColor: string;
   fontFamily: string;
   headingFontFamily: string;
@@ -57,6 +58,7 @@ const DEFAULT_DS: {
   cardColor: '0 0% 100%',
   mutedColor: '240 5% 96%',
   successColor: '142 71% 45%',
+  partialColor: '35 92% 50%',
   destructiveColor: '0 84% 60%',
   fontFamily: '"Inter", sans-serif',
   headingFontFamily: '"Inter", sans-serif',
@@ -400,9 +402,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                   let bgColor = `hsl(${ds.cardColor})`;
                   let textColor = `hsl(${ds.foregroundColor})`;
                   
-                  // For partial state, use amber/yellow for selected correct answers only
-                  const correctColor = answerState === 'partial' ? '45 93% 47%' : ds.successColor;
-                  const correctBgColor = answerState === 'partial' ? '48 100% 90%' : `${ds.successColor} / 0.1`;
+                  // For partial state, use the partial color from design system
+                  const partialColor = ds.partialColor || '35 92% 50%';
+                  const correctColor = answerState === 'partial' ? partialColor : ds.successColor;
+                  const correctBgColor = answerState === 'partial' ? `${partialColor} / 0.15` : `${ds.successColor} / 0.1`;
                   
                   if (showResult && option.isCorrect && isSelected) {
                     // Selected correct answer

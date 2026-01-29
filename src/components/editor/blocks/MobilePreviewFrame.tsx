@@ -85,6 +85,7 @@ const DEFAULT_DS = {
   cardColor: '0 0% 100%',
   mutedColor: '240 5% 96%',
   successColor: '142 71% 45%',
+  partialColor: '35 92% 50%',
   destructiveColor: '0 84% 60%',
   fontFamily: '"Inter", sans-serif',
   headingFontFamily: '"Inter", sans-serif',
@@ -581,9 +582,10 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                   let bgColor = `hsl(${ds.cardColor})`;
                   let textColor = `hsl(${ds.foregroundColor})`;
                   
-                  // For partial state, use amber/yellow for selected correct answers only (don't reveal unselected correct answers)
-                  const correctColor = answerState === 'partial' ? '45 93% 47%' : ds.successColor;
-                  const correctBgColor = answerState === 'partial' ? '48 100% 90%' : `${ds.successColor} / 0.1`;
+                  // For partial state, use the partial color from design system
+                  const partialColorVal = ds.partialColor || '35 92% 50%';
+                  const correctColor = answerState === 'partial' ? partialColorVal : ds.successColor;
+                  const correctBgColor = answerState === 'partial' ? `${partialColorVal} / 0.15` : `${ds.successColor} / 0.1`;
                   
                   if (showResult && option.isCorrect && isSelected) {
                     // Selected correct answer
@@ -1076,10 +1078,11 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     </div>
   );
 
-  // Partial answer colors
-  const partialButtonColor = '45 93% 47%'; // Amber button
-  const partialBgTint = '48 100% 90%'; // Pastel yellow background
-  const partialTextColor = '35 80% 35%'; // Darker amber for text
+  // Partial answer colors - from design system
+  const partialColorDs = ds.partialColor || '35 92% 50%';
+  const partialButtonColor = partialColorDs;
+  const partialBgTint = `${partialColorDs} / 0.15`;
+  const partialTextColorVal = partialColorDs;
   
   // Incorrect answer colors
   const incorrectBgTint = '0 100% 95%'; // Pastel pink background
@@ -1101,7 +1104,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         color: answerState === 'correct' 
           ? `hsl(${correctTextColor})` 
           : answerState === 'partial'
-            ? `hsl(${partialTextColor})`
+            ? `hsl(${partialTextColorVal})`
             : `hsl(${incorrectTextColor})`,
       }}
     >
@@ -1193,9 +1196,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     </button>
   );
 
-  // Partial answer color (amber/yellow)
-  const partialColor = '45 93% 47%';
-  const partialBgColor = '48 100% 90%'; // Pastel yellow background
+  // Partial answer color - from design system
+  const partialColor = ds.partialColor || '35 92% 50%';
+  const partialBgColor = `${partialColor} / 0.15`;
   
   const bottomNavigation = (
     <div 
