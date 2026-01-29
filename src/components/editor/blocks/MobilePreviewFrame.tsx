@@ -1090,6 +1090,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   
   // Correct answer colors (solid lime green like the reference)
   const correctBgTint = '88 62% 85%'; // Light lime green background
+  const correctTextColor = '142 60% 30%'; // Darker green for better contrast
 
   const resultFeedback = answerState !== 'idle' && (
     <div 
@@ -1101,7 +1102,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             ? `hsl(${partialBgTint})`
             : `hsl(${incorrectBgTint})`,
         color: answerState === 'correct' 
-          ? `hsl(${ds.successColor})` 
+          ? `hsl(${correctTextColor})` 
           : answerState === 'partial'
             ? `hsl(${partialTextColor})`
             : `hsl(${incorrectTextColor})`,
@@ -1127,20 +1128,17 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           )}
         </div>
         {answerState === 'correct' && (
-          <span className="text-sm font-medium opacity-80 mt-1">Так держать!</span>
+          <span className="text-sm font-medium opacity-90 mt-1">
+            {block?.type === 'multiple_choice' 
+              ? (block?.explanation || 'Так держать!') 
+              : (block?.explanationCorrect || block?.explanation || 'Так держать!')}
+          </span>
         )}
         {answerState === 'partial' && (
-          <span className="text-sm font-medium opacity-80 mt-1">Подумай ещё чуть-чуть</span>
+          <span className="text-sm font-medium opacity-90 mt-1">Подумай ещё чуть-чуть</span>
         )}
-        {answerState === 'incorrect' && block?.explanation && (
-          <span className="text-sm font-medium opacity-80 mt-1">{block.explanation}</span>
-        )}
-        {/* Для multiple_choice не показываем explanationCorrect */}
-        {answerState === 'correct' && block?.type !== 'multiple_choice' && block?.explanationCorrect && (
-          <p className="text-sm font-medium opacity-80 mt-1 text-center px-2">{block.explanationCorrect}</p>
-        )}
-        {answerState === 'correct' && block?.type === 'multiple_choice' && block?.explanation && (
-          <p className="text-sm font-medium opacity-80 mt-1 text-center px-2">{block.explanation}</p>
+        {answerState === 'incorrect' && (
+          <span className="text-sm font-medium opacity-90 mt-1">{block?.explanation || 'Попробуй ещё раз'}</span>
         )}
       </div>
     </div>
@@ -1484,13 +1482,17 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                 )}
               </div>
               {answerState === 'correct' && (
-                <span className="text-sm font-medium opacity-80 mt-1">Так держать!</span>
+                <span className="text-sm font-medium opacity-90 mt-1">
+                  {block?.type === 'multiple_choice' 
+                    ? (block?.explanation || 'Так держать!') 
+                    : (block?.explanationCorrect || block?.explanation || 'Так держать!')}
+                </span>
               )}
               {answerState === 'partial' && (
-                <span className="text-sm font-medium opacity-80 mt-1">Подумай ещё чуть-чуть</span>
+                <span className="text-sm font-medium opacity-90 mt-1">Подумай ещё чуть-чуть</span>
               )}
-              {answerState === 'incorrect' && block?.explanation && (
-                <span className="text-sm font-medium opacity-80 mt-1">{block.explanation}</span>
+              {answerState === 'incorrect' && (
+                <span className="text-sm font-medium opacity-90 mt-1">{block?.explanation || 'Попробуй ещё раз'}</span>
               )}
             </div>
           </div>

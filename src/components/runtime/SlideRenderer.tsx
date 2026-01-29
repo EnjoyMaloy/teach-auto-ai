@@ -764,7 +764,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
         : `hsl(0 100% 95%)`;
     
     const textColor = answerState === 'correct'
-      ? `hsl(${ds.successColor})`
+      ? `hsl(142 60% 30%)`
       : answerState === 'partial'
         ? `hsl(35 80% 35%)`
         : `hsl(${ds.destructiveColor})`;
