@@ -199,7 +199,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Users className="w-3.5 h-3.5" />
-            <span style={{ fontFamily: currentConfig?.headingFontFamily || 'inherit' }}>Общие темы</span>
+            <span>Общие темы</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
             {/* Database-stored base systems */}
@@ -227,7 +227,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <User className="w-3.5 h-3.5" />
-            <span style={{ fontFamily: currentConfig?.headingFontFamily || 'inherit' }}>Мои темы</span>
+            <span>Мои темы</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
             {userSystems.map((system) => (
@@ -251,7 +251,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
       )}
 
       {/* Create buttons at the bottom */}
-      <div className="flex flex-col gap-2 pt-3">
+      <div className="flex flex-col gap-2 pt-2 border-t border-border">
         {isAdmin && (
           <Button
             variant="outline"
