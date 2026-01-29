@@ -852,13 +852,18 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
               <SettingsCard
                 icon={<Check className="w-4 h-4" />}
                 title="Цвета ответов"
-                description="Правильные и неправильные ответы"
+                description="Правильные, частично правильные и неправильные ответы"
               >
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   <ColorInput
                     label="Правильный"
                     value={config.successColor || DEFAULT_DESIGN_SYSTEM.successColor}
                     onChange={(v) => updateConfig({ successColor: v })}
+                  />
+                  <ColorInput
+                    label="Почти"
+                    value={config.partialColor || DEFAULT_DESIGN_SYSTEM.partialColor || '35 92% 50%'}
+                    onChange={(v) => updateConfig({ partialColor: v })}
                   />
                   <ColorInput
                     label="Неправильный"
