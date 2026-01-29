@@ -159,6 +159,8 @@ const SortableSubBlockItem: React.FC<{
     buttonTextColor: designSystem?.designBlock?.buttonTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.buttonTextColor,
     // Table sub-block
     tableBorderColor: designSystem?.designBlock?.tableBorderColor || DEFAULT_DESIGN_BLOCK_SETTINGS.tableBorderColor,
+    tableBorderWidth: designSystem?.designBlock?.tableBorderWidth ?? DEFAULT_DESIGN_BLOCK_SETTINGS.tableBorderWidth,
+    tableRounded: designSystem?.designBlock?.tableRounded ?? DEFAULT_DESIGN_BLOCK_SETTINGS.tableRounded,
     tableHeaderBgColor: designSystem?.designBlock?.tableHeaderBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.tableHeaderBgColor,
     tableStripeBgColor: designSystem?.designBlock?.tableStripeBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.tableStripeBgColor,
     tableStripeBgColor2: designSystem?.designBlock?.tableStripeBgColor2 || DEFAULT_DESIGN_BLOCK_SETTINGS.tableStripeBgColor2,
@@ -687,8 +689,12 @@ const SortableSubBlockItem: React.FC<{
         const tStyle = subBlock.tableStyle || 'simple';
         const tSize = { small: 'text-xs', medium: 'text-sm', large: 'text-base' }[subBlock.tableTextSize || 'medium'];
         const tAlign = { left: 'text-left', center: 'text-center', right: 'text-right' }[subBlock.textAlign as 'left'|'center'|'right' || 'left'];
-        // Use design system table colors
-        const tableBorderStyle = tStyle === 'bordered' ? { border: `1px solid hsl(${ds.tableBorderColor})` } : {};
+        // Use design system table colors and styles
+        const borderWidth = ds.tableBorderWidth;
+        const borderRadius = ds.tableRounded ? '0.5rem' : '0';
+        const tableBorderStyle = borderWidth > 0 
+          ? { border: `${borderWidth}px solid hsl(${ds.tableBorderColor})`, borderRadius } 
+          : { borderRadius };
         const tableHeaderBg = `hsl(${ds.tableHeaderBgColor})`;
         const tableStripeBg1 = `hsl(${ds.tableStripeBgColor})`;
         const tableStripeBg2 = `hsl(${ds.tableStripeBgColor2})`;
@@ -711,7 +717,7 @@ const SortableSubBlockItem: React.FC<{
         
         return (
           <div 
-            className="w-full rounded-lg overflow-hidden"
+            className="w-full overflow-hidden"
             style={tableBorderStyle}
             onClick={(e) => {
               e.stopPropagation();
@@ -719,7 +725,7 @@ const SortableSubBlockItem: React.FC<{
             }}
           >
             <table className="w-full">
-              <tbody style={tStyle !== 'simple' ? { borderColor: `hsl(${ds.tableBorderColor})` } : {}}>
+              <tbody>
                 {tData.map((row, ri) => (
                   <tr 
                     key={ri} 

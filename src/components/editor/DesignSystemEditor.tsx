@@ -1259,8 +1259,78 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 description="Цвета границ, заголовка и полос"
               >
                 <div className="space-y-3">
+                  {/* Table style row */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1">
+                      <label className="text-xs text-muted-foreground mb-1 block">Стиль углов</label>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => updateConfig({ 
+                            designBlock: { 
+                              ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                              ...config.designBlock, 
+                              tableRounded: false 
+                            } 
+                          })}
+                          className={cn(
+                            "flex-1 px-3 py-2 text-xs rounded-lg border transition-colors",
+                            !(config.designBlock?.tableRounded ?? DEFAULT_DESIGN_BLOCK_SETTINGS.tableRounded)
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-border hover:bg-muted"
+                          )}
+                        >
+                          Квадратные
+                        </button>
+                        <button
+                          onClick={() => updateConfig({ 
+                            designBlock: { 
+                              ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                              ...config.designBlock, 
+                              tableRounded: true 
+                            } 
+                          })}
+                          className={cn(
+                            "flex-1 px-3 py-2 text-xs rounded-lg border transition-colors",
+                            (config.designBlock?.tableRounded ?? DEFAULT_DESIGN_BLOCK_SETTINGS.tableRounded)
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-border hover:bg-muted"
+                          )}
+                        >
+                          Закруглённые
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Border width */}
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">Толщина рамки</label>
+                    <div className="flex gap-2">
+                      {[0, 1, 2, 3].map((width) => (
+                        <button
+                          key={width}
+                          onClick={() => updateConfig({ 
+                            designBlock: { 
+                              ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                              ...config.designBlock, 
+                              tableBorderWidth: width 
+                            } 
+                          })}
+                          className={cn(
+                            "flex-1 px-3 py-2 text-xs rounded-lg border transition-colors",
+                            (config.designBlock?.tableBorderWidth ?? DEFAULT_DESIGN_BLOCK_SETTINGS.tableBorderWidth) === width
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-border hover:bg-muted"
+                          )}
+                        >
+                          {width === 0 ? 'Нет' : `${width}px`}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
                   <ColorInput
-                    label="Цвет границ"
+                    label="Цвет рамки"
                     value={config.designBlock?.tableBorderColor || DEFAULT_DESIGN_BLOCK_SETTINGS.tableBorderColor}
                     onChange={(v) => updateConfig({ 
                       designBlock: { 
