@@ -251,7 +251,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
       )}
 
       {/* Create buttons at the bottom */}
-      <div className="flex flex-col gap-2 pt-2 border-t border-border">
+      <div className="flex flex-col gap-2 pt-2">
         {isAdmin && (
           <Button
             variant="outline"
