@@ -4,7 +4,7 @@ import { CourseDesignSystem } from '@/types/course';
 import { cn } from '@/lib/utils';
 import { 
   Play, Volume2, Check, X,
-  ChevronRight, RotateCcw, Sparkles, Lightbulb, AlertCircle
+  ChevronRight, RotateCcw, Sparkles, Zap, AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AudioPlayer } from './AudioPlayer';
@@ -1093,7 +1093,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             : `hsl(${incorrectTextColor})`,
       }}
     >
-      <div className="flex flex-col items-center gap-1 pt-2">
+      <div className="flex flex-col items-center gap-2 pt-2">
         <div className="flex items-center justify-center gap-2">
           {answerState === 'correct' ? (
             <>
@@ -1102,7 +1102,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             </>
           ) : answerState === 'partial' ? (
             <>
-              <Lightbulb className="w-5 h-5" />
+              <Zap className="w-5 h-5" />
               <span className="text-base font-bold">Почти!</span>
             </>
           ) : (
@@ -1113,7 +1113,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           )}
         </div>
         {answerState === 'partial' && (
-          <span className="text-xs opacity-80">Подумай ещё чуть-чуть</span>
+          <span className="text-xs opacity-80 mt-1">Подумай ещё чуть-чуть</span>
         )}
         {/* Для multiple_choice не показываем explanationCorrect */}
         {answerState === 'correct' && block?.type !== 'multiple_choice' && block?.explanationCorrect && (
@@ -1447,7 +1447,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
               color: 'white',
             }}
           >
-            <div className="flex flex-col items-center gap-1 pt-2">
+            <div className="flex flex-col items-center gap-2 pt-2">
               <div className="flex items-center justify-center gap-2">
                 {answerState === 'correct' ? (
                   <>
@@ -1456,7 +1456,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                   </>
                 ) : answerState === 'partial' ? (
                   <>
-                    <Lightbulb className="w-5 h-5" />
+                    <Zap className="w-5 h-5" />
                     <span className="text-base font-bold">Почти!</span>
                   </>
                 ) : (
@@ -1467,7 +1467,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                 )}
               </div>
               {answerState === 'partial' && (
-                <span className="text-xs opacity-80">Подумай ещё чуть-чуть</span>
+                <span className="text-xs opacity-80 mt-1">Подумай ещё чуть-чуть</span>
               )}
             </div>
           </div>
