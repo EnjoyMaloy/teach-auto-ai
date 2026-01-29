@@ -139,6 +139,8 @@ export interface CourseDesignSystem {
     progressInactiveColor?: string;
     progressCompletedColor?: string;
     progressBackdropColor?: string;
+    // Accent color for interactive elements (progress bar, quiz selections)
+    accentElementColor?: string;
   };
   mascot?: MascotSettings;
 }

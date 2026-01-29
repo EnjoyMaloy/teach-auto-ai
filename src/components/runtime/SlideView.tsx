@@ -229,9 +229,11 @@ export const SlideView: React.FC<SlideViewProps> = ({
                 const showResult = answerState !== 'idle';
                 const isCorrectOption = option.isCorrect;
 
+                const accentColor = designSystem?.designBlock?.accentElementColor || ds.primaryColor;
+                
                 let optionStyle: React.CSSProperties = {
-                  borderColor: `hsl(${ds.mutedColor})`,
-                  backgroundColor: isSelected ? `hsl(${ds.primaryColor} / 0.1)` : 'transparent',
+                  borderColor: isSelected ? `hsl(${accentColor})` : `hsl(${ds.mutedColor})`,
+                  backgroundColor: isSelected ? `hsl(${accentColor} / 0.1)` : 'transparent',
                 };
 
                 if (showResult) {

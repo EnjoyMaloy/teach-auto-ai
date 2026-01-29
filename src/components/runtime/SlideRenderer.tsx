@@ -422,9 +422,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                     bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
                     textColor = `hsl(${ds.destructiveColor})`;
                   } else if (!showResult && isSelected) {
-                    borderColor = `hsl(${ds.primaryColor})`;
-                    bgColor = `hsl(${ds.primaryColor} / 0.1)`;
-                    textColor = `hsl(${ds.primaryColor})`;
+                    const accentColor = designSystem?.designBlock?.accentElementColor || ds.primaryColor;
+                    borderColor = `hsl(${accentColor})`;
+                    bgColor = `hsl(${accentColor} / 0.1)`;
+                    textColor = `hsl(${accentColor})`;
                   }
                   
                   return (
