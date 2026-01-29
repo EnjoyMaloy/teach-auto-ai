@@ -754,21 +754,20 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                   <Label>Объём кнопок</Label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
-                      { value: 'flat', label: 'Плоские', description: 'Минималистичный стиль' },
-                      { value: 'raised', label: 'Объёмные', description: 'С тенью и эффектом 3D' },
+                      { value: 'flat', label: 'Плоские' },
+                      { value: 'raised', label: 'Объёмные' },
                     ].map((depth) => (
                       <button
                         key={depth.value}
                         onClick={() => updateConfig({ buttonDepth: depth.value as ButtonDepth })}
                         className={cn(
-                          "p-4 rounded-lg border-2 text-left transition-all",
+                          "p-3 rounded-lg border-2 text-center transition-all",
                           (config.buttonDepth ?? 'raised') === depth.value
                             ? "border-primary bg-primary/5"
                             : "border-border hover:border-primary/50"
                         )}
                       >
-                        <div className="font-medium text-sm mb-1">{depth.label}</div>
-                        <p className="text-xs text-muted-foreground">{depth.description}</p>
+                        <div className="font-semibold text-base">{depth.label}</div>
                       </button>
                     ))}
                   </div>
