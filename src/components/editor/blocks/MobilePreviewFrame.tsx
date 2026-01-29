@@ -6,6 +6,7 @@ import {
   Play, Volume2, Check, X,
   ChevronRight, RotateCcw, Sparkles, Zap, AlertCircle
 } from 'lucide-react';
+import { getSoftBackgroundColor, getDarkTextColor, getButtonShadowColor } from '@/lib/colorUtils';
 import { Button } from '@/components/ui/button';
 import { AudioPlayer } from './AudioPlayer';
 import { DesignBlockEditor } from './DesignBlockEditor';
@@ -362,11 +363,12 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     return ds.borderRadius;
   };
 
-  // Get raised button styles
+  // Get raised button styles with properly derived shadow color
   const getRaisedButtonStyle = (baseColor: string) => {
     if (!isRaised) return {};
+    const shadowColor = getButtonShadowColor(baseColor);
     return {
-      boxShadow: `0 4px 0 0 hsl(${baseColor} / 0.4), 0 6px 12px -2px hsl(${baseColor} / 0.25)`,
+      boxShadow: `0 4px 0 0 hsl(${shadowColor}), 0 6px 12px -2px hsl(${baseColor} / 0.25)`,
       transform: 'translateY(0)',
     };
   };
@@ -1078,34 +1080,34 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     </div>
   );
 
-  // Partial answer colors - from design system
+  // Derive feedback colors from design system using colorUtils
+  // Correct answer colors - derived from successColor
+  const correctBgTint = getSoftBackgroundColor(ds.successColor, 90);
+  const correctTextColor = getDarkTextColor(ds.successColor);
+  
+  // Partial answer colors - derived from partialColor
   const partialColorDs = ds.partialColor || '35 92% 50%';
-  const partialButtonColor = partialColorDs;
-  const partialBgTint = `${partialColorDs} / 0.15`;
-  const partialTextColorVal = partialColorDs;
+  const partialBgTint = getSoftBackgroundColor(partialColorDs, 90);
+  const partialTextColor = getDarkTextColor(partialColorDs);
   
-  // Incorrect answer colors
-  const incorrectBgTint = '0 100% 95%'; // Pastel pink background
-  const incorrectTextColor = ds.destructiveColor; // Red text
-  
-  // Correct answer colors (solid lime green like the reference)
-  const correctBgTint = '88 62% 85%'; // Light lime green background
-  const correctTextColor = '142 60% 30%'; // Darker green for better contrast
+  // Incorrect answer colors - derived from destructiveColor
+  const incorrectBgTint = getSoftBackgroundColor(ds.destructiveColor, 93);
+  const incorrectTextColor = getDarkTextColor(ds.destructiveColor);
 
   const resultFeedback = answerState !== 'idle' && (
     <div 
       className="px-4 py-3 text-center text-sm font-medium shrink-0"
       style={{
         backgroundColor: answerState === 'correct' 
-          ? `hsl(${correctBgTint})` 
+          ? correctBgTint 
           : answerState === 'partial'
-            ? `hsl(${partialBgTint})`
-            : `hsl(${incorrectBgTint})`,
+            ? partialBgTint
+            : incorrectBgTint,
         color: answerState === 'correct' 
-          ? `hsl(${correctTextColor})` 
+          ? correctTextColor 
           : answerState === 'partial'
-            ? `hsl(${partialTextColorVal})`
-            : `hsl(${incorrectTextColor})`,
+            ? partialTextColor
+            : incorrectTextColor,
       }}
     >
       <div className="flex flex-col items-center gap-2 pt-2">
@@ -1196,21 +1198,17 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     </button>
   );
 
-  // Partial answer color - from design system
-  const partialColor = ds.partialColor || '35 92% 50%';
-  const partialBgColor = `${partialColor} / 0.15`;
-  
   const bottomNavigation = (
     <div 
       className="h-20 border-t flex items-center justify-center gap-3 px-4 shrink-0 relative z-10"
       style={{ 
         borderColor: (answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
         backgroundColor: answerState === 'correct' 
-          ? `hsl(${correctBgTint})` 
+          ? correctBgTint 
           : answerState === 'partial'
-            ? `hsl(${partialBgColor})`
+            ? partialBgTint
             : answerState === 'incorrect'
-              ? `hsl(${incorrectBgTint})`
+              ? incorrectBgTint
               : 'transparent',
       }}
     >
@@ -1227,9 +1225,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             pressAnimationClass
           )}
           style={{
-            borderColor: `hsl(${partialButtonColor})`,
+            borderColor: `hsl(${partialColorDs})`,
             backgroundColor: `hsl(0 0% 100%)`,
-            color: `hsl(${partialButtonColor})`,
+            color: `hsl(${partialColorDs})`,
             borderRadius: getButtonRadius(),
           }}
         >
@@ -1258,7 +1256,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           backgroundColor: answerState === 'correct' 
             ? `hsl(${ds.successColor})` 
             : answerState === 'partial'
-              ? `hsl(${partialColor})`
+              ? `hsl(${partialColorDs})`
               : answerState === 'incorrect'
                 ? `hsl(${ds.destructiveColor})`
                 : `hsl(${ds.primaryColor})`,
@@ -1270,7 +1268,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           ...(answerState === 'correct' 
             ? getRaisedButtonStyle(ds.successColor) 
             : answerState === 'partial'
-              ? getRaisedButtonStyle(partialColor)
+              ? getRaisedButtonStyle(partialColorDs)
               : answerState === 'incorrect'
                 ? getRaisedButtonStyle(ds.destructiveColor)
                 : getRaisedButtonStyle(ds.primaryColor)),
@@ -1312,11 +1310,11 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           style={{ 
             borderColor: (answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
             backgroundColor: answerState === 'correct' 
-              ? `hsl(${correctBgTint})` 
+              ? correctBgTint 
               : answerState === 'partial'
-                ? `hsl(${partialBgTint})`
+                ? partialBgTint
                 : answerState === 'incorrect'
-                  ? `hsl(${incorrectBgTint})`
+                  ? incorrectBgTint
                   : 'transparent',
           }}
         >
@@ -1333,9 +1331,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                 pressAnimationClass
               )}
               style={{
-                borderColor: `hsl(${partialButtonColor})`,
+                borderColor: `hsl(${partialColorDs})`,
                 backgroundColor: `hsl(0 0% 100%)`,
-                color: `hsl(${partialButtonColor})`,
+                color: `hsl(${partialColorDs})`,
                 borderRadius: getButtonRadius(),
               }}
             >
@@ -1363,7 +1361,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
               backgroundColor: answerState === 'correct' 
                 ? `hsl(${ds.successColor})` 
                 : answerState === 'partial'
-                  ? `hsl(${partialButtonColor})`
+                  ? `hsl(${partialColorDs})`
                   : answerState === 'incorrect'
                     ? `hsl(${ds.destructiveColor})`
                     : `hsl(${ds.primaryColor})`,
@@ -1374,7 +1372,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
               ...(answerState === 'correct' 
                 ? getRaisedButtonStyle(ds.successColor) 
                 : answerState === 'partial'
-                  ? getRaisedButtonStyle(partialButtonColor)
+                  ? getRaisedButtonStyle(partialColorDs)
                   : answerState === 'incorrect'
                     ? getRaisedButtonStyle(ds.destructiveColor)
                     : getRaisedButtonStyle(ds.primaryColor)),
@@ -1455,11 +1453,15 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             style={{
               bottom: `${NAV_HEIGHT}px`,
               backgroundColor: answerState === 'correct' 
-                ? `hsl(${ds.successColor} / 0.95)` 
+                ? correctBgTint 
                 : answerState === 'partial'
-                  ? `hsl(45 93% 47% / 0.95)`
-                  : `hsl(${ds.destructiveColor} / 0.95)`,
-              color: 'white',
+                  ? partialBgTint
+                  : incorrectBgTint,
+              color: answerState === 'correct' 
+                ? correctTextColor 
+                : answerState === 'partial'
+                  ? partialTextColor
+                  : incorrectTextColor,
             }}
           >
             <div className="flex flex-col items-center gap-2 pt-2">
@@ -1503,7 +1505,13 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           className="absolute bottom-0 left-0 right-0 h-20 border-t flex items-center justify-center gap-3 px-4 z-10"
           style={{ 
             borderColor: answerState === 'correct' ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
-            backgroundColor: answerState === 'correct' ? `hsl(${correctBgTint})` : 'transparent',
+            backgroundColor: answerState === 'correct' 
+              ? correctBgTint 
+              : answerState === 'partial'
+                ? partialBgTint
+                : answerState === 'incorrect'
+                  ? incorrectBgTint
+                  : 'transparent',
           }}
         >
           {/* Show retry button only for incorrect/partial answers */}
@@ -1544,17 +1552,29 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             style={{
               backgroundColor: answerState === 'correct' 
                 ? `hsl(${ds.successColor})` 
-                : `hsl(${ds.primaryColor})`,
-              color: answerState === 'correct' 
+                : answerState === 'partial'
+                  ? `hsl(${partialColorDs})`
+                  : answerState === 'incorrect'
+                    ? `hsl(${ds.destructiveColor})`
+                    : `hsl(${ds.primaryColor})`,
+              color: answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect'
                 ? `hsl(0 0% 100%)` 
                 : `hsl(${ds.primaryForeground})`,
               borderRadius: getButtonRadius(),
               ...(answerState === 'correct' 
                 ? getRaisedButtonStyle(ds.successColor) 
-                : getRaisedButtonStyle(ds.primaryColor)),
+                : answerState === 'partial'
+                  ? getRaisedButtonStyle(partialColorDs)
+                  : answerState === 'incorrect'
+                    ? getRaisedButtonStyle(ds.destructiveColor)
+                    : getRaisedButtonStyle(ds.primaryColor)),
             }}
           >
-            {isInteractive && answerState === 'idle' ? 'ПРОВЕРИТЬ' : 'ДАЛЕЕ'}
+            {isInteractive && answerState === 'idle' 
+              ? 'ПРОВЕРИТЬ' 
+              : answerState === 'incorrect' 
+                ? 'ПОНЯТНО' 
+                : 'ДАЛЕЕ'}
           </button>
         </div>
       </div>
