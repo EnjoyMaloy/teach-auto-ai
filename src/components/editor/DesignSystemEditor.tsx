@@ -940,7 +940,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 title="Выделение текста"
                 description="Маркер, подчёркивание, волнистая линия"
               >
-                <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-3">
                   <ColorInput
                     label="Маркер"
                     value={config.designBlock?.highlightMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightMarkerColor}
@@ -953,7 +953,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     })}
                   />
                   <ColorInput
-                    label="Линия"
+                    label="Подчёркивание"
                     value={config.designBlock?.highlightUnderlineColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightUnderlineColor}
                     onChange={(v) => updateConfig({ 
                       designBlock: { 
@@ -964,7 +964,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     })}
                   />
                   <ColorInput
-                    label="Волна"
+                    label="Волнистая линия"
                     value={config.designBlock?.highlightWavyColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightWavyColor}
                     onChange={(v) => updateConfig({ 
                       designBlock: { 
