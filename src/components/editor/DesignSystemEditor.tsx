@@ -566,15 +566,17 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
 
   // Handler for base system selection
   const handleBaseSystemSelect = (system: BaseDesignSystem, isPersonalTheme: boolean) => {
-    // Update refs to prevent auto-save of the loaded config
-    currentThemeIdRef.current = system.id;
-    lastSavedConfigRef.current = JSON.stringify(system.config);
-    
-    // Apply the theme's config with themeId to track which theme is selected
-    const newConfig = {
+    // Apply the theme's config with defaults for any missing fields
+    // This ensures fields like partialColor have values even if not in the stored config
+    const newConfig: DesignSystemConfig = {
+      ...DEFAULT_DESIGN_SYSTEM,
       ...system.config,
       themeId: system.id,
     };
+    
+    // Update refs to prevent auto-save of the loaded config
+    currentThemeIdRef.current = system.id;
+    lastSavedConfigRef.current = JSON.stringify(newConfig);
     
     onChange(newConfig);
     // Always pass the system ID for visual selection
