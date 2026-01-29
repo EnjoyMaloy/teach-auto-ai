@@ -885,7 +885,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
 
                       {/* State machine settings */}
                       {config.mascot?.riveUrl && (
-                        <div className="space-y-3 p-3 rounded-lg bg-muted/30">
+                        <div className="space-y-3 p-3 rounded-lg bg-muted/30 overflow-hidden">
                           <Label className="text-xs font-semibold">Настройки State Machine</Label>
                           
                           <div className="space-y-2">
@@ -896,39 +896,46 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                                 mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveStateMachine: e.target.value }
                               })}
                               placeholder="State Machine 1"
+                              className="text-sm"
                             />
                           </div>
 
-                          <div className="grid grid-cols-3 gap-2">
-                            <div className="space-y-1">
-                              <Label className="text-xs text-muted-foreground">Idle</Label>
-                              <Input
-                                value={config.mascot?.riveIdleState || DEFAULT_MASCOT_SETTINGS.riveIdleState}
-                                onChange={(e) => updateConfig({
-                                  mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveIdleState: e.target.value }
-                                })}
-                                placeholder="idle"
-                              />
-                            </div>
-                            <div className="space-y-1">
-                              <Label className="text-xs text-muted-foreground">Correct</Label>
-                              <Input
-                                value={config.mascot?.riveCorrectState || DEFAULT_MASCOT_SETTINGS.riveCorrectState}
-                                onChange={(e) => updateConfig({
-                                  mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveCorrectState: e.target.value }
-                                })}
-                                placeholder="correct"
-                              />
-                            </div>
-                            <div className="space-y-1">
-                              <Label className="text-xs text-muted-foreground">Incorrect</Label>
-                              <Input
-                                value={config.mascot?.riveIncorrectState || DEFAULT_MASCOT_SETTINGS.riveIncorrectState}
-                                onChange={(e) => updateConfig({
-                                  mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveIncorrectState: e.target.value }
-                                })}
-                                placeholder="incorrect"
-                              />
+                          <div className="space-y-2">
+                            <Label className="text-xs text-muted-foreground">Триггеры состояний</Label>
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-muted-foreground w-16 shrink-0">Idle:</span>
+                                <Input
+                                  value={config.mascot?.riveIdleState || DEFAULT_MASCOT_SETTINGS.riveIdleState}
+                                  onChange={(e) => updateConfig({
+                                    mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveIdleState: e.target.value }
+                                  })}
+                                  placeholder="idle"
+                                  className="text-sm h-8"
+                                />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-muted-foreground w-16 shrink-0">Correct:</span>
+                                <Input
+                                  value={config.mascot?.riveCorrectState || DEFAULT_MASCOT_SETTINGS.riveCorrectState}
+                                  onChange={(e) => updateConfig({
+                                    mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveCorrectState: e.target.value }
+                                  })}
+                                  placeholder="correct"
+                                  className="text-sm h-8"
+                                />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-muted-foreground w-16 shrink-0">Incorrect:</span>
+                                <Input
+                                  value={config.mascot?.riveIncorrectState || DEFAULT_MASCOT_SETTINGS.riveIncorrectState}
+                                  onChange={(e) => updateConfig({
+                                    mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveIncorrectState: e.target.value }
+                                  })}
+                                  placeholder="incorrect"
+                                  className="text-sm h-8"
+                                />
+                              </div>
                             </div>
                           </div>
 
