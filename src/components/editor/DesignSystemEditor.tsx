@@ -653,9 +653,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 />
 
                 {/* Preview */}
-                <div className="space-y-3 p-4 rounded-xl bg-muted/30 border border-border">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Превью</p>
-                  
+                <div className="space-y-3 mt-4">
                   {/* Progress bar preview */}
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground">Прогресс-бар:</p>
