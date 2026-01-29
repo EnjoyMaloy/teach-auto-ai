@@ -13,6 +13,7 @@ import { DesignBlockEditor } from '@/components/editor/blocks/DesignBlockEditor'
 import { playSound, SoundConfig } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
 import { RiveMascot } from './RiveMascot';
+import { getSoftBackgroundColor, getDarkTextColor, getButtonShadowColor } from '@/lib/colorUtils';
 
 interface SlideRendererProps {
   slide: Slide | null;
@@ -208,8 +209,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
   const getRaisedButtonStyle = (baseColor: string) => {
     if (!isRaised) return {};
+    // Use derived shadow color for proper 3D effect
+    const shadowColor = getButtonShadowColor(baseColor);
     return {
-      boxShadow: `0 4px 0 0 hsl(${baseColor} / 0.4), 0 6px 12px -2px hsl(${baseColor} / 0.25)`,
+      boxShadow: `0 4px 0 0 hsl(${shadowColor}), 0 6px 12px -2px hsl(${baseColor} / 0.25)`,
     };
   };
 
@@ -757,43 +760,22 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
   const renderFeedback = () => {
     if (answerState === 'idle') return null;
     
-    // Helper to create soft pastel version of HSL color
-    // Input format: "220 70% 50%" or "220 70 50"
-    const getSoftColor = (hslColor: string, lightness: number = 90) => {
-      const parts = hslColor.split(' ');
-      if (parts.length >= 2) {
-        const hue = parts[0];
-        // Remove % sign if present before parsing
-        const satValue = parseInt(parts[1].replace('%', ''));
-        const softSat = Math.round(satValue * 0.5); // Reduce saturation for softer look
-        return `hsl(${hue} ${softSat}% ${lightness}%)`;
-      }
-      return `hsl(${hslColor} / 0.15)`;
-    };
-    
-    // Helper to create dark text version of HSL color
-    const getDarkTextColor = (hslColor: string) => {
-      const parts = hslColor.split(' ');
-      if (parts.length >= 2) {
-        const hue = parts[0];
-        return `hsl(${hue} 60% 30%)`; // Dark version with same hue
-      }
-      return `hsl(${hslColor})`;
-    };
+    // Use imported utility functions for deriving colors
+    // Light background and dark text are derived from the main bright color
     
     // Solid pastel backgrounds based on configured colors
     // Each state uses its own color from design system
     const bgColor = answerState === 'correct' 
-      ? getSoftColor(ds.successColor, 90)
+      ? getSoftBackgroundColor(ds.successColor, 90)
       : answerState === 'partial'
-        ? `hsl(48 100% 90%)`
-        : getSoftColor(ds.destructiveColor, 93);
+        ? getSoftBackgroundColor(ds.partialColor, 90)
+        : getSoftBackgroundColor(ds.destructiveColor, 93);
     
-    // Text color uses corresponding design system color
+    // Text color uses corresponding design system color (dark version for readability)
     const textColor = answerState === 'correct'
       ? getDarkTextColor(ds.successColor)
       : answerState === 'partial'
-        ? `hsl(35 80% 35%)`
+        ? getDarkTextColor(ds.partialColor)
         : getDarkTextColor(ds.destructiveColor);
 
     const title = answerState === 'correct' 
@@ -890,11 +872,11 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
         style={{ 
           borderColor: (answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
           backgroundColor: answerState === 'correct' 
-            ? `hsl(88 62% 85%)`
+            ? getSoftBackgroundColor(ds.successColor, 85)
             : answerState === 'partial'
-              ? `hsl(48 100% 90%)`
+              ? getSoftBackgroundColor(ds.partialColor, 90)
               : answerState === 'incorrect'
-                ? `hsl(0 100% 95%)`
+                ? getSoftBackgroundColor(ds.destructiveColor, 95)
                 : 'transparent',
         }}
       >
@@ -926,7 +908,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
               backgroundColor: answerState === 'correct' 
                 ? `hsl(${ds.successColor})` 
                 : answerState === 'partial'
-                  ? `hsl(45 93% 47%)`
+                  ? `hsl(${ds.partialColor})`
                   : answerState === 'incorrect'
                     ? `hsl(${ds.destructiveColor})`
                     : `hsl(${ds.primaryColor})`,
@@ -937,7 +919,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
               ...(answerState === 'correct' 
                 ? getRaisedButtonStyle(ds.successColor) 
                 : answerState === 'partial'
-                  ? getRaisedButtonStyle('45 93% 47%')
+                  ? getRaisedButtonStyle(ds.partialColor)
                   : answerState === 'incorrect'
                     ? getRaisedButtonStyle(ds.destructiveColor)
                     : getRaisedButtonStyle(ds.primaryColor)),
