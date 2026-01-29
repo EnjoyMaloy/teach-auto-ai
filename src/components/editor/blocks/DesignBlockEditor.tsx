@@ -134,7 +134,20 @@ const SortableSubBlockItem: React.FC<{
     backdropDarkTextColor: designSystem?.designBlock?.backdropDarkTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkTextColor,
     backdropPrimaryTextColor: designSystem?.designBlock?.backdropPrimaryTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryTextColor,
     backdropBlurTextColor: designSystem?.designBlock?.backdropBlurTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurTextColor,
-    // Highlight colors
+    // Highlight colors for each backdrop
+    backdropLightMarkerColor: designSystem?.designBlock?.backdropLightMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropLightMarkerColor,
+    backdropLightUnderlineColor: designSystem?.designBlock?.backdropLightUnderlineColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropLightUnderlineColor,
+    backdropLightWavyColor: designSystem?.designBlock?.backdropLightWavyColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropLightWavyColor,
+    backdropDarkMarkerColor: designSystem?.designBlock?.backdropDarkMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkMarkerColor,
+    backdropDarkUnderlineColor: designSystem?.designBlock?.backdropDarkUnderlineColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkUnderlineColor,
+    backdropDarkWavyColor: designSystem?.designBlock?.backdropDarkWavyColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkWavyColor,
+    backdropPrimaryMarkerColor: designSystem?.designBlock?.backdropPrimaryMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryMarkerColor,
+    backdropPrimaryUnderlineColor: designSystem?.designBlock?.backdropPrimaryUnderlineColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryUnderlineColor,
+    backdropPrimaryWavyColor: designSystem?.designBlock?.backdropPrimaryWavyColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryWavyColor,
+    backdropBlurMarkerColor: designSystem?.designBlock?.backdropBlurMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurMarkerColor,
+    backdropBlurUnderlineColor: designSystem?.designBlock?.backdropBlurUnderlineColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurUnderlineColor,
+    backdropBlurWavyColor: designSystem?.designBlock?.backdropBlurWavyColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurWavyColor,
+    // Default highlight colors (no backdrop)
     highlightMarkerColor: designSystem?.designBlock?.highlightMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightMarkerColor,
     highlightUnderlineColor: designSystem?.designBlock?.highlightUnderlineColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightUnderlineColor,
     highlightWavyColor: designSystem?.designBlock?.highlightWavyColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightWavyColor,
@@ -314,6 +327,31 @@ const SortableSubBlockItem: React.FC<{
           blur: `hsl(${ds.backdropBlurTextColor})`,
         }[subBlock.backdrop || 'none'];
 
+        // Highlight colors based on backdrop type
+        const highlightMarker = {
+          none: ds.highlightMarkerColor,
+          light: ds.backdropLightMarkerColor,
+          dark: ds.backdropDarkMarkerColor,
+          primary: ds.backdropPrimaryMarkerColor,
+          blur: ds.backdropBlurMarkerColor,
+        }[subBlock.backdrop || 'none'];
+        
+        const highlightUnderline = {
+          none: ds.highlightUnderlineColor,
+          light: ds.backdropLightUnderlineColor,
+          dark: ds.backdropDarkUnderlineColor,
+          primary: ds.backdropPrimaryUnderlineColor,
+          blur: ds.backdropBlurUnderlineColor,
+        }[subBlock.backdrop || 'none'];
+        
+        const highlightWavy = {
+          none: ds.highlightWavyColor,
+          light: ds.backdropLightWavyColor,
+          dark: ds.backdropDarkWavyColor,
+          primary: ds.backdropPrimaryWavyColor,
+          blur: ds.backdropBlurWavyColor,
+        }[subBlock.backdrop || 'none'];
+
         const textRotation = subBlock.textRotation || 0;
 
         return (
@@ -331,9 +369,9 @@ const SortableSubBlockItem: React.FC<{
               textSize={subBlock.textSize || 'medium'}
               textAlign={subBlock.textAlign || 'center'}
               textColor={textColor}
-              highlightColor={ds.highlightMarkerColor}
-              underlineColor={ds.highlightUnderlineColor}
-              wavyColor={ds.highlightWavyColor}
+              highlightColor={highlightMarker}
+              underlineColor={highlightUnderline}
+              wavyColor={highlightWavy}
               isEditing={isEditing}
               onFocusChange={(focused) => {
                 setIsTextFocused(focused);

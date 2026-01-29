@@ -93,7 +93,24 @@ export interface DesignBlockSettings {
   backdropPrimaryTextColor?: string;
   backdropBlurTextColor?: string;
   
-  // Text highlighting colors
+  // Highlight colors for each backdrop type (marker, underline, wavy)
+  backdropLightMarkerColor?: string;
+  backdropLightUnderlineColor?: string;
+  backdropLightWavyColor?: string;
+  
+  backdropDarkMarkerColor?: string;
+  backdropDarkUnderlineColor?: string;
+  backdropDarkWavyColor?: string;
+  
+  backdropPrimaryMarkerColor?: string;
+  backdropPrimaryUnderlineColor?: string;
+  backdropPrimaryWavyColor?: string;
+  
+  backdropBlurMarkerColor?: string;
+  backdropBlurUnderlineColor?: string;
+  backdropBlurWavyColor?: string;
+  
+  // Default/global highlighting colors (for no backdrop)
   highlightMarkerColor?: string;
   highlightUnderlineColor?: string;
   highlightWavyColor?: string;
@@ -173,7 +190,23 @@ export const DEFAULT_DESIGN_BLOCK_SETTINGS: Required<DesignBlockSettings> = {
   backdropDarkTextColor: '0 0% 100%',
   backdropPrimaryTextColor: '262 83% 30%',
   backdropBlurTextColor: '240 10% 20%',
-  // Highlighting
+  // Highlight colors for light backdrop
+  backdropLightMarkerColor: '50 100% 50% / 0.4',
+  backdropLightUnderlineColor: '262 83% 58%',
+  backdropLightWavyColor: '0 84% 60%',
+  // Highlight colors for dark backdrop
+  backdropDarkMarkerColor: '50 100% 60% / 0.5',
+  backdropDarkUnderlineColor: '180 70% 60%',
+  backdropDarkWavyColor: '0 100% 70%',
+  // Highlight colors for primary backdrop
+  backdropPrimaryMarkerColor: '50 100% 50% / 0.4',
+  backdropPrimaryUnderlineColor: '262 83% 40%',
+  backdropPrimaryWavyColor: '0 84% 50%',
+  // Highlight colors for blur backdrop
+  backdropBlurMarkerColor: '50 100% 50% / 0.4',
+  backdropBlurUnderlineColor: '262 83% 58%',
+  backdropBlurWavyColor: '0 84% 60%',
+  // Default highlighting (no backdrop)
   highlightMarkerColor: '50 100% 50% / 0.4',
   highlightUnderlineColor: '262 83% 58%',
   highlightWavyColor: '0 84% 60%',

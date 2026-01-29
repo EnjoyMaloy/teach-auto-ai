@@ -141,7 +141,20 @@ export interface CourseDesignSystem {
     backdropDarkTextColor?: string;
     backdropPrimaryTextColor?: string;
     backdropBlurTextColor?: string;
-    // Highlighting
+    // Highlight colors for each backdrop
+    backdropLightMarkerColor?: string;
+    backdropLightUnderlineColor?: string;
+    backdropLightWavyColor?: string;
+    backdropDarkMarkerColor?: string;
+    backdropDarkUnderlineColor?: string;
+    backdropDarkWavyColor?: string;
+    backdropPrimaryMarkerColor?: string;
+    backdropPrimaryUnderlineColor?: string;
+    backdropPrimaryWavyColor?: string;
+    backdropBlurMarkerColor?: string;
+    backdropBlurUnderlineColor?: string;
+    backdropBlurWavyColor?: string;
+    // Default highlighting (no backdrop)
     highlightMarkerColor?: string;
     highlightUnderlineColor?: string;
     highlightWavyColor?: string;
