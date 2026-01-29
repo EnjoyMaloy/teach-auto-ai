@@ -1,4 +1,4 @@
-// Theme selector component - synced with parent state (v2)
+// Theme selector component - synced with parent state (v3 - with mini previews)
 import React, { useState } from 'react';
 import { BaseDesignSystem } from '@/hooks/useBaseDesignSystems';
 import { UserDesignSystem } from '@/hooks/useUserDesignSystems';
@@ -24,8 +24,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Check, Edit, Trash2, Plus, Loader2, Palette, Users, User, Wand2 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Edit, Trash2, Plus, Loader2, Users, User, Wand2, MoreVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ThemeMiniPreview } from './design-system/ThemeMiniPreview';
 
 interface BaseDesignSystemSelectorProps {
   selectedId: string | null;
@@ -350,7 +357,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
   );
 };
 
-// Theme card component
+// Theme card component with mini preview
 interface ThemeCardProps {
   system: BaseDesignSystem | UserDesignSystem;
   isSelected: boolean;
@@ -377,56 +384,60 @@ const ThemeCard: React.FC<ThemeCardProps> = ({
   return (
     <div
       className={cn(
-        "relative p-3 rounded-xl border-2 transition-all bg-card group cursor-pointer",
+        "relative rounded-xl border-2 transition-all bg-card overflow-hidden cursor-pointer",
         isSelected
-          ? "border-primary bg-primary/5 ring-2 ring-primary/20" 
+          ? "border-primary ring-2 ring-primary/20" 
           : "border-border hover:border-primary/50"
       )}
       onClick={onSelect}
     >
-      {/* Color preview dots */}
-      <div className="flex gap-1 mb-2">
-        <div 
-          className="w-5 h-5 rounded-full border border-border/50"
-          style={{ backgroundColor: `hsl(${system.config.primaryColor || '262 83% 58%'})` }}
-        />
-        <div 
-          className="w-5 h-5 rounded-full border border-border/50"
-          style={{ backgroundColor: `hsl(${system.config.backgroundColor || '0 0% 100%'})` }}
-        />
-        <div 
-          className="w-5 h-5 rounded-full border border-border/50"
-          style={{ backgroundColor: `hsl(${system.config.foregroundColor || '240 10% 4%'})` }}
-        />
+      {/* Mini preview of the theme */}
+      <ThemeMiniPreview 
+        config={system.config} 
+        className="border-0 rounded-none"
+      />
+      
+      {/* Theme name footer */}
+      <div className="px-2 py-1.5 bg-card border-t border-border/50 flex items-center justify-between gap-1">
+        <p className="text-xs font-medium text-foreground truncate flex-1">{system.name}</p>
+        
+        {/* Context menu for actions */}
+        {canEdit && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                onClick={(e) => e.stopPropagation()}
+                className="w-5 h-5 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                aria-label="Действия с темой"
+              >
+                <MoreVertical className="w-3.5 h-3.5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40 bg-popover">
+              <DropdownMenuItem 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+                className="text-xs cursor-pointer"
+              >
+                <Edit className="w-3.5 h-3.5 mr-2" />
+                Переименовать
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                }}
+                className="text-xs text-destructive focus:text-destructive cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5 mr-2" />
+                Удалить
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
-      
-      <p className="text-sm font-medium text-foreground truncate pr-12">{system.name}</p>
-      
-      {/* Edit actions - always visible in corner with pastel colors */}
-      {canEdit && (
-        <div className="absolute top-2 right-2 flex gap-1">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit();
-            }}
-            className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-200 transition-colors opacity-0 group-hover:opacity-100"
-            title="Редактировать название"
-          >
-            <Edit className="w-3 h-3" />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}
-            className="w-6 h-6 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center hover:bg-rose-200 transition-colors opacity-0 group-hover:opacity-100"
-            title="Удалить"
-          >
-            <Trash2 className="w-3 h-3" />
-          </button>
-        </div>
-      )}
     </div>
   );
 };
