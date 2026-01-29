@@ -34,6 +34,13 @@ export interface SoundSettings {
 
 export type ButtonDepth = 'flat' | 'raised';
 
+// Custom font from Google Fonts
+export interface CustomFont {
+  name: string;       // Display name (e.g., "Montserrat")
+  family: string;     // CSS font-family value (e.g., '"Montserrat", sans-serif')
+  url: string;        // Google Fonts URL for loading
+}
+
 // Background preset - can be solid or gradient
 export interface BackgroundPreset {
   id: string;
@@ -183,6 +190,9 @@ export interface DesignSystemConfig {
   // Typography
   fontFamily: string;
   headingFontFamily: string;
+  
+  // Custom Google Fonts (array of font names added by user)
+  customFonts?: CustomFont[];
   
   // Border radius
   borderRadius: string;
