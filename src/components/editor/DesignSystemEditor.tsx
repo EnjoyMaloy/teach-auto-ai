@@ -164,8 +164,9 @@ const ColorInput: React.FC<{
     <div className="space-y-2">
       <Label className="text-sm font-medium text-foreground">{label}</Label>
       <div className="flex items-center gap-2">
+        {/* Larger color picker - 48px for better touch target */}
         <div 
-          className="w-10 h-10 rounded-xl border-2 border-border overflow-hidden cursor-pointer relative flex-shrink-0 shadow-sm hover:border-primary/50 transition-colors"
+          className="w-12 h-12 rounded-xl border-2 border-border overflow-hidden cursor-pointer relative flex-shrink-0 shadow-sm hover:border-primary/50 transition-colors hover:scale-105"
           style={{ backgroundColor: `hsl(${value})` }}
         >
           <input
@@ -173,6 +174,7 @@ const ColorInput: React.FC<{
             value={`#${hslToHex(value)}`}
             onChange={handleColorPickerChange}
             className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+            aria-label={`Выбрать ${label}`}
           />
         </div>
         <div className="flex-1 relative">
@@ -185,6 +187,7 @@ const ColorInput: React.FC<{
             className="pl-7 font-mono text-sm uppercase tracking-wider bg-background"
             placeholder="FFFFFF"
             maxLength={6}
+            aria-label={`${label} HEX код`}
           />
         </div>
       </div>
@@ -587,15 +590,15 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
           <TabsList className="w-full grid grid-cols-3 grid-rows-2 h-auto p-1 bg-muted/50 gap-1">
             <TabsTrigger value="ui" className="text-xs py-2 px-1 data-[state=active]:bg-background">
               <Palette className="w-3.5 h-3.5 mr-1" />
-              Фон и кнопки
+              Тема
             </TabsTrigger>
             <TabsTrigger value="interactive" className="text-xs py-2 px-1 data-[state=active]:bg-background">
               <Sparkles className="w-3.5 h-3.5 mr-1" />
-              Интерактив
+              Квизы
             </TabsTrigger>
             <TabsTrigger value="blocks" className="text-xs py-2 px-1 data-[state=active]:bg-background">
               <Layers className="w-3.5 h-3.5 mr-1" />
-              Блоки
+              Текст
             </TabsTrigger>
             <TabsTrigger value="typography" className="text-xs py-2 px-1 data-[state=active]:bg-background">
               <Type className="w-3.5 h-3.5 mr-1" />

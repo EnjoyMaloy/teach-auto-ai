@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ArrowLeft, Shield, User } from 'lucide-react';
 import { DesignSystemConfig } from '@/types/designSystem';
@@ -7,8 +7,8 @@ import { DesignPreviewBlocks } from './DesignPreviewBlocks';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { SaveStatusIndicator, SaveStatus } from './design-system/SaveStatusIndicator';
 
 interface FullscreenDesignEditorProps {
   config: DesignSystemConfig;
@@ -33,9 +33,48 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
   
   // Test mode toggle - allows switching between admin and regular user view
   const [isTestModeAdmin, setIsTestModeAdmin] = useState(realIsAdmin);
+  
+  // Save status indicator
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const lastConfigRef = useRef<string>(JSON.stringify(config));
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const statusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Use test mode value for display, but only if real user is admin
   const effectiveIsAdmin = realIsAdmin ? isTestModeAdmin : false;
+
+  // Track config changes for save status
+  useEffect(() => {
+    const currentConfig = JSON.stringify(config);
+    if (currentConfig !== lastConfigRef.current && selectedBaseSystemId) {
+      // Config changed, show saving status
+      setSaveStatus('saving');
+      lastConfigRef.current = currentConfig;
+      
+      // Clear previous timeout
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      
+      // After debounce period, show saved
+      saveTimeoutRef.current = setTimeout(() => {
+        setSaveStatus('saved');
+        
+        // Hide saved status after 2 seconds
+        if (statusTimeoutRef.current) {
+          clearTimeout(statusTimeoutRef.current);
+        }
+        statusTimeoutRef.current = setTimeout(() => {
+          setSaveStatus('idle');
+        }, 2000);
+      }, 850); // Slightly longer than debounce to ensure save completed
+    }
+    
+    return () => {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+      if (statusTimeoutRef.current) clearTimeout(statusTimeoutRef.current);
+    };
+  }, [config, selectedBaseSystemId]);
 
   const handleGoToWorkshop = () => {
     navigate('/workshop');
@@ -73,6 +112,9 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
           <span className="text-sm font-semibold text-foreground">
             Дизайн-система
           </span>
+          
+          {/* Save status indicator */}
+          <SaveStatusIndicator status={saveStatus} className="ml-2" />
         </nav>
 
         {/* Role toggle for testing (only visible to real admins) */}

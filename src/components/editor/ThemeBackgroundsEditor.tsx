@@ -80,8 +80,9 @@ const ColorInput: React.FC<{
   return (
     <div className="flex items-center gap-2">
       {label && <span className="text-xs text-muted-foreground w-16">{label}</span>}
+      {/* Larger color picker - 44px for better touch target */}
       <div 
-        className="w-8 h-8 rounded-lg border border-border overflow-hidden cursor-pointer relative flex-shrink-0"
+        className="w-11 h-11 rounded-lg border border-border overflow-hidden cursor-pointer relative flex-shrink-0 hover:border-primary/50 transition-colors hover:scale-105"
         style={{ backgroundColor: `hsl(${value})` }}
       >
         <input
@@ -89,6 +90,7 @@ const ColorInput: React.FC<{
           value={hslToHex(value)}
           onChange={(e) => onChange(hexToHsl(e.target.value))}
           className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+          aria-label={`Выбрать ${label || 'цвет'}`}
         />
       </div>
     </div>
