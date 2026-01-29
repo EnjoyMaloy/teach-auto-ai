@@ -31,12 +31,15 @@ const queryClient = new QueryClient({
   },
 });
 
-// Loading fallback component
-const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-background">
+// Loading fallback component - using forwardRef to avoid ref warnings in Suspense
+import { forwardRef } from "react";
+
+const PageLoader = forwardRef<HTMLDivElement>((_, ref) => (
+  <div ref={ref} className="min-h-screen flex items-center justify-center bg-background">
     <Loader2 className="w-8 h-8 animate-spin text-primary" />
   </div>
-);
+));
+PageLoader.displayName = "PageLoader";
 
 // Protected route wrapper
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
