@@ -496,8 +496,9 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                     borderColor = `hsl(${ds.destructiveColor})`;
                     bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
                   } else if (!showResult && isSelected) {
-                    borderColor = `hsl(${ds.primaryColor})`;
-                    bgColor = `hsl(${ds.primaryColor} / 0.1)`;
+                    const accentColor = designSystem?.designBlock?.accentElementColor || ds.primaryColor;
+                    borderColor = `hsl(${accentColor})`;
+                    bgColor = `hsl(${accentColor} / 0.1)`;
                   }
                   
                   return (
@@ -549,7 +550,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                       ? `hsl(${ds.successColor})` 
                       : answerState === 'incorrect'
                         ? `hsl(${ds.destructiveColor})`
-                        : `hsl(${ds.primaryColor})`,
+                        : `hsl(${designSystem?.designBlock?.accentElementColor || ds.primaryColor})`,
                     color: `hsl(${ds.foregroundColor})`,
                   }}
                   placeholder="..."
@@ -587,7 +588,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
               <div className="text-center mt-4">
                 <span 
                   className="text-3xl font-bold"
-                  style={{ color: `hsl(${ds.primaryColor})` }}
+                  style={{ color: `hsl(${designSystem?.designBlock?.accentElementColor || ds.primaryColor})` }}
                 >
                   {sliderValue}
                 </span>
@@ -627,7 +628,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                         borderColor: isMatched 
                           ? `hsl(${ds.successColor})` 
                           : isSelected 
-                            ? `hsl(${ds.primaryColor})` 
+                            ? `hsl(${designSystem?.designBlock?.accentElementColor || ds.primaryColor})` 
                             : `hsl(${ds.mutedColor})`,
                         backgroundColor: isMatched 
                           ? `hsl(${ds.successColor} / 0.1)` 
@@ -700,7 +701,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                   <span 
                     className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
                     style={{ 
-                      backgroundColor: `hsl(${ds.primaryColor})`,
+                      backgroundColor: `hsl(${designSystem?.designBlock?.accentElementColor || ds.primaryColor})`,
                       color: `hsl(${ds.primaryForeground})`,
                     }}
                   >
