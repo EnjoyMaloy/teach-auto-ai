@@ -1112,7 +1112,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         <div className="flex items-center justify-center gap-2">
           {answerState === 'correct' ? (
             <>
-              <Sparkles className="w-5 h-5" />
+              <Check className="w-5 h-5" />
               <span className="text-base font-bold">Правильно!</span>
             </>
           ) : answerState === 'partial' ? (
