@@ -983,18 +983,11 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 title="Цвета текста"
                 description="Основной текст и карточки"
               >
-                <div className="grid grid-cols-2 gap-3">
-                  <ColorInput
-                    label="Текст"
-                    value={config.foregroundColor || DEFAULT_DESIGN_SYSTEM.foregroundColor}
-                    onChange={(v) => updateConfig({ foregroundColor: v })}
-                  />
-                  <ColorInput
-                    label="Карточки"
-                    value={config.cardColor || DEFAULT_DESIGN_SYSTEM.cardColor}
-                    onChange={(v) => updateConfig({ cardColor: v })}
-                  />
-                </div>
+                <ColorInput
+                  label="Цвет текста"
+                  value={config.foregroundColor || DEFAULT_DESIGN_SYSTEM.foregroundColor}
+                  onChange={(v) => updateConfig({ foregroundColor: v })}
+                />
               </SettingsCard>
             </TabsContent>
 
