@@ -4,7 +4,7 @@ import { CourseDesignSystem } from '@/types/course';
 import { cn } from '@/lib/utils';
 import { 
   Play, Volume2, Check, X,
-  ChevronRight, RotateCcw, Sparkles, AlertCircle
+  ChevronRight, RotateCcw, Sparkles, Lightbulb, AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AudioPlayer } from './AudioPlayer';
@@ -1093,25 +1093,28 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             : `hsl(${incorrectTextColor})`,
       }}
     >
-      <div className="flex flex-col items-center gap-1">
+      <div className="flex flex-col items-center gap-1 pt-2">
         <div className="flex items-center justify-center gap-2">
           {answerState === 'correct' ? (
             <>
-              <Sparkles className="w-4 h-4" />
-              <span>Правильно!</span>
+              <Sparkles className="w-5 h-5" />
+              <span className="text-base font-bold">Правильно!</span>
             </>
           ) : answerState === 'partial' ? (
             <>
-              <AlertCircle className="w-4 h-4" />
-              <span>Почти!</span>
+              <Lightbulb className="w-5 h-5" />
+              <span className="text-base font-bold">Почти!</span>
             </>
           ) : (
             <>
-              <X className="w-4 h-4" />
-              <span>Неправильно</span>
+              <X className="w-5 h-5" />
+              <span className="text-base font-bold">Неправильно</span>
             </>
           )}
         </div>
+        {answerState === 'partial' && (
+          <span className="text-xs opacity-80">Подумай ещё чуть-чуть</span>
+        )}
         {/* Для multiple_choice не показываем explanationCorrect */}
         {answerState === 'correct' && block?.type !== 'multiple_choice' && block?.explanationCorrect && (
           <p className="text-xs text-center opacity-90 mt-1 px-2">{block.explanationCorrect}</p>
@@ -1444,22 +1447,27 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
               color: 'white',
             }}
           >
-            <div className="flex items-center justify-center gap-2">
-              {answerState === 'correct' ? (
-                <>
-                  <Sparkles className="w-4 h-4" />
-                  <span>Правильно!</span>
-                </>
-              ) : answerState === 'partial' ? (
-                <>
-                  <AlertCircle className="w-4 h-4" />
-                  <span>Почти!</span>
-                </>
-              ) : (
-                <>
-                  <X className="w-4 h-4" />
-                  <span>Неправильно</span>
-                </>
+            <div className="flex flex-col items-center gap-1 pt-2">
+              <div className="flex items-center justify-center gap-2">
+                {answerState === 'correct' ? (
+                  <>
+                    <Sparkles className="w-5 h-5" />
+                    <span className="text-base font-bold">Правильно!</span>
+                  </>
+                ) : answerState === 'partial' ? (
+                  <>
+                    <Lightbulb className="w-5 h-5" />
+                    <span className="text-base font-bold">Почти!</span>
+                  </>
+                ) : (
+                  <>
+                    <X className="w-5 h-5" />
+                    <span className="text-base font-bold">Неправильно</span>
+                  </>
+                )}
+              </div>
+              {answerState === 'partial' && (
+                <span className="text-xs opacity-80">Подумай ещё чуть-чуть</span>
               )}
             </div>
           </div>

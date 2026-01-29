@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Block } from '@/types/blocks';
 import { CourseDesignSystem } from '@/types/course';
 import { cn } from '@/lib/utils';
-import { RotateCcw, Sparkles, X, AlertCircle } from 'lucide-react';
+import { RotateCcw, Sparkles, X, Lightbulb } from 'lucide-react';
 import { playSound, SoundConfig } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
 
@@ -363,22 +363,27 @@ export const SlideView: React.FC<SlideViewProps> = ({
             : `hsl(${ds.destructiveColor})`,
       }}
     >
-      <div className="flex items-center justify-center gap-2">
-        {answerState === 'correct' ? (
-          <>
-            <Sparkles className="w-4 h-4" />
-            <span>Правильно!</span>
-          </>
-        ) : answerState === 'partial' ? (
-          <>
-            <AlertCircle className="w-4 h-4" />
-            <span>Почти!</span>
-          </>
-        ) : (
-          <>
-            <X className="w-4 h-4" />
-            <span>Неправильно</span>
-          </>
+      <div className="flex flex-col items-center gap-1 pt-2">
+        <div className="flex items-center justify-center gap-2">
+          {answerState === 'correct' ? (
+            <>
+              <Sparkles className="w-5 h-5" />
+              <span className="text-base font-bold">Правильно!</span>
+            </>
+          ) : answerState === 'partial' ? (
+            <>
+              <Lightbulb className="w-5 h-5" />
+              <span className="text-base font-bold">Почти!</span>
+            </>
+          ) : (
+            <>
+              <X className="w-5 h-5" />
+              <span className="text-base font-bold">Неправильно</span>
+            </>
+          )}
+        </div>
+        {answerState === 'partial' && (
+          <span className="text-xs opacity-80">Подумай ещё чуть-чуть</span>
         )}
       </div>
     </div>
@@ -423,22 +428,27 @@ export const SlideView: React.FC<SlideViewProps> = ({
                 : `hsl(${ds.destructiveColor})`,
           }}
         >
-          <div className="flex items-center justify-center gap-2">
-            {answerState === 'correct' ? (
-              <>
-                <Sparkles className="w-4 h-4" />
-                <span>Правильно!</span>
-              </>
-            ) : answerState === 'partial' ? (
-              <>
-                <AlertCircle className="w-4 h-4" />
-                <span>Почти!</span>
-              </>
-            ) : (
-              <>
-                <X className="w-4 h-4" />
-                <span>Неправильно</span>
-              </>
+          <div className="flex flex-col items-center gap-1 pt-2">
+            <div className="flex items-center justify-center gap-2">
+              {answerState === 'correct' ? (
+                <>
+                  <Sparkles className="w-5 h-5" />
+                  <span className="text-base font-bold">Правильно!</span>
+                </>
+              ) : answerState === 'partial' ? (
+                <>
+                  <Lightbulb className="w-5 h-5" />
+                  <span className="text-base font-bold">Почти!</span>
+                </>
+              ) : (
+                <>
+                  <X className="w-5 h-5" />
+                  <span className="text-base font-bold">Неправильно</span>
+                </>
+              )}
+            </div>
+            {answerState === 'partial' && (
+              <span className="text-xs opacity-80">Подумай ещё чуть-чуть</span>
             )}
           </div>
         </div>
