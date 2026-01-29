@@ -446,7 +446,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
             gradientTo: course.designSystem?.gradientTo || '200 83% 95%',
             gradientAngle: course.designSystem?.gradientAngle || 135,
             sound: course.designSystem?.sound,
-            designBlock: course.designSystem?.designBlock,
+            designBlock: course.designSystem?.designBlock || {},
             mascot: course.designSystem?.mascot,
             themeBackgrounds: course.designSystem?.themeBackgrounds || [],
             defaultBackgroundId: course.designSystem?.defaultBackgroundId,
