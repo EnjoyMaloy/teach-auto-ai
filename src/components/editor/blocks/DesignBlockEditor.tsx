@@ -161,6 +161,7 @@ const SortableSubBlockItem: React.FC<{
     tableBorderColor: designSystem?.designBlock?.tableBorderColor || DEFAULT_DESIGN_BLOCK_SETTINGS.tableBorderColor,
     tableHeaderBgColor: designSystem?.designBlock?.tableHeaderBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.tableHeaderBgColor,
     tableStripeBgColor: designSystem?.designBlock?.tableStripeBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.tableStripeBgColor,
+    tableStripeBgColor2: designSystem?.designBlock?.tableStripeBgColor2 || DEFAULT_DESIGN_BLOCK_SETTINGS.tableStripeBgColor2,
   };
 
   const textAlignClass = {
@@ -689,7 +690,8 @@ const SortableSubBlockItem: React.FC<{
         // Use design system table colors
         const tableBorderStyle = tStyle === 'bordered' ? { border: `1px solid hsl(${ds.tableBorderColor})` } : {};
         const tableHeaderBg = `hsl(${ds.tableHeaderBgColor})`;
-        const tableStripeBg = `hsl(${ds.tableStripeBgColor})`;
+        const tableStripeBg1 = `hsl(${ds.tableStripeBgColor})`;
+        const tableStripeBg2 = `hsl(${ds.tableStripeBgColor2})`;
         
         const handleCellChange = (rowIndex: number, cellIndex: number, newContent: string) => {
           const newData = tData.map((row, ri) => 
@@ -698,6 +700,13 @@ const SortableSubBlockItem: React.FC<{
               : row
           );
           onUpdate({ tableData: newData });
+        };
+        
+        // Get row background color for striped style
+        const getRowBg = (rowIndex: number) => {
+          if (tStyle !== 'striped') return undefined;
+          // Skip header row (index 0) - alternating starts from data rows
+          return rowIndex % 2 === 0 ? tableStripeBg1 : tableStripeBg2;
         };
         
         return (
@@ -714,7 +723,7 @@ const SortableSubBlockItem: React.FC<{
                 {tData.map((row, ri) => (
                   <tr 
                     key={ri} 
-                    style={tStyle === 'striped' && ri % 2 === 1 ? { backgroundColor: tableStripeBg } : {}}
+                    style={ri === 0 ? {} : { backgroundColor: getRowBg(ri) }}
                   >
                     {row.map((cell, ci) => (
                       <td 

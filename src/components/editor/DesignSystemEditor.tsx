@@ -1282,13 +1282,24 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     })}
                   />
                   <ColorInput
-                    label="Полосатый фон"
+                    label="Полосатый фон 1"
                     value={config.designBlock?.tableStripeBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.tableStripeBgColor}
                     onChange={(v) => updateConfig({ 
                       designBlock: { 
                         ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
                         ...config.designBlock, 
                         tableStripeBgColor: v 
+                      } 
+                    })}
+                  />
+                  <ColorInput
+                    label="Полосатый фон 2"
+                    value={config.designBlock?.tableStripeBgColor2 || DEFAULT_DESIGN_BLOCK_SETTINGS.tableStripeBgColor2}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        tableStripeBgColor2: v 
                       } 
                     })}
                   />
