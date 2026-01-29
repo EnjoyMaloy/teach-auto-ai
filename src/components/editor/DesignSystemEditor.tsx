@@ -5,6 +5,7 @@ import {
   DEFAULT_DESIGN_SYSTEM,
   DEFAULT_SOUND_SETTINGS,
   DEFAULT_DESIGN_BLOCK_SETTINGS,
+  DEFAULT_MASCOT_SETTINGS,
   FONT_OPTIONS,
   BORDER_RADIUS_OPTIONS,
   SoundTheme,
@@ -848,6 +849,119 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     value={config.destructiveColor || DEFAULT_DESIGN_SYSTEM.destructiveColor}
                     onChange={(v) => updateConfig({ destructiveColor: v })}
                   />
+                </div>
+              </SettingsCard>
+
+              {/* Rive Mascot Card */}
+              <SettingsCard
+                icon={<Play className="w-4 h-4" />}
+                title="Rive-маскот"
+                description="Анимированный персонаж для квизов"
+              >
+                <div className="space-y-4">
+                  {/* Enable/disable toggle */}
+                  <div className="flex items-center justify-between">
+                    <Label>Включить маскота</Label>
+                    <Switch
+                      checked={config.mascot?.riveEnabled || false}
+                      onCheckedChange={(checked) => updateConfig({
+                        mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveEnabled: checked }
+                      })}
+                    />
+                  </div>
+
+                  {config.mascot?.riveEnabled && (
+                    <>
+                      {/* Rive file uploader */}
+                      <RiveFileUploader
+                        riveUrl={config.mascot?.riveUrl || ''}
+                        onUpload={(url) => updateConfig({
+                          mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveUrl: url }
+                        })}
+                        onRemove={() => updateConfig({
+                          mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveUrl: '' }
+                        })}
+                      />
+
+                      {/* State machine settings */}
+                      {config.mascot?.riveUrl && (
+                        <div className="space-y-3 p-3 rounded-lg bg-muted/30">
+                          <Label className="text-xs font-semibold">Настройки State Machine</Label>
+                          
+                          <div className="space-y-2">
+                            <Label className="text-xs text-muted-foreground">Название State Machine</Label>
+                            <Input
+                              value={config.mascot?.riveStateMachine || DEFAULT_MASCOT_SETTINGS.riveStateMachine}
+                              onChange={(e) => updateConfig({
+                                mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveStateMachine: e.target.value }
+                              })}
+                              placeholder="State Machine 1"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-2">
+                            <div className="space-y-1">
+                              <Label className="text-xs text-muted-foreground">Idle</Label>
+                              <Input
+                                value={config.mascot?.riveIdleState || DEFAULT_MASCOT_SETTINGS.riveIdleState}
+                                onChange={(e) => updateConfig({
+                                  mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveIdleState: e.target.value }
+                                })}
+                                placeholder="idle"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs text-muted-foreground">Correct</Label>
+                              <Input
+                                value={config.mascot?.riveCorrectState || DEFAULT_MASCOT_SETTINGS.riveCorrectState}
+                                onChange={(e) => updateConfig({
+                                  mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveCorrectState: e.target.value }
+                                })}
+                                placeholder="correct"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs text-muted-foreground">Incorrect</Label>
+                              <Input
+                                value={config.mascot?.riveIncorrectState || DEFAULT_MASCOT_SETTINGS.riveIncorrectState}
+                                onChange={(e) => updateConfig({
+                                  mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveIncorrectState: e.target.value }
+                                })}
+                                placeholder="incorrect"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Size selector */}
+                          <div className="space-y-2">
+                            <Label className="text-xs text-muted-foreground">Размер</Label>
+                            <div className="grid grid-cols-3 gap-2">
+                              {[
+                                { value: 'small', label: 'Маленький' },
+                                { value: 'medium', label: 'Средний' },
+                                { value: 'large', label: 'Большой' },
+                              ].map((size) => (
+                                <button
+                                  key={size.value}
+                                  onClick={() => updateConfig({
+                                    mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveSize: size.value as any }
+                                  })}
+                                  className={cn(
+                                    "p-2 rounded-lg border-2 text-xs font-medium transition-all",
+                                    (config.mascot?.riveSize || 'medium') === size.value
+                                      ? "border-primary bg-primary/5"
+                                      : "border-border hover:border-primary/50"
+                                  )}
+                                >
+                                  {size.label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
               </SettingsCard>
             </TabsContent>
