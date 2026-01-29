@@ -136,6 +136,12 @@ export interface CourseDesignSystem {
     backdropDarkColor?: string;
     backdropPrimaryColor?: string;
     backdropBlurColor?: string;
+    // Text colors for each backdrop
+    backdropLightTextColor?: string;
+    backdropDarkTextColor?: string;
+    backdropPrimaryTextColor?: string;
+    backdropBlurTextColor?: string;
+    // Highlighting
     highlightMarkerColor?: string;
     highlightUnderlineColor?: string;
     highlightWavyColor?: string;
@@ -148,6 +154,13 @@ export interface CourseDesignSystem {
     accentElementColor?: string;
     // Badge color for badge sub-blocks
     badgeColor?: string;
+    // Button sub-block
+    buttonBgColor?: string;
+    buttonTextColor?: string;
+    // Table sub-block
+    tableBorderColor?: string;
+    tableHeaderBgColor?: string;
+    tableStripeBgColor?: string;
   };
   mascot?: MascotSettings;
 }

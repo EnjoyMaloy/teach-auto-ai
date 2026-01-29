@@ -87,6 +87,12 @@ export interface DesignBlockSettings {
   backdropPrimaryColor?: string;
   backdropBlurColor?: string;
   
+  // Text colors for each backdrop type
+  backdropLightTextColor?: string;
+  backdropDarkTextColor?: string;
+  backdropPrimaryTextColor?: string;
+  backdropBlurTextColor?: string;
+  
   // Text highlighting colors
   highlightMarkerColor?: string;
   highlightUnderlineColor?: string;
@@ -97,6 +103,15 @@ export interface DesignBlockSettings {
   
   // Badge color for badge sub-blocks
   badgeColor?: string;
+  
+  // Button sub-block colors
+  buttonBgColor?: string;
+  buttonTextColor?: string;
+  
+  // Table sub-block colors
+  tableBorderColor?: string;
+  tableHeaderBgColor?: string;
+  tableStripeBgColor?: string;
 }
 
 // Mascot settings for AI-generated characters
@@ -153,6 +168,12 @@ export const DEFAULT_DESIGN_BLOCK_SETTINGS: Required<DesignBlockSettings> = {
   backdropDarkColor: '0 0% 0% / 0.9',
   backdropPrimaryColor: '262 83% 58% / 0.1',
   backdropBlurColor: '0 0% 0% / 0.03',
+  // Text colors for each backdrop
+  backdropLightTextColor: '240 10% 20%',
+  backdropDarkTextColor: '0 0% 100%',
+  backdropPrimaryTextColor: '262 83% 30%',
+  backdropBlurTextColor: '240 10% 20%',
+  // Highlighting
   highlightMarkerColor: '50 100% 50% / 0.4',
   highlightUnderlineColor: '262 83% 58%',
   highlightWavyColor: '0 84% 60%',
@@ -160,6 +181,13 @@ export const DEFAULT_DESIGN_BLOCK_SETTINGS: Required<DesignBlockSettings> = {
   accentElementColor: '262 83% 58%',
   // Badge color for badge sub-blocks
   badgeColor: '262 83% 58%',
+  // Button sub-block
+  buttonBgColor: '262 83% 58%',
+  buttonTextColor: '0 0% 100%',
+  // Table sub-block
+  tableBorderColor: '240 5% 84%',
+  tableHeaderBgColor: '240 5% 96%',
+  tableStripeBgColor: '240 5% 98%',
 };
 
 export type BackgroundType = 'solid' | 'gradient';
