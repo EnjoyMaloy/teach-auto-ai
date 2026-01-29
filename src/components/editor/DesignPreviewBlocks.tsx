@@ -405,7 +405,7 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
                 key={slide.id}
                 onClick={() => setSelectedIndex(index)}
                 className={cn(
-                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all",
+                  "w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all",
                   isSelected 
                     ? "bg-primary/10 border-2 border-primary" 
                     : "hover:bg-muted border-2 border-transparent"
@@ -417,21 +417,12 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
                 )}>
                   <Icon className="w-4 h-4" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className={cn(
-                    "text-sm font-medium truncate",
-                    isSelected ? "text-primary" : "text-foreground"
-                  )}>
-                    {blockLabels[slide.type] || slide.type}
-                  </p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {slide.content?.slice(0, 30) || 'Блок контента'}
-                    {(slide.content?.length || 0) > 30 ? '...' : ''}
-                  </p>
-                </div>
-                <span className="text-xs text-muted-foreground/60 flex-shrink-0">
-                  {index + 1}
-                </span>
+                <p className={cn(
+                  "text-base font-medium truncate flex-1",
+                  isSelected ? "text-primary" : "text-foreground"
+                )}>
+                  {blockLabels[slide.type] || slide.type}
+                </p>
               </button>
             );
           })}
