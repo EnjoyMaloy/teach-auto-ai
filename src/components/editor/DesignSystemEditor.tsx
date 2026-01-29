@@ -857,130 +857,24 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 </div>
               </SettingsCard>
 
-              {/* Rive Mascot Card */}
+              {/* Mascot Card - Coming Soon */}
               <SettingsCard
-                icon={<Play className="w-4 h-4" />}
-                title="Rive-маскот"
+                icon={<Lock className="w-4 h-4" />}
+                title="Маскот"
                 description="Анимированный персонаж для квизов"
-                collapsible
-                defaultOpen={config.mascot?.riveEnabled === true}
               >
-                {/* Enable Rive mascot */}
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-sm">Включить маскота</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Показывать в блоках с вопросами
+                <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50 border border-dashed border-border">
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                    <Bot className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-muted-foreground">Скоро</p>
+                    <p className="text-xs text-muted-foreground/70">
+                      Функция маскота находится в разработке
                     </p>
                   </div>
-                  <Switch
-                    checked={config.mascot?.riveEnabled === true}
-                    onCheckedChange={(enabled) => {
-                      const currentMascot = config.mascot || {};
-                      onChange({ 
-                        ...config,
-                        mascot: { 
-                          ...DEFAULT_MASCOT_SETTINGS, 
-                          ...currentMascot, 
-                          riveEnabled: enabled 
-                        } 
-                      });
-                    }}
-                  />
+                  <Lock className="w-4 h-4 text-muted-foreground/50" />
                 </div>
-
-                {config.mascot?.riveEnabled && (
-                  <>
-                    {/* Rive file upload */}
-                    <RiveFileUploader
-                      riveUrl={config.mascot?.riveUrl || ''}
-                      onUpload={(url) => updateConfig({
-                        mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveUrl: url }
-                      })}
-                      onRemove={() => updateConfig({
-                        mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveUrl: '' }
-                      })}
-                    />
-
-                    {/* State machine settings */}
-                    <div className="space-y-3">
-                      <Label className="text-xs text-muted-foreground font-medium">Настройки State Machine</Label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="space-y-1">
-                          <Label className="text-xs text-muted-foreground">State Machine</Label>
-                          <Input
-                            value={config.mascot?.riveStateMachine || 'State Machine 1'}
-                            onChange={(e) => updateConfig({
-                              mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveStateMachine: e.target.value }
-                            })}
-                            placeholder="State Machine 1"
-                            className="text-xs h-8"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs text-muted-foreground">Idle</Label>
-                          <Input
-                            value={config.mascot?.riveIdleState || 'idle'}
-                            onChange={(e) => updateConfig({
-                              mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveIdleState: e.target.value }
-                            })}
-                            placeholder="idle"
-                            className="text-xs h-8"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs text-muted-foreground">Correct</Label>
-                          <Input
-                            value={config.mascot?.riveCorrectState || 'correct'}
-                            onChange={(e) => updateConfig({
-                              mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveCorrectState: e.target.value }
-                            })}
-                            placeholder="correct"
-                            className="text-xs h-8"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs text-muted-foreground">Incorrect</Label>
-                          <Input
-                            value={config.mascot?.riveIncorrectState || 'incorrect'}
-                            onChange={(e) => updateConfig({
-                              mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveIncorrectState: e.target.value }
-                            })}
-                            placeholder="incorrect"
-                            className="text-xs h-8"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Mascot size */}
-                    <div className="space-y-2">
-                      <Label className="text-xs text-muted-foreground font-medium">Размер маскота</Label>
-                      <div className="grid grid-cols-3 gap-2">
-                        {[
-                          { value: 'small', label: 'S' },
-                          { value: 'medium', label: 'M' },
-                          { value: 'large', label: 'L' },
-                        ].map((size) => (
-                          <button
-                            key={size.value}
-                            onClick={() => updateConfig({
-                              mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveSize: size.value as any }
-                            })}
-                            className={cn(
-                              "p-2 rounded-lg border-2 text-sm font-medium transition-all",
-                              (config.mascot?.riveSize || 'medium') === size.value
-                                ? "border-primary bg-primary/5"
-                                : "border-border hover:border-primary/50"
-                            )}
-                          >
-                            {size.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
               </SettingsCard>
             </TabsContent>
 
