@@ -537,13 +537,10 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
     <div className="space-y-6">
       {/* Unified Themes Block - Base systems from DB + Preset themes */}
       <div className="space-y-3">
-        <div>
-          <h3 className="font-semibold text-foreground flex items-center gap-2">
-            <Palette className="w-4 h-4 text-primary" />
-            Темы
-          </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">Быстрый старт с готовым дизайном</p>
-        </div>
+        <h3 className="font-semibold text-foreground flex items-center gap-2">
+          <Palette className="w-4 h-4 text-primary" />
+          Темы
+        </h3>
 
         {/* Base design systems from database */}
         <BaseDesignSystemSelector
