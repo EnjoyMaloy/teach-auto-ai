@@ -14,6 +14,7 @@ import {
 import { playSound, SOUND_THEME_OPTIONS } from '@/lib/sounds';
 import { BaseDesignSystemSelector } from './BaseDesignSystemSelector';
 import { ThemeBackgroundsEditor } from './ThemeBackgroundsEditor';
+import { SettingsCard } from './design-system/SettingsCard';
 import { useBaseDesignSystems, BaseDesignSystem } from '@/hooks/useBaseDesignSystems';
 import { useUserDesignSystems } from '@/hooks/useUserDesignSystems';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -617,32 +618,30 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
           <div className="mt-4">
 
             {/* === UI TAB: Background, Buttons, Progress Bar === */}
-            <TabsContent value="ui" className="space-y-6">
-              {/* Theme Backgrounds */}
-              <div className="space-y-2">
-                <Label className="text-base font-semibold">Фоны курса</Label>
-                <p className="text-sm text-muted-foreground">
-                  Настройте до 5 фонов для использования в слайдах
-                </p>
-              </div>
-              <ThemeBackgroundsEditor 
-                backgrounds={config.themeBackgrounds || []}
-                onChange={(backgrounds) => updateConfig({ themeBackgrounds: backgrounds })}
-                defaultBackgroundId={config.defaultBackgroundId}
-                onDefaultChange={(id) => updateConfig({ defaultBackgroundId: id })}
-                selectedBackgroundId={config.defaultBackgroundId}
-                onSelectBackground={(id) => updateConfig({ defaultBackgroundId: id })}
-                maxBackgrounds={5}
-              />
+            <TabsContent value="ui" className="space-y-4">
+              {/* Theme Backgrounds Card */}
+              <SettingsCard
+                icon={<ImageIcon className="w-4 h-4" />}
+                title="Фоны курса"
+                description="Настройте до 5 фонов для слайдов"
+              >
+                <ThemeBackgroundsEditor 
+                  backgrounds={config.themeBackgrounds || []}
+                  onChange={(backgrounds) => updateConfig({ themeBackgrounds: backgrounds })}
+                  defaultBackgroundId={config.defaultBackgroundId}
+                  onDefaultChange={(id) => updateConfig({ defaultBackgroundId: id })}
+                  selectedBackgroundId={config.defaultBackgroundId}
+                  onSelectBackground={(id) => updateConfig({ defaultBackgroundId: id })}
+                  maxBackgrounds={5}
+                />
+              </SettingsCard>
 
-              {/* Accent Color for Interactive Elements */}
-              <div className="border-t pt-6 space-y-4">
-                <div className="space-y-2">
-                  <Label className="text-base font-semibold">Акцентный цвет</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Применяется к прогресс-бару и выбранным вариантам ответа в квизах
-                  </p>
-                </div>
+              {/* Accent Color Card */}
+              <SettingsCard
+                icon={<Sparkles className="w-4 h-4" />}
+                title="Акцентный цвет"
+                description="Прогресс-бар и выбор ответов"
+              >
                 <ColorInput
                   label="Цвет"
                   value={config.designBlock?.accentElementColor || DEFAULT_DESIGN_BLOCK_SETTINGS.accentElementColor}
@@ -656,7 +655,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 />
 
                 {/* Preview */}
-                <div className="space-y-3 mt-4">
+                <div className="space-y-3 pt-2">
                   {/* Progress bar preview */}
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground">Прогресс-бар:</p>
@@ -711,32 +710,30 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     </div>
                   </div>
                 </div>
-              </div>
-              {/* Button Style */}
-              <div className="border-t pt-6 space-y-2">
-                <Label className="text-base font-semibold">Кнопки</Label>
-                <p className="text-sm text-muted-foreground">
-                  Форма и стиль кнопок в курсе
-                </p>
-              </div>
-              
-              <div className="space-y-4">
+              </SettingsCard>
+
+              {/* Buttons Card */}
+              <SettingsCard
+                icon={<Square className="w-4 h-4" />}
+                title="Кнопки"
+                description="Форма и стиль кнопок"
+              >
                 {/* Button Colors */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <ColorInput
                     label="Цвет кнопки"
                     value={config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor}
                     onChange={(v) => updateConfig({ primaryColor: v })}
                   />
                   <ColorInput
-                    label="Текст на кнопке"
+                    label="Текст"
                     value={config.primaryForeground || DEFAULT_DESIGN_SYSTEM.primaryForeground}
                     onChange={(v) => updateConfig({ primaryForeground: v })}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Стиль кнопок</Label>
+                  <Label className="text-xs text-muted-foreground">Форма</Label>
                   <div className="grid grid-cols-3 gap-2">
                     {[
                       { value: 'rounded', label: 'Скруглённые' },
@@ -747,7 +744,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                         key={style.value}
                         onClick={() => updateConfig({ buttonStyle: style.value as any })}
                         className={cn(
-                          "p-3 rounded-lg border-2 text-sm font-medium transition-all",
+                          "p-2.5 rounded-lg border-2 text-xs font-medium transition-all",
                           config.buttonStyle === style.value
                             ? "border-primary bg-primary/5"
                             : "border-border hover:border-primary/50"
@@ -760,7 +757,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Объём кнопок</Label>
+                  <Label className="text-xs text-muted-foreground">Объём</Label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
                       { value: 'flat', label: 'Плоские' },
@@ -770,13 +767,13 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                         key={depth.value}
                         onClick={() => updateConfig({ buttonDepth: depth.value as ButtonDepth })}
                         className={cn(
-                          "p-3 rounded-lg border-2 text-center transition-all",
+                          "p-2.5 rounded-lg border-2 text-center transition-all",
                           (config.buttonDepth ?? 'raised') === depth.value
                             ? "border-primary bg-primary/5"
                             : "border-border hover:border-primary/50"
                         )}
                       >
-                        <div className="font-semibold text-base">{depth.label}</div>
+                        <div className="font-medium text-sm">{depth.label}</div>
                       </button>
                     ))}
                   </div>
@@ -807,77 +804,75 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     ПРОДОЛЖИТЬ
                   </button>
                 </div>
-              </div>
+              </SettingsCard>
             </TabsContent>
 
             {/* === INTERACTIVE TAB: Quiz states, hints === */}
-            <TabsContent value="interactive" className="space-y-6">
-              <div className="space-y-2">
-                <Label className="text-base font-semibold">Цвета ответов</Label>
-                <p className="text-sm text-muted-foreground">
-                  Настройте цвета для состояний правильных и неправильных ответов
-                </p>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <ColorInput
-                  label="Правильный ответ"
-                  value={config.successColor || DEFAULT_DESIGN_SYSTEM.successColor}
-                  onChange={(v) => updateConfig({ successColor: v })}
-                  description="Цвет при верном ответе"
-                />
-                <ColorInput
-                  label="Неправильный ответ"
-                  value={config.destructiveColor || DEFAULT_DESIGN_SYSTEM.destructiveColor}
-                  onChange={(v) => updateConfig({ destructiveColor: v })}
-                  description="Цвет при неверном ответе"
-                />
-              </div>
-
-              {/* Hint settings */}
-              <div className="border-t pt-6 space-y-2">
-                <Label className="text-base font-semibold">Подсказки</Label>
-                <p className="text-sm text-muted-foreground">
-                  Настройки отображения подсказок в квизах
-                </p>
-              </div>
-              <ColorInput
-                label="Фон подсказки"
-                value={config.hintBackgroundColor || DEFAULT_DESIGN_SYSTEM.hintBackgroundColor}
-                onChange={(v) => updateConfig({ hintBackgroundColor: v })}
-              />
-              <ColorInput
-                label="Обводка подсказки"
-                value={config.hintBorderColor || DEFAULT_DESIGN_SYSTEM.hintBorderColor}
-                onChange={(v) => updateConfig({ hintBorderColor: v })}
-              />
-              <ColorInput
-                label="Цвет текста подсказки"
-                value={config.hintTextColor || DEFAULT_DESIGN_SYSTEM.hintTextColor}
-                onChange={(v) => updateConfig({ hintTextColor: v })}
-              />
-              <ColorInput
-                label="Цвет иконки подсказки"
-                value={config.hintIconColor || DEFAULT_DESIGN_SYSTEM.hintIconColor}
-                onChange={(v) => updateConfig({ hintIconColor: v })}
-              />
-
-              {/* === RIVE MASCOT SECTION === */}
-              <div className="border-t pt-6 space-y-4">
-                <div className="flex items-center gap-3">
-                  <Play className="w-5 h-5 text-primary" />
-                  <div>
-                    <h4 className="font-medium text-foreground">Rive-маскот для квизов</h4>
-                    <p className="text-xs text-muted-foreground">
-                      Анимированный персонаж с реакциями как в Duolingo
-                    </p>
-                  </div>
+            <TabsContent value="interactive" className="space-y-4">
+              {/* Answer Colors Card */}
+              <SettingsCard
+                icon={<Check className="w-4 h-4" />}
+                title="Цвета ответов"
+                description="Правильные и неправильные ответы"
+              >
+                <div className="grid grid-cols-2 gap-3">
+                  <ColorInput
+                    label="Правильный"
+                    value={config.successColor || DEFAULT_DESIGN_SYSTEM.successColor}
+                    onChange={(v) => updateConfig({ successColor: v })}
+                  />
+                  <ColorInput
+                    label="Неправильный"
+                    value={config.destructiveColor || DEFAULT_DESIGN_SYSTEM.destructiveColor}
+                    onChange={(v) => updateConfig({ destructiveColor: v })}
+                  />
                 </div>
+              </SettingsCard>
 
+              {/* Hints Card */}
+              <SettingsCard
+                icon={<Sparkles className="w-4 h-4" />}
+                title="Подсказки"
+                description="Оформление подсказок в квизах"
+                collapsible
+                defaultOpen={false}
+              >
+                <div className="grid grid-cols-2 gap-3">
+                  <ColorInput
+                    label="Фон"
+                    value={config.hintBackgroundColor || DEFAULT_DESIGN_SYSTEM.hintBackgroundColor}
+                    onChange={(v) => updateConfig({ hintBackgroundColor: v })}
+                  />
+                  <ColorInput
+                    label="Обводка"
+                    value={config.hintBorderColor || DEFAULT_DESIGN_SYSTEM.hintBorderColor}
+                    onChange={(v) => updateConfig({ hintBorderColor: v })}
+                  />
+                  <ColorInput
+                    label="Текст"
+                    value={config.hintTextColor || DEFAULT_DESIGN_SYSTEM.hintTextColor}
+                    onChange={(v) => updateConfig({ hintTextColor: v })}
+                  />
+                  <ColorInput
+                    label="Иконка"
+                    value={config.hintIconColor || DEFAULT_DESIGN_SYSTEM.hintIconColor}
+                    onChange={(v) => updateConfig({ hintIconColor: v })}
+                  />
+                </div>
+              </SettingsCard>
+
+              {/* Rive Mascot Card */}
+              <SettingsCard
+                icon={<Play className="w-4 h-4" />}
+                title="Rive-маскот"
+                description="Анимированный персонаж для квизов"
+                collapsible
+                defaultOpen={config.mascot?.riveEnabled === true}
+              >
                 {/* Enable Rive mascot */}
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Включить Rive-маскота</Label>
+                    <Label className="text-sm">Включить маскота</Label>
                     <p className="text-xs text-muted-foreground">
                       Показывать в блоках с вопросами
                     </p>
@@ -913,229 +908,204 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
 
                     {/* State machine settings */}
                     <div className="space-y-3">
-                      <Label className="text-sm font-medium">Настройки State Machine</Label>
-                      <div className="grid grid-cols-2 gap-3">
+                      <Label className="text-xs text-muted-foreground font-medium">Настройки State Machine</Label>
+                      <div className="grid grid-cols-2 gap-2">
                         <div className="space-y-1">
-                          <Label className="text-xs text-muted-foreground">Имя State Machine</Label>
+                          <Label className="text-xs text-muted-foreground">State Machine</Label>
                           <Input
                             value={config.mascot?.riveStateMachine || 'State Machine 1'}
                             onChange={(e) => updateConfig({
                               mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveStateMachine: e.target.value }
                             })}
                             placeholder="State Machine 1"
-                            className="text-xs"
+                            className="text-xs h-8"
                           />
                         </div>
                         <div className="space-y-1">
-                          <Label className="text-xs text-muted-foreground">Триггер Idle</Label>
+                          <Label className="text-xs text-muted-foreground">Idle</Label>
                           <Input
                             value={config.mascot?.riveIdleState || 'idle'}
                             onChange={(e) => updateConfig({
                               mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveIdleState: e.target.value }
                             })}
                             placeholder="idle"
-                            className="text-xs"
+                            className="text-xs h-8"
                           />
                         </div>
                         <div className="space-y-1">
-                          <Label className="text-xs text-muted-foreground">Триггер Correct</Label>
+                          <Label className="text-xs text-muted-foreground">Correct</Label>
                           <Input
                             value={config.mascot?.riveCorrectState || 'correct'}
                             onChange={(e) => updateConfig({
                               mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveCorrectState: e.target.value }
                             })}
                             placeholder="correct"
-                            className="text-xs"
+                            className="text-xs h-8"
                           />
                         </div>
                         <div className="space-y-1">
-                          <Label className="text-xs text-muted-foreground">Триггер Incorrect</Label>
+                          <Label className="text-xs text-muted-foreground">Incorrect</Label>
                           <Input
                             value={config.mascot?.riveIncorrectState || 'incorrect'}
                             onChange={(e) => updateConfig({
                               mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveIncorrectState: e.target.value }
                             })}
                             placeholder="incorrect"
-                            className="text-xs"
+                            className="text-xs h-8"
                           />
                         </div>
                       </div>
                     </div>
 
-                    {/* Position and size */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">Позиция</Label>
-                        <Select
-                          value={config.mascot?.rivePosition || 'top'}
-                          onValueChange={(v) => updateConfig({
-                            mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, rivePosition: v as 'top' | 'bottom' | 'left' | 'right' }
-                          })}
-                        >
-                          <SelectTrigger className="text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="top">Сверху</SelectItem>
-                            <SelectItem value="bottom">Снизу</SelectItem>
-                            <SelectItem value="left">Слева</SelectItem>
-                            <SelectItem value="right">Справа</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">Размер</Label>
-                        <Select
-                          value={config.mascot?.riveSize || 'medium'}
-                          onValueChange={(v) => updateConfig({
-                            mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveSize: v as 'small' | 'medium' | 'large' }
-                          })}
-                        >
-                          <SelectTrigger className="text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="small">Маленький</SelectItem>
-                            <SelectItem value="medium">Средний</SelectItem>
-                            <SelectItem value="large">Большой</SelectItem>
-                          </SelectContent>
-                        </Select>
+                    {/* Mascot size */}
+                    <div className="space-y-2">
+                      <Label className="text-xs text-muted-foreground font-medium">Размер маскота</Label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { value: 'small', label: 'S' },
+                          { value: 'medium', label: 'M' },
+                          { value: 'large', label: 'L' },
+                        ].map((size) => (
+                          <button
+                            key={size.value}
+                            onClick={() => updateConfig({
+                              mascot: { ...DEFAULT_MASCOT_SETTINGS, ...config.mascot, riveSize: size.value as any }
+                            })}
+                            className={cn(
+                              "p-2 rounded-lg border-2 text-sm font-medium transition-all",
+                              (config.mascot?.riveSize || 'medium') === size.value
+                                ? "border-primary bg-primary/5"
+                                : "border-border hover:border-primary/50"
+                            )}
+                          >
+                            {size.label}
+                          </button>
+                        ))}
                       </div>
                     </div>
                   </>
                 )}
-              </div>
+              </SettingsCard>
             </TabsContent>
 
             {/* === BLOCKS TAB: Design block settings === */}
-            <TabsContent value="blocks" className="space-y-6">
-              {/* Backdrop settings */}
-              <div className="space-y-2">
-                <Label className="text-base font-semibold">Подложки для текста</Label>
-                <p className="text-sm text-muted-foreground">
-                  Цвета подложек для текстовых саб-блоков в дизайн-блоках
-                </p>
-              </div>
+            <TabsContent value="blocks" className="space-y-4">
+              {/* Backdrop Card */}
+              <SettingsCard
+                icon={<Layers className="w-4 h-4" />}
+                title="Подложки для текста"
+                description="Цвета подложек в дизайн-блоках"
+              >
+                <div className="grid grid-cols-2 gap-3">
+                  <ColorInput
+                    label="Светлая"
+                    value={config.designBlock?.backdropLightColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropLightColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        backdropLightColor: v 
+                      } 
+                    })}
+                  />
+                  <ColorInput
+                    label="Тёмная"
+                    value={config.designBlock?.backdropDarkColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        backdropDarkColor: v 
+                      } 
+                    })}
+                  />
+                  <ColorInput
+                    label="Акцентная"
+                    value={config.designBlock?.backdropPrimaryColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        backdropPrimaryColor: v 
+                      } 
+                    })}
+                  />
+                  <ColorInput
+                    label="Blur"
+                    value={config.designBlock?.backdropBlurColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        backdropBlurColor: v 
+                      } 
+                    })}
+                  />
+                </div>
+              </SettingsCard>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <ColorInput
-                  label="Светлая подложка"
-                  value={config.designBlock?.backdropLightColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropLightColor}
-                  onChange={(v) => updateConfig({ 
-                    designBlock: { 
-                      ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                      ...config.designBlock, 
-                      backdropLightColor: v 
-                    } 
-                  })}
-                  description="Лёгкий полупрозрачный фон"
-                />
-                <ColorInput
-                  label="Тёмная подложка"
-                  value={config.designBlock?.backdropDarkColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkColor}
-                  onChange={(v) => updateConfig({ 
-                    designBlock: { 
-                      ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                      ...config.designBlock, 
-                      backdropDarkColor: v 
-                    } 
-                  })}
-                  description="Тёмный фон с белым текстом"
-                />
-                <ColorInput
-                  label="Акцентная подложка"
-                  value={config.designBlock?.backdropPrimaryColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryColor}
-                  onChange={(v) => updateConfig({ 
-                    designBlock: { 
-                      ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                      ...config.designBlock, 
-                      backdropPrimaryColor: v 
-                    } 
-                  })}
-                  description="Фон основного цвета"
-                />
-                <ColorInput
-                  label="Blur-подложка"
-                  value={config.designBlock?.backdropBlurColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurColor}
-                  onChange={(v) => updateConfig({ 
-                    designBlock: { 
-                      ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                      ...config.designBlock, 
-                      backdropBlurColor: v 
-                    } 
-                  })}
-                  description="Полупрозрачный фон с размытием"
-                />
-              </div>
+              {/* Highlights Card */}
+              <SettingsCard
+                icon={<Type className="w-4 h-4" />}
+                title="Выделение текста"
+                description="Маркер, подчёркивание, волнистая линия"
+              >
+                <div className="grid grid-cols-3 gap-3">
+                  <ColorInput
+                    label="Маркер"
+                    value={config.designBlock?.highlightMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightMarkerColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        highlightMarkerColor: v 
+                      } 
+                    })}
+                  />
+                  <ColorInput
+                    label="Линия"
+                    value={config.designBlock?.highlightUnderlineColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightUnderlineColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        highlightUnderlineColor: v 
+                      } 
+                    })}
+                  />
+                  <ColorInput
+                    label="Волна"
+                    value={config.designBlock?.highlightWavyColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightWavyColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        highlightWavyColor: v 
+                      } 
+                    })}
+                  />
+                </div>
+              </SettingsCard>
 
-              {/* Highlight settings */}
-              <div className="border-t pt-6 space-y-2">
-                <Label className="text-base font-semibold">Выделение текста</Label>
-                <p className="text-sm text-muted-foreground">
-                  Цвета для маркера, подчёркивания и волнистой линии
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <ColorInput
-                  label="Маркер"
-                  value={config.designBlock?.highlightMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightMarkerColor}
-                  onChange={(v) => updateConfig({ 
-                    designBlock: { 
-                      ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                      ...config.designBlock, 
-                      highlightMarkerColor: v 
-                    } 
-                  })}
-                  description="Как текстовый маркер"
-                />
-                <ColorInput
-                  label="Подчёркивание"
-                  value={config.designBlock?.highlightUnderlineColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightUnderlineColor}
-                  onChange={(v) => updateConfig({ 
-                    designBlock: { 
-                      ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                      ...config.designBlock, 
-                      highlightUnderlineColor: v 
-                    } 
-                  })}
-                  description="Прямая линия снизу"
-                />
-                <ColorInput
-                  label="Волнистая линия"
-                  value={config.designBlock?.highlightWavyColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightWavyColor}
-                  onChange={(v) => updateConfig({ 
-                    designBlock: { 
-                      ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                      ...config.designBlock, 
-                      highlightWavyColor: v 
-                    } 
-                  })}
-                  description="Волнистая линия снизу"
-                />
-              </div>
-
-              {/* Text colors for blocks */}
-              <div className="border-t pt-6 space-y-2">
-                <Label className="text-base font-semibold">Текст</Label>
-                <p className="text-sm text-muted-foreground">
-                  Цвета текста в блоках
-                </p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <ColorInput
-                  label="Основной текст"
-                  value={config.foregroundColor || DEFAULT_DESIGN_SYSTEM.foregroundColor}
-                  onChange={(v) => updateConfig({ foregroundColor: v })}
-                  description="Цвет основного текста"
-                />
-                <ColorInput
-                  label="Карточки"
-                  value={config.cardColor || DEFAULT_DESIGN_SYSTEM.cardColor}
-                  onChange={(v) => updateConfig({ cardColor: v })}
-                  description="Фон карточек и блоков"
-                />
-              </div>
+              {/* Text Colors Card */}
+              <SettingsCard
+                icon={<Palette className="w-4 h-4" />}
+                title="Цвета текста"
+                description="Основной текст и карточки"
+              >
+                <div className="grid grid-cols-2 gap-3">
+                  <ColorInput
+                    label="Текст"
+                    value={config.foregroundColor || DEFAULT_DESIGN_SYSTEM.foregroundColor}
+                    onChange={(v) => updateConfig({ foregroundColor: v })}
+                  />
+                  <ColorInput
+                    label="Карточки"
+                    value={config.cardColor || DEFAULT_DESIGN_SYSTEM.cardColor}
+                    onChange={(v) => updateConfig({ cardColor: v })}
+                  />
+                </div>
+              </SettingsCard>
             </TabsContent>
 
             {/* === TYPOGRAPHY TAB === */}
