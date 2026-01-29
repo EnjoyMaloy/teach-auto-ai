@@ -27,7 +27,7 @@ import {
   TextHighlightType,
   DividerStyleType
 } from '@/types/designBlock';
-import { DEFAULT_DESIGN_BLOCK_SETTINGS } from '@/types/designSystem';
+import { DEFAULT_DESIGN_BLOCK_SETTINGS, DesignSystemConfig } from '@/types/designSystem';
 import { CourseDesignSystem } from '@/types/course';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -70,7 +70,7 @@ const subBlockIconMap: Record<string, React.ComponentType<{ className?: string; 
 interface DesignBlockEditorProps {
   subBlocks: SubBlock[];
   onUpdateSubBlocks: (subBlocks: SubBlock[]) => void;
-  designSystem?: CourseDesignSystem;
+  designSystem?: CourseDesignSystem | DesignSystemConfig;
   isEditing?: boolean;
   selectedSubBlockId?: string | null;
   onSelectSubBlock?: (id: string | null) => void;
@@ -84,7 +84,7 @@ const SortableSubBlockItem: React.FC<{
   onSelect?: () => void;
   onUpdate: (updates: Partial<SubBlock>) => void;
   onDelete: () => void;
-  designSystem?: CourseDesignSystem;
+  designSystem?: CourseDesignSystem | DesignSystemConfig;
 }> = ({ subBlock, isEditing, isSelected, onSelect, onUpdate, onDelete, designSystem }) => {
   // Component state - always called unconditionally at top level
   const [isTextFocused, setIsTextFocused] = useState(false);

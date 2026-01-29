@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Block, BLOCK_CONFIGS } from '@/types/blocks';
 import { CourseDesignSystem } from '@/types/course';
+import { DesignSystemConfig } from '@/types/designSystem';
 import { cn } from '@/lib/utils';
 import { 
   Play, Volume2, Check, X,
@@ -60,7 +61,7 @@ interface MobilePreviewFrameProps {
   totalBlocks?: number;
   onContinue?: () => void;
   onUpdateBlock?: (updates: Partial<Block>) => void;
-  designSystem?: CourseDesignSystem;
+  designSystem?: CourseDesignSystem | DesignSystemConfig;
   isMuted?: boolean;
   isReadOnly?: boolean;
   /** If true, renders without the outer container/scaling - for embedding in CoursePlayer */
