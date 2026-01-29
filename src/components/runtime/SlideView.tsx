@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { RotateCcw, Sparkles, X, Zap } from 'lucide-react';
 import { playSound, SoundConfig } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
+import { getSoftBackgroundColor, getDarkTextColor, getButtonShadowColor } from '@/lib/colorUtils';
 
 interface SlideViewProps {
   block: Block;
@@ -23,6 +24,7 @@ const DEFAULT_DS = {
   cardColor: '0 0% 100%',
   mutedColor: '240 5% 96%',
   successColor: '142 71% 45%',
+  partialColor: '35 92% 50%',
   destructiveColor: '0 84% 60%',
   fontFamily: 'Inter, system-ui, sans-serif',
   headingFontFamily: 'Inter, system-ui, sans-serif',
@@ -103,8 +105,10 @@ export const SlideView: React.FC<SlideViewProps> = ({
 
   const getRaisedButtonStyle = (color: string) => {
     if (!isRaised) return {};
+    // Use derived shadow color for proper 3D effect
+    const shadowColor = getButtonShadowColor(color);
     return {
-      boxShadow: `0 4px 0 0 hsl(${color} / 0.4), 0 6px 12px -2px hsl(${color} / 0.25)`,
+      boxShadow: `0 4px 0 0 hsl(${shadowColor}), 0 6px 12px -2px hsl(${color} / 0.25)`,
     };
   };
 
@@ -352,15 +356,15 @@ export const SlideView: React.FC<SlideViewProps> = ({
       className="px-4 py-3 text-center text-sm font-medium shrink-0"
       style={{
         backgroundColor: answerState === 'correct' 
-          ? `hsl(${ds.successColor} / 0.1)` 
+          ? getSoftBackgroundColor(ds.successColor, 90)
           : answerState === 'partial'
-            ? `hsl(45 93% 47% / 0.1)`
-            : `hsl(${ds.destructiveColor} / 0.1)`,
+            ? getSoftBackgroundColor(ds.partialColor, 90)
+            : getSoftBackgroundColor(ds.destructiveColor, 93),
         color: answerState === 'correct' 
-          ? `hsl(${ds.successColor})` 
+          ? getDarkTextColor(ds.successColor)
           : answerState === 'partial'
-            ? `hsl(45 93% 40%)`
-            : `hsl(${ds.destructiveColor})`,
+            ? getDarkTextColor(ds.partialColor)
+            : getDarkTextColor(ds.destructiveColor),
       }}
     >
       <div className="flex flex-col items-center gap-2 pt-2">
@@ -427,15 +431,15 @@ export const SlideView: React.FC<SlideViewProps> = ({
           style={{
             bottom: `${NAV_HEIGHT}px`,
             backgroundColor: answerState === 'correct' 
-              ? `hsl(88 62% 85%)`
+              ? getSoftBackgroundColor(ds.successColor, 85)
               : answerState === 'partial'
-                ? `hsl(48 100% 90%)`
-                : `hsl(0 100% 95%)`,
+                ? getSoftBackgroundColor(ds.partialColor, 90)
+                : getSoftBackgroundColor(ds.destructiveColor, 95),
             color: answerState === 'correct' 
-              ? `hsl(142 60% 30%)` 
+              ? getDarkTextColor(ds.successColor)
               : answerState === 'partial'
-                ? `hsl(35 80% 35%)`
-                : `hsl(${ds.destructiveColor})`,
+                ? getDarkTextColor(ds.partialColor)
+                : getDarkTextColor(ds.destructiveColor),
           }}
         >
           <div className="flex flex-col items-center gap-2 pt-2">
@@ -480,11 +484,11 @@ export const SlideView: React.FC<SlideViewProps> = ({
         style={{ 
           borderColor: (answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
           backgroundColor: answerState === 'correct' 
-            ? `hsl(88 62% 85%)`
+            ? getSoftBackgroundColor(ds.successColor, 85)
             : answerState === 'partial'
-              ? `hsl(48 100% 90%)`
+              ? getSoftBackgroundColor(ds.partialColor, 90)
               : answerState === 'incorrect'
-                ? `hsl(0 100% 95%)`
+                ? getSoftBackgroundColor(ds.destructiveColor, 95)
                 : 'transparent',
         }}
       >
@@ -495,9 +499,9 @@ export const SlideView: React.FC<SlideViewProps> = ({
             onClick={resetState}
             className={cn("h-11 px-4 flex items-center gap-2 border-2 font-bold uppercase tracking-wide", pressAnimationClass)}
             style={{
-              borderColor: `hsl(45 93% 47%)`,
+              borderColor: `hsl(${ds.partialColor})`,
               backgroundColor: `hsl(0 0% 100%)`,
-              color: `hsl(45 93% 47%)`,
+              color: `hsl(${ds.partialColor})`,
               borderRadius: getButtonRadius(),
             }}
           >
@@ -521,7 +525,7 @@ export const SlideView: React.FC<SlideViewProps> = ({
             backgroundColor: answerState === 'correct' 
               ? `hsl(${ds.successColor})` 
               : answerState === 'partial'
-                ? `hsl(45 93% 47%)`
+                ? `hsl(${ds.partialColor})`
                 : answerState === 'incorrect'
                   ? `hsl(${ds.destructiveColor})`
                   : `hsl(${ds.primaryColor})`,
@@ -532,7 +536,7 @@ export const SlideView: React.FC<SlideViewProps> = ({
             ...(answerState === 'correct' 
               ? getRaisedButtonStyle(ds.successColor) 
               : answerState === 'partial'
-                ? getRaisedButtonStyle('45 93% 47%')
+                ? getRaisedButtonStyle(ds.partialColor)
                 : answerState === 'incorrect'
                   ? getRaisedButtonStyle(ds.destructiveColor)
                   : getRaisedButtonStyle(ds.primaryColor)),
