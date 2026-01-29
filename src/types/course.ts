@@ -96,6 +96,7 @@ export interface CourseDesignSystem {
   mutedColor?: string;
   accentColor?: string;
   successColor?: string;
+  partialColor?: string;  // "Almost" / "Почти" answer color
   destructiveColor?: string;
   fontFamily?: string;
   headingFontFamily?: string;
