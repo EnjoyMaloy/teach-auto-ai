@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useId } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Highlight from '@tiptap/extension-highlight';
@@ -92,6 +92,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const { setActiveEditor } = useTextEditor();
+  // Generate unique ID for scoped styles to prevent CSS conflicts between instances
+  const uniqueId = useId().replace(/:/g, '');
   const textSizeClass = {
     small: 'text-sm',
     medium: 'text-base',
@@ -169,40 +171,41 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   }, [isEditing, editor]);
 
-  // Dynamic styles for highlighting and justify
+  // Dynamic styles for highlighting and justify - scoped by unique ID to prevent conflicts
+  const scopeClass = `rte-${uniqueId}`;
   const dynamicStyles = `
-    .rich-text-highlight {
+    .${scopeClass} .rich-text-highlight {
       background-color: hsl(${highlightColor});
       padding: 0 2px;
       border-radius: 2px;
     }
-    .rich-text-underline {
+    .${scopeClass} .rich-text-underline {
       text-decoration-line: underline;
       text-decoration-style: solid;
       text-decoration-color: hsl(${underlineColor});
       text-decoration-thickness: 2px;
       text-underline-offset: 3px;
     }
-    .rich-text-wavy {
+    .${scopeClass} .rich-text-wavy {
       text-decoration-line: underline;
       text-decoration-style: wavy;
       text-decoration-color: hsl(${wavyColor});
       text-underline-offset: 4px;
     }
-    [data-wavy="true"] {
+    .${scopeClass} [data-wavy="true"] {
       text-decoration-line: underline;
       text-decoration-style: wavy;
       text-decoration-color: hsl(${wavyColor});
       text-underline-offset: 4px;
     }
     ${isJustified ? `
-    .rich-text-editor-wrapper,
-    .rich-text-editor-wrapper .ProseMirror,
-    .rich-text-editor-wrapper .ProseMirror p,
-    .rich-text-editor-wrapper > div,
-    .rich-text-readonly-wrapper,
-    .rich-text-readonly-wrapper > div,
-    .rich-text-readonly-wrapper > div > * {
+    .${scopeClass}.rich-text-editor-wrapper,
+    .${scopeClass}.rich-text-editor-wrapper .ProseMirror,
+    .${scopeClass}.rich-text-editor-wrapper .ProseMirror p,
+    .${scopeClass}.rich-text-editor-wrapper > div,
+    .${scopeClass}.rich-text-readonly-wrapper,
+    .${scopeClass}.rich-text-readonly-wrapper > div,
+    .${scopeClass}.rich-text-readonly-wrapper > div > * {
       text-align: justify !important;
       text-justify: inter-word !important;
       word-spacing: 0.05em;
@@ -213,7 +216,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   if (!isEditing) {
     return (
       <div 
-        className={cn(textSizeClass, textAlignClass, 'rich-text-readonly-wrapper w-full', className)}
+        className={cn(scopeClass, textSizeClass, textAlignClass, 'rich-text-readonly-wrapper w-full', className)}
         style={{ 
           color: textColor,
           ...(isJustified ? { textAlign: 'justify', textJustify: 'inter-word' } : {})
@@ -230,7 +233,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   return (
     <div 
-      className={cn('rounded-lg transition-all rich-text-editor-wrapper w-full', textAlignClass, isFocused ? 'border border-border/50' : '', className)}
+      className={cn(scopeClass, 'rounded-lg transition-all rich-text-editor-wrapper w-full', textAlignClass, isFocused ? 'border border-border/50' : '', className)}
       onClick={(e) => e.stopPropagation()}
       style={isJustified ? { textAlign: 'justify', textJustify: 'inter-word' } : {}}
       onFocus={() => {
