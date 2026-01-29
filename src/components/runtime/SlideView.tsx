@@ -383,7 +383,7 @@ export const SlideView: React.FC<SlideViewProps> = ({
           )}
         </div>
         {answerState === 'partial' && (
-          <span className="text-xs opacity-80 mt-1">Подумай ещё чуть-чуть</span>
+          <span className="text-sm font-medium opacity-80 mt-1">Подумай ещё чуть-чуть</span>
         )}
       </div>
     </div>
@@ -448,7 +448,7 @@ export const SlideView: React.FC<SlideViewProps> = ({
               )}
             </div>
             {answerState === 'partial' && (
-              <span className="text-xs opacity-80 mt-1">Подумай ещё чуть-чуть</span>
+              <span className="text-sm font-medium opacity-80 mt-1">Подумай ещё чуть-чуть</span>
             )}
           </div>
         </div>
