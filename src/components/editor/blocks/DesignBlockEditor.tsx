@@ -129,12 +129,24 @@ const SortableSubBlockItem: React.FC<{
     backdropDarkColor: designSystem?.designBlock?.backdropDarkColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkColor,
     backdropPrimaryColor: designSystem?.designBlock?.backdropPrimaryColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryColor,
     backdropBlurColor: designSystem?.designBlock?.backdropBlurColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurColor,
+    // Text colors for each backdrop
+    backdropLightTextColor: designSystem?.designBlock?.backdropLightTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropLightTextColor,
+    backdropDarkTextColor: designSystem?.designBlock?.backdropDarkTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkTextColor,
+    backdropPrimaryTextColor: designSystem?.designBlock?.backdropPrimaryTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryTextColor,
+    backdropBlurTextColor: designSystem?.designBlock?.backdropBlurTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurTextColor,
     // Highlight colors
     highlightMarkerColor: designSystem?.designBlock?.highlightMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightMarkerColor,
     highlightUnderlineColor: designSystem?.designBlock?.highlightUnderlineColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightUnderlineColor,
     highlightWavyColor: designSystem?.designBlock?.highlightWavyColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightWavyColor,
     // Badge color
     badgeColor: designSystem?.designBlock?.badgeColor || DEFAULT_DESIGN_BLOCK_SETTINGS.badgeColor,
+    // Button sub-block
+    buttonBgColor: designSystem?.designBlock?.buttonBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.buttonBgColor,
+    buttonTextColor: designSystem?.designBlock?.buttonTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.buttonTextColor,
+    // Table sub-block
+    tableBorderColor: designSystem?.designBlock?.tableBorderColor || DEFAULT_DESIGN_BLOCK_SETTINGS.tableBorderColor,
+    tableHeaderBgColor: designSystem?.designBlock?.tableHeaderBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.tableHeaderBgColor,
+    tableStripeBgColor: designSystem?.designBlock?.tableStripeBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.tableStripeBgColor,
   };
 
   const textAlignClass = {
@@ -293,9 +305,14 @@ const SortableSubBlockItem: React.FC<{
           },
         }[subBlock.backdrop || 'none'];
 
-        const textColor = subBlock.backdrop === 'dark' 
-          ? 'hsl(0 0% 100%)' 
-          : `hsl(${ds.foregroundColor} / 0.8)`;
+        // Text color based on backdrop type (from design system)
+        const textColor = {
+          none: `hsl(${ds.foregroundColor} / 0.8)`,
+          light: `hsl(${ds.backdropLightTextColor})`,
+          dark: `hsl(${ds.backdropDarkTextColor})`,
+          primary: `hsl(${ds.backdropPrimaryTextColor})`,
+          blur: `hsl(${ds.backdropBlurTextColor})`,
+        }[subBlock.backdrop || 'none'];
 
         const textRotation = subBlock.textRotation || 0;
 
@@ -406,10 +423,11 @@ const SortableSubBlockItem: React.FC<{
         );
 
       case 'button':
+        // Use design system button colors
         const buttonVariantStyles = {
           primary: {
-            backgroundColor: `hsl(${ds.primaryColor})`,
-            color: 'white',
+            backgroundColor: `hsl(${ds.buttonBgColor})`,
+            color: `hsl(${ds.buttonTextColor})`,
           },
           secondary: {
             backgroundColor: `hsl(${ds.mutedColor})`,
@@ -417,12 +435,12 @@ const SortableSubBlockItem: React.FC<{
           },
           outline: {
             backgroundColor: 'transparent',
-            border: `2px solid hsl(${ds.primaryColor})`,
-            color: `hsl(${ds.primaryColor})`,
+            border: `2px solid hsl(${ds.buttonBgColor})`,
+            color: `hsl(${ds.buttonBgColor})`,
           },
           ghost: {
             backgroundColor: 'transparent',
-            color: `hsl(${ds.primaryColor})`,
+            color: `hsl(${ds.buttonBgColor})`,
           },
         }[subBlock.buttonVariant || 'primary'];
 
@@ -629,7 +647,10 @@ const SortableSubBlockItem: React.FC<{
         const tStyle = subBlock.tableStyle || 'simple';
         const tSize = { small: 'text-xs', medium: 'text-sm', large: 'text-base' }[subBlock.tableTextSize || 'medium'];
         const tAlign = { left: 'text-left', center: 'text-center', right: 'text-right' }[subBlock.textAlign as 'left'|'center'|'right' || 'left'];
-        const tBorder = tStyle === 'bordered' ? 'border border-border' : '';
+        // Use design system table colors
+        const tableBorderStyle = tStyle === 'bordered' ? { border: `1px solid hsl(${ds.tableBorderColor})` } : {};
+        const tableHeaderBg = `hsl(${ds.tableHeaderBgColor})`;
+        const tableStripeBg = `hsl(${ds.tableStripeBgColor})`;
         
         const handleCellChange = (rowIndex: number, cellIndex: number, newContent: string) => {
           const newData = tData.map((row, ri) => 
@@ -642,18 +663,30 @@ const SortableSubBlockItem: React.FC<{
         
         return (
           <div 
-            className={cn('w-full rounded-lg overflow-hidden', tBorder)} 
+            className="w-full rounded-lg overflow-hidden"
+            style={tableBorderStyle}
             onClick={(e) => {
               e.stopPropagation();
               if (isEditing && onSelect) onSelect();
             }}
           >
             <table className="w-full">
-              <tbody className={tStyle !== 'simple' ? 'divide-y divide-border' : ''}>
+              <tbody style={tStyle !== 'simple' ? { borderColor: `hsl(${ds.tableBorderColor})` } : {}}>
                 {tData.map((row, ri) => (
-                  <tr key={ri} className={tStyle === 'striped' && ri % 2 === 1 ? 'bg-muted/30' : ''}>
+                  <tr 
+                    key={ri} 
+                    style={tStyle === 'striped' && ri % 2 === 1 ? { backgroundColor: tableStripeBg } : {}}
+                  >
                     {row.map((cell, ci) => (
-                      <td key={cell.id} className={cn('p-1', ri === 0 && 'font-medium bg-muted/50', tStyle === 'bordered' && 'border-r border-border last:border-r-0')}>
+                      <td 
+                        key={cell.id} 
+                        className={cn('p-1', ri === 0 && 'font-medium')}
+                        style={{
+                          ...(ri === 0 ? { backgroundColor: tableHeaderBg } : {}),
+                          ...(tStyle === 'bordered' && ci < row.length - 1 ? { borderRight: `1px solid hsl(${ds.tableBorderColor})` } : {}),
+                          ...(tStyle !== 'simple' && ri < tData.length - 1 ? { borderBottom: `1px solid hsl(${ds.tableBorderColor})` } : {}),
+                        }}
+                      >
                         {isEditing ? (
                           <textarea
                             value={cell.content}

@@ -54,7 +54,9 @@ import {
   Play,
   Loader2,
   Link2,
-  Copy
+  Copy,
+  MousePointerClick,
+  Table2
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import {
@@ -884,53 +886,124 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
               <SettingsCard
                 icon={<Layers className="w-4 h-4" />}
                 title="Подложки для текста"
-                description="Цвета подложек в дизайн-блоках"
+                description="Цвет фона и текста для каждой подложки"
               >
-                <div className="grid grid-cols-2 gap-3">
-                  <ColorInput
-                    label="Светлая"
-                    value={config.designBlock?.backdropLightColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropLightColor}
-                    onChange={(v) => updateConfig({ 
-                      designBlock: { 
-                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                        ...config.designBlock, 
-                        backdropLightColor: v 
-                      } 
-                    })}
-                  />
-                  <ColorInput
-                    label="Тёмная"
-                    value={config.designBlock?.backdropDarkColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkColor}
-                    onChange={(v) => updateConfig({ 
-                      designBlock: { 
-                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                        ...config.designBlock, 
-                        backdropDarkColor: v 
-                      } 
-                    })}
-                  />
-                  <ColorInput
-                    label="Акцентная"
-                    value={config.designBlock?.backdropPrimaryColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryColor}
-                    onChange={(v) => updateConfig({ 
-                      designBlock: { 
-                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                        ...config.designBlock, 
-                        backdropPrimaryColor: v 
-                      } 
-                    })}
-                  />
-                  <ColorInput
-                    label="Blur"
-                    value={config.designBlock?.backdropBlurColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurColor}
-                    onChange={(v) => updateConfig({ 
-                      designBlock: { 
-                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                        ...config.designBlock, 
-                        backdropBlurColor: v 
-                      } 
-                    })}
-                  />
+                <div className="space-y-4">
+                  {/* Light backdrop */}
+                  <div className="space-y-2">
+                    <Label className="text-xs font-medium text-muted-foreground">Светлая подложка</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <ColorInput
+                        label="Фон"
+                        value={config.designBlock?.backdropLightColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropLightColor}
+                        onChange={(v) => updateConfig({ 
+                          designBlock: { 
+                            ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                            ...config.designBlock, 
+                            backdropLightColor: v 
+                          } 
+                        })}
+                      />
+                      <ColorInput
+                        label="Текст"
+                        value={config.designBlock?.backdropLightTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropLightTextColor}
+                        onChange={(v) => updateConfig({ 
+                          designBlock: { 
+                            ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                            ...config.designBlock, 
+                            backdropLightTextColor: v 
+                          } 
+                        })}
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Dark backdrop */}
+                  <div className="space-y-2">
+                    <Label className="text-xs font-medium text-muted-foreground">Тёмная подложка</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <ColorInput
+                        label="Фон"
+                        value={config.designBlock?.backdropDarkColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkColor}
+                        onChange={(v) => updateConfig({ 
+                          designBlock: { 
+                            ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                            ...config.designBlock, 
+                            backdropDarkColor: v 
+                          } 
+                        })}
+                      />
+                      <ColorInput
+                        label="Текст"
+                        value={config.designBlock?.backdropDarkTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkTextColor}
+                        onChange={(v) => updateConfig({ 
+                          designBlock: { 
+                            ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                            ...config.designBlock, 
+                            backdropDarkTextColor: v 
+                          } 
+                        })}
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Primary backdrop */}
+                  <div className="space-y-2">
+                    <Label className="text-xs font-medium text-muted-foreground">Акцентная подложка</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <ColorInput
+                        label="Фон"
+                        value={config.designBlock?.backdropPrimaryColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryColor}
+                        onChange={(v) => updateConfig({ 
+                          designBlock: { 
+                            ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                            ...config.designBlock, 
+                            backdropPrimaryColor: v 
+                          } 
+                        })}
+                      />
+                      <ColorInput
+                        label="Текст"
+                        value={config.designBlock?.backdropPrimaryTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryTextColor}
+                        onChange={(v) => updateConfig({ 
+                          designBlock: { 
+                            ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                            ...config.designBlock, 
+                            backdropPrimaryTextColor: v 
+                          } 
+                        })}
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Blur backdrop */}
+                  <div className="space-y-2">
+                    <Label className="text-xs font-medium text-muted-foreground">Blur подложка</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <ColorInput
+                        label="Фон"
+                        value={config.designBlock?.backdropBlurColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurColor}
+                        onChange={(v) => updateConfig({ 
+                          designBlock: { 
+                            ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                            ...config.designBlock, 
+                            backdropBlurColor: v 
+                          } 
+                        })}
+                      />
+                      <ColorInput
+                        label="Текст"
+                        value={config.designBlock?.backdropBlurTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurTextColor}
+                        onChange={(v) => updateConfig({ 
+                          designBlock: { 
+                            ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                            ...config.designBlock, 
+                            backdropBlurTextColor: v 
+                          } 
+                        })}
+                      />
+                    </div>
+                  </div>
                 </div>
               </SettingsCard>
 
@@ -1007,6 +1080,81 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     } 
                   })}
                 />
+              </SettingsCard>
+              
+              {/* Button Sub-block Card */}
+              <SettingsCard
+                icon={<MousePointerClick className="w-4 h-4" />}
+                title="Саб-блок кнопки"
+                description="Цвета фона и текста кнопки"
+              >
+                <div className="grid grid-cols-2 gap-3">
+                  <ColorInput
+                    label="Фон кнопки"
+                    value={config.designBlock?.buttonBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.buttonBgColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        buttonBgColor: v 
+                      } 
+                    })}
+                  />
+                  <ColorInput
+                    label="Текст кнопки"
+                    value={config.designBlock?.buttonTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.buttonTextColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        buttonTextColor: v 
+                      } 
+                    })}
+                  />
+                </div>
+              </SettingsCard>
+              
+              {/* Table Sub-block Card */}
+              <SettingsCard
+                icon={<Layers className="w-4 h-4" />}
+                title="Саб-блок таблицы"
+                description="Цвета границ, заголовка и полос"
+              >
+                <div className="space-y-3">
+                  <ColorInput
+                    label="Цвет границ"
+                    value={config.designBlock?.tableBorderColor || DEFAULT_DESIGN_BLOCK_SETTINGS.tableBorderColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        tableBorderColor: v 
+                      } 
+                    })}
+                  />
+                  <ColorInput
+                    label="Фон заголовка"
+                    value={config.designBlock?.tableHeaderBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.tableHeaderBgColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        tableHeaderBgColor: v 
+                      } 
+                    })}
+                  />
+                  <ColorInput
+                    label="Полосатый фон"
+                    value={config.designBlock?.tableStripeBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.tableStripeBgColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { 
+                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                        ...config.designBlock, 
+                        tableStripeBgColor: v 
+                      } 
+                    })}
+                  />
+                </div>
               </SettingsCard>
             </TabsContent>
 
