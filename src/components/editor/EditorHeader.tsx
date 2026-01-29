@@ -432,6 +432,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
             mutedColor: course.designSystem?.mutedColor || '240 5% 96%',
             accentColor: course.designSystem?.accentColor || '240 5% 96%',
             successColor: course.designSystem?.successColor || '142 71% 45%',
+            partialColor: course.designSystem?.partialColor || '35 92% 50%',
             destructiveColor: course.designSystem?.destructiveColor || '0 84% 60%',
             fontFamily: course.designSystem?.fontFamily || 'Inter, system-ui, sans-serif',
             headingFontFamily: course.designSystem?.headingFontFamily || 'Inter, system-ui, sans-serif',

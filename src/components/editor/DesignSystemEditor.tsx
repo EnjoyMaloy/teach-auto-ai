@@ -866,9 +866,9 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                   />
                   <ColorInput
                     label="Почти"
-                    value={config.partialColor || '35 92% 50%'}
+                    value={config.partialColor || DEFAULT_DESIGN_SYSTEM.partialColor}
                     onChange={(v) => {
-                      console.log('Partial color onChange:', v);
+                      console.log('Partial color onChange:', v, 'current config.partialColor:', config.partialColor);
                       updateConfig({ partialColor: v });
                     }}
                   />
