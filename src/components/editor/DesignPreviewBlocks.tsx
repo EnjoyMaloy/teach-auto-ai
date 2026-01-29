@@ -394,7 +394,6 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
       <div className="w-72 border-r border-border bg-card flex flex-col">
         <div className="px-4 py-3 border-b border-border">
           <h3 className="font-semibold text-sm text-foreground">Демо-блоки</h3>
-          <p className="text-xs text-muted-foreground">{sampleSlides.length} блоков</p>
         </div>
         <div className="flex-1 overflow-y-auto p-2 space-y-1">
           {sampleSlides.map((slide, index) => {
