@@ -52,8 +52,10 @@ import {
   Upload,
   Play,
   Loader2,
-  Link2
+  Link2,
+  Copy
 } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -136,6 +138,7 @@ const ColorInput: React.FC<{
 
   const [hexValue, setHexValue] = React.useState(hslToHex(value));
   const [isFocused, setIsFocused] = React.useState(false);
+  const [copied, setCopied] = React.useState(false);
 
   // Update hex when value prop changes (from outside)
   React.useEffect(() => {
@@ -159,6 +162,16 @@ const ColorInput: React.FC<{
     const hex = e.target.value.replace('#', '').toUpperCase();
     setHexValue(hex);
     onChange(hexToHsl(hex));
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(`#${hexValue}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
   };
   
   return (
@@ -185,11 +198,24 @@ const ColorInput: React.FC<{
             onChange={(e) => handleHexChange(e.target.value)}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            className="pl-7 font-mono text-sm uppercase tracking-wider bg-background"
+            className="pl-7 pr-10 font-mono text-sm uppercase tracking-wider bg-background"
             placeholder="FFFFFF"
             maxLength={6}
             aria-label={`${label} HEX код`}
           />
+          {/* Copy button */}
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-muted transition-colors"
+            aria-label="Копировать HEX"
+          >
+            {copied ? (
+              <Check className="w-4 h-4 text-success" />
+            ) : (
+              <Copy className="w-4 h-4 text-muted-foreground" />
+            )}
+          </button>
         </div>
       </div>
       {description && (
@@ -586,7 +612,33 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
       ) : (
       /* Detailed Settings - view-only for non-admins with base system selected */
       <div className={cn("space-y-4", isEditingRestricted && "opacity-60 [&_input]:pointer-events-none [&_input]:opacity-50 [&_button:not([data-radix-collection-item])]:pointer-events-none [&_button:not([data-radix-collection-item])]:opacity-50 [&_select]:pointer-events-none [&_textarea]:pointer-events-none [&_[role=slider]]:pointer-events-none [&_[role=switch]]:pointer-events-none [&_[type=color]]:pointer-events-none")}>
-        <h3 className="font-semibold text-foreground">Детальные настройки</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-foreground">Детальные настройки</h3>
+          {selectedBaseSystemId && !isEditingRestricted && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                // Find the selected theme and reset to its original config
+                const baseTheme = baseSystems.find(s => s.id === selectedBaseSystemId);
+                const userTheme = userSystems.find(s => s.id === selectedBaseSystemId);
+                const originalConfig = baseTheme?.config || userTheme?.config;
+                
+                if (originalConfig) {
+                  onChange({ ...originalConfig, themeId: selectedBaseSystemId });
+                  toast({
+                    title: "Настройки сброшены",
+                    description: "Тема возвращена к исходным настройкам",
+                  });
+                }
+              }}
+              className="text-xs text-muted-foreground hover:text-foreground gap-1.5"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              Сбросить
+            </Button>
+          )}
+        </div>
         <Tabs defaultValue="ui" className="w-full">
           <TabsList className="w-full grid grid-cols-3 grid-rows-2 h-auto p-1 bg-muted/50 gap-1">
             <TabsTrigger value="ui" className="text-xs py-2 px-1 data-[state=active]:bg-background">
