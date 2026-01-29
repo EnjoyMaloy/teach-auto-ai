@@ -225,6 +225,20 @@ const ColorInput: React.FC<{
   );
 };
 
+// Helper to truncate filename keeping extension visible
+const truncateFileName = (url: string, maxLength: number = 20): string => {
+  const fileName = url.split('/').pop() || '';
+  if (fileName.length <= maxLength) return fileName;
+  
+  const ext = fileName.includes('.') ? fileName.slice(fileName.lastIndexOf('.')) : '';
+  const nameWithoutExt = fileName.slice(0, fileName.length - ext.length);
+  const visibleChars = maxLength - ext.length - 3; // 3 for "..."
+  
+  if (visibleChars <= 0) return fileName.slice(0, maxLength - 3) + '...';
+  
+  return nameWithoutExt.slice(0, visibleChars) + '...' + ext;
+};
+
 // Rive file uploader component with URL input
 const RiveFileUploader: React.FC<{
   riveUrl: string;
@@ -288,11 +302,13 @@ const RiveFileUploader: React.FC<{
     <div className="space-y-3">
       <Label className="text-sm font-medium">Файл анимации (.riv)</Label>
       {riveUrl ? (
-        <div className="flex items-center gap-3 p-3 rounded-xl border border-border bg-muted/30 overflow-hidden">
+        <div className="flex items-center gap-3 p-3 rounded-xl border border-border bg-muted/30">
           <Play className="w-8 h-8 text-primary shrink-0" />
-          <div className="flex-1 min-w-0 overflow-hidden">
-            <p className="text-sm font-medium truncate">Rive-анимация подключена</p>
-            <p className="text-xs text-muted-foreground truncate max-w-full">{riveUrl.split('/').pop()}</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium">Rive-анимация подключена</p>
+            <p className="text-xs text-muted-foreground" title={riveUrl.split('/').pop()}>
+              {truncateFileName(riveUrl, 24)}
+            </p>
           </div>
           <Button variant="ghost" size="sm" onClick={onRemove} className="shrink-0">
             <Trash2 className="w-4 h-4 text-destructive" />
