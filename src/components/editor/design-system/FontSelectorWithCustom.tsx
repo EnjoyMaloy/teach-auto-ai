@@ -16,12 +16,14 @@ import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 interface FontSelectorWithCustomProps {
-  label: string;
-  description: string;
+  label?: string;
+  description?: string;
   value: string;
   onChange: (value: string) => void;
   customFonts: CustomFont[];
   onCustomFontsChange: (fonts: CustomFont[]) => void;
+  /** Called when both font and customFonts need to update together */
+  onAddCustomFont?: (font: CustomFont, selectIt: boolean) => void;
   previewText?: string;
   previewClassName?: string;
 }
@@ -92,6 +94,7 @@ export const FontSelectorWithCustom: React.FC<FontSelectorWithCustomProps> = ({
   onChange,
   customFonts,
   onCustomFontsChange,
+  onAddCustomFont,
   previewText,
   previewClassName = '',
 }) => {
@@ -131,15 +134,24 @@ export const FontSelectorWithCustom: React.FC<FontSelectorWithCustomProps> = ({
     try {
       await loadGoogleFont(parsed.url);
       
-      const newFonts = [...customFonts, parsed];
-      onCustomFontsChange(newFonts);
-      onChange(parsed.family);
+      // Use combined update if available, otherwise fall back to separate updates
+      if (onAddCustomFont) {
+        onAddCustomFont(parsed, true);
+      } else {
+        const newFonts = [...customFonts, parsed];
+        onCustomFontsChange(newFonts);
+        // Use setTimeout to ensure state update happens first
+        setTimeout(() => {
+          onChange(parsed.family);
+        }, 0);
+      }
+      
       setInputValue('');
       setShowAddInput(false);
       
       toast({
         title: 'Шрифт добавлен',
-        description: `"${parsed.name}" успешно загружен`,
+        description: `"${parsed.name}" успешно загружен и выбран`,
       });
     } catch {
       toast({
