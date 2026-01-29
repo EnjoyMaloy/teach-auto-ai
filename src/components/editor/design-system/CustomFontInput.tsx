@@ -3,7 +3,8 @@ import { CustomFont } from '@/types/designSystem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, Link2, Check, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Link2, Check, Loader2, HelpCircle, ExternalLink } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
 
@@ -83,6 +84,7 @@ export const CustomFontInput: React.FC<CustomFontInputProps> = ({
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showInput, setShowInput] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
 
   const handleAddFont = async () => {
     const parsed = parseGoogleFontsInput(inputValue);
@@ -233,6 +235,58 @@ export const CustomFontInput: React.FC<CustomFontInputProps> = ({
           Добавить шрифт из Google Fonts
         </Button>
       )}
+      
+      {/* Guide section */}
+      <Collapsible open={showGuide} onOpenChange={setShowGuide}>
+        <CollapsibleTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="w-full gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <HelpCircle className="w-4 h-4" />
+            {showGuide ? 'Скрыть инструкцию' : 'Как добавить шрифт?'}
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="mt-3">
+          <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-4 text-sm">
+            <div>
+              <h4 className="font-medium text-foreground mb-2">Три способа добавить шрифт:</h4>
+              <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
+                <li>Просто введите название: <code className="px-1 py-0.5 rounded bg-muted text-xs">Montserrat</code></li>
+                <li>Вставьте ссылку со страницы шрифта</li>
+                <li>Вставьте CSS-ссылку из Google Fonts</li>
+              </ol>
+            </div>
+            
+            <div>
+              <h4 className="font-medium text-foreground mb-2">Как получить ссылку:</h4>
+              <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
+                <li>Откройте <a 
+                  href="https://fonts.google.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline inline-flex items-center gap-1"
+                >
+                  fonts.google.com <ExternalLink className="w-3 h-3" />
+                </a></li>
+                <li>Найдите нужный шрифт</li>
+                <li>Скопируйте URL из адресной строки</li>
+                <li>Вставьте в поле выше</li>
+              </ol>
+            </div>
+            
+            <div>
+              <h4 className="font-medium text-foreground mb-2">Примеры:</h4>
+              <div className="space-y-1 text-muted-foreground font-mono text-xs">
+                <p className="break-all">Montserrat</p>
+                <p className="break-all">https://fonts.google.com/specimen/Montserrat</p>
+              </div>
+            </div>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 };
