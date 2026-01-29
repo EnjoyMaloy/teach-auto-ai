@@ -1112,8 +1112,14 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             </>
           )}
         </div>
+        {answerState === 'correct' && (
+          <span className="text-sm font-medium opacity-80 mt-1">Так держать!</span>
+        )}
         {answerState === 'partial' && (
           <span className="text-sm font-medium opacity-80 mt-1">Подумай ещё чуть-чуть</span>
+        )}
+        {answerState === 'incorrect' && (
+          <span className="text-sm font-medium opacity-80 mt-1">Попробуй в следующий раз</span>
         )}
         {/* Для multiple_choice не показываем explanationCorrect */}
         {answerState === 'correct' && block?.type !== 'multiple_choice' && block?.explanationCorrect && (
@@ -1466,8 +1472,14 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                   </>
                 )}
               </div>
+              {answerState === 'correct' && (
+                <span className="text-sm font-medium opacity-80 mt-1">Так держать!</span>
+              )}
               {answerState === 'partial' && (
                 <span className="text-sm font-medium opacity-80 mt-1">Подумай ещё чуть-чуть</span>
+              )}
+              {answerState === 'incorrect' && (
+                <span className="text-sm font-medium opacity-80 mt-1">Попробуй в следующий раз</span>
               )}
             </div>
           </div>

@@ -382,8 +382,14 @@ export const SlideView: React.FC<SlideViewProps> = ({
             </>
           )}
         </div>
+        {answerState === 'correct' && (
+          <span className="text-sm font-medium opacity-80 mt-1">Так держать!</span>
+        )}
         {answerState === 'partial' && (
           <span className="text-sm font-medium opacity-80 mt-1">Подумай ещё чуть-чуть</span>
+        )}
+        {answerState === 'incorrect' && (
+          <span className="text-sm font-medium opacity-80 mt-1">Попробуй в следующий раз</span>
         )}
       </div>
     </div>
@@ -447,8 +453,14 @@ export const SlideView: React.FC<SlideViewProps> = ({
                 </>
               )}
             </div>
+            {answerState === 'correct' && (
+              <span className="text-sm font-medium opacity-80 mt-1">Так держать!</span>
+            )}
             {answerState === 'partial' && (
               <span className="text-sm font-medium opacity-80 mt-1">Подумай ещё чуть-чуть</span>
+            )}
+            {answerState === 'incorrect' && (
+              <span className="text-sm font-medium opacity-80 mt-1">Попробуй в следующий раз</span>
             )}
           </div>
         </div>
