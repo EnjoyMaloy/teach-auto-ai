@@ -734,19 +734,28 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         const parts = (block.content || 'Вставьте ___ слово').split('___');
         const showFBResult = answerState !== 'idle';
         const isCorrectFB = fillBlankInput.toLowerCase().trim() === (block.blankWord || '').toLowerCase().trim();
+        const accentColorFB = designSystem?.designBlock?.accentElementColor || ds.primaryColor;
         
         return (
           <div className="flex-1 flex flex-col items-center justify-center p-6 gap-4">
             {/* Mascot top */}
             {mascotSettings?.rivePosition === 'top' && renderMascot()}
-            <p className="text-lg text-center text-foreground">
+            <p className="text-lg text-center" style={{ color: `hsl(${ds.foregroundColor})` }}>
               {parts[0]}
-              <span className={cn(
-                "inline-block mx-1 px-4 py-1 border-b-2 rounded-lg font-medium min-w-[80px]",
-                showFBResult && isCorrectFB && "bg-success/10 border-success text-success",
-                showFBResult && !isCorrectFB && "bg-destructive/10 border-destructive text-destructive",
-                !showFBResult && "bg-primary/10 border-primary text-primary"
-              )}>
+              <span 
+                className="inline-block mx-1 px-4 py-1 border-b-2 rounded-full font-medium min-w-[80px]"
+                style={{
+                  backgroundColor: showFBResult 
+                    ? (isCorrectFB ? `hsl(${ds.successColor} / 0.1)` : `hsl(${ds.destructiveColor} / 0.1)`)
+                    : `hsl(${accentColorFB} / 0.15)`,
+                  borderColor: showFBResult 
+                    ? (isCorrectFB ? `hsl(${ds.successColor})` : `hsl(${ds.destructiveColor})`)
+                    : `hsl(${accentColorFB})`,
+                  color: showFBResult 
+                    ? (isCorrectFB ? `hsl(${ds.successColor})` : `hsl(${ds.destructiveColor})`)
+                    : `hsl(${accentColorFB})`,
+                }}
+              >
                 {fillBlankInput || '...'}
               </span>
               {parts[1]}
@@ -757,11 +766,16 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
               onChange={(e) => setFillBlankInput(e.target.value)}
               disabled={answerState !== 'idle'}
               placeholder="Введите ответ..."
-              className="w-full max-w-[200px] px-4 py-2 rounded-xl border-2 border-border bg-card text-foreground text-center focus:border-primary focus:outline-none disabled:opacity-50"
+              className="w-full max-w-[200px] px-4 py-2 rounded-full border-2 text-center focus:outline-none disabled:opacity-50"
+              style={{
+                borderColor: `hsl(${accentColorFB})`,
+                backgroundColor: `hsl(${ds.cardColor})`,
+                color: `hsl(${ds.foregroundColor})`,
+              }}
             />
             {showFBResult && !isCorrectFB && (
-              <p className="text-sm text-muted-foreground">
-                Правильный ответ: <span className="text-success font-medium">{block.blankWord}</span>
+              <p className="text-sm" style={{ color: `hsl(${ds.mutedColor})` }}>
+                Правильный ответ: <span style={{ color: `hsl(${ds.successColor})` }} className="font-medium">{block.blankWord}</span>
               </p>
             )}
             {/* Mascot bottom */}
