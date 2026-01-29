@@ -129,6 +129,7 @@ export interface DesignBlockSettings {
   tableBorderColor?: string;
   tableHeaderBgColor?: string;
   tableStripeBgColor?: string;
+  tableStripeBgColor2?: string;
 }
 
 // Mascot settings for AI-generated characters
@@ -221,6 +222,7 @@ export const DEFAULT_DESIGN_BLOCK_SETTINGS: Required<DesignBlockSettings> = {
   tableBorderColor: '240 5% 84%',
   tableHeaderBgColor: '240 5% 96%',
   tableStripeBgColor: '240 5% 98%',
+  tableStripeBgColor2: '0 0% 100%',
 };
 
 export type BackgroundType = 'solid' | 'gradient';

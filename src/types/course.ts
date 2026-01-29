@@ -175,6 +175,7 @@ export interface CourseDesignSystem {
     tableBorderColor?: string;
     tableHeaderBgColor?: string;
     tableStripeBgColor?: string;
+    tableStripeBgColor2?: string;
   };
   mascot?: MascotSettings;
 }
