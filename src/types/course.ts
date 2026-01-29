@@ -99,6 +99,11 @@ export interface CourseDesignSystem {
   destructiveColor?: string;
   fontFamily?: string;
   headingFontFamily?: string;
+  customFonts?: Array<{
+    name: string;
+    family: string;
+    url: string;
+  }>;
   borderRadius?: string;
   buttonStyle?: 'rounded' | 'pill' | 'square';
   buttonDepth?: 'flat' | 'raised';

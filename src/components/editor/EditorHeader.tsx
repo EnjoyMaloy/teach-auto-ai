@@ -435,6 +435,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
             destructiveColor: course.designSystem?.destructiveColor || '0 84% 60%',
             fontFamily: course.designSystem?.fontFamily || 'Inter, system-ui, sans-serif',
             headingFontFamily: course.designSystem?.headingFontFamily || 'Inter, system-ui, sans-serif',
+            customFonts: course.designSystem?.customFonts || [],
             borderRadius: course.designSystem?.borderRadius || '0.75rem',
             buttonStyle: course.designSystem?.buttonStyle || 'rounded',
             buttonDepth: course.designSystem?.buttonDepth || 'raised',
