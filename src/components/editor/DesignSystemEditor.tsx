@@ -653,7 +653,6 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                       accentElementColor: v 
                     } 
                   })}
-                  description="Основной цвет интерактивных элементов"
                 />
 
                 {/* Preview */}
