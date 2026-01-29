@@ -856,7 +856,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 title="Цвета ответов"
                 description="Правильные, частично правильные и неправильные ответы"
               >
-                <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-3">
                   <ColorInput
                     label="Правильный"
                     value={config.successColor || DEFAULT_DESIGN_SYSTEM.successColor}
@@ -864,8 +864,11 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                   />
                   <ColorInput
                     label="Почти"
-                    value={config.partialColor || DEFAULT_DESIGN_SYSTEM.partialColor || '35 92% 50%'}
-                    onChange={(v) => updateConfig({ partialColor: v })}
+                    value={config.partialColor || '35 92% 50%'}
+                    onChange={(v) => {
+                      console.log('Partial color onChange:', v);
+                      updateConfig({ partialColor: v });
+                    }}
                   />
                   <ColorInput
                     label="Неправильный"
