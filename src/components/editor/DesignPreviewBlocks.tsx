@@ -407,18 +407,20 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
                 className={cn(
                   "w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all",
                   isSelected 
-                    ? "bg-primary/10 border-2 border-primary" 
-                    : "hover:bg-muted border-2 border-transparent"
+                    ? "bg-primary/10 ring-2 ring-primary ring-inset" 
+                    : "hover:bg-muted/70 active:bg-muted"
                 )}
               >
                 <div className={cn(
-                  "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0",
-                  isSelected ? "bg-primary text-primary-foreground" : "bg-muted"
+                  "w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors",
+                  isSelected 
+                    ? "bg-primary text-primary-foreground" 
+                    : "bg-muted-foreground/15 text-muted-foreground"
                 )}>
                   <Icon className="w-4 h-4" />
                 </div>
                 <p className={cn(
-                  "text-base font-medium truncate flex-1",
+                  "text-sm font-medium truncate flex-1 transition-colors",
                   isSelected ? "text-primary" : "text-foreground"
                 )}>
                   {blockLabels[slide.type] || slide.type}
