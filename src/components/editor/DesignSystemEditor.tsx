@@ -857,38 +857,6 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 </div>
               </SettingsCard>
 
-              {/* Hints Card */}
-              <SettingsCard
-                icon={<Sparkles className="w-4 h-4" />}
-                title="Подсказки"
-                description="Оформление подсказок в квизах"
-                collapsible
-                defaultOpen={false}
-              >
-                <div className="grid grid-cols-2 gap-3">
-                  <ColorInput
-                    label="Фон"
-                    value={config.hintBackgroundColor || DEFAULT_DESIGN_SYSTEM.hintBackgroundColor}
-                    onChange={(v) => updateConfig({ hintBackgroundColor: v })}
-                  />
-                  <ColorInput
-                    label="Обводка"
-                    value={config.hintBorderColor || DEFAULT_DESIGN_SYSTEM.hintBorderColor}
-                    onChange={(v) => updateConfig({ hintBorderColor: v })}
-                  />
-                  <ColorInput
-                    label="Текст"
-                    value={config.hintTextColor || DEFAULT_DESIGN_SYSTEM.hintTextColor}
-                    onChange={(v) => updateConfig({ hintTextColor: v })}
-                  />
-                  <ColorInput
-                    label="Иконка"
-                    value={config.hintIconColor || DEFAULT_DESIGN_SYSTEM.hintIconColor}
-                    onChange={(v) => updateConfig({ hintIconColor: v })}
-                  />
-                </div>
-              </SettingsCard>
-
               {/* Rive Mascot Card */}
               <SettingsCard
                 icon={<Play className="w-4 h-4" />}
