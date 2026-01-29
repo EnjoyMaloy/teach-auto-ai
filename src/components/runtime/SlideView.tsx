@@ -383,13 +383,17 @@ export const SlideView: React.FC<SlideViewProps> = ({
           )}
         </div>
         {answerState === 'correct' && (
-          <span className="text-sm font-medium opacity-80 mt-1">Так держать!</span>
+          <span className="text-sm font-medium opacity-90 mt-1">
+            {block?.type === 'multiple_choice' 
+              ? (block?.explanation || 'Так держать!') 
+              : (block?.explanationCorrect || block?.explanation || 'Так держать!')}
+          </span>
         )}
         {answerState === 'partial' && (
-          <span className="text-sm font-medium opacity-80 mt-1">Подумай ещё чуть-чуть</span>
+          <span className="text-sm font-medium opacity-90 mt-1">Подумай ещё чуть-чуть</span>
         )}
-        {answerState === 'incorrect' && block?.explanation && (
-          <span className="text-sm font-medium opacity-80 mt-1">{block.explanation}</span>
+        {answerState === 'incorrect' && (
+          <span className="text-sm font-medium opacity-90 mt-1">{block?.explanation || 'Попробуй ещё раз'}</span>
         )}
       </div>
     </div>
@@ -428,7 +432,7 @@ export const SlideView: React.FC<SlideViewProps> = ({
                 ? `hsl(48 100% 90%)`
                 : `hsl(0 100% 95%)`,
             color: answerState === 'correct' 
-              ? `hsl(${ds.successColor})` 
+              ? `hsl(142 60% 30%)` 
               : answerState === 'partial'
                 ? `hsl(35 80% 35%)`
                 : `hsl(${ds.destructiveColor})`,
@@ -454,13 +458,17 @@ export const SlideView: React.FC<SlideViewProps> = ({
               )}
             </div>
             {answerState === 'correct' && (
-              <span className="text-sm font-medium opacity-80 mt-1">Так держать!</span>
+              <span className="text-sm font-medium opacity-90 mt-1">
+                {block?.type === 'multiple_choice' 
+                  ? (block?.explanation || 'Так держать!') 
+                  : (block?.explanationCorrect || block?.explanation || 'Так держать!')}
+              </span>
             )}
             {answerState === 'partial' && (
-              <span className="text-sm font-medium opacity-80 mt-1">Подумай ещё чуть-чуть</span>
+              <span className="text-sm font-medium opacity-90 mt-1">Подумай ещё чуть-чуть</span>
             )}
-            {answerState === 'incorrect' && block?.explanation && (
-              <span className="text-sm font-medium opacity-80 mt-1">{block.explanation}</span>
+            {answerState === 'incorrect' && (
+              <span className="text-sm font-medium opacity-90 mt-1">{block?.explanation || 'Попробуй ещё раз'}</span>
             )}
           </div>
         </div>
