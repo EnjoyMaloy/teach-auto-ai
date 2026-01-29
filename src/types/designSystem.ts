@@ -94,6 +94,9 @@ export interface DesignBlockSettings {
   
   // Accent color for interactive elements (progress bar, quiz selections)
   accentElementColor?: string;
+  
+  // Badge color for badge sub-blocks
+  badgeColor?: string;
 }
 
 // Mascot settings for AI-generated characters
@@ -155,6 +158,8 @@ export const DEFAULT_DESIGN_BLOCK_SETTINGS: Required<DesignBlockSettings> = {
   highlightWavyColor: '0 84% 60%',
   // Accent color for progress bar and quiz selections
   accentElementColor: '262 83% 58%',
+  // Badge color for badge sub-blocks
+  badgeColor: '262 83% 58%',
 };
 
 export type BackgroundType = 'solid' | 'gradient';
