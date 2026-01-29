@@ -612,33 +612,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
       ) : (
       /* Detailed Settings - view-only for non-admins with base system selected */
       <div className={cn("space-y-4", isEditingRestricted && "opacity-60 [&_input]:pointer-events-none [&_input]:opacity-50 [&_button:not([data-radix-collection-item])]:pointer-events-none [&_button:not([data-radix-collection-item])]:opacity-50 [&_select]:pointer-events-none [&_textarea]:pointer-events-none [&_[role=slider]]:pointer-events-none [&_[role=switch]]:pointer-events-none [&_[type=color]]:pointer-events-none")}>
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-foreground">Детальные настройки</h3>
-          {selectedBaseSystemId && !isEditingRestricted && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                // Find the selected theme and reset to its original config
-                const baseTheme = baseSystems.find(s => s.id === selectedBaseSystemId);
-                const userTheme = userSystems.find(s => s.id === selectedBaseSystemId);
-                const originalConfig = baseTheme?.config || userTheme?.config;
-                
-                if (originalConfig) {
-                  onChange({ ...originalConfig, themeId: selectedBaseSystemId });
-                  toast({
-                    title: "Настройки сброшены",
-                    description: "Тема возвращена к исходным настройкам",
-                  });
-                }
-              }}
-              className="text-xs text-muted-foreground hover:text-foreground gap-1.5"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              Сбросить
-            </Button>
-          )}
-        </div>
+        <h3 className="font-semibold text-foreground">Детальные настройки</h3>
         <Tabs defaultValue="ui" className="w-full">
           <TabsList className="w-full grid grid-cols-3 grid-rows-2 h-auto p-1 bg-muted/50 gap-1">
             <TabsTrigger value="ui" className="text-xs py-2 px-1 data-[state=active]:bg-background">
