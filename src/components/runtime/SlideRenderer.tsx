@@ -756,15 +756,37 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
   // Фидбек после ответа
   const renderFeedback = () => {
     if (answerState === 'idle') return null;
-    // Solid pastel backgrounds (no transparency)
+    
+    // Helper to create soft pastel version of HSL color
+    const getSoftColor = (hslColor: string, lightness: number = 90) => {
+      const parts = hslColor.split(' ');
+      if (parts.length >= 2) {
+        const hue = parts[0];
+        const sat = parseInt(parts[1]) * 0.6; // Reduce saturation for softer look
+        return `hsl(${hue} ${sat}% ${lightness}%)`;
+      }
+      return `hsl(${hslColor} / 0.15)`;
+    };
+    
+    // Helper to create dark text version of HSL color
+    const getDarkTextColor = (hslColor: string) => {
+      const parts = hslColor.split(' ');
+      if (parts.length >= 2) {
+        const hue = parts[0];
+        return `hsl(${hue} 60% 30%)`; // Dark version with same hue
+      }
+      return `hsl(${hslColor})`;
+    };
+    
+    // Solid pastel backgrounds based on configured colors
     const bgColor = answerState === 'correct' 
-      ? `hsl(88 62% 85%)`
+      ? getSoftColor(ds.successColor, 90)
       : answerState === 'partial'
         ? `hsl(48 100% 90%)`
-        : `hsl(0 100% 95%)`;
+        : getSoftColor(ds.destructiveColor, 93);
     
     const textColor = answerState === 'correct'
-      ? `hsl(142 60% 30%)`
+      ? getDarkTextColor(ds.successColor)
       : answerState === 'partial'
         ? `hsl(35 80% 35%)`
         : `hsl(${ds.destructiveColor})`;
