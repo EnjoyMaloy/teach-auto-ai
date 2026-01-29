@@ -781,23 +781,20 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
       return `hsl(${hslColor})`;
     };
     
-    // Get the accent color (used for selection borders and highlights)
-    const accentColor = ds.designBlock?.accentElementColor || ds.primaryColor;
-    
     // Solid pastel backgrounds based on configured colors
-    // For incorrect answers, use the same accent color as selection borders (soft version)
+    // Each state uses its own color from design system
     const bgColor = answerState === 'correct' 
       ? getSoftColor(ds.successColor, 90)
       : answerState === 'partial'
         ? `hsl(48 100% 90%)`
-        : getSoftColor(accentColor, 93);
+        : getSoftColor(ds.destructiveColor, 93);
     
-    // Text color for incorrect uses destructive color, for correct uses success
+    // Text color uses corresponding design system color
     const textColor = answerState === 'correct'
       ? getDarkTextColor(ds.successColor)
       : answerState === 'partial'
         ? `hsl(35 80% 35%)`
-        : getDarkTextColor(accentColor);
+        : getDarkTextColor(ds.destructiveColor);
 
     const title = answerState === 'correct' 
       ? 'Правильно!' 
