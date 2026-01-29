@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ArrowLeft, Shield, User } from 'lucide-react';
 import { DesignSystemConfig } from '@/types/designSystem';
 import { DesignSystemEditor } from './DesignSystemEditor';
@@ -28,11 +29,17 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
   selectedBaseSystemId,
   onBaseSystemSelect,
 }) => {
+  const navigate = useNavigate();
+  
   // Test mode toggle - allows switching between admin and regular user view
   const [isTestModeAdmin, setIsTestModeAdmin] = useState(realIsAdmin);
 
   // Use test mode value for display, but only if real user is admin
   const effectiveIsAdmin = realIsAdmin ? isTestModeAdmin : false;
+
+  const handleGoToWorkshop = () => {
+    navigate('/workshop');
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col">
@@ -50,15 +57,18 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
           </Button>
           <div className="h-5 w-px bg-border" />
           <button
-            onClick={onClose}
+            onClick={handleGoToWorkshop}
             className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
           >
             Мастерская
           </button>
           <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
-          <span className="text-sm font-medium text-muted-foreground max-w-[200px] truncate">
+          <button
+            onClick={onClose}
+            className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors max-w-[200px] truncate"
+          >
             {courseTitle}
-          </span>
+          </button>
           <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
           <span className="text-sm font-semibold text-foreground">
             Дизайн-система
