@@ -1109,131 +1109,134 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
             </TabsContent>
 
             {/* === TYPOGRAPHY TAB === */}
-            <TabsContent value="typography" className="space-y-6">
-              <div className="space-y-2">
-                <Label className="text-base font-semibold">Шрифты курса</Label>
-                <p className="text-sm text-muted-foreground">
-                  Выберите шрифты для текста и заголовков
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Основной шрифт</Label>
-                  <Select
-                    value={config.fontFamily}
-                    onValueChange={(v) => updateConfig({ fontFamily: v })}
-                  >
-                    <SelectTrigger className="w-full h-12">
-                      <div className="flex items-center justify-between w-full">
-                        <span style={{ fontFamily: config.fontFamily }} className="text-base">
-                          {FONT_OPTIONS.find(f => f.value === config.fontFamily)?.label || 'Выберите шрифт'}
-                        </span>
-                        <span style={{ fontFamily: config.fontFamily }} className="text-muted-foreground text-sm">
-                          Аа Bb
-                        </span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent className="max-h-80">
-                      {FONT_OPTIONS.map((font) => (
-                        <SelectItem 
-                          key={font.value} 
-                          value={font.value}
-                          className="py-3"
-                        >
-                          <div className="flex items-center justify-between w-full gap-4">
-                            <span style={{ fontFamily: font.value }} className="text-base">
-                              {font.label}
-                            </span>
-                            <span style={{ fontFamily: font.value }} className="text-muted-foreground text-lg">
-                              Аа Bb
-                            </span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {/* Preview */}
-                  <div 
-                    className="p-3 rounded-lg border bg-muted/30 text-sm"
-                    style={{ fontFamily: config.fontFamily }}
-                  >
-                    Пример текста с выбранным шрифтом — The quick brown fox
-                  </div>
+            <TabsContent value="typography" className="space-y-4">
+              {/* Body Font Card */}
+              <SettingsCard
+                icon={<Type className="w-4 h-4" />}
+                title="Основной шрифт"
+                description="Для основного текста и параграфов"
+              >
+                <Select
+                  value={config.fontFamily}
+                  onValueChange={(v) => updateConfig({ fontFamily: v })}
+                >
+                  <SelectTrigger className="w-full h-12">
+                    <div className="flex items-center justify-between w-full">
+                      <span style={{ fontFamily: config.fontFamily }} className="text-base">
+                        {FONT_OPTIONS.find(f => f.value === config.fontFamily)?.label || 'Выберите шрифт'}
+                      </span>
+                      <span style={{ fontFamily: config.fontFamily }} className="text-muted-foreground text-sm">
+                        Аа Bb
+                      </span>
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="max-h-80">
+                    {FONT_OPTIONS.map((font) => (
+                      <SelectItem 
+                        key={font.value} 
+                        value={font.value}
+                        className="py-3"
+                      >
+                        <div className="flex items-center justify-between w-full gap-4">
+                          <span style={{ fontFamily: font.value }} className="text-base">
+                            {font.label}
+                          </span>
+                          <span style={{ fontFamily: font.value }} className="text-muted-foreground text-lg">
+                            Аа Bb
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {/* Preview */}
+                <div 
+                  className="p-3 rounded-lg border bg-muted/30 text-sm"
+                  style={{ fontFamily: config.fontFamily }}
+                >
+                  Пример текста с выбранным шрифтом — The quick brown fox
                 </div>
+              </SettingsCard>
 
-                <div className="space-y-2">
-                  <Label>Шрифт заголовков</Label>
-                  <Select
-                    value={config.headingFontFamily}
-                    onValueChange={(v) => updateConfig({ headingFontFamily: v })}
-                  >
-                    <SelectTrigger className="w-full h-12">
-                      <div className="flex items-center justify-between w-full">
-                        <span style={{ fontFamily: config.headingFontFamily }} className="text-base">
-                          {FONT_OPTIONS.find(f => f.value === config.headingFontFamily)?.label || 'Выберите шрифт'}
-                        </span>
-                        <span style={{ fontFamily: config.headingFontFamily }} className="text-muted-foreground text-sm">
-                          Аа Bb
-                        </span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent className="max-h-80">
-                      {FONT_OPTIONS.map((font) => (
-                        <SelectItem 
-                          key={font.value} 
-                          value={font.value}
-                          className="py-3"
-                        >
-                          <div className="flex items-center justify-between w-full gap-4">
-                            <span style={{ fontFamily: font.value }} className="text-base">
-                              {font.label}
-                            </span>
-                            <span style={{ fontFamily: font.value }} className="text-muted-foreground text-lg">
-                              Аа Bb
-                            </span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {/* Preview */}
-                  <div 
-                    className="p-3 rounded-lg border bg-muted/30 text-lg font-bold"
-                    style={{ fontFamily: config.headingFontFamily }}
-                  >
-                    Заголовок — Heading
-                  </div>
+              {/* Heading Font Card */}
+              <SettingsCard
+                icon={<Type className="w-4 h-4" />}
+                title="Шрифт заголовков"
+                description="Для заголовков и подзаголовков"
+              >
+                <Select
+                  value={config.headingFontFamily}
+                  onValueChange={(v) => updateConfig({ headingFontFamily: v })}
+                >
+                  <SelectTrigger className="w-full h-12">
+                    <div className="flex items-center justify-between w-full">
+                      <span style={{ fontFamily: config.headingFontFamily }} className="text-base">
+                        {FONT_OPTIONS.find(f => f.value === config.headingFontFamily)?.label || 'Выберите шрифт'}
+                      </span>
+                      <span style={{ fontFamily: config.headingFontFamily }} className="text-muted-foreground text-sm">
+                        Аа Bb
+                      </span>
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="max-h-80">
+                    {FONT_OPTIONS.map((font) => (
+                      <SelectItem 
+                        key={font.value} 
+                        value={font.value}
+                        className="py-3"
+                      >
+                        <div className="flex items-center justify-between w-full gap-4">
+                          <span style={{ fontFamily: font.value }} className="text-base">
+                            {font.label}
+                          </span>
+                          <span style={{ fontFamily: font.value }} className="text-muted-foreground text-lg">
+                            Аа Bb
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {/* Preview */}
+                <div 
+                  className="p-3 rounded-lg border bg-muted/30 text-lg font-bold"
+                  style={{ fontFamily: config.headingFontFamily }}
+                >
+                  Заголовок — Heading
                 </div>
-              </div>
+              </SettingsCard>
             </TabsContent>
 
             {/* === SOUND TAB === */}
-            <TabsContent value="sound" className="space-y-6">
-              {/* Sound enabled toggle */}
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Звуковые эффекты</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Звуки при переходах и ответах
-                  </p>
+            <TabsContent value="sound" className="space-y-4">
+              {/* Sound Toggle Card */}
+              <SettingsCard
+                icon={config.sound?.enabled !== false ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                title="Звуковые эффекты"
+                description="Звуки при переходах и ответах"
+              >
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm">Включить звуки</Label>
+                  <Switch
+                    checked={config.sound?.enabled !== false}
+                    onCheckedChange={(enabled) => 
+                      updateConfig({ 
+                        sound: { ...DEFAULT_SOUND_SETTINGS, ...config.sound, enabled } 
+                      })
+                    }
+                  />
                 </div>
-                <Switch
-                  checked={config.sound?.enabled !== false}
-                  onCheckedChange={(enabled) => 
-                    updateConfig({ 
-                      sound: { ...DEFAULT_SOUND_SETTINGS, ...config.sound, enabled } 
-                    })
-                  }
-                />
-              </div>
+              </SettingsCard>
 
               {/* Sound settings - only show when enabled */}
               {config.sound?.enabled !== false && (
                 <>
-                  {/* Sound theme */}
-                  <div className="space-y-3">
-                    <Label>Тема звуков</Label>
+                  {/* Sound theme Card */}
+                  <SettingsCard
+                    icon={<Sparkles className="w-4 h-4" />}
+                    title="Тема звуков"
+                    description="Стиль звукового оформления"
+                  >
                     <div className="grid grid-cols-3 gap-2">
                       {SOUND_THEME_OPTIONS.map((theme) => {
                         const currentTheme = config.sound?.theme ?? 'duolingo';
@@ -1259,7 +1262,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                               }
                             }}
                             className={cn(
-                              "p-2 rounded-lg border-2 text-center transition-all text-sm",
+                              "p-2.5 rounded-lg border-2 text-center transition-all text-sm font-medium",
                               currentTheme === theme.value
                                 ? "border-primary bg-primary/5"
                                 : "border-border hover:border-primary/50"
@@ -1270,16 +1273,14 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                         );
                       })}
                     </div>
-                  </div>
+                  </SettingsCard>
 
-                  {/* Volume slider */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Label>Громкость</Label>
-                      <span className="text-sm text-muted-foreground">
-                        {Math.round((config.sound?.volume ?? 0.5) * 100)}%
-                      </span>
-                    </div>
+                  {/* Volume Card */}
+                  <SettingsCard
+                    icon={<Volume2 className="w-4 h-4" />}
+                    title="Громкость"
+                    description={`${Math.round((config.sound?.volume ?? 0.5) * 100)}%`}
+                  >
                     <Slider
                       value={[(config.sound?.volume ?? 0.5) * 100]}
                       min={0}
@@ -1305,11 +1306,16 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                       }}
                       className="w-full"
                     />
-                  </div>
+                  </SettingsCard>
 
-                  {/* Test sounds */}
-                  <div className="space-y-3">
-                    <Label>Проверить звуки</Label>
+                  {/* Test Sounds Card */}
+                  <SettingsCard
+                    icon={<Play className="w-4 h-4" />}
+                    title="Проверить звуки"
+                    description="Прослушайте звуки курса"
+                    collapsible
+                    defaultOpen={false}
+                  >
                     <div className="flex flex-wrap gap-2">
                       {[
                         { type: 'swipe', label: 'Переход' },
@@ -1332,13 +1338,13 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                         </Button>
                       ))}
                     </div>
-                  </div>
+                  </SettingsCard>
                 </>
               )}
             </TabsContent>
 
             {/* === MASCOT TAB === */}
-            <TabsContent value="mascot" className="space-y-6">
+            <TabsContent value="mascot" className="space-y-4">
               {/* Status banner */}
               <div className={cn(
                 "p-4 rounded-xl border-2 flex items-start gap-3",
@@ -1363,102 +1369,116 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 </div>
               </div>
 
-              {/* Mascot name */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Имя персонажа</Label>
-                <Input
-                  value={config.mascot?.name || ''}
-                  onChange={(e) => updateConfig({ 
-                    mascot: { 
-                      ...DEFAULT_MASCOT_SETTINGS, 
-                      ...config.mascot, 
-                      name: e.target.value 
-                    } 
-                  })}
-                  placeholder="Например: Профессор Лис, Робот Эдди, Сова Мудрила..."
-                  disabled={config.mascot?.isApproved}
-                />
-              </div>
+              {/* Basic Info Card */}
+              <SettingsCard
+                icon={<Bot className="w-4 h-4" />}
+                title="Основные данные"
+                description="Имя и описание персонажа"
+              >
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm">Имя персонажа</Label>
+                    <Input
+                      value={config.mascot?.name || ''}
+                      onChange={(e) => updateConfig({ 
+                        mascot: { 
+                          ...DEFAULT_MASCOT_SETTINGS, 
+                          ...config.mascot, 
+                          name: e.target.value 
+                        } 
+                      })}
+                      placeholder="Например: Профессор Лис, Робот Эдди..."
+                      disabled={config.mascot?.isApproved}
+                    />
+                  </div>
 
-              {/* AI Prompt */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Промт для ИИ</Label>
-                <Textarea
-                  value={config.mascot?.prompt || ''}
-                  onChange={(e) => updateConfig({ 
-                    mascot: { 
-                      ...DEFAULT_MASCOT_SETTINGS, 
-                      ...config.mascot, 
-                      prompt: e.target.value 
-                    } 
-                  })}
-                  placeholder="Опишите внешний вид персонажа: вид животного/существа, одежда, цвета, особенности...
+                  <div className="space-y-2">
+                    <Label className="text-sm">Промт для ИИ</Label>
+                    <Textarea
+                      value={config.mascot?.prompt || ''}
+                      onChange={(e) => updateConfig({ 
+                        mascot: { 
+                          ...DEFAULT_MASCOT_SETTINGS, 
+                          ...config.mascot, 
+                          prompt: e.target.value 
+                        } 
+                      })}
+                      placeholder="Опишите внешний вид персонажа: вид животного/существа, одежда, цвета..."
+                      className="min-h-[100px] resize-none"
+                      disabled={config.mascot?.isApproved}
+                    />
+                  </div>
+                </div>
+              </SettingsCard>
 
-Пример: Дружелюбный лис-профессор в очках и твидовом пиджаке. Рыжий мех с белым пятном на груди. Большие добрые глаза. Всегда носит с собой книгу."
-                  className="min-h-[120px] resize-none"
-                  disabled={config.mascot?.isApproved}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Чем подробнее описание, тем лучше ИИ сможет генерировать консистентные изображения
-                </p>
-              </div>
+              {/* Style & Personality Card */}
+              <SettingsCard
+                icon={<Sparkles className="w-4 h-4" />}
+                title="Стиль и характер"
+                description="Визуальный стиль и поведение"
+                collapsible
+                defaultOpen={false}
+              >
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm">Стиль иллюстрации</Label>
+                    <Select
+                      value={config.mascot?.style || 'flat vector illustration'}
+                      onValueChange={(v) => updateConfig({ 
+                        mascot: { 
+                          ...DEFAULT_MASCOT_SETTINGS, 
+                          ...config.mascot, 
+                          style: v 
+                        } 
+                      })}
+                      disabled={config.mascot?.isApproved}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="flat vector illustration">Плоская векторная иллюстрация</SelectItem>
+                        <SelectItem value="3D cartoon">3D мультяшный</SelectItem>
+                        <SelectItem value="pixel art">Пиксель-арт</SelectItem>
+                        <SelectItem value="watercolor illustration">Акварельная иллюстрация</SelectItem>
+                        <SelectItem value="anime style">Аниме стиль</SelectItem>
+                        <SelectItem value="minimalist line art">Минималистичный лайн-арт</SelectItem>
+                        <SelectItem value="cute kawaii">Милый кавай</SelectItem>
+                        <SelectItem value="realistic illustration">Реалистичная иллюстрация</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              {/* Style */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Стиль иллюстрации</Label>
-                <Select
-                  value={config.mascot?.style || 'flat vector illustration'}
-                  onValueChange={(v) => updateConfig({ 
-                    mascot: { 
-                      ...DEFAULT_MASCOT_SETTINGS, 
-                      ...config.mascot, 
-                      style: v 
-                    } 
-                  })}
-                  disabled={config.mascot?.isApproved}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="flat vector illustration">Плоская векторная иллюстрация</SelectItem>
-                    <SelectItem value="3D cartoon">3D мультяшный</SelectItem>
-                    <SelectItem value="pixel art">Пиксель-арт</SelectItem>
-                    <SelectItem value="watercolor illustration">Акварельная иллюстрация</SelectItem>
-                    <SelectItem value="anime style">Аниме стиль</SelectItem>
-                    <SelectItem value="minimalist line art">Минималистичный лайн-арт</SelectItem>
-                    <SelectItem value="cute kawaii">Милый кавай</SelectItem>
-                    <SelectItem value="realistic illustration">Реалистичная иллюстрация</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Характер персонажа</Label>
+                    <Textarea
+                      value={config.mascot?.personality || ''}
+                      onChange={(e) => updateConfig({ 
+                        mascot: { 
+                          ...DEFAULT_MASCOT_SETTINGS, 
+                          ...config.mascot, 
+                          personality: e.target.value 
+                        } 
+                      })}
+                      placeholder="Опишите характер: как персонаж говорит, какие эмоции выражает..."
+                      className="min-h-[80px] resize-none"
+                      disabled={config.mascot?.isApproved}
+                    />
+                  </div>
+                </div>
+              </SettingsCard>
 
-              {/* Personality */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Характер персонажа</Label>
-                <Textarea
-                  value={config.mascot?.personality || ''}
-                  onChange={(e) => updateConfig({ 
-                    mascot: { 
-                      ...DEFAULT_MASCOT_SETTINGS, 
-                      ...config.mascot, 
-                      personality: e.target.value 
-                    } 
-                  })}
-                  placeholder="Опишите характер: как персонаж говорит, какие эмоции выражает...
-
-Пример: Добрый и терпеливый учитель. Радуется успехам ученика, подбадривает при ошибках. Использует простые объяснения и шутки."
-                  className="min-h-[100px] resize-none"
-                  disabled={config.mascot?.isApproved}
-                />
-              </div>
-
-              {/* Approved Image - File Upload */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Референс изображение</Label>
+              {/* Reference Image Card */}
+              <SettingsCard
+                icon={<ImageIcon className="w-4 h-4" />}
+                title="Референс изображение"
+                description="Загрузите образец внешнего вида"
+                collapsible
+                defaultOpen={!!config.mascot?.approvedImageUrl}
+              >
                 <div className="flex gap-3">
                   <div className={cn(
-                    "w-24 h-24 rounded-xl border-2 border-dashed flex items-center justify-center overflow-hidden bg-muted/30 relative",
+                    "w-20 h-20 rounded-xl border-2 border-dashed flex items-center justify-center overflow-hidden bg-muted/30 relative flex-shrink-0",
                     config.mascot?.approvedImageUrl ? "border-primary/30" : "border-border"
                   )}>
                     {config.mascot?.approvedImageUrl ? (
@@ -1485,13 +1505,11 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                         )}
                       </>
                     ) : (
-                      <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                      <ImageIcon className="w-6 h-6 text-muted-foreground" />
                     )}
                   </div>
                   <div className="flex-1 space-y-2">
-                    {config.mascot?.approvedImageUrl ? (
-                      <p className="text-sm text-foreground">Референс загружен</p>
-                    ) : (
+                    {!config.mascot?.approvedImageUrl && (
                       <label className={cn(
                         "flex flex-col items-center justify-center gap-1 p-3 rounded-xl border-2 border-dashed transition-colors cursor-pointer",
                         config.mascot?.isApproved 
@@ -1532,18 +1550,15 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                           }}
                         />
                         <Upload className="w-5 h-5 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">Загрузить изображение</span>
+                        <span className="text-xs text-muted-foreground">Загрузить</span>
                       </label>
                     )}
-                    <p className="text-xs text-muted-foreground">
-                      Загрузите референс изображение маскота
-                    </p>
                   </div>
                 </div>
-              </div>
+              </SettingsCard>
 
               {/* Approve button */}
-              <div className="pt-4 border-t border-border">
+              <div className="pt-2">
                 <Button
                   variant={config.mascot?.isApproved ? "outline" : "default"}
                   onClick={() => updateConfig({ 
@@ -1569,7 +1584,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 </Button>
                 {!config.mascot?.isApproved && (
                   <p className="text-xs text-muted-foreground text-center mt-2">
-                    После утверждения ИИ-агент будет использовать эти настройки для генерации персонажа
+                    После утверждения ИИ-агент будет использовать эти настройки
                   </p>
                 )}
               </div>
