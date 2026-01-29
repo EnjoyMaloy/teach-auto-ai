@@ -41,7 +41,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import AppLayout from '@/components/layout/AppLayout';
+
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -247,7 +247,7 @@ const Dashboard: React.FC = () => {
   );
 
   return (
-    <AppLayout>
+    <>
       {/* Page Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-6">
@@ -331,7 +331,7 @@ const Dashboard: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </AppLayout>
+    </>
   );
 };
 

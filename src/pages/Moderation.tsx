@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import AppLayout from '@/components/layout/AppLayout';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -193,7 +193,7 @@ const Moderation: React.FC = () => {
   }
 
   return (
-    <AppLayout>
+    <>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-foreground">Модерация курсов</h1>
         <p className="text-muted-foreground mt-1">
@@ -349,7 +349,7 @@ const Moderation: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </AppLayout>
+    </>
   );
 };
 

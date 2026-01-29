@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AppLayout from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, Clock, Layers, TrendingUp, Sparkles, Zap, Target, ArrowRight } from 'lucide-react';
@@ -133,8 +132,7 @@ const Home: React.FC = () => {
   const hasCourses = courses.length > 0;
 
   return (
-    <AppLayout>
-
+    <>
       {isLoading ? (
         <div className="space-y-8">
           {[1, 2].map(i => (
@@ -241,7 +239,7 @@ const Home: React.FC = () => {
           )}
         </>
       )}
-    </AppLayout>
+    </>
   );
 };
 

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
+import ProtectedLayout from "@/components/layout/ProtectedLayout";
 
 // Lazy load route components for code splitting
 const Editor = lazy(() => import("./pages/Editor"));
@@ -68,22 +69,28 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const AppRoutes = () => (
-  <Suspense fallback={<PageLoader />}>
-    <Routes>
-      <Route path="/auth" element={<PublicRoute><Auth /></PublicRoute>} />
-      <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-      <Route path="/catalog" element={<ProtectedRoute><Catalog /></ProtectedRoute>} />
-      <Route path="/workshop" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-      <Route path="/editor/:courseId" element={<ProtectedRoute><Editor /></ProtectedRoute>} />
-      <Route path="/course/:courseId/settings" element={<ProtectedRoute><CourseSettings /></ProtectedRoute>} />
-      <Route path="/course/:courseId/stats" element={<ProtectedRoute><CourseStats /></ProtectedRoute>} />
-      <Route path="/moderation" element={<ProtectedRoute><Moderation /></ProtectedRoute>} />
-      <Route path="/dictionary" element={<ProtectedRoute><Dictionary /></ProtectedRoute>} />
-      <Route path="/course/:courseId" element={<PublicCourse />} />
-      <Route path="/c/:shortId" element={<ShortCourse />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  </Suspense>
+  <Routes>
+    <Route path="/auth" element={<PublicRoute><Suspense fallback={<PageLoader />}><Auth /></Suspense></PublicRoute>} />
+    
+    {/* Protected routes with persistent layout */}
+    <Route element={<ProtectedRoute><ProtectedLayout /></ProtectedRoute>}>
+      <Route path="/" element={<Suspense fallback={<PageLoader />}><Home /></Suspense>} />
+      <Route path="/catalog" element={<Suspense fallback={<PageLoader />}><Catalog /></Suspense>} />
+      <Route path="/workshop" element={<Suspense fallback={<PageLoader />}><Dashboard /></Suspense>} />
+      <Route path="/moderation" element={<Suspense fallback={<PageLoader />}><Moderation /></Suspense>} />
+      <Route path="/dictionary" element={<Suspense fallback={<PageLoader />}><Dictionary /></Suspense>} />
+    </Route>
+    
+    {/* Protected routes without sidebar layout */}
+    <Route path="/editor/:courseId" element={<ProtectedRoute><Suspense fallback={<PageLoader />}><Editor /></Suspense></ProtectedRoute>} />
+    <Route path="/course/:courseId/settings" element={<ProtectedRoute><Suspense fallback={<PageLoader />}><CourseSettings /></Suspense></ProtectedRoute>} />
+    <Route path="/course/:courseId/stats" element={<ProtectedRoute><Suspense fallback={<PageLoader />}><CourseStats /></Suspense></ProtectedRoute>} />
+    
+    {/* Public routes */}
+    <Route path="/course/:courseId" element={<Suspense fallback={<PageLoader />}><PublicCourse /></Suspense>} />
+    <Route path="/c/:shortId" element={<Suspense fallback={<PageLoader />}><ShortCourse /></Suspense>} />
+    <Route path="*" element={<Suspense fallback={<PageLoader />}><NotFound /></Suspense>} />
+  </Routes>
 );
 
 const App = () => (
