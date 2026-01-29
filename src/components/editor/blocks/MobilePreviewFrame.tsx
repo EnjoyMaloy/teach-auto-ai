@@ -528,9 +528,10 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                     bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
                     textColor = `hsl(${ds.destructiveColor})`;
                   } else if (!showResult && isSelected) {
-                    borderColor = `hsl(${ds.primaryColor})`;
-                    bgColor = `hsl(${ds.primaryColor} / 0.1)`;
-                    textColor = `hsl(${ds.primaryColor})`;
+                    const accentColor = designSystem?.designBlock?.accentElementColor || ds.primaryColor;
+                    borderColor = `hsl(${accentColor})`;
+                    bgColor = `hsl(${accentColor} / 0.1)`;
+                    textColor = `hsl(${accentColor})`;
                   }
                   
                   return (
@@ -602,9 +603,10 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                     bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
                     textColor = `hsl(${ds.destructiveColor})`;
                   } else if (!showResult && isSelected) {
-                    borderColor = `hsl(${ds.primaryColor})`;
-                    bgColor = `hsl(${ds.primaryColor} / 0.1)`;
-                    textColor = `hsl(${ds.primaryColor})`;
+                    const accentColor = designSystem?.designBlock?.accentElementColor || ds.primaryColor;
+                    borderColor = `hsl(${accentColor})`;
+                    bgColor = `hsl(${accentColor} / 0.1)`;
+                    textColor = `hsl(${accentColor})`;
                   }
                   
                   return (
@@ -670,9 +672,10 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             bgColor = `hsl(${ds.destructiveColor} / 0.1)`;
             textColor = `hsl(${ds.destructiveColor})`;
           } else if (!showTFResult && isSelected) {
-            borderColor = `hsl(${ds.primaryColor})`;
-            bgColor = `hsl(${ds.primaryColor} / 0.1)`;
-            textColor = `hsl(${ds.primaryColor})`;
+            const accentColor = designSystem?.designBlock?.accentElementColor || ds.primaryColor;
+            borderColor = `hsl(${accentColor})`;
+            bgColor = `hsl(${accentColor} / 0.1)`;
+            textColor = `hsl(${accentColor})`;
           }
           
           return { borderColor, backgroundColor: bgColor, color: textColor, borderRadius: ds.borderRadius };
@@ -811,7 +814,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                       width: `${sliderPercent}%`,
                       backgroundColor: showSliderResult 
                         ? (isSliderCorrect ? `hsl(${ds.successColor})` : `hsl(${ds.destructiveColor})`)
-                        : `hsl(${ds.primaryColor})`
+                        : `hsl(${designSystem?.designBlock?.accentElementColor || ds.primaryColor})`
                     }}
                   />
                 </div>
