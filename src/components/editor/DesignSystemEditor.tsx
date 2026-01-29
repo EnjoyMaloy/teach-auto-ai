@@ -716,13 +716,11 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     label="Цвет кнопки"
                     value={config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor}
                     onChange={(v) => updateConfig({ primaryColor: v })}
-                    description="Основной цвет кнопок"
                   />
                   <ColorInput
                     label="Текст на кнопке"
                     value={config.primaryForeground || DEFAULT_DESIGN_SYSTEM.primaryForeground}
                     onChange={(v) => updateConfig({ primaryForeground: v })}
-                    description="Цвет текста на кнопках"
                   />
                 </div>
 
