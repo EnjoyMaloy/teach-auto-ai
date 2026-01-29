@@ -1387,12 +1387,17 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 description="Для основного текста и параграфов"
               >
                 <FontSelectorWithCustom
-                  label=""
-                  description=""
                   value={config.fontFamily}
                   onChange={(v) => updateConfig({ fontFamily: v })}
                   customFonts={config.customFonts || []}
                   onCustomFontsChange={(fonts) => updateConfig({ customFonts: fonts })}
+                  onAddCustomFont={(font, selectIt) => {
+                    const newFonts = [...(config.customFonts || []), font];
+                    updateConfig({ 
+                      customFonts: newFonts,
+                      ...(selectIt ? { fontFamily: font.family } : {})
+                    });
+                  }}
                   previewText="Пример текста с выбранным шрифтом — The quick brown fox"
                   previewClassName="text-sm"
                 />
@@ -1405,12 +1410,17 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 description="Для заголовков и подзаголовков"
               >
                 <FontSelectorWithCustom
-                  label=""
-                  description=""
                   value={config.headingFontFamily}
                   onChange={(v) => updateConfig({ headingFontFamily: v })}
                   customFonts={config.customFonts || []}
                   onCustomFontsChange={(fonts) => updateConfig({ customFonts: fonts })}
+                  onAddCustomFont={(font, selectIt) => {
+                    const newFonts = [...(config.customFonts || []), font];
+                    updateConfig({ 
+                      customFonts: newFonts,
+                      ...(selectIt ? { headingFontFamily: font.family } : {})
+                    });
+                  }}
                   previewText="Заголовок — Heading"
                   previewClassName="text-lg font-bold"
                 />
