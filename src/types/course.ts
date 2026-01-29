@@ -146,6 +146,8 @@ export interface CourseDesignSystem {
     progressBackdropColor?: string;
     // Accent color for interactive elements (progress bar, quiz selections)
     accentElementColor?: string;
+    // Badge color for badge sub-blocks
+    badgeColor?: string;
   };
   mascot?: MascotSettings;
 }

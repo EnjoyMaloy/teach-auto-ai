@@ -133,6 +133,8 @@ const SortableSubBlockItem: React.FC<{
     highlightMarkerColor: designSystem?.designBlock?.highlightMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightMarkerColor,
     highlightUnderlineColor: designSystem?.designBlock?.highlightUnderlineColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightUnderlineColor,
     highlightWavyColor: designSystem?.designBlock?.highlightWavyColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightWavyColor,
+    // Badge color
+    badgeColor: designSystem?.designBlock?.badgeColor || DEFAULT_DESIGN_BLOCK_SETTINGS.badgeColor,
   };
 
   const textAlignClass = {
@@ -548,11 +550,14 @@ const SortableSubBlockItem: React.FC<{
           pastel: 'rounded-xl',
         }[badgeVariant];
         
+        // Get badge color from design system (fallback to primary)
+        const badgeColor = ds.badgeColor || ds.primaryColor;
+        
         const badgeVariantStyles = {
-          square: { backgroundColor: `hsl(${ds.primaryColor})`, color: 'white' },
-          oval: { backgroundColor: `hsl(${ds.primaryColor} / 0.15)`, color: `hsl(${ds.primaryColor})` },
-          contrast: { backgroundColor: 'transparent', color: `hsl(${ds.primaryColor})`, border: `2px solid hsl(${ds.primaryColor})` },
-          pastel: { backgroundColor: `hsl(${ds.primaryColor} / 0.08)`, color: `hsl(${ds.primaryColor} / 0.9)`, border: `1px solid hsl(${ds.primaryColor} / 0.2)` },
+          square: { backgroundColor: `hsl(${badgeColor})`, color: 'white' },
+          oval: { backgroundColor: `hsl(${badgeColor} / 0.15)`, color: `hsl(${badgeColor})` },
+          contrast: { backgroundColor: 'transparent', color: `hsl(${badgeColor})`, border: `2px solid hsl(${badgeColor})` },
+          pastel: { backgroundColor: `hsl(${badgeColor} / 0.08)`, color: `hsl(${badgeColor} / 0.9)`, border: `1px solid hsl(${badgeColor} / 0.2)` },
         }[badgeVariant];
 
         // Use the global subBlockIconMap for badge icons (includes all AI-supported icons)

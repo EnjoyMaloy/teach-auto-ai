@@ -981,12 +981,31 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
               <SettingsCard
                 icon={<Palette className="w-4 h-4" />}
                 title="Цвета текста"
-                description="Основной текст и карточки"
+                description="Основной текст"
               >
                 <ColorInput
                   label="Цвет текста"
                   value={config.foregroundColor || DEFAULT_DESIGN_SYSTEM.foregroundColor}
                   onChange={(v) => updateConfig({ foregroundColor: v })}
+                />
+              </SettingsCard>
+              
+              {/* Badge Color Card */}
+              <SettingsCard
+                icon={<Palette className="w-4 h-4" />}
+                title="Цвет бейджей"
+                description="Цвет саб-блоков бейджей"
+              >
+                <ColorInput
+                  label="Цвет бейджей"
+                  value={config.designBlock?.badgeColor || DEFAULT_DESIGN_BLOCK_SETTINGS.badgeColor}
+                  onChange={(v) => updateConfig({ 
+                    designBlock: { 
+                      ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
+                      ...config.designBlock, 
+                      badgeColor: v 
+                    } 
+                  })}
                 />
               </SettingsCard>
             </TabsContent>
