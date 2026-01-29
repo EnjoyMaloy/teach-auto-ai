@@ -50,20 +50,17 @@ export const ThemeMiniPreview: React.FC<ThemeMiniPreviewProps> = ({
       )}
       style={getBackgroundStyle()}
     >
-      <div className="p-2 space-y-1.5">
+      <div className="p-2 space-y-2">
         {/* Mini heading */}
         <div 
           className="text-[10px] font-bold truncate"
-          style={{ color: `hsl(${foregroundColor})` }}
+          style={{ 
+            color: `hsl(${foregroundColor})`,
+            fontFamily: config.headingFontFamily || DEFAULT_DESIGN_SYSTEM.headingFontFamily,
+          }}
         >
           Заголовок
         </div>
-        
-        {/* Mini text line */}
-        <div 
-          className="h-1 w-3/4 rounded-full opacity-50"
-          style={{ backgroundColor: `hsl(${foregroundColor})` }}
-        />
         
         {/* Mini button */}
         <div
