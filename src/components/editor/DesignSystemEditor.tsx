@@ -15,7 +15,8 @@ import { playSound, SOUND_THEME_OPTIONS } from '@/lib/sounds';
 import { BaseDesignSystemSelector } from './BaseDesignSystemSelector';
 import { ThemeBackgroundsEditor } from './ThemeBackgroundsEditor';
 import { SettingsCard } from './design-system/SettingsCard';
-import { CustomFontInput, useLoadCustomFonts } from './design-system/CustomFontInput';
+import { FontSelectorWithCustom } from './design-system/FontSelectorWithCustom';
+import { useLoadCustomFonts } from './design-system/CustomFontInput';
 import { useBaseDesignSystems, BaseDesignSystem } from '@/hooks/useBaseDesignSystems';
 import { useUserDesignSystems } from '@/hooks/useUserDesignSystems';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -1379,91 +1380,22 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
 
             {/* === TYPOGRAPHY TAB === */}
             <TabsContent value="typography" className="space-y-4">
-              {/* Custom Fonts Card */}
-              <SettingsCard
-                icon={<Plus className="w-4 h-4" />}
-                title="Кастомные шрифты"
-                description="Добавьте шрифты из Google Fonts"
-              >
-                <CustomFontInput
-                  customFonts={config.customFonts || []}
-                  onChange={(fonts) => updateConfig({ customFonts: fonts })}
-                />
-              </SettingsCard>
-
               {/* Body Font Card */}
               <SettingsCard
                 icon={<Type className="w-4 h-4" />}
                 title="Основной шрифт"
                 description="Для основного текста и параграфов"
               >
-                <Select
+                <FontSelectorWithCustom
+                  label=""
+                  description=""
                   value={config.fontFamily}
-                  onValueChange={(v) => updateConfig({ fontFamily: v })}
-                >
-                  <SelectTrigger className="w-full h-12">
-                    <div className="flex items-center justify-between w-full">
-                      <span style={{ fontFamily: config.fontFamily }} className="text-base">
-                        {config.customFonts?.find(f => f.family === config.fontFamily)?.name || FONT_OPTIONS.find(f => f.value === config.fontFamily)?.label || 'Выберите шрифт'}
-                      </span>
-                      <span style={{ fontFamily: config.fontFamily }} className="text-muted-foreground text-sm">
-                        Аа Bb
-                      </span>
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent className="max-h-80">
-                    {/* Custom fonts first */}
-                    {config.customFonts && config.customFonts.length > 0 && (
-                      <>
-                        <div className="px-2 py-1.5 text-xs text-muted-foreground font-medium">
-                          Кастомные
-                        </div>
-                        {config.customFonts.map((font) => (
-                          <SelectItem 
-                            key={font.family} 
-                            value={font.family}
-                            className="py-3"
-                          >
-                            <div className="flex items-center justify-between w-full gap-4">
-                              <span style={{ fontFamily: font.family }} className="text-base">
-                                {font.name}
-                              </span>
-                              <span style={{ fontFamily: font.family }} className="text-muted-foreground text-lg">
-                                Аа Bb
-                              </span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                        <div className="px-2 py-1.5 text-xs text-muted-foreground font-medium border-t mt-1 pt-2">
-                          Стандартные
-                        </div>
-                      </>
-                    )}
-                    {FONT_OPTIONS.map((font) => (
-                      <SelectItem 
-                        key={font.value} 
-                        value={font.value}
-                        className="py-3"
-                      >
-                        <div className="flex items-center justify-between w-full gap-4">
-                          <span style={{ fontFamily: font.value }} className="text-base">
-                            {font.label}
-                          </span>
-                          <span style={{ fontFamily: font.value }} className="text-muted-foreground text-lg">
-                            Аа Bb
-                          </span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {/* Preview */}
-                <div 
-                  className="p-3 rounded-lg border bg-muted/30 text-sm"
-                  style={{ fontFamily: config.fontFamily }}
-                >
-                  Пример текста с выбранным шрифтом — The quick brown fox
-                </div>
+                  onChange={(v) => updateConfig({ fontFamily: v })}
+                  customFonts={config.customFonts || []}
+                  onCustomFontsChange={(fonts) => updateConfig({ customFonts: fonts })}
+                  previewText="Пример текста с выбранным шрифтом — The quick brown fox"
+                  previewClassName="text-sm"
+                />
               </SettingsCard>
 
               {/* Heading Font Card */}
@@ -1472,73 +1404,16 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 title="Шрифт заголовков"
                 description="Для заголовков и подзаголовков"
               >
-                <Select
+                <FontSelectorWithCustom
+                  label=""
+                  description=""
                   value={config.headingFontFamily}
-                  onValueChange={(v) => updateConfig({ headingFontFamily: v })}
-                >
-                  <SelectTrigger className="w-full h-12">
-                    <div className="flex items-center justify-between w-full">
-                      <span style={{ fontFamily: config.headingFontFamily }} className="text-base">
-                        {config.customFonts?.find(f => f.family === config.headingFontFamily)?.name || FONT_OPTIONS.find(f => f.value === config.headingFontFamily)?.label || 'Выберите шрифт'}
-                      </span>
-                      <span style={{ fontFamily: config.headingFontFamily }} className="text-muted-foreground text-sm">
-                        Аа Bb
-                      </span>
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent className="max-h-80">
-                    {/* Custom fonts first */}
-                    {config.customFonts && config.customFonts.length > 0 && (
-                      <>
-                        <div className="px-2 py-1.5 text-xs text-muted-foreground font-medium">
-                          Кастомные
-                        </div>
-                        {config.customFonts.map((font) => (
-                          <SelectItem 
-                            key={font.family} 
-                            value={font.family}
-                            className="py-3"
-                          >
-                            <div className="flex items-center justify-between w-full gap-4">
-                              <span style={{ fontFamily: font.family }} className="text-base">
-                                {font.name}
-                              </span>
-                              <span style={{ fontFamily: font.family }} className="text-muted-foreground text-lg">
-                                Аа Bb
-                              </span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                        <div className="px-2 py-1.5 text-xs text-muted-foreground font-medium border-t mt-1 pt-2">
-                          Стандартные
-                        </div>
-                      </>
-                    )}
-                    {FONT_OPTIONS.map((font) => (
-                      <SelectItem 
-                        key={font.value} 
-                        value={font.value}
-                        className="py-3"
-                      >
-                        <div className="flex items-center justify-between w-full gap-4">
-                          <span style={{ fontFamily: font.value }} className="text-base">
-                            {font.label}
-                          </span>
-                          <span style={{ fontFamily: font.value }} className="text-muted-foreground text-lg">
-                            Аа Bb
-                          </span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {/* Preview */}
-                <div 
-                  className="p-3 rounded-lg border bg-muted/30 text-lg font-bold"
-                  style={{ fontFamily: config.headingFontFamily }}
-                >
-                  Заголовок — Heading
-                </div>
+                  onChange={(v) => updateConfig({ headingFontFamily: v })}
+                  customFonts={config.customFonts || []}
+                  onCustomFontsChange={(fonts) => updateConfig({ customFonts: fonts })}
+                  previewText="Заголовок — Heading"
+                  previewClassName="text-lg font-bold"
+                />
               </SettingsCard>
             </TabsContent>
 
