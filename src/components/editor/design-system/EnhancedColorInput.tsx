@@ -146,14 +146,14 @@ export const EnhancedColorInput: React.FC<EnhancedColorInputProps> = ({
           />
         </div>
         <div className="flex-1 relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-mono text-sm">#</span>
+          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground font-mono text-xs">#</span>
           <Input
             value={hexValue}
             onChange={(e) => handleHexChange(e.target.value)}
             onPaste={handlePaste}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            className="pl-7 pr-10 font-mono text-sm uppercase tracking-wider bg-background"
+            className="pl-5 pr-8 font-mono text-xs uppercase tracking-tight bg-background h-9"
             placeholder="FFFFFF"
             maxLength={6}
             aria-label={`${label} HEX код`}
@@ -164,7 +164,7 @@ export const EnhancedColorInput: React.FC<EnhancedColorInputProps> = ({
               type="button"
               onClick={handleCopy}
               className={cn(
-                "absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded transition-colors",
+                "absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded transition-colors",
                 copied 
                   ? "text-green-600" 
                   : "text-muted-foreground hover:text-foreground"
@@ -173,9 +173,9 @@ export const EnhancedColorInput: React.FC<EnhancedColorInputProps> = ({
               aria-label="Копировать HEX код"
             >
               {copied ? (
-                <Check className="w-4 h-4" />
+                <Check className="w-3.5 h-3.5" />
               ) : (
-                <Copy className="w-4 h-4" />
+                <Copy className="w-3.5 h-3.5" />
               )}
             </button>
           )}

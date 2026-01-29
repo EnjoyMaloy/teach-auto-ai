@@ -194,13 +194,13 @@ const ColorInput: React.FC<{
           />
         </div>
         <div className="flex-1 relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-mono text-sm">#</span>
+          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground font-mono text-xs">#</span>
           <Input
             value={hexValue}
             onChange={(e) => handleHexChange(e.target.value)}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            className="pl-7 pr-10 font-mono text-sm uppercase tracking-wider bg-background"
+            className="pl-5 pr-8 font-mono text-xs uppercase tracking-tight bg-background h-9"
             placeholder="FFFFFF"
             maxLength={6}
             aria-label={`${label} HEX код`}
@@ -209,13 +209,13 @@ const ColorInput: React.FC<{
           <button
             type="button"
             onClick={handleCopy}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-muted transition-colors"
+            className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-muted transition-colors"
             aria-label="Копировать HEX"
           >
             {copied ? (
-              <Check className="w-4 h-4 text-success" />
+              <Check className="w-3.5 h-3.5 text-success" />
             ) : (
-              <Copy className="w-4 h-4 text-muted-foreground" />
+              <Copy className="w-3.5 h-3.5 text-muted-foreground" />
             )}
           </button>
         </div>
