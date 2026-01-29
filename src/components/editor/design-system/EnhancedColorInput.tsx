@@ -118,9 +118,9 @@ export const EnhancedColorInput: React.FC<EnhancedColorInputProps> = ({
 
   const handleCopy = async () => {
     try {
-      // Always copy the full 6-character hex from the current value
+      // Copy only 6 hex characters without # to avoid truncation when pasting
       const fullHex = hslToHex(value);
-      await navigator.clipboard.writeText(`#${fullHex}`);
+      await navigator.clipboard.writeText(fullHex);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch (err) {

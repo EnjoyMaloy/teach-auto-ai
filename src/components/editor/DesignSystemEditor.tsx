@@ -168,7 +168,7 @@ const ColorInput: React.FC<{
     try {
       // Always copy the full 6-character hex from the current value
       const fullHex = hslToHex(value);
-      await navigator.clipboard.writeText(`#${fullHex}`);
+      await navigator.clipboard.writeText(fullHex);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch (err) {
