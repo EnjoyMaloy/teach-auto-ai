@@ -1504,7 +1504,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         <div 
           className="absolute bottom-0 left-0 right-0 h-20 border-t flex items-center justify-center gap-3 px-4 z-10"
           style={{ 
-            borderColor: answerState === 'correct' ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
+            borderColor: (answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
             backgroundColor: answerState === 'correct' 
               ? correctBgTint 
               : answerState === 'partial'
