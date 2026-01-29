@@ -288,13 +288,13 @@ const RiveFileUploader: React.FC<{
     <div className="space-y-3">
       <Label className="text-sm font-medium">Файл анимации (.riv)</Label>
       {riveUrl ? (
-        <div className="flex items-center gap-3 p-3 rounded-xl border border-border bg-muted/30">
-          <Play className="w-8 h-8 text-primary" />
-          <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-3 p-3 rounded-xl border border-border bg-muted/30 overflow-hidden">
+          <Play className="w-8 h-8 text-primary shrink-0" />
+          <div className="flex-1 min-w-0 overflow-hidden">
             <p className="text-sm font-medium truncate">Rive-анимация подключена</p>
-            <p className="text-xs text-muted-foreground truncate">{riveUrl.split('/').pop()}</p>
+            <p className="text-xs text-muted-foreground truncate max-w-full">{riveUrl.split('/').pop()}</p>
           </div>
-          <Button variant="ghost" size="sm" onClick={onRemove}>
+          <Button variant="ghost" size="sm" onClick={onRemove} className="shrink-0">
             <Trash2 className="w-4 h-4 text-destructive" />
           </Button>
         </div>
