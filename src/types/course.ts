@@ -173,6 +173,8 @@ export interface CourseDesignSystem {
     buttonTextColor?: string;
     // Table sub-block
     tableBorderColor?: string;
+    tableBorderWidth?: number;
+    tableRounded?: boolean;
     tableHeaderBgColor?: string;
     tableStripeBgColor?: string;
     tableStripeBgColor2?: string;

@@ -125,8 +125,10 @@ export interface DesignBlockSettings {
   buttonBgColor?: string;
   buttonTextColor?: string;
   
-  // Table sub-block colors
+  // Table sub-block colors and style
   tableBorderColor?: string;
+  tableBorderWidth?: number;
+  tableRounded?: boolean;
   tableHeaderBgColor?: string;
   tableStripeBgColor?: string;
   tableStripeBgColor2?: string;
@@ -220,6 +222,8 @@ export const DEFAULT_DESIGN_BLOCK_SETTINGS: Required<DesignBlockSettings> = {
   buttonTextColor: '0 0% 100%',
   // Table sub-block
   tableBorderColor: '240 5% 84%',
+  tableBorderWidth: 1,
+  tableRounded: true,
   tableHeaderBgColor: '240 5% 96%',
   tableStripeBgColor: '240 5% 98%',
   tableStripeBgColor2: '0 0% 100%',
