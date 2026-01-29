@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import AppLayout from '@/components/layout/AppLayout';
+
 import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -194,17 +194,14 @@ const Dictionary: React.FC = () => {
 
   if (loading) {
     return (
-      <AppLayout>
-        <div className="flex items-center justify-center h-96">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </div>
-      </AppLayout>
+      <div className="flex items-center justify-center h-96">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
     );
   }
 
   return (
-    <AppLayout>
-      <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8 relative">
           <div className="absolute -top-4 -left-4 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
@@ -441,7 +438,6 @@ const Dictionary: React.FC = () => {
           </div>
         )}
       </div>
-    </AppLayout>
   );
 };
 

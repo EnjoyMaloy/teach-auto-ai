@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AppLayout from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, Clock, Layers } from 'lucide-react';
@@ -28,7 +27,7 @@ const Catalog: React.FC = () => {
     : courses;
 
   return (
-    <AppLayout>
+    <>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-foreground">Каталог курсов</h1>
         <p className="text-muted-foreground mt-1">
@@ -166,7 +165,7 @@ const Catalog: React.FC = () => {
           })}
         </div>
       )}
-    </AppLayout>
+    </>
   );
 };
 
