@@ -540,7 +540,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
         <div>
           <h3 className="font-semibold text-foreground flex items-center gap-2">
             <Palette className="w-4 h-4 text-primary" />
-            Готовые темы
+            Темы
           </h3>
           <p className="text-xs text-muted-foreground mt-0.5">Быстрый старт с готовым дизайном</p>
         </div>
