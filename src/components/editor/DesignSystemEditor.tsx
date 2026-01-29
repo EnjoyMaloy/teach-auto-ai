@@ -1188,49 +1188,6 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 </div>
               </SettingsCard>
 
-              {/* Highlights Card */}
-              <SettingsCard
-                icon={<Type className="w-4 h-4" />}
-                title="Выделение текста"
-                description="Маркер, подчёркивание, волнистая линия"
-              >
-                <div className="space-y-3">
-                  <ColorInput
-                    label="Маркер"
-                    value={config.designBlock?.highlightMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightMarkerColor}
-                    onChange={(v) => updateConfig({ 
-                      designBlock: { 
-                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                        ...config.designBlock, 
-                        highlightMarkerColor: v 
-                      } 
-                    })}
-                  />
-                  <ColorInput
-                    label="Подчёркивание"
-                    value={config.designBlock?.highlightUnderlineColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightUnderlineColor}
-                    onChange={(v) => updateConfig({ 
-                      designBlock: { 
-                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                        ...config.designBlock, 
-                        highlightUnderlineColor: v 
-                      } 
-                    })}
-                  />
-                  <ColorInput
-                    label="Волнистая линия"
-                    value={config.designBlock?.highlightWavyColor || DEFAULT_DESIGN_BLOCK_SETTINGS.highlightWavyColor}
-                    onChange={(v) => updateConfig({ 
-                      designBlock: { 
-                        ...DEFAULT_DESIGN_BLOCK_SETTINGS, 
-                        ...config.designBlock, 
-                        highlightWavyColor: v 
-                      } 
-                    })}
-                  />
-                </div>
-              </SettingsCard>
-
               {/* Text Colors Card */}
               <SettingsCard
                 icon={<Palette className="w-4 h-4" />}
