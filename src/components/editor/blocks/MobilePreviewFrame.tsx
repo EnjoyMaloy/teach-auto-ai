@@ -344,10 +344,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     return (
       <div className="absolute top-4 left-0 right-0 flex justify-center pointer-events-none z-10">
         <RiveMascot 
-          settings={{
-            ...mascotSettings,
-            riveSize: 'large'
-          }} 
+          settings={mascotSettings} 
           state={mascotState}
         />
       </div>
