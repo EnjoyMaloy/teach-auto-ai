@@ -664,7 +664,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
 
               {/* Accent Color Card */}
               <SettingsCard
-                icon={<Sparkles className="w-4 h-4" />}
+                icon={<Palette className="w-4 h-4" />}
                 title="Акцентный цвет"
                 description="Прогресс-бар и выбор ответов"
               >
