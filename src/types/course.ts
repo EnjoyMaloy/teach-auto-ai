@@ -108,6 +108,7 @@ export interface CourseDesignSystem {
   borderRadius?: string;
   buttonStyle?: 'rounded' | 'pill' | 'square';
   buttonDepth?: 'flat' | 'raised';
+  progressBarStyle?: 'dots' | 'line' | 'pills' | 'numbers';
   // Theme identification
   themeId?: string;
   // Theme backgrounds - up to 5 backgrounds for the course

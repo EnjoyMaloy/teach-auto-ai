@@ -34,6 +34,9 @@ export interface SoundSettings {
 
 export type ButtonDepth = 'flat' | 'raised';
 
+// Progress bar styles
+export type ProgressBarStyle = 'dots' | 'line' | 'pills' | 'numbers';
+
 // Custom font from Google Fonts
 export interface CustomFont {
   name: string;       // Display name (e.g., "Montserrat")
@@ -275,6 +278,9 @@ export interface DesignSystemConfig {
   
   // Button depth (flat or 3D raised)
   buttonDepth?: ButtonDepth;
+  
+  // Progress bar style
+  progressBarStyle?: ProgressBarStyle;
   
   // Sound settings
   sound?: SoundSettings;
