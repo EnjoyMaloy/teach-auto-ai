@@ -10,6 +10,7 @@ import {
   BORDER_RADIUS_OPTIONS,
   SoundTheme,
   ButtonDepth,
+  ProgressBarStyle,
 } from '@/types/designSystem';
 import { playSound, SOUND_THEME_OPTIONS } from '@/lib/sounds';
 import { BaseDesignSystemSelector } from './BaseDesignSystemSelector';
@@ -394,6 +395,89 @@ const RiveFileUploader: React.FC<{
           Rive Editor
         </a>
       </p>
+    </div>
+  );
+};
+
+// Progress Bar Preview Component
+const ProgressBarPreview: React.FC<{
+  style: ProgressBarStyle;
+  accentColor: string;
+  mutedColor: string;
+  foregroundColor: string;
+}> = ({ style, accentColor, mutedColor, foregroundColor }) => {
+  const currentIndex = 2; // Preview showing 3rd item active
+  const totalItems = 8;
+
+  if (style === 'line') {
+    const progress = ((currentIndex + 1) / totalItems) * 100;
+    return (
+      <div className="flex items-center justify-center">
+        <div 
+          className="w-full max-w-[200px] h-2 rounded-full overflow-hidden"
+          style={{ backgroundColor: `hsl(${mutedColor})` }}
+        >
+          <div 
+            className="h-full rounded-full transition-all"
+            style={{ 
+              width: `${progress}%`,
+              backgroundColor: `hsl(${accentColor})` 
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (style === 'pills') {
+    return (
+      <div className="flex items-center justify-center gap-1">
+        {Array.from({ length: totalItems }).map((_, i) => (
+          <div
+            key={i}
+            className="h-2 rounded-sm transition-all"
+            style={{
+              width: '20px',
+              backgroundColor: i <= currentIndex 
+                ? `hsl(${accentColor})` 
+                : `hsl(${mutedColor})`,
+            }}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (style === 'numbers') {
+    return (
+      <div className="flex items-center justify-center">
+        <span 
+          className="text-sm font-semibold"
+          style={{ color: `hsl(${foregroundColor})` }}
+        >
+          <span style={{ color: `hsl(${accentColor})` }}>{currentIndex + 1}</span>
+          <span className="opacity-50"> / {totalItems}</span>
+        </span>
+      </div>
+    );
+  }
+
+  // Default: dots
+  return (
+    <div className="flex items-center justify-center gap-1">
+      {Array.from({ length: totalItems }).map((_, i) => (
+        <div
+          key={i}
+          className="rounded-full transition-all"
+          style={{
+            height: '6px',
+            width: i === currentIndex ? '24px' : '8px',
+            backgroundColor: i <= currentIndex 
+              ? `hsl(${accentColor})` 
+              : `hsl(${mutedColor})`,
+          }}
+        />
+      ))}
     </div>
   );
 };
@@ -847,6 +931,53 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                   >
                     ПРОДОЛЖИТЬ
                   </button>
+                </div>
+              </SettingsCard>
+
+              {/* Progress Bar Style */}
+              <SettingsCard
+                icon={<Layers className="w-4 h-4" />}
+                title="Прогресс-бар"
+                description="Стиль индикатора прогресса урока"
+              >
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { value: 'dots', label: 'Точки', icon: '● ● ●' },
+                      { value: 'line', label: 'Линия', icon: '━━━' },
+                      { value: 'pills', label: 'Сегменты', icon: '▬ ▬ ▬' },
+                      { value: 'numbers', label: 'Числа', icon: '1/10' },
+                    ].map((style) => (
+                      <button
+                        key={style.value}
+                        onClick={() => updateConfig({ progressBarStyle: style.value as ProgressBarStyle })}
+                        className={cn(
+                          "p-3 rounded-lg border-2 text-center transition-all",
+                          (config.progressBarStyle ?? 'dots') === style.value
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:border-primary/50"
+                        )}
+                      >
+                        <div className="text-lg mb-1 font-mono">{style.icon}</div>
+                        <div className="text-xs font-medium">{style.label}</div>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Progress Bar Preview */}
+                  <div 
+                    className="rounded-lg p-4"
+                    style={{ 
+                      backgroundColor: `hsl(${config.backgroundColor || DEFAULT_DESIGN_SYSTEM.backgroundColor})` 
+                    }}
+                  >
+                    <ProgressBarPreview 
+                      style={(config.progressBarStyle ?? 'dots') as ProgressBarStyle}
+                      accentColor={config.accentColor || DEFAULT_DESIGN_SYSTEM.accentColor}
+                      mutedColor={config.mutedColor || DEFAULT_DESIGN_SYSTEM.mutedColor}
+                      foregroundColor={config.foregroundColor || DEFAULT_DESIGN_SYSTEM.foregroundColor}
+                    />
+                  </div>
                 </div>
               </SettingsCard>
             </TabsContent>

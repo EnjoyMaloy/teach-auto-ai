@@ -1045,12 +1045,72 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   const inactiveColor = '0 0% 0% / 0.15'; // Light gray for inactive elements
   
 
-  const progressBar = !hideHeader && (
-    <div 
-      className="h-10 flex items-center justify-center px-4 shrink-0"
-    >
-      <div className="flex items-center gap-1">
-        {Array.from({ length: Math.min(totalBlocks, 20) }).map((_, i) => (
+  const progressBarStyle = designSystem?.progressBarStyle || 'dots';
+
+  const renderProgressBar = () => {
+    const displayBlocks = Math.min(totalBlocks, 20);
+    
+    // Line style - single continuous bar
+    if (progressBarStyle === 'line') {
+      const progress = totalBlocks > 0 ? ((blockIndex + 1) / totalBlocks) * 100 : 0;
+      return (
+        <div 
+          className="w-full max-w-[200px] h-2 rounded-full overflow-hidden"
+          style={{ backgroundColor: `hsl(${inactiveColor})` }}
+        >
+          <div 
+            className="h-full rounded-full transition-all"
+            style={{ 
+              width: `${progress}%`,
+              backgroundColor: `hsl(${accentColor})` 
+            }}
+          />
+        </div>
+      );
+    }
+
+    // Pills style - rounded segments
+    if (progressBarStyle === 'pills') {
+      return (
+        <>
+          {Array.from({ length: displayBlocks }).map((_, i) => (
+            <div
+              key={i}
+              className="h-2 rounded-sm transition-all"
+              style={{
+                width: '16px',
+                backgroundColor: i <= blockIndex 
+                  ? `hsl(${accentColor})` 
+                  : `hsl(${inactiveColor})`,
+              }}
+            />
+          ))}
+          {totalBlocks > 20 && (
+            <span className="text-xs ml-1" style={{ color: `hsl(${ds.foregroundColor} / 0.6)` }}>
+              +{totalBlocks - 20}
+            </span>
+          )}
+        </>
+      );
+    }
+
+    // Numbers style - "3/10" format
+    if (progressBarStyle === 'numbers') {
+      return (
+        <span 
+          className="text-sm font-semibold"
+          style={{ color: `hsl(${ds.foregroundColor})` }}
+        >
+          <span style={{ color: `hsl(${accentColor})` }}>{blockIndex + 1}</span>
+          <span className="opacity-50"> / {totalBlocks}</span>
+        </span>
+      );
+    }
+
+    // Default: dots style
+    return (
+      <>
+        {Array.from({ length: displayBlocks }).map((_, i) => (
           <div
             key={i}
             className="rounded-full transition-all"
@@ -1068,7 +1128,15 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             +{totalBlocks - 20}
           </span>
         )}
-      </div>
+      </>
+    );
+  };
+
+  const progressBar = !hideHeader && (
+    <div 
+      className="h-10 flex items-center justify-center px-4 shrink-0 gap-1"
+    >
+      {renderProgressBar()}
     </div>
   );
 
