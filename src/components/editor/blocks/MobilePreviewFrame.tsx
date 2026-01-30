@@ -1047,11 +1047,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
   const progressBar = !hideHeader && (
     <div 
-      className="h-10 flex items-center justify-center px-4 border-b shrink-0"
-      style={{ 
-        backgroundColor: `hsl(0 0% 0% / 0.03)`,
-        borderColor: `hsl(${ds.mutedColor})`,
-      }}
+      className="h-10 flex items-center justify-center px-4 shrink-0"
     >
       <div className="flex items-center gap-1">
         {Array.from({ length: Math.min(totalBlocks, 20) }).map((_, i) => (
