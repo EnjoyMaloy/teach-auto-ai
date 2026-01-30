@@ -729,9 +729,13 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
               <Sparkles className="w-3.5 h-3.5 mr-1" />
               Квизы
             </TabsTrigger>
+            <TabsTrigger value="quizblocks" className="text-xs py-2 px-1 data-[state=active]:bg-background">
+              <MousePointerClick className="w-3.5 h-3.5 mr-1" />
+              Блоки
+            </TabsTrigger>
             <TabsTrigger value="blocks" className="text-xs py-2 px-1 data-[state=active]:bg-background">
               <Layers className="w-3.5 h-3.5 mr-1" />
-              Текст
+              Дизайн-блок
             </TabsTrigger>
             <TabsTrigger value="typography" className="text-xs py-2 px-1 data-[state=active]:bg-background">
               <Type className="w-3.5 h-3.5 mr-1" />
@@ -1129,6 +1133,141 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                       )}
                     </>
                   )}
+                </div>
+              </SettingsCard>
+            </TabsContent>
+
+            {/* === QUIZ BLOCKS TAB: Matching, Ordering, Fill Blank, Slider === */}
+            <TabsContent value="quizblocks" className="space-y-4">
+              {/* Matching Block Card */}
+              <SettingsCard
+                icon={<Link2 className="w-4 h-4" />}
+                title="Блок соответствия"
+                description="Цвета для блока 'Соедините пары'"
+              >
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-2">
+                    <ColorInput
+                      label="Фон элемента"
+                      value={config.designBlock?.matchingItemBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.matchingItemBgColor}
+                      onChange={(v) => updateConfig({ 
+                        designBlock: { ...DEFAULT_DESIGN_BLOCK_SETTINGS, ...config.designBlock, matchingItemBgColor: v } 
+                      })}
+                    />
+                    <ColorInput
+                      label="Рамка"
+                      value={config.designBlock?.matchingItemBorderColor || DEFAULT_DESIGN_BLOCK_SETTINGS.matchingItemBorderColor}
+                      onChange={(v) => updateConfig({ 
+                        designBlock: { ...DEFAULT_DESIGN_BLOCK_SETTINGS, ...config.designBlock, matchingItemBorderColor: v } 
+                      })}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <ColorInput
+                      label="Верно"
+                      value={config.designBlock?.matchingCorrectColor || DEFAULT_DESIGN_BLOCK_SETTINGS.matchingCorrectColor}
+                      onChange={(v) => updateConfig({ 
+                        designBlock: { ...DEFAULT_DESIGN_BLOCK_SETTINGS, ...config.designBlock, matchingCorrectColor: v } 
+                      })}
+                    />
+                    <ColorInput
+                      label="Неверно"
+                      value={config.designBlock?.matchingIncorrectColor || DEFAULT_DESIGN_BLOCK_SETTINGS.matchingIncorrectColor}
+                      onChange={(v) => updateConfig({ 
+                        designBlock: { ...DEFAULT_DESIGN_BLOCK_SETTINGS, ...config.designBlock, matchingIncorrectColor: v } 
+                      })}
+                    />
+                  </div>
+                </div>
+              </SettingsCard>
+
+              {/* Ordering Block Card */}
+              <SettingsCard
+                icon={<Layers className="w-4 h-4" />}
+                title="Блок порядка"
+                description="Цвета для блока 'Расположите по порядку'"
+              >
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-2">
+                    <ColorInput
+                      label="Фон элемента"
+                      value={config.designBlock?.orderingItemBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.orderingItemBgColor}
+                      onChange={(v) => updateConfig({ 
+                        designBlock: { ...DEFAULT_DESIGN_BLOCK_SETTINGS, ...config.designBlock, orderingItemBgColor: v } 
+                      })}
+                    />
+                    <ColorInput
+                      label="Рамка"
+                      value={config.designBlock?.orderingItemBorderColor || DEFAULT_DESIGN_BLOCK_SETTINGS.orderingItemBorderColor}
+                      onChange={(v) => updateConfig({ 
+                        designBlock: { ...DEFAULT_DESIGN_BLOCK_SETTINGS, ...config.designBlock, orderingItemBorderColor: v } 
+                      })}
+                    />
+                  </div>
+                  <ColorInput
+                    label="Бейдж номера"
+                    value={config.designBlock?.orderingBadgeColor || DEFAULT_DESIGN_BLOCK_SETTINGS.orderingBadgeColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { ...DEFAULT_DESIGN_BLOCK_SETTINGS, ...config.designBlock, orderingBadgeColor: v } 
+                    })}
+                  />
+                </div>
+              </SettingsCard>
+
+              {/* Fill Blank Block Card */}
+              <SettingsCard
+                icon={<Type className="w-4 h-4" />}
+                title="Заполни пропуск"
+                description="Цвета для поля ввода"
+              >
+                <div className="grid grid-cols-2 gap-2">
+                  <ColorInput
+                    label="Линия"
+                    value={config.designBlock?.fillBlankUnderlineColor || DEFAULT_DESIGN_BLOCK_SETTINGS.fillBlankUnderlineColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { ...DEFAULT_DESIGN_BLOCK_SETTINGS, ...config.designBlock, fillBlankUnderlineColor: v } 
+                    })}
+                  />
+                  <ColorInput
+                    label="Текст"
+                    value={config.designBlock?.fillBlankTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.fillBlankTextColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { ...DEFAULT_DESIGN_BLOCK_SETTINGS, ...config.designBlock, fillBlankTextColor: v } 
+                    })}
+                  />
+                </div>
+              </SettingsCard>
+
+              {/* Slider Block Card */}
+              <SettingsCard
+                icon={<Layers className="w-4 h-4" />}
+                title="Ползунок"
+                description="Цвета для слайдера"
+              >
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-2">
+                    <ColorInput
+                      label="Полоска"
+                      value={config.designBlock?.sliderTrackColor || DEFAULT_DESIGN_BLOCK_SETTINGS.sliderTrackColor}
+                      onChange={(v) => updateConfig({ 
+                        designBlock: { ...DEFAULT_DESIGN_BLOCK_SETTINGS, ...config.designBlock, sliderTrackColor: v } 
+                      })}
+                    />
+                    <ColorInput
+                      label="Ползунок"
+                      value={config.designBlock?.sliderThumbColor || DEFAULT_DESIGN_BLOCK_SETTINGS.sliderThumbColor}
+                      onChange={(v) => updateConfig({ 
+                        designBlock: { ...DEFAULT_DESIGN_BLOCK_SETTINGS, ...config.designBlock, sliderThumbColor: v } 
+                      })}
+                    />
+                  </div>
+                  <ColorInput
+                    label="Значение"
+                    value={config.designBlock?.sliderValueColor || DEFAULT_DESIGN_BLOCK_SETTINGS.sliderValueColor}
+                    onChange={(v) => updateConfig({ 
+                      designBlock: { ...DEFAULT_DESIGN_BLOCK_SETTINGS, ...config.designBlock, sliderValueColor: v } 
+                    })}
+                  />
                 </div>
               </SettingsCard>
             </TabsContent>

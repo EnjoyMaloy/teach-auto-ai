@@ -11,7 +11,7 @@ import { Play, Volume2, Check, X } from 'lucide-react';
 import { AudioPlayer } from '@/components/editor/blocks/AudioPlayer';
 import { DesignBlockEditor } from '@/components/editor/blocks/DesignBlockEditor';
 import { playSound, SoundConfig } from '@/lib/sounds';
-import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
+import { DEFAULT_SOUND_SETTINGS, DEFAULT_DESIGN_BLOCK_SETTINGS } from '@/types/designSystem';
 import { RiveMascot } from './RiveMascot';
 import { getSoftBackgroundColor, getDarkTextColor, getButtonShadowColor } from '@/lib/colorUtils';
 import { OptimizedImage } from '@/components/ui/optimized-image';
@@ -558,6 +558,9 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
       case 'fill_blank': {
         const parts = (slide.content || '').split('___');
+        const fillUnderline = designSystem?.designBlock?.fillBlankUnderlineColor || DEFAULT_DESIGN_BLOCK_SETTINGS.fillBlankUnderlineColor;
+        const fillText = designSystem?.designBlock?.fillBlankTextColor || DEFAULT_DESIGN_BLOCK_SETTINGS.fillBlankTextColor;
+        
         return (
           <div className="flex-1 flex flex-col items-center justify-center p-4 h-full min-h-0">
             <div className="text-center">
@@ -574,8 +577,8 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                       ? `hsl(${ds.successColor})` 
                       : answerState === 'incorrect'
                         ? `hsl(${ds.destructiveColor})`
-                        : `hsl(${designSystem?.designBlock?.accentElementColor || ds.primaryColor})`,
-                    color: `hsl(${ds.foregroundColor})`,
+                        : `hsl(${fillUnderline})`,
+                    color: `hsl(${fillText})`,
                   }}
                   placeholder="..."
                 />
@@ -587,7 +590,9 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
       }
 
       case 'slider': {
-        const accentColor = designSystem?.designBlock?.accentElementColor || ds.primaryColor;
+        const sliderTrack = designSystem?.designBlock?.sliderTrackColor || DEFAULT_DESIGN_BLOCK_SETTINGS.sliderTrackColor;
+        const sliderThumb = designSystem?.designBlock?.sliderThumbColor || DEFAULT_DESIGN_BLOCK_SETTINGS.sliderThumbColor;
+        const sliderValue_ = designSystem?.designBlock?.sliderValueColor || DEFAULT_DESIGN_BLOCK_SETTINGS.sliderValueColor;
         const trackProgress = ((sliderValue - (slide.sliderMin || 0)) / ((slide.sliderMax || 100) - (slide.sliderMin || 0))) * 100;
         
         return (
@@ -614,7 +619,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                   className="absolute top-2 left-0 h-2 rounded-full"
                   style={{ 
                     width: `${trackProgress}%`,
-                    backgroundColor: `hsl(${accentColor})`,
+                    backgroundColor: `hsl(${sliderTrack})`,
                   }}
                 />
                 {/* Thumb */}
@@ -623,7 +628,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                   style={{
                     left: `calc(${trackProgress}% - 12px)`,
                     backgroundColor: `hsl(${ds.cardColor})`,
-                    borderColor: `hsl(${accentColor})`,
+                    borderColor: `hsl(${sliderThumb})`,
                     top: 'calc(0.5rem + 4px)',
                   }}
                 />
@@ -648,7 +653,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
               <div className="text-center mt-4">
                 <span 
                   className="text-4xl font-bold"
-                  style={{ color: `hsl(${accentColor})` }}
+                  style={{ color: `hsl(${sliderValue_})` }}
                 >
                   {sliderValue}
                 </span>
@@ -734,17 +739,22 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                   const isMatched = !!matchedPair;
                   const isFlashingWrong = matchingSelected.flashingWrong?.leftId === pair.id;
                   
-                  let borderColor = `hsl(${ds.mutedColor})`;
-                  let bgColor = `hsl(${ds.cardColor})`;
+                  const matchingBg = designSystem?.designBlock?.matchingItemBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.matchingItemBgColor;
+                  const matchingBorder = designSystem?.designBlock?.matchingItemBorderColor || DEFAULT_DESIGN_BLOCK_SETTINGS.matchingItemBorderColor;
+                  const matchingCorrect = designSystem?.designBlock?.matchingCorrectColor || ds.successColor;
+                  const matchingIncorrect = designSystem?.designBlock?.matchingIncorrectColor || ds.destructiveColor;
+                  const accentColor = designSystem?.designBlock?.accentElementColor || ds.primaryColor;
+                  
+                  let borderColor = `hsl(${matchingBorder})`;
+                  let bgColor = `hsl(${matchingBg})`;
                   
                   if (isMatched) {
-                    borderColor = `hsl(${ds.successColor})`;
-                    bgColor = `hsl(${ds.successColor} / 0.15)`;
+                    borderColor = `hsl(${matchingCorrect})`;
+                    bgColor = `hsl(${matchingCorrect} / 0.15)`;
                   } else if (isFlashingWrong) {
-                    borderColor = `hsl(${ds.destructiveColor})`;
-                    bgColor = `hsl(${ds.destructiveColor} / 0.15)`;
+                    borderColor = `hsl(${matchingIncorrect})`;
+                    bgColor = `hsl(${matchingIncorrect} / 0.15)`;
                   } else if (isSelected) {
-                    const accentColor = designSystem?.designBlock?.accentElementColor || ds.primaryColor;
                     borderColor = `hsl(${accentColor})`;
                     bgColor = `hsl(${accentColor} / 0.1)`;
                   }
@@ -779,15 +789,20 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                   const isFlashingWrong = matchingSelected.flashingWrong?.rightId === rightItem.id;
                   const canClick = matchingSelected.leftId !== null && !isMatched;
                   
-                  let borderColor = `hsl(${ds.mutedColor})`;
-                  let bgColor = `hsl(${ds.cardColor})`;
+                  const matchingBg = designSystem?.designBlock?.matchingItemBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.matchingItemBgColor;
+                  const matchingBorder = designSystem?.designBlock?.matchingItemBorderColor || DEFAULT_DESIGN_BLOCK_SETTINGS.matchingItemBorderColor;
+                  const matchingCorrect = designSystem?.designBlock?.matchingCorrectColor || ds.successColor;
+                  const matchingIncorrect = designSystem?.designBlock?.matchingIncorrectColor || ds.destructiveColor;
+                  
+                  let borderColor = `hsl(${matchingBorder})`;
+                  let bgColor = `hsl(${matchingBg})`;
                   
                   if (isMatched) {
-                    borderColor = `hsl(${ds.successColor})`;
-                    bgColor = `hsl(${ds.successColor} / 0.15)`;
+                    borderColor = `hsl(${matchingCorrect})`;
+                    bgColor = `hsl(${matchingCorrect} / 0.15)`;
                   } else if (isFlashingWrong) {
-                    borderColor = `hsl(${ds.destructiveColor})`;
-                    bgColor = `hsl(${ds.destructiveColor} / 0.15)`;
+                    borderColor = `hsl(${matchingIncorrect})`;
+                    bgColor = `hsl(${matchingIncorrect} / 0.15)`;
                   }
                   
                   return (
@@ -804,10 +819,9 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                         borderColor,
                         backgroundColor: bgColor,
                         borderRadius: ds.borderRadius,
-                        color: isMatched ? `hsl(${ds.successColor})` : `hsl(${ds.foregroundColor})`,
+                        color: isMatched ? `hsl(${matchingCorrect})` : `hsl(${ds.foregroundColor})`,
                         opacity: isMatched ? 0.7 : 1,
-                      }}
-                    >
+                      }}>
                       {rightItem.text}
                     </button>
                   );
@@ -834,7 +848,9 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
           setOrderedSequence(prev => [...prev, itemId]);
         };
 
-        const accentColor = designSystem?.designBlock?.accentElementColor || ds.primaryColor;
+        const orderingBg = designSystem?.designBlock?.orderingItemBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.orderingItemBgColor;
+        const orderingBorder = designSystem?.designBlock?.orderingItemBorderColor || DEFAULT_DESIGN_BLOCK_SETTINGS.orderingItemBorderColor;
+        const orderingBadge = designSystem?.designBlock?.orderingBadgeColor || DEFAULT_DESIGN_BLOCK_SETTINGS.orderingBadgeColor;
         
         return (
           <div className="flex-1 flex flex-col p-4 overflow-auto h-full min-h-0">
@@ -866,8 +882,8 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                     disabled={answerState !== 'idle'}
                     className="w-full flex items-center gap-3 p-3 border-2 transition-all text-left"
                     style={{
-                      borderColor: isOrdered ? `hsl(${accentColor})` : `hsl(${ds.mutedColor})`,
-                      backgroundColor: isOrdered ? `hsl(${accentColor} / 0.1)` : `hsl(${ds.cardColor})`,
+                      borderColor: isOrdered ? `hsl(${orderingBadge})` : `hsl(${orderingBorder})`,
+                      backgroundColor: isOrdered ? `hsl(${orderingBadge} / 0.1)` : `hsl(${orderingBg})`,
                       borderRadius: ds.borderRadius,
                     }}
                   >
@@ -875,7 +891,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                     <span 
                       className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-all"
                       style={{ 
-                        backgroundColor: isOrdered ? `hsl(${accentColor})` : `hsl(${ds.mutedColor})`,
+                        backgroundColor: isOrdered ? `hsl(${orderingBadge})` : `hsl(${ds.mutedColor})`,
                         color: isOrdered ? `hsl(${ds.primaryForeground})` : `hsl(${ds.foregroundColor} / 0.4)`,
                       }}
                     >

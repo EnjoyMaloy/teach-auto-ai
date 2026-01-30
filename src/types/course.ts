@@ -180,6 +180,19 @@ export interface CourseDesignSystem {
     tableHeaderBgColor?: string;
     tableStripeBgColor?: string;
     tableStripeBgColor2?: string;
+    // Quiz blocks
+    matchingItemBgColor?: string;
+    matchingItemBorderColor?: string;
+    matchingCorrectColor?: string;
+    matchingIncorrectColor?: string;
+    orderingItemBgColor?: string;
+    orderingItemBorderColor?: string;
+    orderingBadgeColor?: string;
+    fillBlankUnderlineColor?: string;
+    fillBlankTextColor?: string;
+    sliderTrackColor?: string;
+    sliderThumbColor?: string;
+    sliderValueColor?: string;
   };
   mascot?: MascotSettings;
 }
