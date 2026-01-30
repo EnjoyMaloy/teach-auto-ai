@@ -608,15 +608,15 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
             </p>
             <div className="w-full max-w-xs">
               {/* Custom slider */}
-              <div className="relative pt-2 pb-4">
+              <div className="relative h-6 flex items-center">
                 {/* Track background */}
                 <div 
-                  className="h-2 rounded-full"
+                  className="absolute left-0 right-0 h-2 rounded-full"
                   style={{ backgroundColor: `hsl(${ds.mutedColor})` }}
                 />
                 {/* Track progress */}
                 <div 
-                  className="absolute top-2 left-0 h-2 rounded-full"
+                  className="absolute left-0 h-2 rounded-full"
                   style={{ 
                     width: `${trackProgress}%`,
                     backgroundColor: `hsl(${sliderTrack})`,
@@ -624,12 +624,11 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                 />
                 {/* Thumb */}
                 <div
-                  className="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-4 shadow-md"
+                  className="absolute w-6 h-6 rounded-full border-4 shadow-md -translate-x-1/2"
                   style={{
-                    left: `calc(${trackProgress}% - 12px)`,
+                    left: `${trackProgress}%`,
                     backgroundColor: `hsl(${ds.cardColor})`,
                     borderColor: `hsl(${sliderThumb})`,
-                    top: 'calc(0.5rem + 4px)',
                   }}
                 />
                 {/* Invisible input for interaction */}
@@ -641,8 +640,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                   value={sliderValue}
                   onChange={(e) => setSliderValue(Number(e.target.value))}
                   disabled={answerState !== 'idle'}
-                  className="absolute inset-0 w-full opacity-0 cursor-pointer"
-                  style={{ height: '100%' }}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
               </div>
               {/* Min/Max labels */}
