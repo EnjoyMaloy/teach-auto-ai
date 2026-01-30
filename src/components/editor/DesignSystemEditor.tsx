@@ -408,6 +408,8 @@ const ProgressBarPreview: React.FC<{
 }> = ({ style, accentColor, mutedColor, foregroundColor }) => {
   const currentIndex = 2; // Preview showing 3rd item active
   const totalItems = 8;
+  
+  console.log('[ProgressBarPreview] style:', style);
 
   // Bar style - single solid line (square)
   if (style === 'bar') {
@@ -977,7 +979,10 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     ].map((style) => (
                       <button
                         key={style.value}
-                        onClick={() => updateConfig({ progressBarStyle: style.value as ProgressBarStyle })}
+                        onClick={() => {
+                          console.log('[ProgressBar] Clicked:', style.value);
+                          updateConfig({ progressBarStyle: style.value as ProgressBarStyle });
+                        }}
                         className={cn(
                           "p-2.5 rounded-lg border-2 text-center transition-all",
                           (config.progressBarStyle ?? 'dots') === style.value
