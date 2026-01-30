@@ -55,7 +55,7 @@ export interface SubBlock {
   // Badge specific
   badgeText?: string;
   badgeVariant?: 'square' | 'oval' | 'contrast' | 'pastel';
-  badgeSize?: 'small' | 'medium' | 'large';
+  badgeSize?: 'large' | 'xlarge';
   
   // Multiple badges support
   badges?: BadgeItem[];
@@ -237,7 +237,7 @@ export const createSubBlock = (type: SubBlockType, order: number): SubBlock => (
   ...(type === 'badge' ? { 
     badgeText: 'Бейдж', 
     badgeVariant: 'oval' as const, 
-    badgeSize: 'medium' as const,
+    badgeSize: 'large' as const,
     badges: [{ id: crypto.randomUUID(), text: 'Бейдж', iconType: 'none' as const }],
     badgeLayout: 'horizontal' as const,
   } : {}),
