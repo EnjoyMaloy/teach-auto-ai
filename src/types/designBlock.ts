@@ -186,10 +186,11 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
     nameRu: 'Hero-секция',
     description: 'Большой заголовок с подзаголовком и кнопкой',
     subBlocks: [
-      { type: 'badge', order: 1, badgeText: 'Новинка', badgeVariant: 'oval', textAlign: 'center' },
-      { type: 'heading', order: 2, content: 'Добро пожаловать!', textAlign: 'center', textSize: 'xlarge', fontWeight: 'bold' },
-      { type: 'text', order: 3, content: 'Описание вашего курса или урока', textAlign: 'center', textSize: 'medium' },
-      { type: 'button', order: 4, buttonLabel: 'Начать', buttonVariant: 'primary', textAlign: 'center' },
+      { type: 'image', order: 1, imageSize: 'medium', textAlign: 'center' },
+      { type: 'badge', order: 2, badgeText: 'Новинка', badgeVariant: 'oval', textAlign: 'center' },
+      { type: 'heading', order: 3, content: 'Добро пожаловать!', textAlign: 'center', textSize: 'xlarge', fontWeight: 'bold' },
+      { type: 'text', order: 4, content: 'Описание вашего курса или урока', textAlign: 'center', textSize: 'medium' },
+      { type: 'button', order: 5, buttonLabel: 'Начать', buttonVariant: 'primary', textAlign: 'center' },
     ],
   },
   {
@@ -209,9 +210,10 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
     nameRu: 'Фича',
     description: 'Бейдж с заголовком и описанием',
     subBlocks: [
-      { type: 'badge', order: 1, badges: [{ id: '1', text: '⭐ Фича', iconType: 'none' }], badgeVariant: 'oval', textAlign: 'center' },
-      { type: 'heading', order: 2, content: 'Преимущество', textAlign: 'center', textSize: 'large', fontWeight: 'semibold' },
-      { type: 'text', order: 3, content: 'Описание преимущества вашего курса', textAlign: 'center', textSize: 'medium' },
+      { type: 'image', order: 1, imageSize: 'small', textAlign: 'center' },
+      { type: 'badge', order: 2, badges: [{ id: '1', text: '⭐ Фича', iconType: 'none' }], badgeVariant: 'oval', textAlign: 'center' },
+      { type: 'heading', order: 3, content: 'Преимущество', textAlign: 'center', textSize: 'large', fontWeight: 'semibold' },
+      { type: 'text', order: 4, content: 'Описание преимущества вашего курса', textAlign: 'center', textSize: 'medium' },
     ],
   },
   {
