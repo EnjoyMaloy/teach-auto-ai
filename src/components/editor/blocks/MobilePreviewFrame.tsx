@@ -1342,9 +1342,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
   const bottomNavigation = (
     <div 
-      className="h-20 border-t flex items-center justify-center gap-3 px-4 shrink-0 relative z-10"
+      className="h-20 flex items-center justify-center gap-3 px-4 shrink-0 relative z-10"
       style={{ 
-        borderColor: (answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
         backgroundColor: answerState === 'correct' 
           ? correctBgTint 
           : answerState === 'partial'
@@ -1448,9 +1447,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         {resultFeedback}
         {/* Bottom navigation - shrink-0 to stay fixed at bottom */}
         <div 
-          className="h-20 border-t flex items-center justify-center gap-3 px-4 shrink-0"
+          className="h-20 flex items-center justify-center gap-3 px-4 shrink-0"
           style={{ 
-            borderColor: (answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
             backgroundColor: answerState === 'correct' 
               ? correctBgTint 
               : answerState === 'partial'
@@ -1644,9 +1642,8 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         
         {/* Bottom nav - absolute at bottom */}
         <div 
-          className="absolute bottom-0 left-0 right-0 h-20 border-t flex items-center justify-center gap-3 px-4 z-10"
+          className="absolute bottom-0 left-0 right-0 h-20 flex items-center justify-center gap-3 px-4 z-10"
           style={{ 
-            borderColor: (answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
             backgroundColor: answerState === 'correct' 
               ? correctBgTint 
               : answerState === 'partial'
