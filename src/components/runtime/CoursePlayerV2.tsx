@@ -3,7 +3,7 @@
  * Использует useCourseData для загрузки и SlideRenderer для рендеринга
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Trophy, Star, Clock, Loader2, AlertCircle } from 'lucide-react';
 import { useCourseData, CourseDataMode } from '@/hooks/useCourseData';
 import { SlideRenderer } from './SlideRenderer';
@@ -11,6 +11,7 @@ import { LessonMap } from './LessonMap';
 import { playSound } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
 import { cn } from '@/lib/utils';
+import { useImagePreloader } from '@/hooks/useImagePreloader';
 
 interface CoursePlayerV2Props {
   courseId: string;
@@ -51,6 +52,19 @@ export const CoursePlayerV2: React.FC<CoursePlayerV2Props> = ({
   const currentLesson = course?.lessons[currentLessonIndex];
   const currentSlide = currentLesson?.slides[currentSlideIndex] || null;
   const totalSlides = currentLesson?.slides?.length || 0;
+
+  // Получаем все слайды текущего урока для предзагрузки
+  const currentLessonSlides = useMemo(() => {
+    return currentLesson?.slides || [];
+  }, [currentLesson]);
+
+  // Предзагрузка картинок
+  useImagePreloader({
+    slides: currentLessonSlides,
+    currentIndex: currentSlideIndex,
+    preloadAhead: 3,
+    preloadBehind: 1,
+  });
 
   // Переход к следующему слайду
   const handleContinue = () => {
