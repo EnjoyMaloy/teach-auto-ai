@@ -595,12 +595,11 @@ const SortableSubBlockItem: React.FC<{
           ? rawBadges 
           : [{ id: '1', text: subBlock.badgeText || 'Бейдж', iconType: 'none' as const }];
         
-        // Size classes
+        // Size classes (large = маленький, xlarge = большой)
         const badgeSizeClasses = {
-          small: 'px-2 py-0.5 text-[10px] gap-1',
-          medium: 'px-3 py-1 text-xs gap-1.5',
           large: 'px-4 py-1.5 text-sm gap-2',
-        }[badgeSize];
+          xlarge: 'px-5 py-2 text-base gap-2.5',
+        }[badgeSize] || 'px-4 py-1.5 text-sm gap-2';
         
         // Variant styles
         const badgeVariantClasses = {
@@ -624,10 +623,9 @@ const SortableSubBlockItem: React.FC<{
         const badgeLucideIcons = subBlockIconMap;
 
         const badgeIconSize = {
-          small: 'w-3.5 h-3.5',
-          medium: 'w-4 h-4',
           large: 'w-5 h-5',
-        }[badgeSize];
+          xlarge: 'w-6 h-6',
+        }[badgeSize] || 'w-5 h-5';
 
         const renderBadgeIcon = (badge: typeof badges[0]) => {
           if (badge.iconType === 'none' || !badge.iconValue) return null;

@@ -383,15 +383,15 @@ export const SubBlockSettingsEditor: React.FC<SubBlockSettingsEditorProps> = ({
       <Label className="text-xs text-muted-foreground">Размер</Label>
       <div className="flex gap-1">
         {[
-          { value: 'medium', label: 'M' },
-          { value: 'large', label: 'L' },
+          { value: 'large', label: 'Маленький' },
+          { value: 'xlarge', label: 'Большой' },
         ].map(({ value, label }) => (
           <button
             key={value}
-            onClick={() => onUpdate({ badgeSize: value as 'medium' | 'large' })}
+            onClick={() => onUpdate({ badgeSize: value as 'large' | 'xlarge' })}
             className={cn(
               "flex-1 py-1.5 px-2 rounded-lg text-sm font-medium transition-colors",
-              (subBlock.badgeSize === value || (!subBlock.badgeSize && value === 'medium'))
+              (subBlock.badgeSize === value || (!subBlock.badgeSize && value === 'large'))
                 ? "bg-primary text-primary-foreground" 
                 : "bg-muted hover:bg-muted/80"
             )}
