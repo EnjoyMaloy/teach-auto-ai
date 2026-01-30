@@ -102,8 +102,13 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
   const [sliderValue, setSliderValue] = useState<number>(50);
   const [fillBlankInput, setFillBlankInput] = useState('');
   const [answerState, setAnswerState] = useState<AnswerState>('idle');
-  const [matchingSelected, setMatchingSelected] = useState<{ left: string | null; pairs: Record<string, string> }>({ left: null, pairs: {} });
-  const [shuffledRights, setShuffledRights] = useState<string[]>([]);
+  const [matchingSelected, setMatchingSelected] = useState<{ 
+    leftId: string | null; 
+    rightId: string | null;
+    matchedPairs: Array<{ leftId: string; rightId: string; isCorrect: boolean }>;
+    flashingWrong: { leftId: string; rightId: string } | null;
+  }>({ leftId: null, rightId: null, matchedPairs: [], flashingWrong: null });
+  const [shuffledRights, setShuffledRights] = useState<Array<{ id: string; text: string }>>([]);
   const [orderingItems, setOrderingItems] = useState<string[]>([]);
 
   // Сброс состояния при смене слайда
@@ -114,10 +119,12 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
     setSliderValue(slide?.sliderMin || 0);
     setFillBlankInput('');
     setAnswerState('idle');
-    setMatchingSelected({ left: null, pairs: {} });
+    setMatchingSelected({ leftId: null, rightId: null, matchedPairs: [], flashingWrong: null });
     
     if (slide?.matchingPairs) {
-      setShuffledRights([...slide.matchingPairs.map(p => p.right)].sort(() => Math.random() - 0.5));
+      // Shuffle right side items with their IDs
+      const rights = slide.matchingPairs.map(p => ({ id: p.id, text: p.right }));
+      setShuffledRights([...rights].sort(() => Math.random() - 0.5));
     }
     if (slide?.orderingItems) {
       setOrderingItems([...slide.orderingItems].sort(() => Math.random() - 0.5));
@@ -162,10 +169,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
         break;
       }
       case 'matching': {
-        const allPairsCorrect = slide.matchingPairs?.every(pair => 
-          matchingSelected.pairs[pair.left] === pair.right
-        ) || false;
-        isCorrect = allPairsCorrect && Object.keys(matchingSelected.pairs).length === (slide.matchingPairs?.length || 0);
+        // All pairs must be matched and all must be correct
+        const allMatched = matchingSelected.matchedPairs.length === (slide.matchingPairs?.length || 0);
+        const allCorrect = matchingSelected.matchedPairs.every(mp => mp.isCorrect);
+        isCorrect = allMatched && allCorrect;
         break;
       }
       case 'ordering':
@@ -192,7 +199,8 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
       case 'slider':
         return true;
       case 'matching':
-        return Object.keys(matchingSelected.pairs).length > 0;
+        // Can check only when all pairs are matched
+        return matchingSelected.matchedPairs.length === (slide.matchingPairs?.length || 0);
       case 'ordering':
         return orderingItems.length > 0;
       default:
@@ -605,7 +613,62 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
           </div>
         );
 
-      case 'matching':
+      case 'matching': {
+        // Duolingo-style matching: tap left, then right, instant feedback
+        const handleLeftClick = (pairId: string) => {
+          if (answerState !== 'idle') return;
+          // Check if already matched
+          if (matchingSelected.matchedPairs.some(mp => mp.leftId === pairId)) return;
+          
+          setMatchingSelected(prev => ({
+            ...prev,
+            leftId: prev.leftId === pairId ? null : pairId,
+            rightId: null,
+          }));
+        };
+
+        const handleRightClick = (rightItem: { id: string; text: string }) => {
+          if (answerState !== 'idle' || !matchingSelected.leftId) return;
+          // Check if already used
+          if (matchingSelected.matchedPairs.some(mp => mp.rightId === rightItem.id)) return;
+
+          const selectedLeftPair = slide.matchingPairs?.find(p => p.id === matchingSelected.leftId);
+          if (!selectedLeftPair) return;
+
+          const isCorrectMatch = selectedLeftPair.right === rightItem.text;
+
+          if (isCorrectMatch) {
+            // Correct match - add to matched pairs with green color
+            playSound('correct', soundConfig);
+            setMatchingSelected(prev => ({
+              leftId: null,
+              rightId: null,
+              matchedPairs: [...prev.matchedPairs, { 
+                leftId: matchingSelected.leftId!, 
+                rightId: rightItem.id, 
+                isCorrect: true 
+              }],
+              flashingWrong: null,
+            }));
+          } else {
+            // Wrong match - flash red and reset selection
+            playSound('incorrect', soundConfig);
+            setMatchingSelected(prev => ({
+              ...prev,
+              flashingWrong: { leftId: matchingSelected.leftId!, rightId: rightItem.id },
+            }));
+            // Reset after animation
+            setTimeout(() => {
+              setMatchingSelected(prev => ({
+                ...prev,
+                leftId: null,
+                rightId: null,
+                flashingWrong: null,
+              }));
+            }, 600);
+          }
+        };
+
         return (
           <div className="flex-1 flex flex-col p-4 overflow-auto h-full min-h-0">
             <p 
@@ -617,32 +680,45 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
             >
               {slide.content || 'Соедините пары'}
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
+              {/* Left column */}
               <div className="flex-1 space-y-2">
                 {(slide.matchingPairs || []).map((pair) => {
-                  const isSelected = matchingSelected.left === pair.left;
-                  const isMatched = pair.left in matchingSelected.pairs;
+                  const isSelected = matchingSelected.leftId === pair.id;
+                  const matchedPair = matchingSelected.matchedPairs.find(mp => mp.leftId === pair.id);
+                  const isMatched = !!matchedPair;
+                  const isFlashingWrong = matchingSelected.flashingWrong?.leftId === pair.id;
+                  
+                  let borderColor = `hsl(${ds.mutedColor})`;
+                  let bgColor = `hsl(${ds.cardColor})`;
+                  
+                  if (isMatched) {
+                    borderColor = `hsl(${ds.successColor})`;
+                    bgColor = `hsl(${ds.successColor} / 0.15)`;
+                  } else if (isFlashingWrong) {
+                    borderColor = `hsl(${ds.destructiveColor})`;
+                    bgColor = `hsl(${ds.destructiveColor} / 0.15)`;
+                  } else if (isSelected) {
+                    const accentColor = designSystem?.designBlock?.accentElementColor || ds.primaryColor;
+                    borderColor = `hsl(${accentColor})`;
+                    bgColor = `hsl(${accentColor} / 0.1)`;
+                  }
                   
                   return (
                     <button
                       key={pair.id}
-                      onClick={() => {
-                        if (answerState !== 'idle' || isMatched) return;
-                        setMatchingSelected(prev => ({ ...prev, left: pair.left }));
-                      }}
+                      onClick={() => handleLeftClick(pair.id)}
                       disabled={answerState !== 'idle' || isMatched}
-                      className="w-full p-3 text-left border-2 transition-all text-sm"
+                      className={cn(
+                        "w-full p-3 text-center border-2 transition-all text-sm font-medium",
+                        isFlashingWrong && "animate-pulse"
+                      )}
                       style={{
-                        borderColor: isMatched 
-                          ? `hsl(${ds.successColor})` 
-                          : isSelected 
-                            ? `hsl(${designSystem?.designBlock?.accentElementColor || ds.primaryColor})` 
-                            : `hsl(${ds.mutedColor})`,
-                        backgroundColor: isMatched 
-                          ? `hsl(${ds.successColor} / 0.1)` 
-                          : `hsl(${ds.cardColor})`,
+                        borderColor,
+                        backgroundColor: bgColor,
                         borderRadius: ds.borderRadius,
-                        color: `hsl(${ds.foregroundColor})`,
+                        color: isMatched ? `hsl(${ds.successColor})` : `hsl(${ds.foregroundColor})`,
+                        opacity: isMatched ? 0.7 : 1,
                       }}
                     >
                       {pair.left}
@@ -650,31 +726,44 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
                   );
                 })}
               </div>
+              {/* Right column */}
               <div className="flex-1 space-y-2">
-                {shuffledRights.map((right, idx) => {
-                  const isUsed = Object.values(matchingSelected.pairs).includes(right);
+                {shuffledRights.map((rightItem) => {
+                  const matchedPair = matchingSelected.matchedPairs.find(mp => mp.rightId === rightItem.id);
+                  const isMatched = !!matchedPair;
+                  const isFlashingWrong = matchingSelected.flashingWrong?.rightId === rightItem.id;
+                  const canClick = matchingSelected.leftId !== null && !isMatched;
+                  
+                  let borderColor = `hsl(${ds.mutedColor})`;
+                  let bgColor = `hsl(${ds.cardColor})`;
+                  
+                  if (isMatched) {
+                    borderColor = `hsl(${ds.successColor})`;
+                    bgColor = `hsl(${ds.successColor} / 0.15)`;
+                  } else if (isFlashingWrong) {
+                    borderColor = `hsl(${ds.destructiveColor})`;
+                    bgColor = `hsl(${ds.destructiveColor} / 0.15)`;
+                  }
                   
                   return (
                     <button
-                      key={idx}
-                      onClick={() => {
-                        if (answerState !== 'idle' || !matchingSelected.left || isUsed) return;
-                        setMatchingSelected(prev => ({
-                          left: null,
-                          pairs: { ...prev.pairs, [prev.left!]: right },
-                        }));
-                      }}
-                      disabled={answerState !== 'idle' || !matchingSelected.left || isUsed}
-                      className="w-full p-3 text-left border-2 transition-all text-sm"
+                      key={rightItem.id}
+                      onClick={() => handleRightClick(rightItem)}
+                      disabled={answerState !== 'idle' || !canClick || isMatched}
+                      className={cn(
+                        "w-full p-3 text-center border-2 transition-all text-sm font-medium",
+                        isFlashingWrong && "animate-pulse",
+                        !canClick && !isMatched && "opacity-60"
+                      )}
                       style={{
-                        borderColor: isUsed ? `hsl(${ds.successColor})` : `hsl(${ds.mutedColor})`,
-                        backgroundColor: isUsed ? `hsl(${ds.successColor} / 0.1)` : `hsl(${ds.cardColor})`,
+                        borderColor,
+                        backgroundColor: bgColor,
                         borderRadius: ds.borderRadius,
-                        color: `hsl(${ds.foregroundColor})`,
-                        opacity: isUsed ? 0.6 : 1,
+                        color: isMatched ? `hsl(${ds.successColor})` : `hsl(${ds.foregroundColor})`,
+                        opacity: isMatched ? 0.7 : 1,
                       }}
                     >
-                      {right}
+                      {rightItem.text}
                     </button>
                   );
                 })}
@@ -682,6 +771,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
             </div>
           </div>
         );
+      }
 
       case 'ordering':
         return (
