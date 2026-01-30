@@ -578,7 +578,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
         );
       }
 
-      case 'slider':
+      case 'slider': {
+        const accentColor = designSystem?.designBlock?.accentElementColor || ds.primaryColor;
+        const trackProgress = ((sliderValue - (slide.sliderMin || 0)) / ((slide.sliderMax || 100) - (slide.sliderMin || 0))) * 100;
+        
         return (
           <div className="flex-1 flex flex-col items-center justify-center p-4 h-full min-h-0">
             <p 
@@ -591,20 +594,53 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
               {slide.content || 'Выберите значение'}
             </p>
             <div className="w-full max-w-xs">
-              <input
-                type="range"
-                min={slide.sliderMin || 0}
-                max={slide.sliderMax || 100}
-                step={slide.sliderStep || 1}
-                value={sliderValue}
-                onChange={(e) => setSliderValue(Number(e.target.value))}
-                disabled={answerState !== 'idle'}
-                className="w-full"
-              />
+              {/* Custom slider */}
+              <div className="relative pt-2 pb-4">
+                {/* Track background */}
+                <div 
+                  className="h-2 rounded-full"
+                  style={{ backgroundColor: `hsl(${ds.mutedColor})` }}
+                />
+                {/* Track progress */}
+                <div 
+                  className="absolute top-2 left-0 h-2 rounded-full"
+                  style={{ 
+                    width: `${trackProgress}%`,
+                    backgroundColor: `hsl(${accentColor})`,
+                  }}
+                />
+                {/* Thumb */}
+                <div
+                  className="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-4 shadow-md"
+                  style={{
+                    left: `calc(${trackProgress}% - 12px)`,
+                    backgroundColor: `hsl(${ds.cardColor})`,
+                    borderColor: `hsl(${accentColor})`,
+                    top: 'calc(0.5rem + 4px)',
+                  }}
+                />
+                {/* Invisible input for interaction */}
+                <input
+                  type="range"
+                  min={slide.sliderMin || 0}
+                  max={slide.sliderMax || 100}
+                  step={slide.sliderStep || 1}
+                  value={sliderValue}
+                  onChange={(e) => setSliderValue(Number(e.target.value))}
+                  disabled={answerState !== 'idle'}
+                  className="absolute inset-0 w-full opacity-0 cursor-pointer"
+                  style={{ height: '100%' }}
+                />
+              </div>
+              {/* Min/Max labels */}
+              <div className="flex justify-between text-sm mt-1" style={{ color: `hsl(${ds.foregroundColor} / 0.5)` }}>
+                <span>{slide.sliderMin || 0}</span>
+                <span>{slide.sliderMax || 100}</span>
+              </div>
               <div className="text-center mt-4">
                 <span 
-                  className="text-3xl font-bold"
-                  style={{ color: `hsl(${designSystem?.designBlock?.accentElementColor || ds.primaryColor})` }}
+                  className="text-4xl font-bold"
+                  style={{ color: `hsl(${accentColor})` }}
                 >
                   {sliderValue}
                 </span>
@@ -612,6 +648,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
             </div>
           </div>
         );
+      }
 
       case 'matching': {
         // Duolingo-style matching: tap left, then right, instant feedback
