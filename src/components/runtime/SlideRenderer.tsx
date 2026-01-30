@@ -109,7 +109,8 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
     flashingWrong: { leftId: string; rightId: string } | null;
   }>({ leftId: null, rightId: null, matchedPairs: [], flashingWrong: null });
   const [shuffledRights, setShuffledRights] = useState<Array<{ id: string; text: string }>>([]);
-  const [orderingItems, setOrderingItems] = useState<string[]>([]);
+  const [orderingItems, setOrderingItems] = useState<Array<{ id: string; text: string }>>([]);
+  const [orderedSequence, setOrderedSequence] = useState<string[]>([]); // IDs in selected order
 
   // Сброс состояния при смене слайда
   useEffect(() => {
@@ -127,7 +128,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
       setShuffledRights([...rights].sort(() => Math.random() - 0.5));
     }
     if (slide?.orderingItems) {
-      setOrderingItems([...slide.orderingItems].sort(() => Math.random() - 0.5));
+      // Create items with IDs and shuffle
+      const items = slide.orderingItems.map((text, idx) => ({ id: `order-${idx}`, text }));
+      setOrderingItems([...items].sort(() => Math.random() - 0.5));
+      setOrderedSequence([]);
     }
   }, [slide?.id]);
 
@@ -175,9 +179,12 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
         isCorrect = allMatched && allCorrect;
         break;
       }
-      case 'ordering':
-        isCorrect = JSON.stringify(orderingItems) === JSON.stringify(slide.orderingItems);
+      case 'ordering': {
+        // Check if ordered sequence matches correct order
+        const orderedTexts = orderedSequence.map(id => orderingItems.find(item => item.id === id)?.text);
+        isCorrect = JSON.stringify(orderedTexts) === JSON.stringify(slide.orderingItems);
         break;
+      }
     }
 
     setAnswerState(isCorrect ? 'correct' : 'incorrect');
@@ -202,7 +209,8 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
         // Can check only when all pairs are matched
         return matchingSelected.matchedPairs.length === (slide.matchingPairs?.length || 0);
       case 'ordering':
-        return orderingItems.length > 0;
+        // Can check when all items are ordered
+        return orderedSequence.length === orderingItems.length;
       default:
         return false;
     }
@@ -810,11 +818,28 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
         );
       }
 
-      case 'ordering':
+      case 'ordering': {
+        // Tap-to-order: tap items in sequence to assign order numbers
+        const handleItemClick = (itemId: string) => {
+          if (answerState !== 'idle') return;
+          
+          // If already selected, remove it and all items after it
+          const existingIndex = orderedSequence.indexOf(itemId);
+          if (existingIndex !== -1) {
+            setOrderedSequence(prev => prev.slice(0, existingIndex));
+            return;
+          }
+          
+          // Add to sequence
+          setOrderedSequence(prev => [...prev, itemId]);
+        };
+
+        const accentColor = designSystem?.designBlock?.accentElementColor || ds.primaryColor;
+        
         return (
           <div className="flex-1 flex flex-col p-4 overflow-auto h-full min-h-0">
             <p 
-              className="text-lg font-semibold mb-4 text-center"
+              className="text-lg font-semibold mb-2 text-center"
               style={{ 
                 color: `hsl(${ds.foregroundColor})`,
                 fontFamily: ds.headingFontFamily,
@@ -822,60 +847,63 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
             >
               {slide.content || 'Расположите в правильном порядке'}
             </p>
+            <p 
+              className="text-sm mb-4 text-center"
+              style={{ color: `hsl(${ds.foregroundColor} / 0.6)` }}
+            >
+              Нажимайте на элементы по порядку
+            </p>
             <div className="space-y-2">
-              {orderingItems.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-2 p-3 border-2"
-                  style={{
-                    borderColor: `hsl(${ds.mutedColor})`,
-                    backgroundColor: `hsl(${ds.cardColor})`,
-                    borderRadius: ds.borderRadius,
-                  }}
-                >
-                  <span 
-                    className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
-                    style={{ 
-                      backgroundColor: `hsl(${designSystem?.designBlock?.accentElementColor || ds.primaryColor})`,
-                      color: `hsl(${ds.primaryForeground})`,
+              {orderingItems.map((item) => {
+                const orderIndex = orderedSequence.indexOf(item.id);
+                const isOrdered = orderIndex !== -1;
+                const orderNumber = orderIndex + 1;
+                
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleItemClick(item.id)}
+                    disabled={answerState !== 'idle'}
+                    className="w-full flex items-center gap-3 p-3 border-2 transition-all text-left"
+                    style={{
+                      borderColor: isOrdered ? `hsl(${accentColor})` : `hsl(${ds.mutedColor})`,
+                      backgroundColor: isOrdered ? `hsl(${accentColor} / 0.1)` : `hsl(${ds.cardColor})`,
+                      borderRadius: ds.borderRadius,
                     }}
                   >
-                    {idx + 1}
-                  </span>
-                  <span style={{ color: `hsl(${ds.foregroundColor})` }}>{item}</span>
-                  {answerState === 'idle' && (
-                    <div className="ml-auto flex gap-1">
-                      <button
-                        onClick={() => {
-                          if (idx === 0) return;
-                          const newItems = [...orderingItems];
-                          [newItems[idx], newItems[idx - 1]] = [newItems[idx - 1], newItems[idx]];
-                          setOrderingItems(newItems);
-                        }}
-                        className="p-1 text-xs"
-                        disabled={idx === 0}
-                      >
-                        ↑
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (idx === orderingItems.length - 1) return;
-                          const newItems = [...orderingItems];
-                          [newItems[idx], newItems[idx + 1]] = [newItems[idx + 1], newItems[idx]];
-                          setOrderingItems(newItems);
-                        }}
-                        className="p-1 text-xs"
-                        disabled={idx === orderingItems.length - 1}
-                      >
-                        ↓
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    {/* Order number badge */}
+                    <span 
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-all"
+                      style={{ 
+                        backgroundColor: isOrdered ? `hsl(${accentColor})` : `hsl(${ds.mutedColor})`,
+                        color: isOrdered ? `hsl(${ds.primaryForeground})` : `hsl(${ds.foregroundColor} / 0.4)`,
+                      }}
+                    >
+                      {isOrdered ? orderNumber : '?'}
+                    </span>
+                    <span 
+                      className="flex-1 font-medium"
+                      style={{ color: `hsl(${ds.foregroundColor})` }}
+                    >
+                      {item.text}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
+            {/* Reset button */}
+            {orderedSequence.length > 0 && answerState === 'idle' && (
+              <button
+                onClick={() => setOrderedSequence([])}
+                className="mt-4 text-sm underline self-center"
+                style={{ color: `hsl(${ds.foregroundColor} / 0.6)` }}
+              >
+                Сбросить
+              </button>
+            )}
           </div>
         );
+      }
 
       default:
         return (
