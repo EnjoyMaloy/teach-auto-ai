@@ -644,7 +644,7 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px]" hideCloseButton>
         <DialogHeader className="flex flex-row items-start justify-between">
           <div>
             <DialogTitle className="flex items-center gap-2">
@@ -663,18 +663,16 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
             </DialogDescription>
           </div>
           
-          {/* Minimize button when generating */}
-          {isGenerating && (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={handleMinimize}
-              className="h-8 w-8 rounded-full"
-              title="Свернуть"
-            >
-              <Minimize2 className="w-4 h-4" />
-            </Button>
-          )}
+          {/* Minimize button - always visible in top right corner */}
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={handleMinimize}
+            className="h-8 w-8 rounded-full absolute right-4 top-4"
+            title="Свернуть"
+          >
+            <Minimize2 className="w-4 h-4" />
+          </Button>
         </DialogHeader>
 
         <div className="space-y-4">
