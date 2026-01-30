@@ -48,6 +48,7 @@ import {
   ArrowRight, ChevronRight, Edit, Download, Share, Link, FileText, Folder,
   Database, Cloud, Code, Terminal, Cpu, Smartphone, Bell, MessageCircle, Send
 } from 'lucide-react';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 import { AnimationBlock } from './AnimationBlock';
 
 const iconMap = {
@@ -406,23 +407,12 @@ const SortableSubBlockItem: React.FC<{
                   if (isEditing && onSelect) onSelect();
                 }}
               >
-                <img 
+                <OptimizedImage 
                   src={subBlock.imageUrl} 
                   alt="" 
                   className="w-full h-full object-cover object-center"
-                  onLoad={(e) => {
-                    const img = e.currentTarget;
-                    const parent = img.parentElement;
-                    if (parent && img.naturalHeight > img.naturalWidth) {
-                      // Portrait image - crop to square (max 1:1 height)
-                      parent.style.aspectRatio = '1/1';
-                    } else if (parent && img.naturalWidth / img.naturalHeight > 10) {
-                      // Ultra-wide image - limit to 10:1
-                      parent.style.aspectRatio = '10/1';
-                    } else if (parent) {
-                      // Normal aspect ratio - use natural
-                      parent.style.aspectRatio = `${img.naturalWidth}/${img.naturalHeight}`;
-                    }
+                  onLoad={() => {
+                    // Aspect ratio logic is handled via parent container
                   }}
                 />
               </div>

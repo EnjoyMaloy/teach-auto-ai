@@ -14,6 +14,7 @@ import { playSound, SoundConfig } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS } from '@/types/designSystem';
 import { RiveMascot } from './RiveMascot';
 import { getSoftBackgroundColor, getDarkTextColor, getButtonShadowColor } from '@/lib/colorUtils';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 
 interface SlideRendererProps {
   slide: Slide | null;
@@ -360,7 +361,11 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
         return (
           <div className="flex-1 flex flex-col items-center justify-center p-4 gap-4 h-full min-h-0">
             {slide.imageUrl && (
-              <img src={slide.imageUrl} alt="" className="w-full rounded-2xl object-contain max-h-[60%]" />
+              <OptimizedImage 
+                src={slide.imageUrl} 
+                alt="" 
+                className="w-full rounded-2xl object-contain max-h-[60%]" 
+              />
             )}
             <p className="text-lg text-center" style={{ color: `hsl(${ds.foregroundColor})` }}>
               {slide.content || 'Описание...'}
