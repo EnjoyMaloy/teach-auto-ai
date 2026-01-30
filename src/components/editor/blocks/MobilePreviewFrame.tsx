@@ -15,14 +15,14 @@ import { playSound, SoundConfig } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS, DEFAULT_DESIGN_BLOCK_SETTINGS, BackgroundPreset } from '@/types/designSystem';
 import { RiveMascot } from '@/components/runtime/RiveMascot';
 
-// Fixed preview dimensions (simulating iPhone 16 at 100% browser zoom)
-const PREVIEW_BASE_WIDTH = 393; // iPhone 16 width in CSS pixels
-const PREVIEW_BASE_HEIGHT = 852; // iPhone 16 height in CSS pixels (9:19.5 aspect ratio)
+// Fixed preview dimensions - using iPhone 14/15 Pro proportions for better visual balance
+// These are "virtual" internal dimensions that get scaled to fit the container
+const PREVIEW_BASE_WIDTH = 390; // CSS pixels
+const PREVIEW_BASE_HEIGHT = 760; // Slightly shorter than full iPhone height for better proportions
 
 // Hook to scale preview content to fit container while maintaining fixed internal dimensions
 const usePreviewScale = (containerRef: React.RefObject<HTMLDivElement>) => {
   const [scale, setScale] = useState(1);
-  const [scaledDimensions, setScaledDimensions] = useState({ width: PREVIEW_BASE_WIDTH, height: PREVIEW_BASE_HEIGHT });
   
   useEffect(() => {
     const updateScale = () => {
@@ -37,10 +37,6 @@ const usePreviewScale = (containerRef: React.RefObject<HTMLDivElement>) => {
       const newScale = Math.min(scaleX, scaleY);
       
       setScale(newScale);
-      setScaledDimensions({
-        width: PREVIEW_BASE_WIDTH * newScale,
-        height: PREVIEW_BASE_HEIGHT * newScale,
-      });
     };
     
     updateScale();
@@ -56,7 +52,7 @@ const usePreviewScale = (containerRef: React.RefObject<HTMLDivElement>) => {
     };
   }, [containerRef]);
   
-  return { scale, scaledDimensions };
+  return scale;
 };
 
 interface MobilePreviewFrameProps {
@@ -161,7 +157,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   // Scale preview to fit container while maintaining fixed internal dimensions
-  const { scale: previewScale, scaledDimensions } = usePreviewScale(containerRef);
+  const previewScale = usePreviewScale(containerRef);
   
   // Merge design system with defaults
   const ds = { ...DEFAULT_DS, ...designSystem };
@@ -1596,33 +1592,24 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         backgroundColor: `hsl(${ds.mutedColor} / 0.2)`,
       }}
     >
-      {/* Wrapper with actual scaled dimensions to fix layout */}
+      {/* Inner container with fixed dimensions, scaled to fit using CSS zoom for crisp rendering */}
       <div 
+        className="flex flex-col overflow-hidden rounded-3xl"
         style={{ 
-          width: `${scaledDimensions.width}px`,
-          height: `${scaledDimensions.height}px`,
-          flexShrink: 0,
+          fontFamily: ds.fontFamily,
+          // Fixed internal dimensions (mobile screen size)
+          width: `${PREVIEW_BASE_WIDTH}px`,
+          height: `${PREVIEW_BASE_HEIGHT}px`,
+          // Use CSS zoom for proper layout sizing
+          zoom: previewScale,
+          ...getBackgroundStyle(ds),
         }}
       >
-        {/* Inner container with fixed dimensions, scaled to fit */}
-        <div 
-          className="flex flex-col overflow-hidden rounded-3xl origin-top-left"
-          style={{ 
-            fontFamily: ds.fontFamily,
-            // Fixed internal dimensions (mobile screen size)
-            width: `${PREVIEW_BASE_WIDTH}px`,
-            height: `${PREVIEW_BASE_HEIGHT}px`,
-            // Use transform scale for proper aspect ratio
-            transform: `scale(${previewScale})`,
-            ...getBackgroundStyle(ds),
-          }}
-        >
-          {progressBar}
-          {contentArea}
-          {hintDisplay}
-          {resultFeedback}
-          {bottomNavigation}
-        </div>
+        {progressBar}
+        {contentArea}
+        {hintDisplay}
+        {resultFeedback}
+        {bottomNavigation}
       </div>
     </div>
   );
