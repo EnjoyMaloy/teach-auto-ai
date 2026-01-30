@@ -36,6 +36,7 @@ import { SortableBlockItem } from '@/components/editor/SortableBlockItem';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Loader2, Plus, Smartphone, Volume2, VolumeX } from 'lucide-react';
+import { AIGenerationProvider } from '@/hooks/useAIGeneration';
 
 // Adapter: Convert Slide to Block for the new editor
 const slideToBlock = (slide: Slide): Block => ({
@@ -700,10 +701,16 @@ const Editor: React.FC = () => {
           onClose={() => setShowBlockSelector(false)}
         />
       )}
-
     </div>
     </TextEditorProvider>
   );
 };
 
-export default Editor;
+// Wrap Editor with AIGenerationProvider
+const EditorWithProviders: React.FC = () => (
+  <AIGenerationProvider>
+    <Editor />
+  </AIGenerationProvider>
+);
+
+export default EditorWithProviders;

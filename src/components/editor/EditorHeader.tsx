@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Undo2, Redo2, Eye, 
   Share2, Loader2, Pencil, Check, X, Palette, ChevronRight, Map, Sparkles
@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useAIGeneration } from '@/hooks/useAIGeneration';
 
 interface EditorHeaderProps {
   course: Course;
@@ -56,18 +57,19 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   onBack,
 }) => {
   const { isAdmin } = useUserRole();
+  const { state: aiState, isDialogOpen, setDialogOpen, showCompletionFlash } = useAIGeneration();
+  
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(course.title);
   const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [showDesignSystem, setShowDesignSystem] = useState(false);
   const [showMapSettings, setShowMapSettings] = useState(false);
-  const [showAIGenerator, setShowAIGenerator] = useState(false);
   const [selectedBaseSystemId, setSelectedBaseSystemId] = useState<string | null>(
     course.designSystem?.themeId || null
   );
 
   // Sync selectedBaseSystemId with course.designSystem.themeId when it changes
-  React.useEffect(() => {
+  useEffect(() => {
     const themeId = course.designSystem?.themeId || null;
     if (themeId !== selectedBaseSystemId) {
       setSelectedBaseSystemId(themeId);
@@ -387,11 +389,29 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => setShowAIGenerator(true)}
-              className="gap-1.5 border-primary/30 text-primary hover:bg-primary/10 hover:text-primary"
+              onClick={() => setDialogOpen(true)}
+              className={cn(
+                "gap-1.5 transition-all duration-300",
+                showCompletionFlash 
+                  ? "border-emerald-500 bg-emerald-500/20 text-emerald-600 animate-pulse"
+                  : aiState.status === 'generating'
+                    ? "border-primary/50 bg-primary/10 text-primary"
+                    : aiState.status === 'completed'
+                      ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600"
+                      : "border-primary/30 text-primary hover:bg-primary/10 hover:text-primary"
+              )}
             >
-              <Sparkles className="w-4 h-4" />
+              {aiState.status === 'generating' ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : showCompletionFlash || aiState.status === 'completed' ? (
+                <Check className="w-4 h-4" />
+              ) : (
+                <Sparkles className="w-4 h-4" />
+              )}
               AI
+              {aiState.status === 'generating' && (
+                <span className="text-xs opacity-70">...</span>
+              )}
             </Button>
           )}
 
@@ -464,8 +484,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
       {/* AI Generator Dialog */}
       {onAIGenerate && (
         <AIGeneratorDialog
-          open={showAIGenerator}
-          onOpenChange={setShowAIGenerator}
+          open={isDialogOpen}
+          onOpenChange={setDialogOpen}
           onGenerated={onAIGenerate}
           courseId={course.id}
           designSystem={course.designSystem}
