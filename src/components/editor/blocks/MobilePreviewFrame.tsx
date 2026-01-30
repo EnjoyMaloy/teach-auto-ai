@@ -823,21 +823,33 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
               </div>
               
               {/* Custom styled slider */}
-              <div className="relative pt-2 pb-6">
+              <div className="relative h-7 flex items-center">
+                {/* Track background */}
                 <div 
-                  className="h-3 rounded-full overflow-hidden"
+                  className="absolute left-0 right-0 h-3 rounded-full"
                   style={{ backgroundColor: `hsl(${ds.mutedColor})` }}
-                >
-                  <div 
-                    className="h-full rounded-full transition-all"
-                    style={{ 
-                      width: `${sliderPercent}%`,
-                      backgroundColor: showSliderResult 
-                        ? (isSliderCorrect ? `hsl(${ds.successColor})` : `hsl(${ds.destructiveColor})`)
-                        : `hsl(${designSystem?.designBlock?.accentElementColor || ds.primaryColor})`
-                    }}
-                  />
-                </div>
+                />
+                {/* Track progress */}
+                <div 
+                  className="absolute left-0 h-3 rounded-full"
+                  style={{ 
+                    width: `${sliderPercent}%`,
+                    backgroundColor: showSliderResult 
+                      ? (isSliderCorrect ? `hsl(${ds.successColor})` : `hsl(${ds.destructiveColor})`)
+                      : `hsl(${(designSystem?.designBlock as any)?.sliderTrackColor || accentColor})`
+                  }}
+                />
+                {/* Thumb */}
+                <div 
+                  className="absolute w-7 h-7 rounded-full shadow-lg border-4 border-white -translate-x-1/2 pointer-events-none"
+                  style={{ 
+                    left: `${sliderPercent}%`,
+                    backgroundColor: showSliderResult 
+                      ? (isSliderCorrect ? `hsl(${ds.successColor})` : `hsl(${ds.destructiveColor})`)
+                      : `hsl(${(designSystem?.designBlock as any)?.sliderThumbColor || accentColor})`
+                  }}
+                />
+                {/* Invisible input */}
                 <input
                   type="range"
                   min={block.sliderMin || 0}
@@ -846,27 +858,17 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                   value={sliderValue}
                   onChange={(e) => setSliderValue(Number(e.target.value))}
                   disabled={answerState !== 'idle'}
-                  className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                  style={{ height: '20px', top: '50%', transform: 'translateY(-50%)' }}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
                 />
-                <div 
-                  className={cn(
-                    "absolute top-1/2 -translate-y-1/2 w-7 h-7 rounded-full shadow-lg border-4 border-white transition-all pointer-events-none",
-                    showSliderResult && isSliderCorrect && "bg-success",
-                    showSliderResult && !isSliderCorrect && "bg-destructive",
-                    !showSliderResult && "bg-primary"
-                  )}
-                  style={{ left: `calc(${sliderPercent}% - 14px)` }}
-                />
-                
-                {/* Min/Max labels */}
-                <div 
-                  className="flex justify-between text-sm mt-3"
-                  style={{ color: `hsl(${ds.foregroundColor} / 0.5)` }}
-                >
-                  <span>{block.sliderMin || 0}</span>
-                  <span>{block.sliderMax || 100}</span>
-                </div>
+              </div>
+              
+              {/* Min/Max labels */}
+              <div 
+                className="flex justify-between text-sm mt-3"
+                style={{ color: `hsl(${ds.foregroundColor} / 0.5)` }}
+              >
+                <span>{block.sliderMin || 0}</span>
+                <span>{block.sliderMax || 100}</span>
               </div>
             </div>
             
