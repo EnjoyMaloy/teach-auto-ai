@@ -57,6 +57,7 @@ export interface Slide {
   backgroundColor?: string;
   textColor?: string;
   textSize?: 'small' | 'medium' | 'large' | 'xlarge';
+  backgroundId?: string; // Reference to theme background preset
   createdAt: Date;
   updatedAt: Date;
 }

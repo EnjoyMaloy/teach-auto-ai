@@ -52,6 +52,7 @@ const slideToBlock = (slide: Slide): Block => ({
   backgroundColor: slide.backgroundColor,
   textColor: slide.textColor,
   textSize: slide.textSize,
+  backgroundId: slide.backgroundId,
   createdAt: slide.createdAt,
   updatedAt: slide.updatedAt,
 });
