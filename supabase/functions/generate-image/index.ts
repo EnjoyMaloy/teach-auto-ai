@@ -68,7 +68,7 @@ serve(async (req) => {
       return authError;
     }
 
-    const { prompt, slideContext } = await req.json();
+    const { prompt, slideContext, colorPalette } = await req.json();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     
     if (!GEMINI_API_KEY) {
@@ -76,6 +76,18 @@ serve(async (req) => {
         JSON.stringify({ error: "GEMINI_API_KEY не настроен. Добавьте ваш API ключ в настройках." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    // Build color guidance from design system palette
+    let colorGuidance = '';
+    if (colorPalette && (colorPalette.primary || colorPalette.accent)) {
+      const colors = [colorPalette.primary, colorPalette.accent].filter(Boolean);
+      colorGuidance = `
+Color palette guidance:
+- Use colors harmonious with: ${colors.join(', ')}
+- These should be the dominant accent colors in the illustration
+- Complementary and analogous colors are allowed for visual balance
+- Keep the overall palette cohesive and professional`;
     }
 
     // Create image generation prompt - minimalist flat design style
@@ -87,7 +99,7 @@ Style requirements:
 - Bold, vibrant colors with good contrast
 - NO text, words, letters, or labels on the image
 - Modern, professional look suitable for educational content
-- Simple backgrounds, no complex textures`;
+- Simple backgrounds, no complex textures${colorGuidance}`;
 
     console.log(`Generating image via Gemini 3 Pro Image for: ${(slideContext || prompt).substring(0, 60)}...`);
 

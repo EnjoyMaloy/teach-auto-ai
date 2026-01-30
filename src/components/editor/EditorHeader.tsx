@@ -468,6 +468,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           onOpenChange={setShowAIGenerator}
           onGenerated={onAIGenerate}
           courseId={course.id}
+          designSystem={course.designSystem}
         />
       )}
     </>

@@ -12,7 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
-import { Course, Lesson, Slide, SlideType } from '@/types/course';
+import { Course, Lesson, Slide, SlideType, CourseDesignSystem } from '@/types/course';
 import { 
   Sparkles, 
   Loader2, 
@@ -32,6 +32,7 @@ interface AIGeneratorDialogProps {
   onOpenChange: (open: boolean) => void;
   onGenerated: (lessons: Lesson[]) => void;
   courseId: string;
+  designSystem?: CourseDesignSystem;
 }
 
 interface GenerationStep {
@@ -260,6 +261,7 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
   onOpenChange,
   onGenerated,
   courseId,
+  designSystem,
 }) => {
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -273,16 +275,61 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
     ));
   };
 
+  // Extract color palette from design system for image generation
+  const getColorPalette = (): { primary: string; accent: string; background: string } | null => {
+    if (!designSystem) return null;
+    
+    // Convert HSL string to readable color description
+    const hslToColorName = (hsl: string): string => {
+      if (!hsl) return '';
+      // Parse HSL: "262 83% 58%" -> [262, 83, 58]
+      const parts = hsl.split(' ').map(p => parseFloat(p));
+      if (parts.length < 3) return hsl;
+      
+      const h = parts[0];
+      const s = parts[1];
+      const l = parts[2];
+      
+      // Determine color name based on hue
+      let colorName = '';
+      if (s < 10) {
+        colorName = l > 50 ? 'light gray' : 'dark gray';
+      } else if (h >= 0 && h < 30) colorName = 'red-orange';
+      else if (h >= 30 && h < 60) colorName = 'orange-yellow';
+      else if (h >= 60 && h < 90) colorName = 'yellow-green';
+      else if (h >= 90 && h < 150) colorName = 'green';
+      else if (h >= 150 && h < 210) colorName = 'cyan-teal';
+      else if (h >= 210 && h < 270) colorName = 'blue-purple';
+      else if (h >= 270 && h < 330) colorName = 'purple-magenta';
+      else colorName = 'red-pink';
+      
+      // Add lightness descriptor
+      if (l > 70) colorName = 'light ' + colorName;
+      else if (l < 30) colorName = 'dark ' + colorName;
+      
+      return colorName;
+    };
+    
+    return {
+      primary: hslToColorName(designSystem.primaryColor || ''),
+      accent: hslToColorName(designSystem.accentColor || designSystem.primaryColor || ''),
+      background: hslToColorName(designSystem.backgroundColor || ''),
+    };
+  };
+
   const generateImageForSlide = async (slideContent: string, coursePrompt: string): Promise<string | null> => {
     // Create an AbortController for timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 seconds max
 
     try {
+      const colorPalette = getColorPalette();
+      
       const response = await supabase.functions.invoke('generate-image', {
         body: { 
           prompt: coursePrompt,
-          slideContext: slideContent
+          slideContext: slideContent,
+          colorPalette: colorPalette,
         },
       });
 
