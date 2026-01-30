@@ -15,9 +15,9 @@ import { playSound, SoundConfig } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS, DEFAULT_DESIGN_BLOCK_SETTINGS, BackgroundPreset } from '@/types/designSystem';
 import { RiveMascot } from '@/components/runtime/RiveMascot';
 
-// Fixed preview dimensions (simulating a mobile screen at 100% browser zoom)
-const PREVIEW_BASE_WIDTH = 375; // iPhone width in CSS pixels
-const PREVIEW_BASE_HEIGHT = 667; // iPhone height in CSS pixels
+// Fixed preview dimensions (simulating iPhone 16 at 100% browser zoom)
+const PREVIEW_BASE_WIDTH = 393; // iPhone 16 width in CSS pixels
+const PREVIEW_BASE_HEIGHT = 852; // iPhone 16 height in CSS pixels (9:19.5 aspect ratio)
 
 // Hook to scale preview content to fit container while maintaining fixed internal dimensions
 const usePreviewScale = (containerRef: React.RefObject<HTMLDivElement>) => {
