@@ -787,9 +787,8 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
                   variant="outline" 
                   size="sm"
                   onClick={handleCancel}
-                  className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  className="text-destructive border-destructive hover:text-destructive hover:bg-destructive/10"
                 >
-                  <X className="w-4 h-4" />
                   Отменить генерацию
                 </Button>
               </div>
