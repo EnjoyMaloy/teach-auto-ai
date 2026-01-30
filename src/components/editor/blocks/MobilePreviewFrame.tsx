@@ -22,6 +22,7 @@ const PREVIEW_BASE_HEIGHT = 852; // iPhone 16 height in CSS pixels (9:19.5 aspec
 // Hook to scale preview content to fit container while maintaining fixed internal dimensions
 const usePreviewScale = (containerRef: React.RefObject<HTMLDivElement>) => {
   const [scale, setScale] = useState(1);
+  const [scaledDimensions, setScaledDimensions] = useState({ width: PREVIEW_BASE_WIDTH, height: PREVIEW_BASE_HEIGHT });
   
   useEffect(() => {
     const updateScale = () => {
@@ -36,6 +37,10 @@ const usePreviewScale = (containerRef: React.RefObject<HTMLDivElement>) => {
       const newScale = Math.min(scaleX, scaleY);
       
       setScale(newScale);
+      setScaledDimensions({
+        width: PREVIEW_BASE_WIDTH * newScale,
+        height: PREVIEW_BASE_HEIGHT * newScale,
+      });
     };
     
     updateScale();
@@ -51,7 +56,7 @@ const usePreviewScale = (containerRef: React.RefObject<HTMLDivElement>) => {
     };
   }, [containerRef]);
   
-  return scale;
+  return { scale, scaledDimensions };
 };
 
 interface MobilePreviewFrameProps {
@@ -156,7 +161,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   // Scale preview to fit container while maintaining fixed internal dimensions
-  const previewScale = usePreviewScale(containerRef);
+  const { scale: previewScale, scaledDimensions } = usePreviewScale(containerRef);
   
   // Merge design system with defaults
   const ds = { ...DEFAULT_DS, ...designSystem };
@@ -1591,25 +1596,33 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         backgroundColor: `hsl(${ds.mutedColor} / 0.2)`,
       }}
     >
-      {/* Inner container with fixed dimensions, scaled to fit using transform for proper aspect ratio */}
+      {/* Wrapper with actual scaled dimensions to fix layout */}
       <div 
-        className="flex flex-col overflow-hidden rounded-3xl origin-center"
         style={{ 
-          fontFamily: ds.fontFamily,
-          // Fixed internal dimensions (mobile screen size)
-          width: `${PREVIEW_BASE_WIDTH}px`,
-          height: `${PREVIEW_BASE_HEIGHT}px`,
-          // Use transform scale instead of zoom to maintain proper aspect ratio
-          transform: `scale(${previewScale})`,
+          width: `${scaledDimensions.width}px`,
+          height: `${scaledDimensions.height}px`,
           flexShrink: 0,
-          ...getBackgroundStyle(ds),
         }}
       >
-        {progressBar}
-        {contentArea}
-        {hintDisplay}
-        {resultFeedback}
-        {bottomNavigation}
+        {/* Inner container with fixed dimensions, scaled to fit */}
+        <div 
+          className="flex flex-col overflow-hidden rounded-3xl origin-top-left"
+          style={{ 
+            fontFamily: ds.fontFamily,
+            // Fixed internal dimensions (mobile screen size)
+            width: `${PREVIEW_BASE_WIDTH}px`,
+            height: `${PREVIEW_BASE_HEIGHT}px`,
+            // Use transform scale for proper aspect ratio
+            transform: `scale(${previewScale})`,
+            ...getBackgroundStyle(ds),
+          }}
+        >
+          {progressBar}
+          {contentArea}
+          {hintDisplay}
+          {resultFeedback}
+          {bottomNavigation}
+        </div>
       </div>
     </div>
   );
