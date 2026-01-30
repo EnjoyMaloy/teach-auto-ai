@@ -135,8 +135,28 @@ export interface DesignBlockSettings {
   tableHeaderBgColor?: string;
   tableStripeBgColor?: string;
   tableStripeBgColor2?: string;
+  
+  // === Quiz block colors ===
+  // Matching block
+  matchingItemBgColor?: string;
+  matchingItemBorderColor?: string;
+  matchingCorrectColor?: string;
+  matchingIncorrectColor?: string;
+  
+  // Ordering block
+  orderingItemBgColor?: string;
+  orderingItemBorderColor?: string;
+  orderingBadgeColor?: string;
+  
+  // Fill blank block
+  fillBlankUnderlineColor?: string;
+  fillBlankTextColor?: string;
+  
+  // Slider block
+  sliderTrackColor?: string;
+  sliderThumbColor?: string;
+  sliderValueColor?: string;
 }
-
 // Mascot settings for AI-generated characters
 export interface MascotSettings {
   // AI prompt describing the mascot character
@@ -230,6 +250,19 @@ export const DEFAULT_DESIGN_BLOCK_SETTINGS: Required<DesignBlockSettings> = {
   tableHeaderBgColor: '240 5% 96%',
   tableStripeBgColor: '240 5% 98%',
   tableStripeBgColor2: '0 0% 100%',
+  // Quiz blocks
+  matchingItemBgColor: '0 0% 100%',
+  matchingItemBorderColor: '240 5% 84%',
+  matchingCorrectColor: '142 71% 45%',
+  matchingIncorrectColor: '0 84% 60%',
+  orderingItemBgColor: '0 0% 100%',
+  orderingItemBorderColor: '240 5% 84%',
+  orderingBadgeColor: '262 83% 58%',
+  fillBlankUnderlineColor: '262 83% 58%',
+  fillBlankTextColor: '240 10% 4%',
+  sliderTrackColor: '262 83% 58%',
+  sliderThumbColor: '262 83% 58%',
+  sliderValueColor: '262 83% 58%',
 };
 
 export type BackgroundType = 'solid' | 'gradient';
