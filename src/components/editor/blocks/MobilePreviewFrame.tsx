@@ -105,7 +105,7 @@ const DEFAULT_DS = {
   hintIconColor: '262 83% 58%',
 };
 
-// Calculate background style based on design system
+// Calculate background style based on design system and optional block-specific background
 const getBackgroundStyle = (ds: { 
   backgroundColor: string; 
   backgroundType?: 'solid' | 'gradient'; 
@@ -114,10 +114,13 @@ const getBackgroundStyle = (ds: {
   gradientAngle?: number;
   themeBackgrounds?: BackgroundPreset[];
   defaultBackgroundId?: string;
-}): React.CSSProperties => {
-  // First check if we have themeBackgrounds and a defaultBackgroundId
-  if (ds.themeBackgrounds && ds.themeBackgrounds.length > 0 && ds.defaultBackgroundId) {
-    const preset = ds.themeBackgrounds.find(bg => bg.id === ds.defaultBackgroundId);
+}, blockBackgroundId?: string): React.CSSProperties => {
+  // Priority: block-specific backgroundId > defaultBackgroundId
+  const targetBackgroundId = blockBackgroundId || ds.defaultBackgroundId;
+  
+  // Check if we have themeBackgrounds and a target background id
+  if (ds.themeBackgrounds && ds.themeBackgrounds.length > 0 && targetBackgroundId) {
+    const preset = ds.themeBackgrounds.find(bg => bg.id === targetBackgroundId);
     if (preset) {
       if (preset.type === 'gradient' && preset.from && preset.to) {
         return {
@@ -312,7 +315,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
       <div 
         className="h-full w-full flex items-center justify-center"
         style={{ 
-          ...getBackgroundStyle(ds),
+          ...getBackgroundStyle(ds, undefined),
           fontFamily: ds.fontFamily,
         }}
       >
@@ -1076,7 +1079,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
   const contentArea = (
     <div 
       className="flex-1 min-h-0 overflow-auto relative z-0 flex flex-col justify-center"
-      style={getBackgroundStyle(ds)}
+      style={getBackgroundStyle(ds, block?.backgroundId)}
     >
       {renderContent()}
     </div>
@@ -1294,7 +1297,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         className="h-full w-full flex flex-col"
         style={{ 
           fontFamily: ds.fontFamily,
-          ...getBackgroundStyle(ds),
+          ...getBackgroundStyle(ds, block?.backgroundId),
         }}
       >
         {progressBar}
@@ -1402,7 +1405,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         className="relative h-full w-full overflow-hidden"
         style={{ 
           fontFamily: ds.fontFamily,
-          ...getBackgroundStyle(ds),
+          ...getBackgroundStyle(ds, block?.backgroundId),
         }}
       >
         {/* Header/progress bar - absolute at top */}
@@ -1602,7 +1605,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           height: `${PREVIEW_BASE_HEIGHT}px`,
           // Use CSS zoom for proper layout sizing
           zoom: previewScale,
-          ...getBackgroundStyle(ds),
+          ...getBackgroundStyle(ds, block?.backgroundId),
         }}
       >
         {progressBar}
