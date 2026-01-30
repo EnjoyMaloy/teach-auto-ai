@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
-import { Course, Lesson, Slide, SlideType, CourseDesignSystem } from '@/types/course';
+import { Lesson, Slide, SlideType, CourseDesignSystem } from '@/types/course';
 import { 
   Sparkles, 
   Loader2, 
@@ -23,9 +23,15 @@ import {
   Layers,
   BookOpen,
   CheckCircle2,
-  Image
+  Image,
+  X,
+  Minimize2,
+  Clock,
+  RotateCcw,
+  PartyPopper
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAIGeneration, GenerationStep, getGenerationDuration } from '@/hooks/useAIGeneration';
 
 interface AIGeneratorDialogProps {
   open: boolean;
@@ -33,13 +39,6 @@ interface AIGeneratorDialogProps {
   onGenerated: (lessons: Lesson[]) => void;
   courseId: string;
   designSystem?: CourseDesignSystem;
-}
-
-interface GenerationStep {
-  id: string;
-  label: string;
-  status: 'pending' | 'active' | 'completed' | 'error';
-  message?: string;
 }
 
 interface GeneratedSubBlock {
@@ -83,19 +82,16 @@ interface GeneratedSlide {
   type: SlideType;
   content?: string;
   imageUrl?: string;
-  imageDescription?: string; // AI-generated description for image generation
+  imageDescription?: string;
   options?: string[];
   correctAnswer?: string | string[] | boolean | number;
   explanation?: string;
   explanationCorrect?: string;
   explanationPartial?: string;
   blankWord?: string;
-  // Matching
   matchingPairs?: { id: string; left: string; right: string }[];
-  // Ordering
   orderingItems?: string[];
   correctOrder?: string[];
-  // Slider
   sliderMin?: number;
   sliderMax?: number;
   sliderCorrect?: number;
@@ -105,154 +101,55 @@ interface GeneratedSlide {
 
 interface GeneratedLesson {
   title: string;
-  description: string;
+  description?: string;
   slides: GeneratedSlide[];
 }
 
 interface GeneratedCourse {
   title: string;
-  description: string;
-  targetAudience: string;
-  estimatedMinutes: number;
+  description?: string;
   lessons: GeneratedLesson[];
 }
 
 // Helper to extract and fix JSON from AI response
 const extractAndFixJson = (content: string): any => {
-  if (!content || typeof content !== 'string') {
-    console.error('extractAndFixJson received empty or invalid content:', content);
-    throw new Error('Пустой ответ от AI');
-  }
-
-  console.log('Attempting to parse content length:', content.length);
-  console.log('Content preview:', content.substring(0, 500));
-
-  // Multiple strategies to find JSON
-  let jsonStr = '';
+  // Try to extract JSON from markdown code blocks
+  const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+  let jsonStr = jsonMatch ? jsonMatch[1].trim() : content.trim();
   
-  // Strategy 1: Find JSON in code blocks
-  const codeBlockMatch = content.match(/```json\s*([\s\S]*?)\s*```/);
-  if (codeBlockMatch) {
-    jsonStr = codeBlockMatch[1];
+  // Remove any leading/trailing non-JSON characters
+  const jsonStart = jsonStr.indexOf('{');
+  const jsonEnd = jsonStr.lastIndexOf('}');
+  if (jsonStart !== -1 && jsonEnd !== -1) {
+    jsonStr = jsonStr.slice(jsonStart, jsonEnd + 1);
   }
   
-  // Strategy 2: Find any code block
-  if (!jsonStr) {
-    const anyBlockMatch = content.match(/```\s*([\s\S]*?)\s*```/);
-    if (anyBlockMatch) {
-      jsonStr = anyBlockMatch[1];
-    }
-  }
-  
-  // Strategy 3: Find JSON object pattern (greedy - find the largest match)
-  if (!jsonStr) {
-    const firstBrace = content.indexOf('{');
-    if (firstBrace !== -1) {
-      jsonStr = content.substring(firstBrace);
-    }
-  }
-  
-  if (!jsonStr || jsonStr.trim().length === 0) {
-    console.error('No JSON found in content. Full content:', content);
-    throw new Error('JSON не найден в ответе');
-  }
-  
-  // Clean up common issues
-  jsonStr = jsonStr
-    .replace(/,\s*}/g, '}')  // Remove trailing commas before }
-    .replace(/,\s*]/g, ']')  // Remove trailing commas before ]
-    .replace(/[\x00-\x1F\x7F]/g, ' ')  // Remove control characters
-    .replace(/\n\s*\.\.\.\s*\n/g, '\n')  // Remove ... ellipsis lines
-    .replace(/"\s*\n\s*"/g, '", "')  // Fix broken string arrays
-    .trim();
-  
-  // Try to parse
+  // Try direct parse first
   try {
     return JSON.parse(jsonStr);
   } catch (e) {
-    // If it fails, try to fix truncated JSON
-    console.warn('JSON parse failed, attempting aggressive fix...', e);
-    console.log('Problematic JSON (first 1000 chars):', jsonStr.substring(0, 1000));
-    
-    // Try to find the last complete object/array
-    let fixedJson = jsonStr;
-    
-    // Remove incomplete trailing content
-    // Find patterns like: ,"incomplete  or {"incomplete  
-    const incompletePatterns = [
-      /,\s*"[^"]*$/,           // Trailing incomplete key
-      /,\s*\{[^}]*$/,          // Trailing incomplete object
-      /,\s*\[[^\]]*$/,         // Trailing incomplete array
-      /:\s*"[^"]*$/,           // Trailing incomplete value
-      /:\s*\{[^}]*$/,          // Trailing incomplete object value
+    // Try various fixes
+    const fixes = [
+      // Fix unescaped newlines in strings
+      (s: string) => s.replace(/\n/g, '\\n'),
+      // Fix trailing commas
+      (s: string) => s.replace(/,(\s*[}\]])/g, '$1'),
+      // Fix single quotes
+      (s: string) => s.replace(/'/g, '"'),
+      // Fix unquoted keys
+      (s: string) => s.replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3'),
     ];
     
-    for (const pattern of incompletePatterns) {
-      fixedJson = fixedJson.replace(pattern, '');
-    }
-    
-    // Count brackets to find imbalance
-    const openBraces = (fixedJson.match(/\{/g) || []).length;
-    const closeBraces = (fixedJson.match(/\}/g) || []).length;
-    const openBrackets = (fixedJson.match(/\[/g) || []).length;
-    const closeBrackets = (fixedJson.match(/\]/g) || []).length;
-    
-    console.log(`Bracket balance: { ${openBraces}/${closeBraces}, [ ${openBrackets}/${closeBrackets}`);
-    
-    // Add missing closing brackets in correct order
-    for (let i = 0; i < openBrackets - closeBrackets; i++) {
-      fixedJson += ']';
-    }
-    for (let i = 0; i < openBraces - closeBraces; i++) {
-      fixedJson += '}';
-    }
-    
-    try {
-      return JSON.parse(fixedJson);
-    } catch (e2) {
-      console.error('Aggressive fix also failed:', e2);
-      console.log('Final attempt JSON:', fixedJson.substring(fixedJson.length - 500));
-      
-      // Last resort: try to extract at least partial data
-      // Look for the lessons array specifically
-      const lessonsMatch = fixedJson.match(/"lessons"\s*:\s*\[([\s\S]*)/);
-      if (lessonsMatch) {
-        const lessonsContent = lessonsMatch[1];
-        // Find complete lesson objects
-        const lessonObjects: any[] = [];
-        let depth = 0;
-        let start = -1;
-        
-        for (let i = 0; i < lessonsContent.length; i++) {
-          const char = lessonsContent[i];
-          if (char === '{') {
-            if (depth === 0) start = i;
-            depth++;
-          } else if (char === '}') {
-            depth--;
-            if (depth === 0 && start !== -1) {
-              try {
-                const lessonStr = lessonsContent.substring(start, i + 1);
-                const lesson = JSON.parse(lessonStr);
-                lessonObjects.push(lesson);
-              } catch {}
-              start = -1;
-            }
-          }
-        }
-        
-        if (lessonObjects.length > 0) {
-          console.log(`Extracted ${lessonObjects.length} complete lessons from truncated response`);
-          return {
-            title: 'Сгенерированный курс',
-            description: '',
-            lessons: lessonObjects
-          };
-        }
+    for (const fix of fixes) {
+      try {
+        const fixed = fix(jsonStr);
+        return JSON.parse(fixed);
+      } catch {
+        continue;
       }
-      
-      throw new Error('Не удалось восстановить JSON после всех попыток');
     }
+    
+    throw new Error('Не удалось восстановить JSON после всех попыток');
   }
 };
 
@@ -263,26 +160,42 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
   courseId,
   designSystem,
 }) => {
-  const [prompt, setPrompt] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [steps, setSteps] = useState<GenerationStep[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [skipImages, setSkipImages] = useState(false);
+  const {
+    state,
+    startGeneration,
+    cancelGeneration,
+    resetGeneration,
+    updateStep,
+    setSteps,
+    setStatus,
+    setError,
+    completeGeneration,
+    abortController,
+    setDesignSystem,
+  } = useAIGeneration();
 
-  const updateStep = (stepId: string, updates: Partial<GenerationStep>) => {
-    setSteps(prev => prev.map(step => 
-      step.id === stepId ? { ...step, ...updates } : step
-    ));
-  };
+  const [localPrompt, setLocalPrompt] = React.useState('');
+  const [localSkipImages, setLocalSkipImages] = React.useState(false);
+  const isGeneratingRef = useRef(false);
+
+  // Sync design system
+  useEffect(() => {
+    setDesignSystem(designSystem);
+  }, [designSystem, setDesignSystem]);
+
+  // Restore prompt when reopening after cancel
+  useEffect(() => {
+    if (open && state.status === 'cancelled') {
+      setLocalPrompt(state.prompt);
+    }
+  }, [open, state.status, state.prompt]);
 
   // Extract color palette from design system for image generation
   const getColorPalette = (): { primary: string; accent: string; background: string } | null => {
     if (!designSystem) return null;
     
-    // Convert HSL string to readable color description
     const hslToColorName = (hsl: string): string => {
       if (!hsl) return '';
-      // Parse HSL: "262 83% 58%" -> [262, 83, 58]
       const parts = hsl.split(' ').map(p => parseFloat(p));
       if (parts.length < 3) return hsl;
       
@@ -290,7 +203,6 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
       const s = parts[1];
       const l = parts[2];
       
-      // Determine color name based on hue
       let colorName = '';
       if (s < 10) {
         colorName = l > 50 ? 'light gray' : 'dark gray';
@@ -303,7 +215,6 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
       else if (h >= 270 && h < 330) colorName = 'purple-magenta';
       else colorName = 'red-pink';
       
-      // Add lightness descriptor
       if (l > 70) colorName = 'light ' + colorName;
       else if (l < 30) colorName = 'dark ' + colorName;
       
@@ -318,9 +229,8 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
   };
 
   const generateImageForSlide = async (slideContent: string, coursePrompt: string): Promise<string | null> => {
-    // Create an AbortController for timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 seconds max
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
 
     try {
       const colorPalette = getColorPalette();
@@ -348,15 +258,12 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
     }
   };
 
-  // Animation auto-selection removed - users can add animations manually via LottieFiles search
-
   const handleGenerate = async () => {
-    if (!prompt.trim()) return;
+    if (!localPrompt.trim() || isGeneratingRef.current) return;
 
-    setIsGenerating(true);
-    setError(null);
+    isGeneratingRef.current = true;
+    startGeneration(localPrompt, localSkipImages);
     
-    // Initialize steps - 4-step pipeline (animations removed)
     const initialSteps: GenerationStep[] = [
       { id: 'research', label: 'Исследование темы', status: 'pending' },
       { id: 'structure', label: 'Планирование структуры', status: 'pending' },
@@ -366,15 +273,25 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
     setSteps(initialSteps);
 
     try {
-      // Step 1: Research - gather facts about the topic
+      // Check if cancelled
+      const checkCancelled = () => {
+        if (abortController.current?.signal.aborted) {
+          throw new Error('CANCELLED');
+        }
+      };
+
+      // Step 1: Research
       updateStep('research', { status: 'active', message: 'Изучаю тему...' });
+      checkCancelled();
       
       const researchResponse = await supabase.functions.invoke('generate-course', {
         body: { 
-          userMessage: `Исследуй тему: "${prompt}"`, 
+          userMessage: `Исследуй тему: "${localPrompt}"`, 
           agentRole: 'research' 
         },
       });
+
+      checkCancelled();
 
       if (researchResponse.error) {
         throw new Error(researchResponse.error.message || 'Ошибка при исследовании');
@@ -394,20 +311,18 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
         message: `Найдено ${factsCount} ключевых фактов` 
       });
 
-      // Step 2: Structure - plan the course based on research
+      // Step 2: Structure
       updateStep('structure', { status: 'active', message: 'Планирую структуру...' });
-
+      checkCancelled();
+      
       const structureResponse = await supabase.functions.invoke('generate-course', {
         body: { 
-          userMessage: `Запрос пользователя: "${prompt}"
-
-Исследование темы:
-${JSON.stringify(researchData, null, 2)}
-
-Создай структуру курса СТРОГО по требованиям пользователя. Если указано количество уроков или блоков - следуй им точно.`, 
+          userMessage: `На основе исследования:\n${JSON.stringify(researchData)}\n\nЗапрос пользователя: "${localPrompt}"\n\nСпланируй структуру курса.`, 
           agentRole: 'structure' 
         },
       });
+
+      checkCancelled();
 
       if (structureResponse.error) {
         throw new Error(structureResponse.error.message || 'Ошибка при планировании');
@@ -422,29 +337,23 @@ ${JSON.stringify(researchData, null, 2)}
       }
 
       const lessonsCount = structureData.lessons?.length || 0;
-      const blocksCount = structureData.lessons?.reduce((acc: number, l: any) => acc + (l.blocks?.length || 0), 0) || 0;
       updateStep('structure', { 
         status: 'completed', 
-        message: `${lessonsCount} уроков, ${blocksCount} блоков` 
+        message: `Создано ${lessonsCount} уроков` 
       });
 
-      // Step 3: Generate actual content for blocks
-      updateStep('content', { status: 'active', message: 'Создаю контент...' });
+      // Step 3: Content
+      updateStep('content', { status: 'active', message: 'Генерирую контент...' });
+      checkCancelled();
 
       const generateResponse = await supabase.functions.invoke('generate-course', {
         body: { 
-          userMessage: `Запрос пользователя: "${prompt}"
-
-Структура курса:
-${JSON.stringify(structureData, null, 2)}
-
-Исследование:
-${JSON.stringify(researchData, null, 2)}
-
-Создай полный контент для КАЖДОГО блока по этой структуре. Следуй плану точно.`, 
+          userMessage: `Исследование:\n${JSON.stringify(researchData)}\n\nСтруктура:\n${JSON.stringify(structureData)}\n\nСоздай полный контент для всех блоков.`, 
           agentRole: 'content' 
         },
       });
+
+      checkCancelled();
 
       if (generateResponse.error) {
         throw new Error(generateResponse.error.message || 'Ошибка при генерации');
@@ -452,7 +361,6 @@ ${JSON.stringify(researchData, null, 2)}
 
       updateStep('content', { status: 'completed', message: 'Контент создан' });
 
-      // Parse course data with robust JSON fixing
       let courseData: GeneratedCourse;
       try {
         const content = generateResponse.data?.content || '';
@@ -466,38 +374,26 @@ ${JSON.stringify(researchData, null, 2)}
         throw new Error('Курс не содержит уроков');
       }
 
-      // Step 4: Images (animations step removed - users can add manually)
-
-      // Step 5: Generate images for all image_text slides (max 8) - or skip if user chose fast mode
-      if (skipImages) {
+      // Step 4: Images
+      if (localSkipImages) {
         updateStep('images', { status: 'completed', message: 'Пропущено (быстрый режим)' });
       } else {
         updateStep('images', { status: 'active', message: 'Генерирую иллюстрации...' });
+        checkCancelled();
 
         try {
-          // Find ALL slides that need images:
-          // 1. image_text type slides
-          // 2. design blocks with image sub-blocks that have imageDescription
           const slidesToIllustrate: { lessonIdx: number; slideIdx: number; subBlockIdx?: number; description: string }[] = [];
           
-          // Log all slide types for debugging
-          console.log('=== Analyzing slides for image generation ===');
           courseData.lessons.forEach((lesson, lessonIdx) => {
-            console.log(`Lesson ${lessonIdx + 1}: ${lesson.title}`);
             lesson.slides.forEach((slide, slideIdx) => {
-              console.log(`  Slide ${slideIdx + 1}: type=${slide.type}, hasImageUrl=${!!slide.imageUrl}, hasImageDescription=${!!slide.imageDescription}`);
-              
-              // Generate images for image_text slides that don't have imageUrl
               if (slide.type === 'image_text' && !slide.imageUrl) {
                 slidesToIllustrate.push({
                   lessonIdx,
                   slideIdx,
                   description: slide.imageDescription || slide.content || lesson.title
                 });
-                console.log(`    -> Added image_text to queue: ${(slide.imageDescription || slide.content || '').substring(0, 50)}...`);
               }
               
-              // Check design blocks for image sub-blocks
               if (slide.type === 'design' && slide.subBlocks) {
                 slide.subBlocks.forEach((sb: any, sbIdx: number) => {
                   if (sb.type === 'image' && sb.imageDescription && !sb.imageUrl) {
@@ -507,14 +403,12 @@ ${JSON.stringify(researchData, null, 2)}
                       subBlockIdx: sbIdx,
                       description: sb.imageDescription
                     });
-                    console.log(`    -> Added design.image sub-block to queue: ${sb.imageDescription.substring(0, 50)}...`);
                   }
                 });
               }
             });
           });
 
-          console.log(`Total slides to illustrate: ${slidesToIllustrate.length}`);
           const totalImages = slidesToIllustrate.length;
           
           if (totalImages === 0) {
@@ -523,88 +417,72 @@ ${JSON.stringify(researchData, null, 2)}
               message: 'Иллюстрации не требуются'
             });
           } else {
-            // Generate images in parallel (batch of 2 at a time to avoid rate limits)
             let imagesGenerated = 0;
             let imageErrors = 0;
             
-            // Process in smaller batches to avoid rate limits
             const batchSize = 2;
             for (let i = 0; i < slidesToIllustrate.length; i += batchSize) {
+              checkCancelled();
+              
               const batch = slidesToIllustrate.slice(i, i + batchSize);
               
               try {
                 const imagePromises = batch.map(async ({ lessonIdx, slideIdx, subBlockIdx, description }) => {
                   try {
-                    // Use the detailed imageDescription for generation
-                    const imageUrl = await generateImageForSlide(description, prompt);
+                    const imageUrl = await generateImageForSlide(description, localPrompt);
                     if (imageUrl) {
-                      // If it's a sub-block image, update the sub-block
                       if (subBlockIdx !== undefined) {
                         const subBlocks = courseData.lessons[lessonIdx].slides[slideIdx].subBlocks as any[];
                         if (subBlocks && subBlocks[subBlockIdx]) {
                           subBlocks[subBlockIdx].imageUrl = imageUrl;
                         }
                       } else {
-                        // Regular image_text slide
                         courseData.lessons[lessonIdx].slides[slideIdx].imageUrl = imageUrl;
                       }
                       imagesGenerated++;
-                      updateStep('images', { message: `Создано ${imagesGenerated} из ${totalImages} изображений...` });
                     } else {
                       imageErrors++;
                     }
-                    return imageUrl;
-                  } catch (err) {
-                    console.error('Image generation error:', err);
+                  } catch {
                     imageErrors++;
-                    return null;
                   }
                 });
 
                 await Promise.all(imagePromises);
               } catch (batchError) {
-                console.error('Batch image generation error:', batchError);
-                imageErrors += batch.length;
+                console.error('Batch image error:', batchError);
               }
               
-              // Small delay between batches to avoid rate limits
-              if (i + batchSize < slidesToIllustrate.length) {
-                await new Promise(resolve => setTimeout(resolve, 500));
-              }
-            }
-
-            // Mark images step as completed (with warning if some failed)
-            if (imagesGenerated > 0) {
               updateStep('images', { 
-                status: 'completed', 
-                message: imageErrors > 0 
-                  ? `${imagesGenerated} из ${totalImages} иллюстраций (${imageErrors} не удалось)`
-                  : `${imagesGenerated} иллюстраций создано`
-              });
-            } else {
-              // All images failed - still continue but show warning
-              updateStep('images', { 
-                status: 'completed', 
-                message: 'Не удалось создать иллюстрации (можно добавить позже)'
+                status: 'active',
+                message: `Создано ${imagesGenerated}/${totalImages} иллюстраций`
               });
             }
+            
+            updateStep('images', { 
+              status: 'completed', 
+              message: imageErrors > 0 
+                ? `Создано ${imagesGenerated} из ${totalImages} (${imageErrors} ошибок)`
+                : `Создано ${imagesGenerated} иллюстраций`
+            });
           }
-        } catch (imageStepError) {
-          console.error('Image generation step failed:', imageStepError);
-          // Ensure step is marked as completed even on total failure
+        } catch (imageError) {
+          if ((imageError as Error).message === 'CANCELLED') throw imageError;
+          console.error('Image generation failed:', imageError);
           updateStep('images', { 
             status: 'completed', 
-            message: 'Пропущено (ошибка генерации)'
+            message: 'Иллюстрации пропущены из-за ошибки'
           });
         }
       }
 
-      // Convert to our Lesson/Slide format
+      checkCancelled();
+
+      // Convert to Lesson/Slide format
       const lessons: Lesson[] = courseData.lessons.map((genLesson, lessonIndex) => {
         const lessonId = crypto.randomUUID();
         
         const slides: Slide[] = (genLesson.slides || []).map((genSlide, slideIndex) => {
-          // Process subBlocks for design type
           const subBlocks = genSlide.subBlocks?.map((sb, sbIndex) => ({
             id: crypto.randomUUID(),
             type: sb.type as any,
@@ -634,7 +512,6 @@ ${JSON.stringify(researchData, null, 2)}
             tableData: sb.tableData?.map(row => row.map(cell => ({ ...cell, id: crypto.randomUUID() }))),
             tableStyle: sb.tableStyle as any,
             tableTextSize: sb.tableTextSize as any,
-            // Animation - use resolved URL if available
             animationUrl: sb.animationUrl,
             animationType: sb.animationType as any,
             animationSize: sb.animationSize as any,
@@ -650,7 +527,6 @@ ${JSON.stringify(researchData, null, 2)}
             content: genSlide.content || '',
             imageUrl: genSlide.imageUrl,
             subBlocks: genSlide.type === 'design' ? subBlocks : undefined,
-            // Quiz options
             options: genSlide.options?.map(opt => ({
               id: crypto.randomUUID(),
               text: opt,
@@ -663,12 +539,9 @@ ${JSON.stringify(researchData, null, 2)}
             explanationCorrect: genSlide.explanationCorrect,
             explanationPartial: genSlide.explanationPartial,
             blankWord: genSlide.blankWord,
-            // Matching
             matchingPairs: genSlide.matchingPairs?.map(p => ({ ...p, id: crypto.randomUUID() })),
-            // Ordering
             orderingItems: genSlide.orderingItems,
             correctOrder: genSlide.correctOrder,
-            // Slider
             sliderMin: genSlide.sliderMin,
             sliderMax: genSlide.sliderMax,
             sliderCorrect: genSlide.sliderCorrect,
@@ -691,30 +564,47 @@ ${JSON.stringify(researchData, null, 2)}
         };
       });
 
-      // Generation complete - no separate finalize step needed
-
-      // Wait a moment to show completion
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      onGenerated(lessons);
-      onOpenChange(false);
-      
-      // Reset state
-      setPrompt('');
-      setSteps([]);
+      completeGeneration(lessons);
+      isGeneratingRef.current = false;
 
     } catch (err) {
+      isGeneratingRef.current = false;
+      
+      if ((err as Error).message === 'CANCELLED') {
+        // User cancelled - keep prompt for editing
+        return;
+      }
+      
       console.error('Generation error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка';
       setError(errorMessage);
       
       // Mark current active step as error
-      setSteps(prev => prev.map(step => 
+      setSteps(state.steps.map(step => 
         step.status === 'active' ? { ...step, status: 'error', message: errorMessage } : step
       ));
-    } finally {
-      setIsGenerating(false);
     }
+  };
+
+  const handleApplyGenerated = () => {
+    if (state.generatedLessons) {
+      onGenerated(state.generatedLessons);
+      onOpenChange(false);
+      resetGeneration();
+      setLocalPrompt('');
+    }
+  };
+
+  const handleNewGeneration = () => {
+    resetGeneration();
+  };
+
+  const handleMinimize = () => {
+    onOpenChange(false);
+  };
+
+  const handleCancel = () => {
+    cancelGeneration();
   };
 
   const getStepIcon = (step: GenerationStep) => {
@@ -738,8 +628,6 @@ ${JSON.stringify(researchData, null, 2)}
         return <Brain className="w-4 h-4" />;
       case 'content':
         return <Layers className="w-4 h-4" />;
-      case 'animations':
-        return <Sparkles className="w-4 h-4" />;
       case 'images':
         return <Image className="w-4 h-4" />;
       default:
@@ -747,46 +635,63 @@ ${JSON.stringify(researchData, null, 2)}
     }
   };
 
-  // Prevent closing dialog while generating
-  const handleOpenChange = (newOpen: boolean) => {
-    if (isGenerating && !newOpen) {
-      // Don't allow closing while generating
-      return;
-    }
-    onOpenChange(newOpen);
-  };
+  const duration = getGenerationDuration(state.startTime, state.endTime);
+  const isIdle = state.status === 'idle';
+  const isGenerating = state.status === 'generating';
+  const isCompleted = state.status === 'completed';
+  const isCancelled = state.status === 'cancelled';
+  const isError = state.status === 'error';
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange} modal={!isGenerating}>
-      <DialogContent 
-        className={cn("sm:max-w-[500px]", isGenerating && "[&>button]:hidden")}
-        onPointerDownOutside={(e) => isGenerating && e.preventDefault()}
-        onEscapeKeyDown={(e) => isGenerating && e.preventDefault()}
-        onInteractOutside={(e) => isGenerating && e.preventDefault()}
-        onFocusOutside={(e) => isGenerating && e.preventDefault()}
-      >
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary" />
-            AI Генератор курса
-          </DialogTitle>
-          <DialogDescription>
-            Опишите тему и AI создаст курс с уроками и слайдами
-          </DialogDescription>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader className="flex flex-row items-start justify-between">
+          <div>
+            <DialogTitle className="flex items-center gap-2">
+              {isCompleted ? (
+                <PartyPopper className="w-5 h-5 text-emerald-500" />
+              ) : (
+                <Sparkles className="w-5 h-5 text-primary" />
+              )}
+              {isCompleted ? 'Курс готов!' : 'AI Генератор курса'}
+            </DialogTitle>
+            <DialogDescription>
+              {isCompleted 
+                ? `Создан за ${duration} секунд`
+                : 'Опишите тему и AI создаст курс с уроками и слайдами'
+              }
+            </DialogDescription>
+          </div>
+          
+          {/* Minimize button when generating */}
+          {isGenerating && (
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={handleMinimize}
+              className="h-8 w-8 rounded-full"
+              title="Свернуть"
+            >
+              <Minimize2 className="w-4 h-4" />
+            </Button>
+          )}
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Input area */}
-          {!isGenerating && steps.length === 0 && (
+          {/* Idle state - input form */}
+          {(isIdle || isCancelled) && (
             <>
               <div>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Опишите тему курса и AI создаст структуру с уроками и слайдами
+                  {isCancelled 
+                    ? 'Генерация была отменена. Вы можете изменить запрос и попробовать снова.'
+                    : 'Опишите тему курса и AI создаст структуру с уроками и слайдами'
+                  }
                 </p>
                 <Textarea
                   placeholder="Например: Курс по основам Python для начинающих. Охватить переменные, циклы, функции и простые проекты."
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
+                  value={localPrompt}
+                  onChange={(e) => setLocalPrompt(e.target.value)}
                   className="min-h-[120px] resize-none"
                 />
               </div>
@@ -794,8 +699,8 @@ ${JSON.stringify(researchData, null, 2)}
               <div className="flex items-center gap-2 py-2">
                 <Checkbox 
                   id="skipImages" 
-                  checked={skipImages}
-                  onCheckedChange={(checked) => setSkipImages(checked === true)}
+                  checked={localSkipImages}
+                  onCheckedChange={(checked) => setLocalSkipImages(checked === true)}
                 />
                 <Label 
                   htmlFor="skipImages" 
@@ -808,32 +713,35 @@ ${JSON.stringify(researchData, null, 2)}
               <div className="flex justify-end gap-2">
                 <Button 
                   variant="outline" 
-                  onClick={() => onOpenChange(false)}
+                  onClick={() => {
+                    onOpenChange(false);
+                    if (isCancelled) resetGeneration();
+                  }}
                 >
-                  Отмена
+                  {isCancelled ? 'Закрыть' : 'Отмена'}
                 </Button>
                 <Button
                   onClick={handleGenerate}
-                  disabled={!prompt.trim()}
+                  disabled={!localPrompt.trim()}
                   className="gap-2"
                 >
                   <Sparkles className="w-4 h-4" />
-                  Сгенерировать
+                  {isCancelled ? 'Попробовать снова' : 'Сгенерировать'}
                 </Button>
               </div>
             </>
           )}
 
-          {/* Progress steps */}
-          {steps.length > 0 && (
+          {/* Generating state - progress */}
+          {isGenerating && state.steps.length > 0 && (
             <div className="space-y-3">
               <div className="p-4 bg-muted/50 rounded-lg">
                 <p className="text-sm font-medium mb-1">Генерируем курс:</p>
-                <p className="text-xs text-muted-foreground line-clamp-2">{prompt}</p>
+                <p className="text-xs text-muted-foreground line-clamp-2">{state.prompt}</p>
               </div>
 
               <div className="space-y-2">
-                {steps.map((step, index) => (
+                {state.steps.map((step) => (
                   <div 
                     key={step.id}
                     className={cn(
@@ -873,19 +781,95 @@ ${JSON.stringify(researchData, null, 2)}
                 ))}
               </div>
 
-              {error && !isGenerating && (
-                <div className="flex justify-end gap-2 pt-2">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => {
-                      setSteps([]);
-                      setError(null);
-                    }}
-                  >
-                    Попробовать снова
-                  </Button>
+              {/* Cancel button */}
+              <div className="flex justify-center pt-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleCancel}
+                  className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <X className="w-4 h-4" />
+                  Отменить генерацию
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Completed state */}
+          {isCompleted && state.generatedLessons && (
+            <div className="space-y-4">
+              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                  <span className="font-medium text-emerald-700">
+                    Курс успешно создан!
+                  </span>
                 </div>
-              )}
+                <div className="flex items-center gap-4 text-sm text-emerald-600">
+                  <span className="flex items-center gap-1">
+                    <BookOpen className="w-4 h-4" />
+                    {state.generatedLessons.length} уроков
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {duration} сек
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <p className="text-xs text-muted-foreground mb-1">Ваш запрос:</p>
+                <p className="text-sm">{state.prompt}</p>
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={handleNewGeneration}
+                  className="gap-2"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  Создать новый
+                </Button>
+                <Button
+                  onClick={handleApplyGenerated}
+                  className="gap-2 bg-emerald-600 hover:bg-emerald-700"
+                >
+                  <Check className="w-4 h-4" />
+                  Применить курс
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Error state */}
+          {isError && (
+            <div className="space-y-3">
+              <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertCircle className="w-5 h-5 text-destructive" />
+                  <span className="font-medium text-destructive">Ошибка генерации</span>
+                </div>
+                <p className="text-sm text-destructive/80">{state.error}</p>
+              </div>
+
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <p className="text-xs text-muted-foreground mb-1">Ваш запрос:</p>
+                <p className="text-sm">{state.prompt}</p>
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setLocalPrompt(state.prompt);
+                    resetGeneration();
+                  }}
+                >
+                  Попробовать снова
+                </Button>
+              </div>
             </div>
           )}
         </div>
