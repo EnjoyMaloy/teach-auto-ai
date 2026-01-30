@@ -887,18 +887,46 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
         // Use shuffled rights from state
         const availableRights = shuffledRights.filter(r => !Object.values(matchingSelected.pairs).includes(r));
         
+        // Get matching colors from design system
+        const matchingBg = (designSystem?.designBlock as any)?.matchingItemBgColor || DEFAULT_DESIGN_BLOCK_SETTINGS.matchingItemBgColor;
+        const matchingBorder = (designSystem?.designBlock as any)?.matchingItemBorderColor || DEFAULT_DESIGN_BLOCK_SETTINGS.matchingItemBorderColor;
+        const matchingCorrect = (designSystem?.designBlock as any)?.matchingCorrectColor || ds.successColor;
+        const matchingIncorrect = (designSystem?.designBlock as any)?.matchingIncorrectColor || ds.destructiveColor;
+        
         return (
           <div className="flex-1 flex flex-col items-center justify-center p-4 overflow-auto h-full min-h-0">
             {/* Mascot top */}
             {mascotSettings?.rivePosition === 'top' && renderMascot()}
             <div className="w-full flex-1 flex flex-col justify-center">
-              <p className="text-lg font-semibold mb-4 text-center text-foreground">
+              <p 
+                className="text-lg font-semibold mb-4 text-center"
+                style={{ color: `hsl(${ds.foregroundColor})`, fontFamily: ds.headingFontFamily }}
+              >
                 {block.content || 'Соедините пары'}
               </p>
               <div className="space-y-2">
                 {(block.matchingPairs || []).map((pair) => {
                   const selectedRight = matchingSelected.pairs[pair.left];
                   const isCorrectPair = selectedRight === pair.right;
+                  const isSelected = matchingSelected.left === pair.left;
+                  
+                  let leftBorderColor = `hsl(${matchingBorder})`;
+                  let leftBgColor = `hsl(${matchingBg})`;
+                  let leftTextColor = `hsl(${ds.foregroundColor})`;
+                  
+                  if (showMatchResult && isCorrectPair) {
+                    leftBorderColor = `hsl(${matchingCorrect})`;
+                    leftBgColor = `hsl(${matchingCorrect} / 0.15)`;
+                    leftTextColor = `hsl(${matchingCorrect})`;
+                  } else if (showMatchResult && selectedRight && !isCorrectPair) {
+                    leftBorderColor = `hsl(${matchingIncorrect})`;
+                    leftBgColor = `hsl(${matchingIncorrect} / 0.15)`;
+                    leftTextColor = `hsl(${matchingIncorrect})`;
+                  } else if (isSelected) {
+                    leftBorderColor = `hsl(${accentColor})`;
+                    leftBgColor = `hsl(${accentColor} / 0.1)`;
+                    leftTextColor = `hsl(${accentColor})`;
+                  }
                   
                   return (
                     <div key={pair.id} className="flex items-center gap-2">
@@ -907,23 +935,39 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                           if (answerState !== 'idle') return;
                           setMatchingSelected(prev => ({ ...prev, left: pair.left }));
                         }}
-                        className={cn(
-                          "flex-1 p-2.5 rounded-xl text-xs font-medium transition-all border-2",
-                          matchingSelected.left === pair.left && "border-primary bg-primary/10 text-primary",
-                          matchingSelected.left !== pair.left && "border-border bg-muted text-foreground",
-                          showMatchResult && isCorrectPair && "border-success bg-success/10 text-success",
-                          showMatchResult && selectedRight && !isCorrectPair && "border-destructive bg-destructive/10 text-destructive"
-                        )}
+                        className="flex-1 p-2.5 text-xs font-medium transition-all border-2"
+                        style={{
+                          borderColor: leftBorderColor,
+                          backgroundColor: leftBgColor,
+                          color: leftTextColor,
+                          borderRadius: ds.borderRadius,
+                        }}
                       >
                         {pair.left}
                       </button>
-                      <ChevronRight className="w-4 h-4 text-primary shrink-0" />
-                      <div className={cn(
-                        "flex-1 p-2.5 rounded-xl text-xs font-medium min-h-[36px] flex items-center justify-center",
-                        selectedRight ? "bg-primary/10 text-primary" : "bg-muted/50 text-muted-foreground border-2 border-dashed border-border",
-                        showMatchResult && isCorrectPair && "bg-success/10 text-success",
-                        showMatchResult && selectedRight && !isCorrectPair && "bg-destructive/10 text-destructive"
-                      )}>
+                      <ChevronRight className="w-4 h-4 shrink-0" style={{ color: `hsl(${accentColor})` }} />
+                      <div 
+                        className="flex-1 p-2.5 text-xs font-medium min-h-[36px] flex items-center justify-center border-2"
+                        style={{
+                          borderRadius: ds.borderRadius,
+                          borderColor: selectedRight 
+                            ? (showMatchResult 
+                                ? (isCorrectPair ? `hsl(${matchingCorrect})` : `hsl(${matchingIncorrect})`)
+                                : `hsl(${accentColor})`)
+                            : `hsl(${matchingBorder})`,
+                          borderStyle: selectedRight ? 'solid' : 'dashed',
+                          backgroundColor: selectedRight 
+                            ? (showMatchResult 
+                                ? (isCorrectPair ? `hsl(${matchingCorrect} / 0.15)` : `hsl(${matchingIncorrect} / 0.15)`)
+                                : `hsl(${accentColor} / 0.1)`)
+                            : `hsl(${matchingBg} / 0.5)`,
+                          color: selectedRight 
+                            ? (showMatchResult 
+                                ? (isCorrectPair ? `hsl(${matchingCorrect})` : `hsl(${matchingIncorrect})`)
+                                : `hsl(${accentColor})`)
+                            : `hsl(${ds.foregroundColor} / 0.5)`,
+                        }}
+                      >
                         {selectedRight || '?'}
                       </div>
                     </div>
@@ -932,8 +976,13 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
               </div>
               
               {matchingSelected.left && !showMatchResult && (
-                <div className="mt-4 p-3 bg-muted/30 rounded-xl">
-                  <p className="text-xs text-muted-foreground mb-2">Выберите пару для: <span className="text-primary font-medium">{matchingSelected.left}</span></p>
+                <div 
+                  className="mt-4 p-3 rounded-xl"
+                  style={{ backgroundColor: `hsl(${ds.mutedColor} / 0.3)` }}
+                >
+                  <p className="text-xs mb-2" style={{ color: `hsl(${ds.foregroundColor} / 0.6)` }}>
+                    Выберите пару для: <span style={{ color: `hsl(${accentColor})`, fontWeight: 500 }}>{matchingSelected.left}</span>
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {availableRights.map((right) => (
                       <button
@@ -944,7 +993,11 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                             pairs: { ...prev.pairs, [prev.left!]: right }
                           }));
                         }}
-                        className="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-medium hover:bg-primary/20 transition-all"
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                        style={{
+                          backgroundColor: `hsl(${accentColor} / 0.1)`,
+                          color: `hsl(${accentColor})`,
+                        }}
                       >
                         {right}
                       </button>
