@@ -35,7 +35,7 @@ export interface SoundSettings {
 export type ButtonDepth = 'flat' | 'raised';
 
 // Progress bar styles
-export type ProgressBarStyle = 'dots' | 'line' | 'pills' | 'numbers';
+export type ProgressBarStyle = 'dots' | 'line' | 'pills' | 'numbers' | 'bar' | 'bar-rounded';
 
 // Custom font from Google Fonts
 export interface CustomFont {

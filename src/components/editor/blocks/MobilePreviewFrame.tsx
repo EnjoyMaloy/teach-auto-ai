@@ -1049,13 +1049,31 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
   const renderProgressBar = () => {
     const displayBlocks = Math.min(totalBlocks, 20);
+    const progress = totalBlocks > 0 ? ((blockIndex + 1) / totalBlocks) * 100 : 0;
     
-    // Line style - single continuous bar
-    if (progressBarStyle === 'line') {
-      const progress = totalBlocks > 0 ? ((blockIndex + 1) / totalBlocks) * 100 : 0;
+    // Bar style - square solid line
+    if (progressBarStyle === 'bar') {
       return (
         <div 
-          className="w-full max-w-[200px] h-2 rounded-full overflow-hidden"
+          className="w-full h-1"
+          style={{ backgroundColor: `hsl(${inactiveColor})` }}
+        >
+          <div 
+            className="h-full transition-all"
+            style={{ 
+              width: `${progress}%`,
+              backgroundColor: `hsl(${accentColor})` 
+            }}
+          />
+        </div>
+      );
+    }
+    
+    // Bar-rounded or line style - rounded solid line
+    if (progressBarStyle === 'bar-rounded' || progressBarStyle === 'line') {
+      return (
+        <div 
+          className="w-[95%] h-1.5 rounded-full overflow-hidden mx-auto"
           style={{ backgroundColor: `hsl(${inactiveColor})` }}
         >
           <div 
