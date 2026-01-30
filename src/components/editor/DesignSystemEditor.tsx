@@ -409,12 +409,34 @@ const ProgressBarPreview: React.FC<{
   const currentIndex = 2; // Preview showing 3rd item active
   const totalItems = 8;
 
-  if (style === 'line') {
+  // Bar style - single solid line (square)
+  if (style === 'bar') {
     const progress = ((currentIndex + 1) / totalItems) * 100;
     return (
       <div className="flex items-center justify-center">
         <div 
-          className="w-full max-w-[200px] h-2 rounded-full overflow-hidden"
+          className="w-full max-w-[200px] h-1.5 overflow-hidden"
+          style={{ backgroundColor: `hsl(${mutedColor})` }}
+        >
+          <div 
+            className="h-full transition-all"
+            style={{ 
+              width: `${progress}%`,
+              backgroundColor: `hsl(${accentColor})` 
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Bar-rounded style - single solid line with rounded edges
+  if (style === 'bar-rounded' || style === 'line') {
+    const progress = ((currentIndex + 1) / totalItems) * 100;
+    return (
+      <div className="flex items-center justify-center">
+        <div 
+          className="w-full max-w-[200px] h-1.5 rounded-full overflow-hidden"
           style={{ backgroundColor: `hsl(${mutedColor})` }}
         >
           <div 
@@ -945,25 +967,26 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 description="Стиль индикатора прогресса урока"
               >
                 <div className="space-y-3">
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-3 gap-2">
                     {[
+                      { value: 'bar', label: 'Полоса', icon: '▬▬▬' },
+                      { value: 'bar-rounded', label: 'Полоса ○', icon: '━━━' },
                       { value: 'dots', label: 'Точки', icon: '● ● ●' },
-                      { value: 'line', label: 'Линия', icon: '━━━' },
-                      { value: 'pills', label: 'Сегменты', icon: '▬ ▬ ▬' },
-                      { value: 'numbers', label: 'Числа', icon: '1/10' },
+                      { value: 'pills', label: 'Сегменты', icon: '▮ ▮ ▮' },
+                      { value: 'numbers', label: 'Числа', icon: '3/10' },
                     ].map((style) => (
                       <button
                         key={style.value}
                         onClick={() => updateConfig({ progressBarStyle: style.value as ProgressBarStyle })}
                         className={cn(
-                          "p-3 rounded-lg border-2 text-center transition-all",
+                          "p-2.5 rounded-lg border-2 text-center transition-all",
                           (config.progressBarStyle ?? 'dots') === style.value
                             ? "border-primary bg-primary/5"
                             : "border-border hover:border-primary/50"
                         )}
                       >
-                        <div className="text-lg mb-1 font-mono">{style.icon}</div>
-                        <div className="text-xs font-medium">{style.label}</div>
+                        <div className="text-base mb-0.5 font-mono">{style.icon}</div>
+                        <div className="text-[10px] font-medium">{style.label}</div>
                       </button>
                     ))}
                   </div>

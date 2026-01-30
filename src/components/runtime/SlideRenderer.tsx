@@ -992,6 +992,99 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
   // Прогресс бар
   const progress = totalCount > 0 ? ((currentIndex + 1) / totalCount) * 100 : 0;
+  const progressBarStyle = designSystem?.progressBarStyle || 'bar';
+  const accentColor = designSystem?.designBlock?.accentElementColor || ds.primaryColor;
+  
+  const renderProgressBar = () => {
+    // Bar style - square solid line
+    if (progressBarStyle === 'bar') {
+      return (
+        <div 
+          className="h-1 w-full flex-shrink-0"
+          style={{ backgroundColor: `hsl(${ds.mutedColor})` }}
+        >
+          <div 
+            className="h-full transition-all duration-300"
+            style={{ 
+              width: `${progress}%`,
+              backgroundColor: `hsl(${accentColor})`,
+            }}
+          />
+        </div>
+      );
+    }
+    
+    // Bar-rounded or line style - rounded solid line
+    if (progressBarStyle === 'bar-rounded' || progressBarStyle === 'line') {
+      return (
+        <div 
+          className="h-1.5 w-full flex-shrink-0 rounded-full overflow-hidden mx-auto max-w-[95%] mt-1"
+          style={{ backgroundColor: `hsl(${ds.mutedColor})` }}
+        >
+          <div 
+            className="h-full rounded-full transition-all duration-300"
+            style={{ 
+              width: `${progress}%`,
+              backgroundColor: `hsl(${accentColor})`,
+            }}
+          />
+        </div>
+      );
+    }
+    
+    // Pills style - segments
+    if (progressBarStyle === 'pills') {
+      return (
+        <div className="flex items-center justify-center gap-1 py-1 flex-shrink-0">
+          {Array.from({ length: totalCount }).map((_, i) => (
+            <div
+              key={i}
+              className="h-1.5 rounded-sm transition-all flex-1 max-w-8"
+              style={{
+                backgroundColor: i <= currentIndex 
+                  ? `hsl(${accentColor})` 
+                  : `hsl(${ds.mutedColor})`,
+              }}
+            />
+          ))}
+        </div>
+      );
+    }
+    
+    // Numbers style
+    if (progressBarStyle === 'numbers') {
+      return (
+        <div className="flex items-center justify-center py-1 flex-shrink-0">
+          <span 
+            className="text-sm font-semibold"
+            style={{ color: `hsl(${ds.foregroundColor})` }}
+          >
+            <span style={{ color: `hsl(${accentColor})` }}>{currentIndex + 1}</span>
+            <span className="opacity-50"> / {totalCount}</span>
+          </span>
+        </div>
+      );
+    }
+    
+    // Default: dots style
+    return (
+      <div className="flex items-center justify-center gap-1 py-1 flex-shrink-0">
+        {Array.from({ length: totalCount }).map((_, i) => (
+          <div
+            key={i}
+            className="rounded-full transition-all"
+            style={{
+              height: '6px',
+              width: i === currentIndex ? '20px' : '6px',
+              backgroundColor: i <= currentIndex 
+                ? `hsl(${accentColor})` 
+                : `hsl(${ds.mutedColor})`,
+            }}
+          />
+        ))}
+      </div>
+    );
+  };
 
   // Calculate background style
   const getBackgroundStyle = (): React.CSSProperties => {
@@ -1019,20 +1112,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
       }}
     >
       {/* Прогресс бар */}
-      {showProgress && (
-        <div 
-          className="h-1 w-full flex-shrink-0"
-          style={{ backgroundColor: `hsl(${ds.mutedColor})` }}
-        >
-          <div 
-            className="h-full transition-all duration-300"
-            style={{ 
-              width: `${progress}%`,
-              backgroundColor: `hsl(${ds.primaryColor})`,
-            }}
-          />
-        </div>
-      )}
+      {showProgress && renderProgressBar()}
 
       {/* Контент */}
       <div className="flex-1 min-h-0 overflow-auto">
