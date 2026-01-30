@@ -1044,9 +1044,8 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
 
       {/* Нижняя навигация */}
       <div 
-        className="p-5 border-t flex-shrink-0"
+        className="p-5 flex-shrink-0"
         style={{ 
-          borderColor: (answerState === 'correct' || answerState === 'partial' || answerState === 'incorrect') ? 'transparent' : `hsl(${ds.mutedColor} / 0.3)`,
           backgroundColor: answerState === 'correct' 
             ? getSoftBackgroundColor(ds.successColor, 85)
             : answerState === 'partial'
