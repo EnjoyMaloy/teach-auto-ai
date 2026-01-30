@@ -250,13 +250,14 @@ const CONTENT_PROMPT = `Ты — контент-мейкер для мобиль
   ]
 }
 
-**Пример ИТОГОВОГО design блока (с бейджами навыков!):**
+**Пример ИТОГОВОГО design блока (с бейджами навыков + картинка!):**
 {
   "type": "design",
   "subBlocks": [
     { "type": "heading", "order": 1, "content": "Отлично!", "textAlign": "center", "textSize": "xlarge", "fontWeight": "bold" },
     { "type": "text", "order": 2, "content": "Вы освоили ключевые навыки этого урока!", "textAlign": "center", "textSize": "medium" },
-    { "type": "badge", "order": 3, "badges": [{"id": "1", "text": "Навык 1", "iconType": "lucide", "iconValue": "CheckCircle"}, {"id": "2", "text": "Навык 2", "iconType": "lucide", "iconValue": "Star"}], "badgeVariant": "contrast", "badgeLayout": "horizontal", "textAlign": "center", "padding": "small" }
+    { "type": "badge", "order": 3, "badges": [{"id": "1", "text": "Навык 1", "iconType": "lucide", "iconValue": "CheckCircle"}, {"id": "2", "text": "Навык 2", "iconType": "lucide", "iconValue": "Star"}], "badgeVariant": "contrast", "badgeLayout": "horizontal", "textAlign": "center", "padding": "small" },
+    { "type": "image", "order": 4, "imageDescription": "A celebratory illustration with a trophy and confetti", "imageSize": "medium", "textAlign": "center", "padding": "small" }
   ]
 }
 
@@ -348,6 +349,14 @@ const CONTENT_PROMPT = `Ты — контент-мейкер для мобиль
 - table: МАКС 4 колонки, 5 строк
 - Для backdrop ВСЕГДА backdropRounded: true
 - НЕ генерируй animation блоки — пользователь добавит анимации вручную!
+
+## ⚠️ ОБЯЗАТЕЛЬНОЕ ПРАВИЛО: КАРТИНКА В КАЖДОМ DESIGN БЛОКЕ!
+- Если в design блоке НЕТ table — последним саб-блоком ОБЯЗАТЕЛЬНО идёт image!
+- image ВСЕГДА должен быть последним в массиве subBlocks (самый большой order)
+- Единственное исключение: блок с table (таблица заменяет картинку)
+- ❌ ПЛОХО: subBlocks: [badge, heading, text] ← нет картинки!
+- ✅ ХОРОШО: subBlocks: [badge, heading, text, image] ← картинка последняя!
+- ✅ ХОРОШО: subBlocks: [heading, text, table] ← есть таблица, картинка не нужна
 
 ## ⚠️ ПРАВИЛО ЧЕРЕДОВАНИЯ САБ-БЛОКОВ (ОБЯЗАТЕЛЬНО!):
 - НИКОГДА не ставь 2+ текстовых блока (heading/text) подряд без визуального элемента между ними!
