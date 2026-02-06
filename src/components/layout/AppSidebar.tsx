@@ -150,15 +150,15 @@ const AppSidebar: React.FC = () => {
             </div>
             
             {/* Credits Section */}
-            <div className="p-4 border-b border-white/10">
+            <div className="p-4 border-b border-white/10 bg-white/5">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[13px] font-medium text-white">Credits</span>
                 <span className="text-[13px] text-primary">∞ left →</span>
               </div>
-              <Progress value={100} className="h-1.5 bg-white/10" />
+              <Progress value={100} className="h-1.5 bg-white/20" />
               <div className="flex items-center gap-2 mt-2">
                 <div className="w-2 h-2 rounded-full bg-primary" />
-                <span className="text-[11px] text-white/50">Unlimited plan</span>
+                <span className="text-[11px] text-white/60">Unlimited plan</span>
               </div>
             </div>
             
@@ -166,7 +166,7 @@ const AppSidebar: React.FC = () => {
             <div className="p-2">
               <button 
                 onClick={handleSignOut}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] text-red-400 hover:bg-red-500/10 transition-colors"
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] text-white/70 hover:text-white hover:bg-white/10 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 Выйти
