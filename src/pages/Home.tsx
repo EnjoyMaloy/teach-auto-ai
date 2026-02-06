@@ -35,9 +35,9 @@ const Home: React.FC = () => {
       // 2. Call the AI generation function
       const { data, error } = await supabase.functions.invoke('generate-course', {
         body: {
-          prompt,
+          userMessage: prompt,
           courseId: course.id,
-          skipImages: true, // Start fast, images can be added later
+          skipImages: true,
         },
       });
 
