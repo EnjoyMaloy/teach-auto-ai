@@ -26,6 +26,15 @@ const mainNav: NavItem[] = [
   { icon: Home, label: 'Главная', path: '/' },
 ];
 
+const languages = [
+  { code: 'ru', label: 'Русский' },
+  { code: 'en', label: 'English' },
+  { code: 'es', label: 'Español' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'fr', label: 'Français' },
+  { code: 'zh', label: '中文' },
+];
+
 const NavItemButton: React.FC<{
   item: NavItem;
   isActive: boolean;
@@ -283,13 +292,37 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) =
       {/* Bottom */}
       <div className="p-3">
         {/* Language Selector */}
-        <button
-          onClick={() => onLanguageChange(language === 'ru' ? 'en' : 'ru')}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-white/50 hover:bg-white/5 hover:text-white/70 transition-all text-[12px]"
-        >
-          <Globe className="w-3.5 h-3.5" />
-          <span>{language === 'ru' ? 'RU' : 'EN'}</span>
-        </button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-white/50 hover:bg-white/5 hover:text-white/70 transition-all text-[12px]">
+              <div className="flex items-center gap-3">
+                <Globe className="w-3.5 h-3.5" />
+                <span>{languages.find(l => l.code === language)?.label || 'RU'}</span>
+              </div>
+              <ChevronRight className="w-3 h-3" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent 
+            side="top" 
+            align="start" 
+            className="w-48 p-1 bg-[#1a1a1b] border-white/10"
+          >
+            {languages.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => onLanguageChange(lang.code)}
+                className={cn(
+                  "w-full flex items-center gap-2 px-3 py-2 rounded-md text-[13px] transition-colors",
+                  language === lang.code 
+                    ? "bg-white/10 text-white" 
+                    : "text-white/60 hover:bg-white/5 hover:text-white"
+                )}
+              >
+                {lang.label}
+              </button>
+            ))}
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* User Footer - removed, now in dropdown */}
