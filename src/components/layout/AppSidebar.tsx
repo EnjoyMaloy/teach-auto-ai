@@ -66,6 +66,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) =
   const [recentExpanded, setRecentExpanded] = useState(true);
   const [recentCourses, setRecentCourses] = useState<RecentCourse[]>([]);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
 
   // Use "Pavel" as hardcoded name per user request
   const userName = 'Pavel';
@@ -313,7 +314,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) =
         </button>
 
         {/* Language Selector */}
-        <Popover>
+        <Popover open={langOpen} onOpenChange={setLangOpen}>
           <PopoverTrigger asChild>
             <button className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-white/50 hover:bg-white/5 hover:text-white/70 transition-all text-[12px]">
               <div className="flex items-center gap-3">
@@ -331,7 +332,10 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) =
             {languages.map((lang) => (
               <button
                 key={lang.code}
-                onClick={() => onLanguageChange(lang.code)}
+                onClick={() => {
+                  onLanguageChange(lang.code);
+                  setLangOpen(false);
+                }}
                 className={cn(
                   "w-full flex items-center gap-2 px-3 py-2 rounded-md text-[13px] transition-colors",
                   language === lang.code 
