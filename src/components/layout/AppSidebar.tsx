@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, BookOpen, PenTool, Library, Clock, Star, Compass, ChevronDown, ChevronRight, FileText, Settings, UserPlus, LogOut, Globe } from 'lucide-react';
+import { Home, BookOpen, PenTool, Library, Clock, Star, Compass, ChevronDown, ChevronRight, FileText, Settings, UserPlus, LogOut, Globe, Sun, Moon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -290,7 +290,28 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) =
       </nav>
 
       {/* Bottom */}
-      <div className="p-3">
+      <div className="p-3 space-y-1">
+        {/* Theme Toggle */}
+        <button
+          onClick={() => {
+            const html = document.documentElement;
+            const isDark = html.classList.contains('dark');
+            if (isDark) {
+              html.classList.remove('dark');
+              localStorage.setItem('theme', 'light');
+            } else {
+              html.classList.add('dark');
+              localStorage.setItem('theme', 'dark');
+            }
+          }}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-white/50 hover:bg-white/5 hover:text-white/70 transition-all text-[12px]"
+        >
+          <Sun className="w-3.5 h-3.5 dark:hidden" />
+          <Moon className="w-3.5 h-3.5 hidden dark:block" />
+          <span className="dark:hidden">Light</span>
+          <span className="hidden dark:block">Dark</span>
+        </button>
+
         {/* Language Selector */}
         <Popover>
           <PopoverTrigger asChild>
