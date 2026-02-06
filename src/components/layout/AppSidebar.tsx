@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Search, BookOpen, PenTool, Library, Clock, Star, Sparkles, ChevronDown } from 'lucide-react';
+import { Home, Search, BookOpen, PenTool, Library, Clock, Star, Compass, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Logo from '@/assets/Logo.svg';
 import { useAuth } from '@/hooks/useAuth';
@@ -34,7 +34,7 @@ const projectsNav: NavSection = {
 const resourcesNav: NavSection = {
   title: 'Ресурсы',
   items: [
-    { icon: Sparkles, label: 'Исследовать', path: '/catalog' },
+    { icon: Compass, label: 'Исследовать', path: '/catalog' },
     { icon: Library, label: 'Словарь', path: '/dictionary' },
   ],
 };
