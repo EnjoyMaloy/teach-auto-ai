@@ -31,17 +31,6 @@ const Home: React.FC = () => {
       
       {/* Content */}
       <div className="flex-1 flex flex-col items-center justify-center relative z-10 px-6">
-        {/* New Badge */}
-        <div className="mb-6">
-          <Badge 
-            variant="secondary" 
-            className="px-4 py-2 bg-white/10 backdrop-blur-sm text-white/90 border-0 font-medium cursor-pointer hover:bg-white/15 transition-colors rounded-full"
-          >
-            <span className="text-primary font-semibold mr-2">New</span>
-            Introducing a smarter Academy
-            <ArrowRight className="w-3.5 h-3.5 ml-2" />
-          </Badge>
-        </div>
 
         {/* Welcome Text */}
         <h1 className="text-4xl md:text-5xl font-semibold mb-10 text-white text-center">
