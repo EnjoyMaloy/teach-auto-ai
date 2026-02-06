@@ -280,29 +280,15 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) =
         </div>
       </nav>
 
-      {/* Bottom Cards */}
-      <div className="p-3 space-y-2">
+      {/* Bottom */}
+      <div className="p-3">
         {/* Language Selector */}
         <button
           onClick={() => onLanguageChange(language === 'ru' ? 'en' : 'ru')}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-white/60 hover:bg-white/5 hover:text-white/90 transition-all"
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-white/50 hover:bg-white/5 hover:text-white/70 transition-all text-[12px]"
         >
-          <Globe className="w-4 h-4" />
-          <span className="text-[13px] font-medium">{language === 'ru' ? '🇷🇺 Русский' : '🇬🇧 English'}</span>
-        </button>
-
-        {/* Create Course Card */}
-        <button
-          onClick={() => navigate('/workshop')}
-          className="w-full flex items-center gap-3 px-3 py-3 rounded-xl bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/20 hover:border-primary/40 transition-all group"
-        >
-          <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-            <PenTool className="w-4 h-4 text-primary" />
-          </div>
-          <div className="flex-1 text-left">
-            <div className="text-[13px] font-medium text-white">Мастерская</div>
-            <div className="text-[11px] text-white/50">Создать курс</div>
-          </div>
+          <Globe className="w-3.5 h-3.5" />
+          <span>{language === 'ru' ? 'RU' : 'EN'}</span>
         </button>
       </div>
 
