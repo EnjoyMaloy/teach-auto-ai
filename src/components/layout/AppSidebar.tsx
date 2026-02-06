@@ -23,11 +23,11 @@ const mainNav: NavItem[] = [
 ];
 
 const projectsNav: NavSection = {
-  title: 'Курсы',
+  title: 'Мои курсы',
   items: [
-    { icon: Clock, label: 'Недавние', path: '/catalog?sort=recent' },
-    { icon: BookOpen, label: 'Все курсы', path: '/catalog' },
-    { icon: Star, label: 'Избранное', path: '/catalog?filter=starred' },
+    { icon: Clock, label: 'Недавние', path: '/workshop?sort=recent' },
+    { icon: BookOpen, label: 'Все курсы', path: '/workshop' },
+    { icon: Star, label: 'Избранное', path: '/workshop?filter=starred' },
   ],
 };
 
