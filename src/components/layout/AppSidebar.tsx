@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Search, BookOpen, PenTool, Library, Clock, Star, Compass, ChevronDown, ChevronRight, FileText } from 'lucide-react';
+import { Home, Search, BookOpen, PenTool, Library, Clock, Star, Compass, ChevronDown, ChevronRight, FileText, Settings, UserPlus, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Progress } from '@/components/ui/progress';
+import { toast } from 'sonner';
+import pavelAvatar from '@/assets/pavel-avatar.jpg';
 
 interface NavItem {
   icon: React.ElementType;
@@ -44,12 +48,14 @@ const NavItemButton: React.FC<{
 const AppSidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const [recentExpanded, setRecentExpanded] = useState(true);
   const [recentCourses, setRecentCourses] = useState<RecentCourse[]>([]);
+  const [profileOpen, setProfileOpen] = useState(false);
 
-  const userName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'User';
-  const userInitials = userName.slice(0, 2).toUpperCase();
+  // Use "Pavel" as hardcoded name per user request
+  const userName = 'Pavel';
+  const userInitials = 'PA';
 
   // Fetch recent courses
   useEffect(() => {
@@ -73,6 +79,12 @@ const AppSidebar: React.FC = () => {
 
   const isEditorRoute = (courseId: string) => location.pathname === `/editor/${courseId}`;
 
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success('Вы вышли из аккаунта');
+    navigate('/auth');
+  };
+
   return (
     <aside className="w-64 bg-[#0f0f10] flex flex-col h-screen fixed left-0 top-0 border-r border-white/5">
       {/* Logo & Workspace */}
@@ -84,16 +96,84 @@ const AppSidebar: React.FC = () => {
           </div>
         </div>
         
-        {/* Workspace Selector */}
-        <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group">
-          <div className="w-6 h-6 rounded bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-[10px] font-bold text-white">
-            {userInitials}
-          </div>
-          <span className="flex-1 text-left text-[13px] font-medium text-white truncate">
-            {userName}'s Academy
-          </span>
-          <ChevronDown className="w-4 h-4 text-white/40 group-hover:text-white/60 transition-colors" />
-        </button>
+        {/* Workspace Selector with Dropdown */}
+        <Popover open={profileOpen} onOpenChange={setProfileOpen}>
+          <PopoverTrigger asChild>
+            <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group">
+              <Avatar className="w-6 h-6">
+                <AvatarImage src={pavelAvatar} alt={userName} />
+                <AvatarFallback className="bg-gradient-to-br from-violet-500 to-pink-500 text-[10px] font-bold text-white">
+                  {userInitials}
+                </AvatarFallback>
+              </Avatar>
+              <span className="flex-1 text-left text-[13px] font-medium text-white truncate">
+                {userName}'s Academy
+              </span>
+              <ChevronDown className={cn(
+                "w-4 h-4 text-white/40 group-hover:text-white/60 transition-all",
+                profileOpen && "rotate-180"
+              )} />
+            </button>
+          </PopoverTrigger>
+          
+          <PopoverContent 
+            className="w-64 p-0 bg-[#1a1a1b] border-white/10 shadow-xl" 
+            align="start"
+            sideOffset={8}
+          >
+            {/* Profile Header */}
+            <div className="p-4 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <Avatar className="w-12 h-12">
+                  <AvatarImage src={pavelAvatar} alt={userName} />
+                  <AvatarFallback className="bg-gradient-to-br from-violet-500 to-pink-500 text-sm font-bold text-white">
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[14px] font-semibold text-white">{userName}'s Academy</div>
+                  <div className="text-[12px] text-white/50">Pro Plan • 1 member</div>
+                </div>
+              </div>
+              
+              {/* Quick Actions */}
+              <div className="flex gap-2 mt-4">
+                <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-[12px] text-white/70 hover:text-white">
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </button>
+                <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-[12px] text-white/70 hover:text-white">
+                  <UserPlus className="w-4 h-4" />
+                  Invite
+                </button>
+              </div>
+            </div>
+            
+            {/* Credits Section */}
+            <div className="p-4 border-b border-white/10">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[13px] font-medium text-white">Credits</span>
+                <span className="text-[13px] text-primary">∞ left →</span>
+              </div>
+              <Progress value={100} className="h-1.5 bg-white/10" />
+              <div className="flex items-center gap-2 mt-2">
+                <div className="w-2 h-2 rounded-full bg-primary" />
+                <span className="text-[11px] text-white/50">Unlimited plan</span>
+              </div>
+            </div>
+            
+            {/* Sign Out */}
+            <div className="p-2">
+              <button 
+                onClick={handleSignOut}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] text-red-400 hover:bg-red-500/10 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                Выйти
+              </button>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* Main Navigation */}
@@ -215,20 +295,7 @@ const AppSidebar: React.FC = () => {
         </button>
       </div>
 
-      {/* User Footer */}
-      <div className="p-3 border-t border-white/5">
-        <div className="flex items-center gap-3 px-2 py-2">
-          <Avatar className="w-8 h-8">
-            <AvatarFallback className="bg-white/10 text-white text-xs font-medium">
-              {userInitials}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <div className="text-[13px] font-medium text-white truncate">{userName}</div>
-            <div className="text-[11px] text-white/40 truncate">{user?.email}</div>
-          </div>
-        </div>
-      </div>
+      {/* User Footer - removed, now in dropdown */}
     </aside>
   );
 };
