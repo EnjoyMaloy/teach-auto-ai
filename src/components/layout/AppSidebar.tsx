@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, BookOpen, PenTool, Library, Clock, Star, Compass, ChevronDown, ChevronRight, FileText, Settings, UserPlus, LogOut, Globe, Sun, Moon } from 'lucide-react';
+import { Home, BookOpen, PenTool, Library, Clock, Star, Compass, ChevronDown, ChevronRight, FileText, Settings, UserPlus, LogOut, Globe, Sun, Moon, Palette } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -150,15 +150,30 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) =
               </div>
               
               {/* Quick Actions */}
-              <div className="flex gap-2 mt-4">
-                <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-[12px] text-white/70 hover:text-white">
-                  <Settings className="w-4 h-4" />
-                  Settings
-                </button>
-                <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-[12px] text-white/70 hover:text-white">
-                  <UserPlus className="w-4 h-4" />
-                  Invite
-                </button>
+              <div className="flex flex-col gap-2 mt-4">
+                <div className="flex gap-2">
+                  <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-[12px] text-white/70 hover:text-white">
+                    <Settings className="w-4 h-4" />
+                    Settings
+                  </button>
+                  <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-[12px] text-white/70 hover:text-white">
+                    <UserPlus className="w-4 h-4" />
+                    Invite
+                  </button>
+                </div>
+                {/* Design System Link - only show for admin */}
+                {(user?.email === 'trupcgames@gmail.com' || user?.email === 'vazhenka.hello@gmail.com') && (
+                  <button 
+                    onClick={() => {
+                      setProfileOpen(false);
+                      navigate('/design-system');
+                    }}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-[hsl(265,60%,75%)]/10 hover:bg-[hsl(265,60%,75%)]/20 transition-colors text-[12px] text-[hsl(265,60%,75%)] hover:text-white"
+                  >
+                    <Palette className="w-4 h-4" />
+                    Дизайн-система
+                  </button>
+                )}
               </div>
             </div>
             
