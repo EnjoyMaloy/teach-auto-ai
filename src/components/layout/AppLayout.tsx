@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import AppSidebar from './AppSidebar';
-import AppHeader from './AppHeader';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -19,14 +18,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }, [language]);
 
   return (
-    <div className="min-h-screen bg-white">
-      <AppSidebar />
+    <div className="min-h-screen bg-[#0a0a0b]">
+      <AppSidebar language={language} onLanguageChange={setLanguage} />
       <div className="ml-64">
-        <AppHeader
-          language={language}
-          onLanguageChange={setLanguage}
-        />
-        <main className="p-6">
+        <main>
           {children}
         </main>
       </div>

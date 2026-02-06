@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Search, BookOpen, PenTool, Library, Clock, Star, Compass, ChevronDown, ChevronRight, FileText, Settings, UserPlus, LogOut } from 'lucide-react';
+import { Home, BookOpen, PenTool, Library, Clock, Star, Compass, ChevronDown, ChevronRight, FileText, Settings, UserPlus, LogOut, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -24,7 +24,6 @@ interface RecentCourse {
 
 const mainNav: NavItem[] = [
   { icon: Home, label: 'Главная', path: '/' },
-  { icon: Search, label: 'Поиск', path: '/catalog' },
 ];
 
 const NavItemButton: React.FC<{
@@ -46,7 +45,12 @@ const NavItemButton: React.FC<{
   </button>
 );
 
-const AppSidebar: React.FC = () => {
+interface AppSidebarProps {
+  language: string;
+  onLanguageChange: (lang: string) => void;
+}
+
+const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
@@ -278,6 +282,15 @@ const AppSidebar: React.FC = () => {
 
       {/* Bottom Cards */}
       <div className="p-3 space-y-2">
+        {/* Language Selector */}
+        <button
+          onClick={() => onLanguageChange(language === 'ru' ? 'en' : 'ru')}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-white/60 hover:bg-white/5 hover:text-white/90 transition-all"
+        >
+          <Globe className="w-4 h-4" />
+          <span className="text-[13px] font-medium">{language === 'ru' ? '🇷🇺 Русский' : '🇬🇧 English'}</span>
+        </button>
+
         {/* Create Course Card */}
         <button
           onClick={() => navigate('/workshop')}

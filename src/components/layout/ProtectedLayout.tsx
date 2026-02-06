@@ -1,7 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import AppSidebar from './AppSidebar';
-import AppHeader from './AppHeader';
 import { useState, useEffect } from 'react';
 
 const ProtectedLayout: React.FC = () => {
@@ -17,14 +16,10 @@ const ProtectedLayout: React.FC = () => {
   }, [language]);
 
   return (
-    <div className="min-h-screen bg-white">
-      <AppSidebar />
+    <div className="min-h-screen bg-[#0a0a0b]">
+      <AppSidebar language={language} onLanguageChange={setLanguage} />
       <div className="ml-64">
-        <AppHeader
-          language={language}
-          onLanguageChange={setLanguage}
-        />
-        <main className="p-6">
+        <main>
           <Outlet />
         </main>
       </div>
