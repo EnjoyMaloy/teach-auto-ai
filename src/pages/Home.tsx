@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Send, Loader2 } from 'lucide-react';
+import { Plus, ArrowUp, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useCourses } from '@/hooks/useCourses';
 import { supabase } from '@/integrations/supabase/client';
@@ -206,16 +206,16 @@ const Home: React.FC = () => {
               onClick={handleGenerate}
               disabled={!prompt.trim() || isGenerating}
               className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center transition-all",
+                "w-7 h-7 rounded-full flex items-center justify-center transition-all",
                 prompt.trim() && !isGenerating
-                  ? "bg-primary hover:bg-primary/90 cursor-pointer"
-                  : "bg-white/10 cursor-not-allowed"
+                  ? "bg-white hover:bg-white/90 cursor-pointer"
+                  : "bg-white/20 cursor-not-allowed"
               )}
             >
               {isGenerating ? (
-                <Loader2 className="w-4 h-4 text-white/50 animate-spin" />
+                <Loader2 className="w-4 h-4 text-black/50 animate-spin" />
               ) : (
-                <Send className="w-4 h-4 text-white/70" />
+                <ArrowUp className="w-4 h-4 text-black" strokeWidth={2.5} />
               )}
             </button>
           </div>
