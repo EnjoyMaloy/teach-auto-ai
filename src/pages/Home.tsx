@@ -125,19 +125,19 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden bg-[#0a0a0b]">
-      {/* Gradient Background - More purple tones */}
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-[#0f0f12]">
+      {/* Gradient Background - Soft pastel purple tones */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{
           background: `
-            radial-gradient(ellipse 120% 80% at 50% 100%, hsl(270 80% 45% / 0.45), transparent 50%),
-            radial-gradient(ellipse 80% 60% at 30% 90%, hsl(280 85% 50% / 0.35), transparent 45%),
-            radial-gradient(ellipse 100% 70% at 70% 95%, hsl(260 75% 55% / 0.4), transparent 50%),
-            radial-gradient(ellipse 60% 50% at 50% 60%, hsl(250 85% 55% / 0.3), transparent 40%),
-            radial-gradient(ellipse 80% 40% at 20% 40%, hsl(243 75% 58% / 0.25), transparent 35%),
-            radial-gradient(ellipse 70% 50% at 80% 30%, hsl(265 70% 50% / 0.2), transparent 40%),
-            linear-gradient(180deg, #0a0a0b 0%, #0a0a0b 100%)
+            radial-gradient(ellipse 120% 80% at 50% 100%, hsl(270 40% 35% / 0.35), transparent 55%),
+            radial-gradient(ellipse 80% 60% at 30% 90%, hsl(280 35% 40% / 0.25), transparent 50%),
+            radial-gradient(ellipse 100% 70% at 70% 95%, hsl(260 35% 45% / 0.3), transparent 55%),
+            radial-gradient(ellipse 60% 50% at 50% 60%, hsl(250 30% 45% / 0.2), transparent 45%),
+            radial-gradient(ellipse 80% 40% at 20% 40%, hsl(243 30% 48% / 0.15), transparent 40%),
+            radial-gradient(ellipse 70% 50% at 80% 30%, hsl(265 25% 40% / 0.15), transparent 45%),
+            linear-gradient(180deg, #0f0f12 0%, #0f0f12 100%)
           `
         }}
       />
@@ -146,7 +146,7 @@ const Home: React.FC = () => {
       <div className="flex-1 flex flex-col items-center justify-center relative z-10 px-6">
         {/* Welcome Text */}
         <h1 className="text-4xl md:text-5xl font-semibold mb-10 text-white text-center">
-          What's on your mind, <span className="text-primary">{userName}</span>?
+          What's on your mind, <span className="text-[hsl(265,60%,75%)]">{userName}</span>?
         </h1>
 
         {/* Action Card */}
