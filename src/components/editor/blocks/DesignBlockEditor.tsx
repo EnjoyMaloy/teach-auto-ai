@@ -167,6 +167,12 @@ const SortableSubBlockItem: React.FC<{
     tableStripeBgColor2: designSystem?.designBlock?.tableStripeBgColor2 || DEFAULT_DESIGN_BLOCK_SETTINGS.tableStripeBgColor2,
   };
 
+  // Helper to strip HTML tags from content (AI sometimes generates with <p> tags)
+  const stripHtml = (text: string | undefined): string => {
+    if (!text) return '';
+    return text.replace(/<[^>]*>/g, '').trim();
+  };
+
   const textAlignClass = {
     left: 'text-left',
     center: 'text-center',
@@ -232,8 +238,8 @@ const SortableSubBlockItem: React.FC<{
         return (
           <div className="w-full">
             {isEditing ? (
-              <textarea
-                value={subBlock.content || ''}
+            <textarea
+                value={stripHtml(subBlock.content)}
                 onChange={(e) => {
                   const text = e.target.value.slice(0, MAX_HEADING_CHARS);
                   headingContentRef.current = text;
@@ -283,7 +289,7 @@ const SortableSubBlockItem: React.FC<{
                   fontFamily: ds.headingFontFamily,
                 }}
               >
-                {subBlock.content || 'Заголовок'}
+                {stripHtml(subBlock.content) || 'Заголовок'}
               </h2>
             )}
           </div>
@@ -368,7 +374,7 @@ const SortableSubBlockItem: React.FC<{
             }}
           >
             <RichTextEditor
-              content={subBlock.content || (isEditing ? '' : 'Текст абзаца')}
+              content={stripHtml(subBlock.content) || (isEditing ? '' : 'Текст абзаца')}
               onChange={(content) => onUpdate({ content })}
               placeholder="Текст абзаца..."
               textSize={subBlock.textSize || 'medium'}

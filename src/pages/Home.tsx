@@ -86,20 +86,32 @@ const Home: React.FC = () => {
             for (let j = 0; j < lesson.slides.length; j++) {
               const slide = lesson.slides[j];
               
+              // Helper to strip HTML tags from text
+              const stripHtml = (text: string | undefined): string => {
+                if (!text) return '';
+                return text.replace(/<[^>]*>/g, '').trim();
+              };
+              
+              // Clean subBlocks from HTML tags
+              const cleanSubBlocks = slide.subBlocks?.map((sb: any) => ({
+                ...sb,
+                content: stripHtml(sb.content),
+              }));
+              
               await supabase.from('slides').insert({
                 lesson_id: lessonData.id,
                 type: slide.type || 'info',
                 order: j,
-                content: slide.content || '',
+                content: stripHtml(slide.content),
                 image_url: slide.imageUrl,
                 options: slide.options ? slide.options.map((o: string, idx: number) => ({
                   id: `opt-${idx}`,
-                  text: o,
+                  text: stripHtml(o),
                 })) : null,
                 correct_answer: slide.correctAnswer,
-                explanation: slide.explanation,
-                explanation_correct: slide.explanationCorrect,
-                explanation_partial: slide.explanationPartial,
+                explanation: stripHtml(slide.explanation),
+                explanation_correct: stripHtml(slide.explanationCorrect),
+                explanation_partial: stripHtml(slide.explanationPartial),
                 blank_word: slide.blankWord,
                 matching_pairs: slide.matchingPairs,
                 ordering_items: slide.orderingItems,
@@ -108,7 +120,7 @@ const Home: React.FC = () => {
                 slider_max: slide.sliderMax,
                 slider_correct: slide.sliderCorrect,
                 slider_step: slide.sliderStep,
-                sub_blocks: slide.subBlocks,
+                sub_blocks: cleanSubBlocks,
               });
             }
           }
