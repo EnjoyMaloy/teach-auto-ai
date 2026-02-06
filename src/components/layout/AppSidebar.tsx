@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Search, BookOpen, PenTool, Library, Clock, Star, Compass, ChevronDown } from 'lucide-react';
+import { Home, Search, BookOpen, PenTool, Library, Clock, Star, Compass, ChevronDown, ChevronRight, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import Logo from '@/assets/Logo.svg';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { supabase } from '@/integrations/supabase/client';
 
 interface NavItem {
   icon: React.ElementType;
@@ -12,32 +12,15 @@ interface NavItem {
   path: string;
 }
 
-interface NavSection {
-  title?: string;
-  items: NavItem[];
+interface RecentCourse {
+  id: string;
+  title: string;
 }
 
 const mainNav: NavItem[] = [
   { icon: Home, label: 'Главная', path: '/' },
   { icon: Search, label: 'Поиск', path: '/catalog' },
 ];
-
-const projectsNav: NavSection = {
-  title: 'Мои курсы',
-  items: [
-    { icon: Clock, label: 'Недавние', path: '/workshop?sort=recent' },
-    { icon: BookOpen, label: 'Все курсы', path: '/workshop' },
-    { icon: Star, label: 'Избранное', path: '/workshop?filter=starred' },
-  ],
-};
-
-const resourcesNav: NavSection = {
-  title: 'Ресурсы',
-  items: [
-    { icon: Compass, label: 'Исследовать', path: '/catalog' },
-    { icon: Library, label: 'Словарь', path: '/dictionary' },
-  ],
-};
 
 const NavItemButton: React.FC<{
   item: NavItem;
@@ -58,37 +41,37 @@ const NavItemButton: React.FC<{
   </button>
 );
 
-const NavSectionGroup: React.FC<{
-  section: NavSection;
-  currentPath: string;
-  onNavigate: (path: string) => void;
-}> = ({ section, currentPath, onNavigate }) => (
-  <div className="mb-4">
-    {section.title && (
-      <div className="flex items-center gap-2 px-3 py-2 text-[11px] font-semibold text-white/40 uppercase tracking-wider">
-        {section.title}
-      </div>
-    )}
-    <div className="space-y-0.5">
-      {section.items.map(item => (
-        <NavItemButton
-          key={item.path + item.label}
-          item={item}
-          isActive={currentPath === item.path || currentPath.startsWith(item.path.split('?')[0] + '/')}
-          onClick={() => onNavigate(item.path)}
-        />
-      ))}
-    </div>
-  </div>
-);
-
 const AppSidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const [recentExpanded, setRecentExpanded] = useState(true);
+  const [recentCourses, setRecentCourses] = useState<RecentCourse[]>([]);
 
   const userName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'User';
   const userInitials = userName.slice(0, 2).toUpperCase();
+
+  // Fetch recent courses
+  useEffect(() => {
+    const fetchRecentCourses = async () => {
+      if (!user) return;
+      
+      const { data, error } = await supabase
+        .from('courses')
+        .select('id, title, updated_at')
+        .eq('author_id', user.id)
+        .order('updated_at', { ascending: false })
+        .limit(5);
+      
+      if (!error && data) {
+        setRecentCourses(data.map(c => ({ id: c.id, title: c.title })));
+      }
+    };
+
+    fetchRecentCourses();
+  }, [user]);
+
+  const isEditorRoute = (courseId: string) => location.pathname === `/editor/${courseId}`;
 
   return (
     <aside className="w-64 bg-[#0f0f10] flex flex-col h-screen fixed left-0 top-0 border-r border-white/5">
@@ -127,19 +110,92 @@ const AppSidebar: React.FC = () => {
           ))}
         </div>
 
-        {/* Projects Section */}
-        <NavSectionGroup
-          section={projectsNav}
-          currentPath={location.pathname}
-          onNavigate={navigate}
-        />
+        {/* My Courses Section */}
+        <div className="mb-4">
+          <div className="flex items-center gap-2 px-3 py-2 text-[11px] font-semibold text-white/40 uppercase tracking-wider">
+            Мои курсы
+          </div>
+          
+          {/* Recent - Collapsible */}
+          <div className="space-y-0.5">
+            <button
+              onClick={() => setRecentExpanded(!recentExpanded)}
+              className={cn(
+                "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 text-[13px] font-medium",
+                "text-white/60 hover:bg-white/5 hover:text-white/90"
+              )}
+            >
+              <ChevronRight 
+                className={cn(
+                  "w-3 h-3 transition-transform duration-200",
+                  recentExpanded && "rotate-90"
+                )} 
+              />
+              <Clock className="w-4 h-4" />
+              <span className="flex-1 text-left">Недавние</span>
+            </button>
+            
+            {/* Recent Courses List */}
+            {recentExpanded && (
+              <div className="ml-3 pl-3 border-l border-white/10 space-y-0.5">
+                {recentCourses.length > 0 ? (
+                  recentCourses.map(course => (
+                    <button
+                      key={course.id}
+                      onClick={() => navigate(`/editor/${course.id}`)}
+                      className={cn(
+                        "w-full flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-150 text-[12px]",
+                        isEditorRoute(course.id)
+                          ? "bg-white/10 text-white"
+                          : "text-white/50 hover:bg-white/5 hover:text-white/80"
+                      )}
+                    >
+                      <FileText className="w-3.5 h-3.5 shrink-0" />
+                      <span className="truncate">{course.title}</span>
+                    </button>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-[11px] text-white/30">
+                    Нет недавних курсов
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* All Courses */}
+            <NavItemButton
+              item={{ icon: BookOpen, label: 'Все курсы', path: '/workshop' }}
+              isActive={location.pathname === '/workshop'}
+              onClick={() => navigate('/workshop')}
+            />
+
+            {/* Starred */}
+            <NavItemButton
+              item={{ icon: Star, label: 'Избранное', path: '/workshop?filter=starred' }}
+              isActive={location.pathname + location.search === '/workshop?filter=starred'}
+              onClick={() => navigate('/workshop?filter=starred')}
+            />
+          </div>
+        </div>
 
         {/* Resources Section */}
-        <NavSectionGroup
-          section={resourcesNav}
-          currentPath={location.pathname}
-          onNavigate={navigate}
-        />
+        <div className="mb-4">
+          <div className="flex items-center gap-2 px-3 py-2 text-[11px] font-semibold text-white/40 uppercase tracking-wider">
+            Ресурсы
+          </div>
+          <div className="space-y-0.5">
+            <NavItemButton
+              item={{ icon: Compass, label: 'Исследовать', path: '/catalog' }}
+              isActive={location.pathname === '/catalog'}
+              onClick={() => navigate('/catalog')}
+            />
+            <NavItemButton
+              item={{ icon: Library, label: 'Словарь', path: '/dictionary' }}
+              isActive={location.pathname === '/dictionary'}
+              onClick={() => navigate('/dictionary')}
+            />
+          </div>
+        </div>
       </nav>
 
       {/* Bottom Cards */}
