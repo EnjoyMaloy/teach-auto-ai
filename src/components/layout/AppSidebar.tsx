@@ -91,7 +91,7 @@ const AppSidebar: React.FC = () => {
       {/* Logo & Workspace */}
       <div className="p-4 pb-2">
         {/* Logo */}
-        <div className="mb-4">
+        <div className="mt-2 mb-6">
           <img src={Logo} alt="Academy" className="h-6" />
         </div>
         
