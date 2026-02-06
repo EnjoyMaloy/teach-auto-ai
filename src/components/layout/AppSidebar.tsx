@@ -91,12 +91,8 @@ const AppSidebar: React.FC = () => {
       {/* Logo & Workspace */}
       <div className="p-4 pb-2">
         {/* Logo */}
-        <div className="mb-4 flex items-center gap-2">
-          <img src={Logo} alt="Logo" className="w-10 h-10" />
-          <span className="text-lg font-semibold">
-            <span className="text-primary">A</span>
-            <span className="text-white">cademy</span>
-          </span>
+        <div className="mb-4">
+          <img src={Logo} alt="Academy" className="h-6" />
         </div>
         
         {/* Workspace Selector with Dropdown */}
