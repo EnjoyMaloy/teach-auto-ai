@@ -278,9 +278,9 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) =
 
             {/* Starred */}
             <NavItemButton
-              item={{ icon: Star, label: 'Избранное', path: '/workshop?filter=starred' }}
-              isActive={location.pathname + location.search === '/workshop?filter=starred'}
-              onClick={() => navigate('/workshop?filter=starred')}
+              item={{ icon: Star, label: 'Избранное', path: '/favorites' }}
+              isActive={location.pathname === '/favorites'}
+              onClick={() => navigate('/favorites')}
             />
           </div>
         </div>

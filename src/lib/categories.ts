@@ -1,4 +1,4 @@
-import { Bitcoin, Wallet, TrendingUp, Shield, Coins, GraduationCap, LucideIcon } from 'lucide-react';
+import { Heart, Dumbbell, Brain, Briefcase, Palette, Languages, Book, Sparkles, LucideIcon } from 'lucide-react';
 
 export interface CourseCategory {
   id: string;
@@ -9,12 +9,14 @@ export interface CourseCategory {
 }
 
 export const COURSE_CATEGORIES: CourseCategory[] = [
-  { id: 'crypto-basics', name: 'Основы крипты', nameEn: 'Crypto Basics', icon: Bitcoin, color: '#FFB09E' },
-  { id: 'defi', name: 'DeFi', nameEn: 'DeFi', icon: Coins, color: '#D9C0FF' },
-  { id: 'trading', name: 'Трейдинг', nameEn: 'Trading', icon: TrendingUp, color: '#C2F4E8' },
-  { id: 'security', name: 'Безопасность', nameEn: 'Security', icon: Shield, color: '#FFF7AC' },
-  { id: 'wallets', name: 'Кошельки', nameEn: 'Wallets', icon: Wallet, color: '#FDC0DD' },
-  { id: 'advanced', name: 'Продвинутый', nameEn: 'Advanced', icon: GraduationCap, color: '#CDF3FF' },
+  { id: 'health', name: 'Здоровье', nameEn: 'Health', icon: Heart, color: 'hsl(0, 80%, 92%)' },
+  { id: 'sports', name: 'Спорт', nameEn: 'Sports', icon: Dumbbell, color: 'hsl(200, 80%, 92%)' },
+  { id: 'psychology', name: 'Психология', nameEn: 'Psychology', icon: Brain, color: 'hsl(280, 80%, 92%)' },
+  { id: 'business', name: 'Бизнес', nameEn: 'Business', icon: Briefcase, color: 'hsl(35, 80%, 92%)' },
+  { id: 'creativity', name: 'Творчество', nameEn: 'Creativity', icon: Palette, color: 'hsl(320, 80%, 92%)' },
+  { id: 'languages', name: 'Языки', nameEn: 'Languages', icon: Languages, color: 'hsl(160, 80%, 92%)' },
+  { id: 'education', name: 'Образование', nameEn: 'Education', icon: Book, color: 'hsl(220, 80%, 92%)' },
+  { id: 'lifestyle', name: 'Лайфстайл', nameEn: 'Lifestyle', icon: Sparkles, color: 'hsl(50, 80%, 92%)' },
 ];
 
 export function getCategoryById(id: string): CourseCategory | undefined {
