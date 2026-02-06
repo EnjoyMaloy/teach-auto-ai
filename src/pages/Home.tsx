@@ -1,29 +1,142 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Badge } from '@/components/ui/badge';
-import { Sparkles, Plus, Send, ArrowRight, BarChart3 } from 'lucide-react';
+import { Plus, Send, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
+import { useCourses } from '@/hooks/useCourses';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { createCourse } = useCourses();
+  const [prompt, setPrompt] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationStatus, setGenerationStatus] = useState('');
 
   const userName = 'Павел';
 
+  const handleGenerate = async () => {
+    if (!prompt.trim() || isGenerating || !user) return;
+
+    setIsGenerating(true);
+    setGenerationStatus('Создаю курс...');
+
+    try {
+      // 1. Create a new course
+      const course = await createCourse(prompt.slice(0, 50) + (prompt.length > 50 ? '...' : ''));
+      if (!course) {
+        throw new Error('Не удалось создать курс');
+      }
+
+      setGenerationStatus('Генерирую контент с помощью ИИ...');
+
+      // 2. Call the AI generation function
+      const { data, error } = await supabase.functions.invoke('generate-course', {
+        body: {
+          prompt,
+          courseId: course.id,
+          skipImages: true, // Start fast, images can be added later
+        },
+      });
+
+      if (error) {
+        console.error('AI generation error:', error);
+        throw new Error('Ошибка генерации контента');
+      }
+
+      if (data?.lessons && Array.isArray(data.lessons)) {
+        // 3. Save generated lessons to database
+        setGenerationStatus('Сохраняю уроки...');
+        
+        for (let i = 0; i < data.lessons.length; i++) {
+          const lesson = data.lessons[i];
+          
+          // Create lesson
+          const { data: lessonData, error: lessonError } = await supabase
+            .from('lessons')
+            .insert({
+              course_id: course.id,
+              title: lesson.title || `Урок ${i + 1}`,
+              description: lesson.description || '',
+              order: i,
+            })
+            .select()
+            .single();
+
+          if (lessonError) {
+            console.error('Error creating lesson:', lessonError);
+            continue;
+          }
+
+          // Create slides for this lesson
+          if (lesson.slides && Array.isArray(lesson.slides)) {
+            for (let j = 0; j < lesson.slides.length; j++) {
+              const slide = lesson.slides[j];
+              
+              await supabase.from('slides').insert({
+                lesson_id: lessonData.id,
+                type: slide.type || 'info',
+                order: j,
+                content: slide.content || '',
+                image_url: slide.imageUrl,
+                options: slide.options ? slide.options.map((o: string, idx: number) => ({
+                  id: `opt-${idx}`,
+                  text: o,
+                })) : null,
+                correct_answer: slide.correctAnswer,
+                explanation: slide.explanation,
+                explanation_correct: slide.explanationCorrect,
+                explanation_partial: slide.explanationPartial,
+                blank_word: slide.blankWord,
+                matching_pairs: slide.matchingPairs,
+                ordering_items: slide.orderingItems,
+                correct_order: slide.correctOrder,
+                slider_min: slide.sliderMin,
+                slider_max: slide.sliderMax,
+                slider_correct: slide.sliderCorrect,
+                slider_step: slide.sliderStep,
+                sub_blocks: slide.subBlocks,
+              });
+            }
+          }
+        }
+
+        toast.success('Курс успешно создан!');
+        navigate(`/editor/${course.id}`);
+      } else {
+        throw new Error('ИИ не вернул данные курса');
+      }
+    } catch (error) {
+      console.error('Generation error:', error);
+      toast.error(error instanceof Error ? error.message : 'Ошибка генерации курса');
+    } finally {
+      setIsGenerating(false);
+      setGenerationStatus('');
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleGenerate();
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden bg-[#0a0a0b]">
-      {/* Gradient Background */}
+      {/* Gradient Background - More purple tones */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{
           background: `
-            radial-gradient(ellipse 120% 80% at 50% 100%, hsl(330 90% 50% / 0.4), transparent 50%),
-            radial-gradient(ellipse 80% 60% at 30% 90%, hsl(280 80% 50% / 0.3), transparent 45%),
-            radial-gradient(ellipse 100% 70% at 70% 95%, hsl(340 85% 55% / 0.35), transparent 50%),
-            radial-gradient(ellipse 60% 50% at 50% 60%, hsl(220 90% 50% / 0.25), transparent 40%),
-            radial-gradient(ellipse 80% 40% at 20% 40%, hsl(210 95% 45% / 0.2), transparent 35%),
-            radial-gradient(ellipse 70% 50% at 80% 30%, hsl(200 90% 50% / 0.15), transparent 40%),
+            radial-gradient(ellipse 120% 80% at 50% 100%, hsl(270 80% 45% / 0.45), transparent 50%),
+            radial-gradient(ellipse 80% 60% at 30% 90%, hsl(280 85% 50% / 0.35), transparent 45%),
+            radial-gradient(ellipse 100% 70% at 70% 95%, hsl(260 75% 55% / 0.4), transparent 50%),
+            radial-gradient(ellipse 60% 50% at 50% 60%, hsl(250 85% 55% / 0.3), transparent 40%),
+            radial-gradient(ellipse 80% 40% at 20% 40%, hsl(243 75% 58% / 0.25), transparent 35%),
+            radial-gradient(ellipse 70% 50% at 80% 30%, hsl(265 70% 50% / 0.2), transparent 40%),
             linear-gradient(180deg, #0a0a0b 0%, #0a0a0b 100%)
           `
         }}
@@ -31,39 +144,66 @@ const Home: React.FC = () => {
       
       {/* Content */}
       <div className="flex-1 flex flex-col items-center justify-center relative z-10 px-6">
-
         {/* Welcome Text */}
         <h1 className="text-4xl md:text-5xl font-semibold mb-10 text-white text-center">
           What's on your mind, <span className="text-primary">{userName}</span>?
         </h1>
 
         {/* Action Card */}
-        <div 
-          className="w-full max-w-2xl bg-[#1a1a1b] border border-white/10 rounded-2xl p-2 shadow-2xl cursor-pointer hover:border-white/20 transition-all group"
-          onClick={() => navigate('/workshop')}
-        >
-          <div className="flex items-center gap-3 px-4 py-3">
-            <span className="flex-1 text-left text-white/50 group-hover:text-white/70 transition-colors">
-              Ask Academy to create a course that...
-            </span>
+        <div className="w-full max-w-2xl bg-[#1a1a1b] border border-white/10 rounded-2xl p-2 shadow-2xl transition-all">
+          <div className="flex items-start gap-3 px-4 py-3">
+            <textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Опиши идею курса, который ты хочешь создать..."
+              disabled={isGenerating}
+              className="flex-1 bg-transparent text-white placeholder:text-white/40 resize-none outline-none text-[15px] min-h-[24px] max-h-[120px]"
+              rows={1}
+              style={{ height: 'auto' }}
+              onInput={(e) => {
+                const target = e.target as HTMLTextAreaElement;
+                target.style.height = 'auto';
+                target.style.height = Math.min(target.scrollHeight, 120) + 'px';
+              }}
+            />
           </div>
+          
+          {/* Generation status */}
+          {isGenerating && generationStatus && (
+            <div className="px-4 py-2 border-t border-white/5">
+              <div className="flex items-center gap-2 text-white/60 text-sm">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>{generationStatus}</span>
+              </div>
+            </div>
+          )}
+          
           <div className="flex items-center justify-between px-4 py-2 border-t border-white/5">
             <div className="flex items-center gap-2">
-              <button className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
-                <Plus className="w-4 h-4 text-white/50" />
+              <button 
+                disabled
+                className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center opacity-50 cursor-not-allowed"
+              >
+                <Plus className="w-4 h-4 text-white/30" />
               </button>
             </div>
-            <div className="flex items-center gap-3">
-              <button className="px-3 py-1.5 rounded-lg text-sm text-white/60 hover:text-white/80 hover:bg-white/5 transition-colors">
-                Plan
-              </button>
-              <button className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
-                <BarChart3 className="w-4 h-4 text-white/50" />
-              </button>
-              <Button size="sm" className="rounded-full w-9 h-9 p-0 shrink-0 bg-primary hover:bg-primary/90">
-                <Send className="w-4 h-4 text-white" />
-              </Button>
-            </div>
+            <button
+              onClick={handleGenerate}
+              disabled={!prompt.trim() || isGenerating}
+              className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center transition-all",
+                prompt.trim() && !isGenerating
+                  ? "bg-primary hover:bg-primary/90 cursor-pointer"
+                  : "bg-white/10 cursor-not-allowed"
+              )}
+            >
+              {isGenerating ? (
+                <Loader2 className="w-4 h-4 text-white/50 animate-spin" />
+              ) : (
+                <Send className="w-4 h-4 text-white/70" />
+              )}
+            </button>
           </div>
         </div>
       </div>
