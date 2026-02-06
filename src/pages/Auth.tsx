@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { lovable } from '@/integrations/lovable';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -96,11 +97,11 @@ const Auth: React.FC = () => {
   };
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
-    const {
-      error
-    } = await signInWithGoogle();
-    if (error) {
-      toast.error('Ошибка входа через Google: ' + error.message);
+    const result = await lovable.auth.signInWithOAuth('google', {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      toast.error('Ошибка входа через Google: ' + result.error.message);
       setIsGoogleLoading(false);
     }
   };
