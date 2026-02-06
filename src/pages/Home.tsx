@@ -46,12 +46,23 @@ const Home: React.FC = () => {
         throw new Error('Ошибка генерации контента');
       }
 
-      if (data?.lessons && Array.isArray(data.lessons)) {
+      // Parse the AI response - it returns {content: "JSON string"}
+      let parsedData = data;
+      if (data?.content && typeof data.content === 'string') {
+        try {
+          parsedData = JSON.parse(data.content);
+        } catch (parseError) {
+          console.error('Failed to parse AI response:', parseError);
+          throw new Error('Ошибка парсинга ответа ИИ');
+        }
+      }
+
+      if (parsedData?.lessons && Array.isArray(parsedData.lessons)) {
         // 3. Save generated lessons to database
         setGenerationStatus('Сохраняю уроки...');
         
-        for (let i = 0; i < data.lessons.length; i++) {
-          const lesson = data.lessons[i];
+        for (let i = 0; i < parsedData.lessons.length; i++) {
+          const lesson = parsedData.lessons[i];
           
           // Create lesson
           const { data: lessonData, error: lessonError } = await supabase
