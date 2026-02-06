@@ -150,10 +150,9 @@ const AppSidebar: React.FC = () => {
             </div>
             
             {/* Credits Section */}
-            <div className="p-4 border-b border-white/10 bg-white/5">
+            <div className="p-4 border-b border-white/10 bg-primary/10 rounded-lg mx-2 my-2">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[13px] font-medium text-white">Credits</span>
-                <span className="text-[13px] text-primary">∞ left →</span>
               </div>
               <Progress value={100} className="h-1.5 bg-white/20" />
               <div className="flex items-center gap-2 mt-2">
