@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import pavelAvatar from '@/assets/pavel-avatar.jpg';
+import Logo from '@/assets/Logo.svg';
 
 interface NavItem {
   icon: React.ElementType;
@@ -91,9 +92,7 @@ const AppSidebar: React.FC = () => {
       <div className="p-4 pb-2">
         {/* Logo */}
         <div className="mb-4">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
-            <BookOpen className="w-4 h-4 text-white" />
-          </div>
+          <img src={Logo} alt="Logo" className="w-8 h-8" />
         </div>
         
         {/* Workspace Selector with Dropdown */}
