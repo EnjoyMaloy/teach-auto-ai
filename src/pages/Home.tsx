@@ -150,7 +150,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden bg-background">
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-background dark:bg-[#0f0f12]">
       <AnimatedBackground />
       
       {/* Content - centered accounting for sidebar */}
