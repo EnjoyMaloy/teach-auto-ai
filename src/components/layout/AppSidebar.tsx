@@ -305,11 +305,12 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
 
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  isActive={isActive('/dictionary')}
-                  onClick={() => navigate('/dictionary')}
+                  disabled
+                  className="opacity-50 cursor-not-allowed"
                 >
                   <BookOpen className="size-4" />
                   <span>Словарь</span>
+                  <span className="ml-auto text-[10px] text-muted-foreground px-1.5 py-0.5 rounded bg-muted">скоро</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
