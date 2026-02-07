@@ -3,10 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   BookOpen,
-  Clock,
-  Star,
-  Compass,
-  Library,
   ChevronRight,
   FileText,
   LogOut,
@@ -20,14 +16,17 @@ import {
   BadgeCheck,
   Globe2,
   Sparkles,
+  Star,
+  Compass,
   Palette,
+  type LucideIcon,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import pavelAvatar from '@/assets/pavel-avatar.jpg';
+import Logo from '@/assets/Logo.svg';
 import {
   Sidebar,
   SidebarContent,
@@ -80,10 +79,24 @@ interface Workspace {
 
 // Workspace data
 const workspacesList: Workspace[] = [
-  { id: '1', name: "Pavel's Academy", logo: pavelAvatar, plan: 'Pro' },
+  { id: '1', name: "Pavel's Academy", logo: Logo, plan: 'Pro' },
 ];
 
-// Workspace Switcher Component
+// NavItem type (from Sidebar9)
+interface NavItem {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  isActive?: boolean;
+  children?: { label: string; href: string; isActive?: boolean }[];
+}
+
+interface NavGroup {
+  title: string;
+  items: NavItem[];
+}
+
+// Workspace Switcher Component (exact Sidebar9 structure)
 const WorkspaceSwitcher = ({
   workspaces,
   activeWorkspace,
@@ -102,8 +115,12 @@ const WorkspaceSwitcher = ({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <span className="text-sm font-bold">{selected.name.charAt(0)}</span>
+              <div className="flex aspect-square size-8 items-center justify-center rounded-sm bg-primary">
+                <img
+                  src={selected.logo}
+                  alt={selected.name}
+                  className="size-6 text-primary-foreground invert dark:invert-0"
+                />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{selected.name}</span>
@@ -129,8 +146,12 @@ const WorkspaceSwitcher = ({
                 onClick={() => setSelected(workspace)}
                 className="gap-2 p-2"
               >
-                <div className="flex size-6 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-                  <span className="text-xs font-bold">{workspace.name.charAt(0)}</span>
+                <div className="flex size-6 items-center justify-center rounded-sm bg-primary">
+                  <img
+                    src={workspace.logo}
+                    alt={workspace.name}
+                    className="size-4 invert dark:invert-0"
+                  />
                 </div>
                 {workspace.name}
                 {workspace.id === selected.id && (
@@ -145,7 +166,7 @@ const WorkspaceSwitcher = ({
   );
 };
 
-// Search Component
+// Search Component (exact Sidebar9 structure)
 const SearchForm = () => {
   return (
     <form>
@@ -166,7 +187,7 @@ const SearchForm = () => {
   );
 };
 
-// Nav User Component
+// Nav User Component (exact Sidebar9 structure)
 const NavUser = ({ 
   user, 
   onSignOut,
@@ -251,31 +272,59 @@ const NavUser = ({
   );
 };
 
-// Collapsible Nav Item
-const NavItemCollapsible = ({
-  label,
-  icon: Icon,
-  children,
-  defaultOpen = false,
-}: {
-  label: string;
-  icon: React.ElementType;
-  children: React.ReactNode;
-  defaultOpen?: boolean;
+// NavMenuItem Component (exact Sidebar9 structure)
+const NavMenuItem = ({ 
+  item,
+  onClick,
+}: { 
+  item: NavItem;
+  onClick?: (href: string) => void;
 }) => {
+  const Icon = item.icon;
+  const hasChildren = item.children && item.children.length > 0;
+
+  if (!hasChildren) {
+    return (
+      <SidebarMenuItem>
+        <SidebarMenuButton 
+          asChild 
+          isActive={item.isActive}
+          onClick={() => onClick?.(item.href)}
+        >
+          <a href={item.href} onClick={(e) => { e.preventDefault(); onClick?.(item.href); }}>
+            <Icon className="size-4" />
+            <span>{item.label}</span>
+          </a>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    );
+  }
+
   return (
-    <Collapsible defaultOpen={defaultOpen} className="group/collapsible">
+    <Collapsible asChild defaultOpen={item.isActive} className="group/collapsible">
       <SidebarMenuItem>
         <CollapsibleTrigger asChild>
-          <SidebarMenuButton tooltip={label}>
-            <Icon />
-            <span>{label}</span>
-            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+          <SidebarMenuButton isActive={item.isActive}>
+            <Icon className="size-4" />
+            <span>{item.label}</span>
+            <ChevronRight className="ml-auto size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
           </SidebarMenuButton>
         </CollapsibleTrigger>
         <CollapsibleContent>
           <SidebarMenuSub>
-            {children}
+            {item.children!.map((child) => (
+              <SidebarMenuSubItem key={child.label}>
+                <SidebarMenuSubButton 
+                  asChild 
+                  isActive={child.isActive}
+                  onClick={() => onClick?.(child.href)}
+                >
+                  <a href={child.href} onClick={(e) => { e.preventDefault(); onClick?.(child.href); }}>
+                    {child.label}
+                  </a>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+            ))}
           </SidebarMenuSub>
         </CollapsibleContent>
       </SidebarMenuItem>
@@ -323,163 +372,92 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) =
   const isActive = (path: string) => location.pathname === path;
   const isEditorRoute = (courseId: string) => location.pathname === `/editor/${courseId}`;
 
+  const handleNavigate = (href: string) => {
+    navigate(href);
+  };
+
+  // Build navigation groups with active course children
+  const navGroups: NavGroup[] = [
+    {
+      title: 'Overview',
+      items: [
+        { label: 'Dashboard', href: '/', icon: LayoutDashboard, isActive: isActive('/') },
+        { label: 'Tasks', href: '/workshop', icon: BookOpen, isActive: isActive('/workshop') },
+        { label: 'Roadmap', href: '/catalog', icon: Compass, isActive: isActive('/catalog') },
+      ],
+    },
+    {
+      title: 'Projects',
+      items: [
+        { 
+          label: 'Active Projects', 
+          href: '#', 
+          icon: Briefcase, 
+          isActive: recentCourses.some(c => isEditorRoute(c.id)),
+          children: recentCourses.length > 0 
+            ? recentCourses.slice(0, 3).map((course) => ({
+                label: course.title,
+                href: `/editor/${course.id}`,
+                isActive: isEditorRoute(course.id),
+              }))
+            : [{ label: 'No projects yet', href: '#', isActive: false }],
+        },
+        { 
+          label: 'Archived', 
+          href: '#', 
+          icon: Folder,
+          children: [
+            { label: '2024 Archive', href: '#', isActive: false },
+            { label: '2023 Archive', href: '#', isActive: false },
+          ],
+        },
+      ],
+    },
+    {
+      title: 'Team',
+      items: [
+        { label: 'Members', href: '#', icon: Users },
+        { label: 'Sprints', href: '#', icon: Clock3 },
+        { label: 'Approvals', href: '/favorites', icon: BadgeCheck, isActive: isActive('/favorites') },
+        { label: 'Reviews', href: '#', icon: Star },
+      ],
+    },
+    {
+      title: 'Workspace',
+      items: [
+        { label: 'Integrations', href: '#', icon: Globe2 },
+        { label: 'Automations', href: '#', icon: Sparkles },
+      ],
+    },
+  ];
+
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar variant="floating" collapsible="icon">
       <SidebarHeader>
-        {/* Workspace Switcher */}
         <WorkspaceSwitcher
           workspaces={workspacesList}
           activeWorkspace={workspacesList[0]}
         />
-        
-        {/* Search */}
         <SearchForm />
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Overview */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Overview</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive('/')}
-                  onClick={() => navigate('/')}
-                  tooltip="Dashboard"
-                >
-                  <LayoutDashboard />
-                  <span>Dashboard</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive('/workshop')}
-                  onClick={() => navigate('/workshop')}
-                  tooltip="Tasks"
-                >
-                  <BookOpen />
-                  <span>Tasks</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive('/catalog')}
-                  onClick={() => navigate('/catalog')}
-                  tooltip="Roadmap"
-                >
-                  <Compass />
-                  <span>Roadmap</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Projects */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Projects</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {/* Active Projects - Collapsible */}
-              <NavItemCollapsible label="Active Projects" icon={Briefcase} defaultOpen={false}>
-                {recentCourses.length > 0 ? (
-                  recentCourses.slice(0, 3).map((course) => (
-                    <SidebarMenuSubItem key={course.id}>
-                      <SidebarMenuSubButton
-                        isActive={isEditorRoute(course.id)}
-                        onClick={() => navigate(`/editor/${course.id}`)}
-                      >
-                        <FileText className="size-3.5" />
-                        <span className="truncate">{course.title}</span>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))
-                ) : (
-                  <SidebarMenuSubItem>
-                    <span className="px-2 py-1.5 text-xs text-muted-foreground">
-                      No projects yet
-                    </span>
-                  </SidebarMenuSubItem>
-                )}
-              </NavItemCollapsible>
-
-              {/* Archived - Collapsible */}
-              <NavItemCollapsible label="Archived" icon={Folder} defaultOpen={false}>
-                <SidebarMenuSubItem>
-                  <SidebarMenuSubButton>
-                    <FileText className="size-3.5" />
-                    <span>2024 Archive</span>
-                  </SidebarMenuSubButton>
-                </SidebarMenuSubItem>
-                <SidebarMenuSubItem>
-                  <SidebarMenuSubButton>
-                    <FileText className="size-3.5" />
-                    <span>2023 Archive</span>
-                  </SidebarMenuSubButton>
-                </SidebarMenuSubItem>
-              </NavItemCollapsible>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Team */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Team</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Members">
-                  <Users />
-                  <span>Members</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Sprints">
-                  <Clock3 />
-                  <span>Sprints</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive('/favorites')}
-                  onClick={() => navigate('/favorites')}
-                  tooltip="Approvals"
-                >
-                  <BadgeCheck />
-                  <span>Approvals</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Reviews">
-                  <Star />
-                  <span>Reviews</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Workspace */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Workspace</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Integrations">
-                  <Globe2 />
-                  <span>Integrations</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Automations">
-                  <Sparkles />
-                  <span>Automations</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {navGroups.map((group) => (
+          <SidebarGroup key={group.title}>
+            <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) => (
+                  <NavMenuItem 
+                    key={item.label} 
+                    item={item}
+                    onClick={handleNavigate}
+                  />
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
 
       <SidebarFooter>
