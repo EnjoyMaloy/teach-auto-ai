@@ -43,9 +43,9 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   const isModerator = userRole === 'moderator' || userRole === 'admin';
 
   return (
-    <header className="h-16 border-b border-gray-100 flex items-center justify-between px-6 bg-white my-0 py-[40px]">
+    <header className="h-16 border-b border-border flex items-center justify-between px-6 bg-background my-0 py-[40px]">
       {/* Search */}
-      <button className="flex items-center gap-2.5 rounded-[5px] transition-all border border-transparent hover:border-[#EBE9EA] py-[16px] bg-[#F7F7F8] text-[#8D8D8D] px-[90px]">
+      <button className="flex items-center gap-2.5 rounded-[5px] transition-all border border-transparent hover:border-border py-[16px] bg-muted text-muted-foreground px-[90px]">
         <Search className="w-[18px] h-[18px]" />
         <span className="text-[15px]">{language === 'ru' ? 'Найти курс' : 'Find course'}</span>
       </button>
@@ -54,10 +54,10 @@ const AppHeader: React.FC<AppHeaderProps> = ({
         {/* Language Selector */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 rounded-[5px] border border-[#EBE9EA] bg-white hover:border-[#D5D3D4] transition-all py-[10px] px-[16px]">
+            <button className="flex items-center gap-2 rounded-[5px] border border-border bg-background hover:border-border/80 transition-all py-[10px] px-[16px]">
               <span className="text-[16px]">{language === 'ru' ? '🇷🇺' : '🇬🇧'}</span>
-              <span className="text-[14px] text-[#8D8D8D] font-medium">{language === 'ru' ? 'RU' : 'EN'}</span>
-              <ChevronDown className="w-3 h-3 text-[#8D8D8D]" />
+              <span className="text-[14px] text-muted-foreground font-medium">{language === 'ru' ? 'RU' : 'EN'}</span>
+              <ChevronDown className="w-3 h-3 text-muted-foreground" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="min-w-[120px]">

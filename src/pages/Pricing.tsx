@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import AnimatedBackground from "@/components/layout/AnimatedBackground";
 
 const plans = [
   {
@@ -86,6 +87,7 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden bg-background">
+      <AnimatedBackground />
       {/* Content with sidebar offset */}
       <div 
         className="flex-1 flex flex-col relative z-10 py-12 md:py-20 px-6 transition-all duration-300"

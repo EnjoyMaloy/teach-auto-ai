@@ -73,7 +73,7 @@ const Favorites: React.FC = () => {
   const loading = isLoading || favoritesLoading;
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-[#0f0f12]">
+    <div className="min-h-screen relative overflow-hidden bg-background">
       <AnimatedBackground />
       <div 
         className="relative z-10 p-6 transition-all duration-200"
@@ -82,9 +82,9 @@ const Favorites: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-[15px] font-semibold text-white">Избранное</h1>
+          <h1 className="text-[15px] font-semibold text-foreground">Избранное</h1>
           {courses.length > 0 && (
-            <p className="text-[12px] text-white/30 mt-0.5">
+            <p className="text-[12px] text-muted-foreground/50 mt-0.5">
               {courses.length} {getCoursesWord(courses.length)}
             </p>
           )}
@@ -94,16 +94,16 @@ const Favorites: React.FC = () => {
       {/* Content */}
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="w-5 h-5 animate-spin text-white/30" />
+          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground/50" />
         </div>
       ) : courses.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center">
-          <div className="text-white/20 text-[13px] mb-2">
+          <div className="text-muted-foreground/40 text-[13px] mb-2">
             Нет сохранённых курсов
           </div>
           <button 
             onClick={() => navigate('/catalog')}
-            className="text-[13px] text-white/40 hover:text-white/60 transition-colors"
+            className="text-[13px] text-muted-foreground hover:text-foreground/80 transition-colors"
           >
             Исследовать курсы →
           </button>
@@ -139,11 +139,11 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onRemove }) => {
 
   return (
     <div 
-      className="group relative bg-white/[0.02] rounded-lg border border-white/[0.04] hover:border-white/10 transition-colors cursor-pointer overflow-hidden"
+      className="group relative bg-card/30 rounded-lg border border-border/50 hover:border-border transition-colors cursor-pointer overflow-hidden"
       onClick={() => navigate(`/course/${course.id}`)}
     >
       {/* Image */}
-      <div className="aspect-[16/10] bg-white/[0.02] relative">
+      <div className="aspect-[16/10] bg-muted/30 relative">
         {course.coverImage ? (
           <img 
             src={course.coverImage} 
@@ -152,8 +152,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onRemove }) => {
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-8 h-8 rounded-lg bg-white/[0.03] flex items-center justify-center">
-              <span className="text-white/10 text-lg font-medium">
+            <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center">
+              <span className="text-muted-foreground/30 text-lg font-medium">
                 {course.title.charAt(0).toUpperCase()}
               </span>
             </div>
@@ -163,7 +163,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onRemove }) => {
         {/* Category Badge */}
         {category && (
           <div className="absolute top-2 left-2">
-            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-white/10 text-white/60">
+            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground">
               {category.name}
             </span>
           </div>
@@ -175,7 +175,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onRemove }) => {
             e.stopPropagation();
             onRemove();
           }}
-          className="absolute top-2 right-2 w-6 h-6 rounded flex items-center justify-center bg-white/20 text-white transition-colors hover:bg-white/30"
+          className="absolute top-2 right-2 w-6 h-6 rounded flex items-center justify-center bg-muted text-foreground transition-colors hover:bg-muted/80"
         >
           <Star className="w-3 h-3" fill="currentColor" />
         </button>
@@ -183,10 +183,10 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onRemove }) => {
 
       {/* Info */}
       <div className="p-3">
-        <h3 className="text-[13px] font-medium text-white/90 truncate mb-1">
+        <h3 className="text-[13px] font-medium text-foreground/90 truncate mb-1">
           {course.title}
         </h3>
-        <div className="text-[11px] text-white/30">
+        <div className="text-[11px] text-muted-foreground/50">
           {course.lessons.length} {getLessonWord(course.lessons.length)}
         </div>
       </div>

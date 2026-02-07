@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Copy, Check, Palette, Type, Component, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
+import AnimatedBackground from '@/components/layout/AnimatedBackground';
 
 // Color palette tokens extracted from the dark theme
 const colorPalette = {
@@ -62,26 +63,26 @@ const ColorSwatch = ({ color }: { color: { name: string; hsl: string; hex?: stri
   };
 
   return (
-    <div className="flex items-center gap-4 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group">
+    <div className="flex items-center gap-4 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors group">
       <div 
-        className="w-12 h-12 rounded-lg border border-white/10 shrink-0"
+        className="w-12 h-12 rounded-lg border border-border shrink-0"
         style={{ background: color.hex || `hsl(${color.hsl})` }}
       />
       <div className="flex-1 min-w-0">
-        <div className="font-medium text-white">{color.name}</div>
-        <div className="text-sm text-white/50 truncate">{color.usage}</div>
+        <div className="font-medium text-foreground">{color.name}</div>
+        <div className="text-sm text-muted-foreground truncate">{color.usage}</div>
       </div>
       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           onClick={() => copyToClipboard(color.hsl)}
-          className="px-2 py-1 text-xs bg-white/10 rounded hover:bg-white/20 text-white/70"
+          className="px-2 py-1 text-xs bg-muted rounded hover:bg-muted/80 text-muted-foreground"
         >
           HSL
         </button>
         {color.hex && (
           <button
             onClick={() => copyToClipboard(color.hex!)}
-            className="px-2 py-1 text-xs bg-white/10 rounded hover:bg-white/20 text-white/70"
+            className="px-2 py-1 text-xs bg-muted rounded hover:bg-muted/80 text-muted-foreground"
           >
             HEX
           </button>
@@ -94,12 +95,13 @@ const ColorSwatch = ({ color }: { color: { name: string; hsl: string; hex?: stri
 
 const DesignSystem: React.FC = () => {
   return (
-    <div className="min-h-screen bg-[#0f0f12] text-white p-8">
-      <div className="max-w-6xl mx-auto space-y-12">
+    <div className="min-h-screen relative overflow-hidden bg-background text-foreground p-8">
+      <AnimatedBackground />
+      <div className="max-w-6xl mx-auto space-y-12 relative z-10">
         {/* Header */}
         <div className="space-y-2">
           <h1 className="text-4xl font-bold">Дизайн-система Academy</h1>
-          <p className="text-white/60 text-lg">
+          <p className="text-muted-foreground text-lg">
             Документация всех цветов, типографики, компонентов и эффектов проекта
           </p>
         </div>
@@ -112,9 +114,9 @@ const DesignSystem: React.FC = () => {
           </div>
 
           <div className="grid gap-8 md:grid-cols-2">
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-card/50 border-border">
               <CardHeader>
-                <CardTitle className="text-white">Primary</CardTitle>
+                <CardTitle className="text-foreground">Primary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {colorPalette.primary.map((color) => (
@@ -123,9 +125,9 @@ const DesignSystem: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-card/50 border-border">
               <CardHeader>
-                <CardTitle className="text-white">Accent</CardTitle>
+                <CardTitle className="text-foreground">Accent</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {colorPalette.accent.map((color) => (
@@ -134,9 +136,9 @@ const DesignSystem: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-card/50 border-border">
               <CardHeader>
-                <CardTitle className="text-white">Background</CardTitle>
+                <CardTitle className="text-foreground">Background</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {colorPalette.background.map((color) => (
@@ -145,9 +147,9 @@ const DesignSystem: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-card/50 border-border">
               <CardHeader>
-                <CardTitle className="text-white">Text</CardTitle>
+                <CardTitle className="text-foreground">Text</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {colorPalette.text.map((color) => (
@@ -156,9 +158,9 @@ const DesignSystem: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-card/50 border-border">
               <CardHeader>
-                <CardTitle className="text-white">Gradients & Blobs</CardTitle>
+                <CardTitle className="text-foreground">Gradients & Blobs</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {colorPalette.gradients.map((color) => (
@@ -167,9 +169,9 @@ const DesignSystem: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-card/50 border-border">
               <CardHeader>
-                <CardTitle className="text-white">Status</CardTitle>
+                <CardTitle className="text-foreground">Status</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {colorPalette.status.map((color) => (
@@ -180,7 +182,7 @@ const DesignSystem: React.FC = () => {
           </div>
         </section>
 
-        <Separator className="bg-white/10" />
+        <Separator className="bg-border" />
 
         {/* Typography Section */}
         <section className="space-y-6">
@@ -189,46 +191,46 @@ const DesignSystem: React.FC = () => {
             <h2 className="text-2xl font-semibold">Типографика</h2>
           </div>
 
-          <Card className="bg-white/5 border-white/10">
+          <Card className="bg-card/50 border-border">
             <CardContent className="pt-6 space-y-6">
               {typography.map((item) => (
-                <div key={item.name} className="flex items-baseline gap-6 pb-4 border-b border-white/5 last:border-0">
+                <div key={item.name} className="flex items-baseline gap-6 pb-4 border-b border-border/50 last:border-0">
                   <div className="w-32 shrink-0">
-                    <span className="text-sm text-white/50">{item.name}</span>
-                    <div className="text-xs text-white/30 mt-1 font-mono">{item.className}</div>
+                    <span className="text-sm text-muted-foreground">{item.name}</span>
+                    <div className="text-xs text-muted-foreground/50 mt-1 font-mono">{item.className}</div>
                   </div>
-                  <div className={item.className + ' text-white'}>{item.sample}</div>
+                  <div className={item.className + ' text-foreground'}>{item.sample}</div>
                 </div>
               ))}
             </CardContent>
           </Card>
 
-          <Card className="bg-white/5 border-white/10">
+          <Card className="bg-card/50 border-border">
             <CardHeader>
-              <CardTitle className="text-white">Шрифты</CardTitle>
+              <CardTitle className="text-foreground">Шрифты</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-4">
-                <div className="w-32 text-sm text-white/50">Display</div>
+                <div className="w-32 text-sm text-muted-foreground">Display</div>
                 <div className="font-display text-xl">Inter — для заголовков</div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="w-32 text-sm text-white/50">Body</div>
+                <div className="w-32 text-sm text-muted-foreground">Body</div>
                 <div className="font-sans text-xl">Lato — основной текст</div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="w-32 text-sm text-white/50">Serif</div>
+                <div className="w-32 text-sm text-muted-foreground">Serif</div>
                 <div className="font-serif text-xl">EB Garamond — акценты</div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="w-32 text-sm text-white/50">Mono</div>
+                <div className="w-32 text-sm text-muted-foreground">Mono</div>
                 <div className="font-mono text-xl">Fira Code — код</div>
               </div>
             </CardContent>
           </Card>
         </section>
 
-        <Separator className="bg-white/10" />
+        <Separator className="bg-border" />
 
         {/* Components Section */}
         <section className="space-y-6">
@@ -239,9 +241,9 @@ const DesignSystem: React.FC = () => {
 
           <div className="grid gap-6 md:grid-cols-2">
             {/* Buttons */}
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-card/50 border-border">
               <CardHeader>
-                <CardTitle className="text-white">Кнопки</CardTitle>
+                <CardTitle className="text-foreground">Кнопки</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex flex-wrap gap-3">
@@ -256,16 +258,16 @@ const DesignSystem: React.FC = () => {
                   <Button size="default">Default</Button>
                   <Button size="lg">Large</Button>
                 </div>
-                <div className="pt-4 border-t border-white/5">
-                  <p className="text-sm text-white/50 mb-3">Кнопка отправки (минималистичная)</p>
+                <div className="pt-4 border-t border-border/50">
+                  <p className="text-sm text-muted-foreground mb-3">Кнопка отправки (минималистичная)</p>
                   <div className="flex items-center gap-4">
-                    <button className="w-7 h-7 rounded-full bg-white flex items-center justify-center">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <button className="w-7 h-7 rounded-full bg-foreground flex items-center justify-center">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--background))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M12 19V5M5 12l7-7 7 7"/>
                       </svg>
                     </button>
-                    <button className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center cursor-not-allowed">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.5)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <button className="w-7 h-7 rounded-full bg-muted flex items-center justify-center cursor-not-allowed">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--muted-foreground) / 0.5)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M12 19V5M5 12l7-7 7 7"/>
                       </svg>
                     </button>
@@ -275,16 +277,16 @@ const DesignSystem: React.FC = () => {
             </Card>
 
             {/* Inputs */}
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-card/50 border-border">
               <CardHeader>
-                <CardTitle className="text-white">Поля ввода</CardTitle>
+                <CardTitle className="text-foreground">Поля ввода</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <Input placeholder="Стандартный инпут" />
-                <div className="p-4 bg-[#1a1a1b] border border-white/10 rounded-2xl">
+                <div className="p-4 bg-card border border-border rounded-2xl">
                   <textarea 
                     placeholder="Опиши идею курса..."
-                    className="w-full bg-transparent text-white placeholder:text-white/40 resize-none outline-none text-[15px]"
+                    className="w-full bg-transparent text-foreground placeholder:text-muted-foreground/60 resize-none outline-none text-[15px]"
                     rows={2}
                   />
                 </div>
@@ -292,9 +294,9 @@ const DesignSystem: React.FC = () => {
             </Card>
 
             {/* Badges */}
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-card/50 border-border">
               <CardHeader>
-                <CardTitle className="text-white">Бейджи</CardTitle>
+                <CardTitle className="text-foreground">Бейджи</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex flex-wrap gap-2">
@@ -307,23 +309,23 @@ const DesignSystem: React.FC = () => {
             </Card>
 
             {/* Cards */}
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-card/50 border-border">
               <CardHeader>
-                <CardTitle className="text-white">Карточки</CardTitle>
+                <CardTitle className="text-foreground">Карточки</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="p-4 bg-[#1a1a1b] border border-white/10 rounded-2xl">
-                  <p className="text-white/70">Карточка с темным фоном и скруглением 2xl</p>
+                <div className="p-4 bg-card border border-border rounded-2xl">
+                  <p className="text-muted-foreground">Карточка с темным фоном и скруглением 2xl</p>
                 </div>
-                <div className="p-4 bg-white/5 border border-white/10 rounded-xl">
-                  <p className="text-white/70">Карточка с полупрозрачным фоном</p>
+                <div className="p-4 bg-muted/50 border border-border rounded-xl">
+                  <p className="text-muted-foreground">Карточка с полупрозрачным фоном</p>
                 </div>
               </CardContent>
             </Card>
           </div>
         </section>
 
-        <Separator className="bg-white/10" />
+        <Separator className="bg-border" />
 
         {/* Effects Section */}
         <section className="space-y-6">
@@ -334,16 +336,16 @@ const DesignSystem: React.FC = () => {
 
           <div className="grid gap-6 md:grid-cols-2">
             {/* Hover Effects */}
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-card/50 border-border">
               <CardHeader>
-                <CardTitle className="text-white">Hover-эффекты</CardTitle>
+                <CardTitle className="text-foreground">Hover-эффекты</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-colors cursor-pointer">
-                  <p className="text-white/70">hover:bg-white/10 — подсветка при наведении</p>
+                <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors cursor-pointer">
+                  <p className="text-muted-foreground">hover:bg-muted — подсветка при наведении</p>
                 </div>
-                <div className="p-4 bg-white/5 rounded-lg hover-scale cursor-pointer">
-                  <p className="text-white/70">hover-scale — увеличение при наведении</p>
+                <div className="p-4 bg-muted/50 rounded-lg hover-scale cursor-pointer">
+                  <p className="text-muted-foreground">hover-scale — увеличение при наведении</p>
                 </div>
                 <button className="px-4 py-2 bg-primary rounded-lg hover:bg-primary/90 transition-colors">
                   hover:bg-primary/90
@@ -352,20 +354,20 @@ const DesignSystem: React.FC = () => {
             </Card>
 
             {/* Animations */}
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-card/50 border-border">
               <CardHeader>
-                <CardTitle className="text-white">Анимации</CardTitle>
+                <CardTitle className="text-foreground">Анимации</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <p className="text-sm text-white/50">name-glow (4s)</p>
+                  <p className="text-sm text-muted-foreground">name-glow (4s)</p>
                   <span className="text-2xl font-semibold animate-[name-glow_4s_ease-in-out_infinite]" style={{ color: 'hsl(265, 60%, 75%)' }}>
                     Павел
                   </span>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm text-white/50">blob-float (12-20s)</p>
-                  <div className="relative h-24 overflow-hidden rounded-lg bg-[#0f0f12]">
+                  <p className="text-sm text-muted-foreground">blob-float (12-20s)</p>
+                  <div className="relative h-24 overflow-hidden rounded-lg bg-background">
                     <div 
                       className="absolute w-32 h-32 rounded-full blur-[30px] animate-[blob-float-1_12s_ease-in-out_infinite]"
                       style={{ background: 'hsl(270 40% 35% / 0.6)', top: '50%', left: '30%' }}
@@ -380,51 +382,51 @@ const DesignSystem: React.FC = () => {
             </Card>
 
             {/* Shadows */}
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-card/50 border-border">
               <CardHeader>
-                <CardTitle className="text-white">Тени</CardTitle>
+                <CardTitle className="text-foreground">Тени</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center gap-6">
-                  <div className="w-20 h-20 bg-white/10 rounded-xl shadow-sm" />
-                  <span className="text-sm text-white/50">shadow-sm</span>
+                  <div className="w-20 h-20 bg-muted rounded-xl shadow-sm" />
+                  <span className="text-sm text-muted-foreground">shadow-sm</span>
                 </div>
                 <div className="flex items-center gap-6">
-                  <div className="w-20 h-20 bg-white/10 rounded-xl shadow-lg" />
-                  <span className="text-sm text-white/50">shadow-lg</span>
+                  <div className="w-20 h-20 bg-muted rounded-xl shadow-lg" />
+                  <span className="text-sm text-muted-foreground">shadow-lg</span>
                 </div>
                 <div className="flex items-center gap-6">
                   <div className="w-20 h-20 bg-primary/20 rounded-xl" style={{ boxShadow: '0 4px 20px 0 hsl(265 60% 65% / 0.3)' }} />
-                  <span className="text-sm text-white/50">shadow-primary</span>
+                  <span className="text-sm text-muted-foreground">shadow-primary</span>
                 </div>
               </CardContent>
             </Card>
 
             {/* Border Radius */}
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-card/50 border-border">
               <CardHeader>
-                <CardTitle className="text-white">Скругления</CardTitle>
+                <CardTitle className="text-foreground">Скругления</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-wrap gap-4">
                 <div className="flex flex-col items-center gap-2">
-                  <div className="w-16 h-16 bg-white/10 rounded" />
-                  <span className="text-xs text-white/50">rounded</span>
+                  <div className="w-16 h-16 bg-muted rounded" />
+                  <span className="text-xs text-muted-foreground">rounded</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
-                  <div className="w-16 h-16 bg-white/10 rounded-lg" />
-                  <span className="text-xs text-white/50">rounded-lg</span>
+                  <div className="w-16 h-16 bg-muted rounded-lg" />
+                  <span className="text-xs text-muted-foreground">rounded-lg</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
-                  <div className="w-16 h-16 bg-white/10 rounded-xl" />
-                  <span className="text-xs text-white/50">rounded-xl</span>
+                  <div className="w-16 h-16 bg-muted rounded-xl" />
+                  <span className="text-xs text-muted-foreground">rounded-xl</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
-                  <div className="w-16 h-16 bg-white/10 rounded-2xl" />
-                  <span className="text-xs text-white/50">rounded-2xl</span>
+                  <div className="w-16 h-16 bg-muted rounded-2xl" />
+                  <span className="text-xs text-muted-foreground">rounded-2xl</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
-                  <div className="w-16 h-16 bg-white/10 rounded-full" />
-                  <span className="text-xs text-white/50">rounded-full</span>
+                  <div className="w-16 h-16 bg-muted rounded-full" />
+                  <span className="text-xs text-muted-foreground">rounded-full</span>
                 </div>
               </CardContent>
             </Card>
