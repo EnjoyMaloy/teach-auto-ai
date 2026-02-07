@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import pavelAvatar from '@/assets/pavel-avatar.jpg';
-import Logo from '@/assets/Logo.svg';
+import AcademyLogo from './AcademyLogo';
 import {
   Sidebar,
   SidebarContent,
@@ -121,7 +121,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
     <Sidebar variant="floating">
       {/* Header — Logo */}
       <SidebarHeader className="p-4">
-        <img src={Logo} alt="Academy" className="h-8" />
+        <AcademyLogo className="h-6" />
       </SidebarHeader>
 
       <SidebarContent>
