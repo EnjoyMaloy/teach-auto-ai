@@ -89,7 +89,7 @@ const Pricing = () => {
   const isExpanded = state === "expanded";
 
   return (
-    <div className="fixed inset-0 bg-[#0a0a0b] overflow-auto">
+    <div className="absolute inset-0 bg-[#0a0a0b] overflow-auto">
       <AnimatedBackground />
       
       {/* Content with sidebar offset */}
