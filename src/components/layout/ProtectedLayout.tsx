@@ -7,15 +7,17 @@ import { SidebarProvider, SidebarTrigger, useSidebar } from '@/components/ui/sid
 const LayoutContent: React.FC = () => {
   const { state } = useSidebar();
   const isCollapsed = state === 'collapsed';
+  const sidebarOffset = isCollapsed ? '0px' : 'var(--sidebar-width)';
   
   return (
     <>
-      {/* Full-screen content layer - shifts with sidebar */}
+      {/* Full-screen content layer - background fills entire screen */}
       <div 
-        className="fixed inset-0 z-0 transition-all duration-200"
+        className="fixed inset-0 z-0"
         style={{ 
-          paddingLeft: isCollapsed ? '0' : 'var(--sidebar-width)',
-        }}
+          // Pass sidebar offset as CSS variable for pages to use for centering
+          '--sidebar-offset': sidebarOffset,
+        } as React.CSSProperties}
       >
         <Outlet />
       </div>
