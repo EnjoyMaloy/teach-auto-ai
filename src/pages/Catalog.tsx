@@ -8,6 +8,7 @@ import { useCourses } from '@/hooks/useCourses';
 import { useFavorites } from '@/hooks/useFavorites';
 import { Course } from '@/types/course';
 import { COURSE_CATEGORIES, getCategoryById } from '@/lib/categories';
+import { getCoursesWord } from '@/lib/pluralize';
 import AnimatedBackground from '@/components/layout/AnimatedBackground';
 import CourseCardOverlay from '@/components/catalog/CourseCardOverlay';
 
@@ -151,28 +152,5 @@ const CourseCardSkeleton: React.FC = () => (
   </div>
 );
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Helpers
-───────────────────────────────────────────────────────────────────────────── */
-
-function getLessonWord(count: number): string {
-  const lastTwo = count % 100;
-  const lastOne = count % 10;
-  
-  if (lastTwo >= 11 && lastTwo <= 19) return 'уроков';
-  if (lastOne === 1) return 'урок';
-  if (lastOne >= 2 && lastOne <= 4) return 'урока';
-  return 'уроков';
-}
-
-function getCoursesWord(count: number): string {
-  const lastTwo = count % 100;
-  const lastOne = count % 10;
-  
-  if (lastTwo >= 11 && lastTwo <= 19) return 'курсов';
-  if (lastOne === 1) return 'курс';
-  if (lastOne >= 2 && lastOne <= 4) return 'курса';
-  return 'курсов';
-}
 
 export default Catalog;

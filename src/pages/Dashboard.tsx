@@ -194,18 +194,5 @@ const CourseCardSkeleton: React.FC = () => (
   </div>
 );
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Helpers
-───────────────────────────────────────────────────────────────────────────── */
-
-function getLessonWord(count: number): string {
-  const lastTwo = count % 100;
-  const lastOne = count % 10;
-  
-  if (lastTwo >= 11 && lastTwo <= 19) return 'уроков';
-  if (lastOne === 1) return 'урок';
-  if (lastOne >= 2 && lastOne <= 4) return 'урока';
-  return 'уроков';
-}
 
 export default Dashboard;

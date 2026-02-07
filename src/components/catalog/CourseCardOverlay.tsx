@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star, MoreHorizontal, Trash2, Settings, Eye, BarChart3, BookOpen, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getLessonWord } from '@/lib/pluralize';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -61,14 +62,6 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
     }
   };
 
-  const getLessonWord = (count: number): string => {
-    const lastTwo = count % 100;
-    const lastOne = count % 10;
-    if (lastTwo >= 11 && lastTwo <= 19) return 'уроков';
-    if (lastOne === 1) return 'урок';
-    if (lastOne >= 2 && lastOne <= 4) return 'урока';
-    return 'уроков';
-  };
 
   return (
     <div
