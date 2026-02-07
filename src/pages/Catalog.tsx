@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Sparkles, TrendingUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, Compass, BookOpen, Clock, Layers, Star, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useCourses } from '@/hooks/useCourses';
 import { useFavorites } from '@/hooks/useFavorites';
 import { Course } from '@/types/course';
-import { getCategoryById } from '@/lib/categories';
-import CategoryFilter from '@/components/catalog/CategoryFilter';
-import CourseCard from '@/components/catalog/CourseCard';
+import { COURSE_CATEGORIES, getCategoryById } from '@/lib/categories';
+import { cn } from '@/lib/utils';
 
 const Catalog: React.FC = () => {
+  const navigate = useNavigate();
   const { fetchPublishedCourses, isLoading } = useCourses();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [courses, setCourses] = useState<Course[]>([]);
@@ -23,7 +24,6 @@ const Catalog: React.FC = () => {
     loadCourses();
   }, [fetchPublishedCourses]);
 
-  // Filter courses by category and search
   const filteredCourses = courses.filter(course => {
     const matchesCategory = !selectedCategory || (course as any).category === selectedCategory;
     const matchesSearch = !searchQuery || 
@@ -32,162 +32,98 @@ const Catalog: React.FC = () => {
     return matchesCategory && matchesSearch;
   });
 
-  // Get featured course (first one with cover image)
-  const featuredCourse = courses.find(c => c.coverImage);
-
   return (
-    <div className="min-h-screen bg-[hsl(0,0%,4%)] -m-6 p-6">
-      {/* Hero Section */}
-      <div className="relative mb-10">
-        {/* Hero gradient background */}
-        <div className="hero-gradient absolute inset-0 -top-6 h-[300px] pointer-events-none" />
-        
-        <div className="relative pt-4">
-          {/* Title */}
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-white">Исследуй</h1>
-              <p className="text-white/50 text-sm">Открывай новые знания</p>
-            </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+            <Compass className="w-5 h-5 text-primary" />
           </div>
-
-          {/* Search */}
-          <div className="relative max-w-lg mt-6">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
-            <Input
-              placeholder="Поиск курсов..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-xl focus:border-primary/50 focus:ring-primary/20"
-            />
+          <div>
+            <h1 className="text-xl font-semibold text-white">Исследовать</h1>
+            <p className="text-sm text-white/40">Открывай новые знания</p>
           </div>
         </div>
       </div>
 
-      {/* Categories */}
-      <div className="mb-8">
-        <h2 className="text-xs font-medium text-white/40 mb-4 uppercase tracking-wider">
-          Категории
-        </h2>
-        <CategoryFilter 
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
+      {/* Search */}
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+        <Input
+          placeholder="Поиск курсов..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-white/30 h-10"
         />
       </div>
 
-      {/* Featured Course */}
-      {featuredCourse && !selectedCategory && !searchQuery && (
-        <div className="mb-10">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-medium text-white/70">Популярное</h2>
-          </div>
-          <div 
-            className="card-glow overflow-hidden cursor-pointer group"
-            onClick={() => window.location.href = `/course/${featuredCourse.id}`}
-          >
-            <div className="flex flex-col md:flex-row">
-              {/* Image */}
-              <div className="md:w-1/2 h-48 md:h-64 relative overflow-hidden">
-                {featuredCourse.coverImage && (
-                  <img 
-                    src={featuredCourse.coverImage} 
-                    alt={featuredCourse.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[hsl(0,0%,10%)] hidden md:block" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[hsl(0,0%,10%)] to-transparent md:hidden" />
-              </div>
-              {/* Content */}
-              <div className="md:w-1/2 p-6 flex flex-col justify-center">
-                <div className="text-xs text-primary font-medium mb-2 uppercase tracking-wider">
-                  Рекомендуем
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors">
-                  {featuredCourse.title}
-                </h3>
-                <p className="text-white/50 text-sm line-clamp-2 mb-4">
-                  {featuredCourse.description}
-                </p>
-                <div className="flex items-center gap-4 text-sm text-white/40">
-                  <span>{featuredCourse.lessons.length} уроков</span>
-                  {featuredCourse.estimatedMinutes > 0 && (
-                    <span>{featuredCourse.estimatedMinutes} мин</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Categories */}
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <button
+          onClick={() => setSelectedCategory(null)}
+          className={cn(
+            "px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors",
+            !selectedCategory 
+              ? "bg-primary text-white" 
+              : "bg-white/5 text-white/50 hover:text-white/70"
+          )}
+        >
+          Все
+        </button>
+        {COURSE_CATEGORIES.map(category => {
+          const Icon = category.icon;
+          return (
+            <button
+              key={category.id}
+              onClick={() => setSelectedCategory(category.id)}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors",
+                selectedCategory === category.id
+                  ? "bg-primary text-white"
+                  : "bg-white/5 text-white/50 hover:text-white/70"
+              )}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              {category.name}
+            </button>
+          );
+        })}
+      </div>
 
-      {/* Section Title */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-white">
+      {/* Results Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm text-white/50">
           {selectedCategory 
             ? getCategoryById(selectedCategory)?.name 
             : 'Все курсы'}
-          <span className="text-white/30 ml-2 text-base font-normal">
-            ({filteredCourses.length})
-          </span>
+          <span className="ml-1.5 text-white/30">({filteredCourses.length})</span>
         </h2>
         {selectedCategory && (
           <button 
             onClick={() => setSelectedCategory(null)}
-            className="text-sm text-primary hover:text-primary/80 transition-colors"
+            className="text-xs text-primary hover:text-primary/80"
           >
-            Показать все
+            Сбросить
           </button>
         )}
       </div>
 
-      {/* Courses Grid */}
+      {/* Content */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="card-glow animate-pulse">
-              <div className="h-36 bg-white/5 rounded-t-2xl" />
-              <div className="p-4">
-                <div className="h-5 bg-white/10 rounded w-3/4 mb-2" />
-                <div className="h-4 bg-white/5 rounded w-full mb-4" />
-                <div className="flex gap-2">
-                  <div className="h-4 bg-white/5 rounded w-16" />
-                  <div className="h-4 bg-white/5 rounded w-16" />
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-6 h-6 animate-spin text-primary" />
         </div>
       ) : filteredCourses.length === 0 ? (
-        <div className="card-glow">
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
-              <Sparkles className="w-8 h-8 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold text-white mb-2">
-              {selectedCategory || searchQuery 
-                ? 'Курсы не найдены' 
-                : 'Пока нет опубликованных курсов'}
-            </h3>
-            <p className="text-white/50 text-center max-w-md">
-              {selectedCategory || searchQuery
-                ? 'Попробуйте изменить параметры поиска' 
-                : 'Здесь появятся опубликованные курсы от всех авторов'}
-            </p>
-          </div>
-        </div>
+        <EmptyState hasFilters={!!selectedCategory || !!searchQuery} />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredCourses.map(course => (
-            <CourseCard
+            <CourseCard 
               key={course.id}
-              course={course as Course & { category?: string }}
+              course={course}
               isFavorite={isFavorite(course.id)}
-              onToggleFavorite={toggleFavorite}
+              onToggleFavorite={() => toggleFavorite(course.id)}
             />
           ))}
         </div>
@@ -195,5 +131,105 @@ const Catalog: React.FC = () => {
     </div>
   );
 };
+
+// Course Card
+interface CourseCardProps {
+  course: Course & { category?: string };
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
+}
+
+const CourseCard: React.FC<CourseCardProps> = ({ course, isFavorite, onToggleFavorite }) => {
+  const navigate = useNavigate();
+  const category = getCategoryById(course.category || '');
+
+  return (
+    <div 
+      className="group bg-white/[0.03] border border-white/5 rounded-xl overflow-hidden hover:border-white/10 transition-colors cursor-pointer"
+      onClick={() => navigate(`/course/${course.id}`)}
+    >
+      {/* Cover */}
+      <div className="h-32 relative">
+        {course.coverImage ? (
+          <img 
+            src={course.coverImage} 
+            alt={course.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+            <BookOpen className="w-8 h-8 text-white/10" />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        
+        {/* Category */}
+        {category && (
+          <span 
+            className="absolute top-2 left-2 px-2 py-0.5 rounded-md text-xs font-medium"
+            style={{ 
+              backgroundColor: `${category.color}30`,
+              color: category.color
+            }}
+          >
+            {category.name}
+          </span>
+        )}
+
+        {/* Favorite */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleFavorite();
+          }}
+          className={cn(
+            "absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center transition-colors",
+            "bg-black/30 hover:bg-black/50",
+            isFavorite ? "text-yellow-400" : "text-white/50 hover:text-white/70"
+          )}
+        >
+          <Star className="w-3.5 h-3.5" fill={isFavorite ? "currentColor" : "none"} />
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="p-3">
+        <h3 className="font-medium text-white text-sm line-clamp-1 mb-1">
+          {course.title}
+        </h3>
+        <p className="text-xs text-white/40 line-clamp-2 mb-2 min-h-[2rem]">
+          {course.description || 'Без описания'}
+        </p>
+        <div className="flex items-center gap-3 text-xs text-white/30">
+          <span className="flex items-center gap-1">
+            <Layers className="w-3 h-3" />
+            {course.lessons.length}
+          </span>
+          {course.estimatedMinutes > 0 && (
+            <span className="flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {course.estimatedMinutes} мин
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Empty State
+const EmptyState: React.FC<{ hasFilters: boolean }> = ({ hasFilters }) => (
+  <div className="flex flex-col items-center justify-center py-16 bg-white/[0.02] rounded-xl border border-white/5">
+    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
+      <Compass className="w-6 h-6 text-primary" />
+    </div>
+    <h3 className="text-white font-medium mb-1">
+      {hasFilters ? 'Ничего не найдено' : 'Пока нет курсов'}
+    </h3>
+    <p className="text-white/40 text-sm">
+      {hasFilters ? 'Попробуйте изменить параметры поиска' : 'Здесь появятся опубликованные курсы'}
+    </p>
+  </div>
+);
 
 export default Catalog;
