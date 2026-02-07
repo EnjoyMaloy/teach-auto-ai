@@ -83,10 +83,10 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
         <img
           src={coverImage}
           alt={title}
-          className="aspect-[3/4] w-full object-cover"
+          className="aspect-[2/3] w-full object-cover"
         />
       ) : (
-        <div className="aspect-[3/4] w-full bg-gradient-to-br from-primary/40 via-primary/20 to-accent/30 flex items-center justify-center">
+        <div className="aspect-[2/3] w-full bg-gradient-to-br from-primary/40 via-primary/20 to-accent/30 flex items-center justify-center">
           <span className="text-6xl font-bold text-white/30">
             {title.charAt(0).toUpperCase()}
           </span>
@@ -94,7 +94,7 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
       )}
 
       {/* Gradient overlay for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
 
       {/* Top action buttons */}
       <div className="absolute top-3 right-3 flex items-center gap-1">
@@ -186,9 +186,9 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
       <div className="absolute inset-x-0 bottom-0 space-y-3 p-5 text-white">
         {/* Title */}
         <div>
-          <h3 className="text-lg font-semibold line-clamp-2">{title}</h3>
+          <h3 className="text-lg font-semibold line-clamp-1">{title}</h3>
           {description && (
-            <p className="mt-1 text-sm text-white/80 line-clamp-2">{description}</p>
+            <p className="mt-1 text-sm text-white line-clamp-2">{description}</p>
           )}
         </div>
 
