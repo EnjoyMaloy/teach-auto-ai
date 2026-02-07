@@ -150,7 +150,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden bg-[#0f0f12]">
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-background">
       <AnimatedBackground />
       
       {/* Content - centered accounting for sidebar */}
@@ -159,12 +159,12 @@ const Home: React.FC = () => {
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1.5rem)' }}
       >
         {/* Welcome Text */}
-        <h1 className="text-4xl md:text-5xl font-semibold mb-10 text-white text-center">
-          What's on your mind, <span className="animate-[name-glow_4s_ease-in-out_infinite]" style={{ color: 'hsl(265, 60%, 75%)' }}>{userName}</span>?
+        <h1 className="text-4xl md:text-5xl font-semibold mb-10 text-foreground text-center">
+          What's on your mind, <span className="text-primary">{userName}</span>?
         </h1>
 
         {/* Action Card */}
-        <div className="w-full max-w-2xl bg-[#1a1a1b] border border-white/[0.08] rounded-2xl p-2 shadow-2xl transition-all">
+        <div className="w-full max-w-2xl bg-card border border-border rounded-2xl p-2 shadow-2xl transition-all">
           <div className="flex items-start gap-3 px-4 py-3">
             <textarea
               value={prompt}
@@ -172,7 +172,7 @@ const Home: React.FC = () => {
               onKeyDown={handleKeyDown}
               placeholder="Опиши идею курса, который ты хочешь создать..."
               disabled={isGenerating}
-              className="flex-1 bg-transparent text-white placeholder:text-white/40 resize-none outline-none text-[15px] min-h-[24px] max-h-[120px]"
+              className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground resize-none outline-none text-[15px] min-h-[24px] max-h-[120px]"
               rows={1}
               style={{ height: 'auto' }}
               onInput={(e) => {
@@ -185,15 +185,15 @@ const Home: React.FC = () => {
           
           {/* Generation status */}
           {isGenerating && generationStatus && (
-            <div className="px-4 py-2 border-t border-white/5">
-              <div className="flex items-center gap-2 text-white/60 text-sm">
+            <div className="px-4 py-2 border-t border-border">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 <span>{generationStatus}</span>
               </div>
             </div>
           )}
           
-          <div className="flex items-center justify-between px-4 py-2 border-t border-white/5">
+          <div className="flex items-center justify-between px-4 py-2 border-t border-border">
             <TooltipProvider delayDuration={300}>
               <div className="flex items-center gap-1.5">
                 {/* Add attachment */}
@@ -201,12 +201,12 @@ const Home: React.FC = () => {
                   <TooltipTrigger asChild>
                     <button 
                       disabled
-                      className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center opacity-50 cursor-not-allowed hover:bg-white/[0.08] transition-colors"
+                      className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center opacity-50 cursor-not-allowed hover:bg-muted/80 transition-colors"
                     >
-                      <Plus className="w-4 h-4 text-white/30" />
+                      <Plus className="w-4 h-4 text-muted-foreground" />
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent side="top" className="bg-[#1a1a1b] border-white/10 text-white/70 text-xs">
+                  <TooltipContent side="top">
                     Прикрепить файл
                   </TooltipContent>
                 </Tooltip>
@@ -216,13 +216,13 @@ const Home: React.FC = () => {
                   <TooltipTrigger asChild>
                     <button 
                       disabled
-                      className="h-8 px-3 rounded-lg bg-white/5 flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-white/[0.08] transition-colors"
+                      className="h-8 px-3 rounded-lg bg-muted flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-muted/80 transition-colors"
                     >
-                      <Gauge className="w-3.5 h-3.5 text-white/30" />
-                      <span className="text-[12px] text-white/30">Сложность</span>
+                      <Gauge className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span className="text-[12px] text-muted-foreground">Сложность</span>
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent side="top" className="bg-[#1a1a1b] border-white/10 text-white/70 text-xs">
+                  <TooltipContent side="top">
                     Скоро
                   </TooltipContent>
                 </Tooltip>
@@ -232,13 +232,13 @@ const Home: React.FC = () => {
                   <TooltipTrigger asChild>
                     <button 
                       disabled
-                      className="h-8 px-3 rounded-lg bg-white/5 flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-white/[0.08] transition-colors"
+                      className="h-8 px-3 rounded-lg bg-muted flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-muted/80 transition-colors"
                     >
-                      <Palette className="w-3.5 h-3.5 text-white/30" />
-                      <span className="text-[12px] text-white/30">Дизайн</span>
+                      <Palette className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span className="text-[12px] text-muted-foreground">Дизайн</span>
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent side="top" className="bg-[#1a1a1b] border-white/10 text-white/70 text-xs">
+                  <TooltipContent side="top">
                     Скоро
                   </TooltipContent>
                 </Tooltip>
@@ -248,13 +248,13 @@ const Home: React.FC = () => {
                   <TooltipTrigger asChild>
                     <button 
                       disabled
-                      className="h-8 px-3 rounded-lg bg-white/5 flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-white/[0.08] transition-colors"
+                      className="h-8 px-3 rounded-lg bg-muted flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-muted/80 transition-colors"
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-white/30" />
-                      <span className="text-[12px] text-white/30">Маскот</span>
+                      <Sparkles className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span className="text-[12px] text-muted-foreground">Маскот</span>
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent side="top" className="bg-[#1a1a1b] border-white/10 text-white/70 text-xs">
+                  <TooltipContent side="top">
                     Скоро
                   </TooltipContent>
                 </Tooltip>
@@ -266,14 +266,14 @@ const Home: React.FC = () => {
               className={cn(
                 "w-7 h-7 rounded-full flex items-center justify-center transition-all",
                 prompt.trim() && !isGenerating
-                  ? "bg-white hover:bg-white/90 cursor-pointer"
-                  : "bg-white/20 cursor-not-allowed"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
+                  : "bg-muted cursor-not-allowed"
               )}
             >
               {isGenerating ? (
-                <Loader2 className="w-4 h-4 text-black/50 animate-spin" />
+                <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
               ) : (
-                <ArrowUp className="w-4 h-4 text-black" strokeWidth={2.5} />
+                <ArrowUp className="w-4 h-4" strokeWidth={2.5} />
               )}
             </button>
           </div>
