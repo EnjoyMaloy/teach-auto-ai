@@ -111,8 +111,19 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   };
 
   const languages = [
-    { code: 'ru' as const, label: 'RU' },
-    { code: 'en' as const, label: 'EN' },
+    { code: 'ru' as const, label: 'Russian' },
+    { code: 'en' as const, label: 'English' },
+  ];
+
+  // Extended languages for UI display (actual i18n only supports ru/en)
+  const displayLanguages = [
+    { code: 'ru', label: 'Russian' },
+    { code: 'en', label: 'English' },
+    { code: 'es', label: 'Español' },
+    { code: 'de', label: 'Deutsch' },
+    { code: 'fr', label: 'Français' },
+    { code: 'zh', label: '中文' },
+    { code: 'ja', label: '日本語' },
   ];
 
   const currentLang = languages.find((l) => l.code === language) || languages[0];
@@ -293,15 +304,45 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Footer — Theme & Language */}
+      {/* Footer — Language & Theme */}
       <SidebarFooter className="p-4">
         <div className="flex items-center justify-between">
+          {/* Language Selector */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-9 px-3 text-muted-foreground hover:text-foreground"
+              >
+                {displayLanguages.find(l => l.code === language)?.label || 'Russian'}
+                <ChevronDown className="ml-1 size-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="min-w-[120px]">
+              {displayLanguages.map((lang) => (
+                <DropdownMenuItem
+                  key={lang.code}
+                  onClick={() => {
+                    // Only ru/en are actually supported in i18n
+                    if (lang.code === 'ru' || lang.code === 'en') {
+                      setLanguage(lang.code);
+                    }
+                  }}
+                  className={lang.code !== 'ru' && lang.code !== 'en' ? 'opacity-50' : ''}
+                >
+                  {lang.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {/* Theme Toggle */}
           <Button
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
-            className="size-9"
+            className="size-9 text-muted-foreground hover:text-foreground"
           >
             {theme === 'dark' ? (
               <Sun className="size-4" />
@@ -309,27 +350,6 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
               <Moon className="size-4" />
             )}
           </Button>
-
-          {/* Language Selector */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-xs font-medium text-muted-foreground hover:text-foreground">
-                {currentLang.label}
-                <ChevronDown className="ml-1 size-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[80px]">
-              {languages.map((lang) => (
-                <DropdownMenuItem
-                  key={lang.code}
-                  onClick={() => setLanguage(lang.code)}
-                  className="text-xs justify-center"
-                >
-                  {lang.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </SidebarFooter>
 
