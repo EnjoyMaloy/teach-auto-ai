@@ -10,6 +10,7 @@ import {
   Clock,
   Compass,
   Folder,
+  Globe,
   Home,
   LogOut,
   Moon,
@@ -313,10 +314,11 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="h-9 px-3 text-muted-foreground hover:text-foreground"
+                className="h-9 px-3 text-muted-foreground hover:text-foreground gap-2"
               >
-                {displayLanguages.find(l => l.code === language)?.label || 'Russian'}
-                <ChevronDown className="ml-1 size-3" />
+                <Globe className="size-4" />
+                Язык
+                <ChevronDown className="size-3" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="min-w-[120px]">
