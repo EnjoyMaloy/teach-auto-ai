@@ -14,9 +14,9 @@ import {
   Home,
   LogOut,
   Moon,
-  Palette,
   Star,
   Sun,
+  Zap,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/hooks/useAuth';
@@ -168,20 +168,29 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                   side="bottom"
                   sideOffset={4}
                 >
-                  <DropdownMenuItem>
+                  {/* Plan & Credits Block */}
+                  <div className="px-2 py-2 mb-1">
+                    <div className="flex items-center gap-2 px-2 py-2 rounded-md bg-primary/10">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/20">
+                        <Zap className="size-4 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm font-medium">Pro Plan</div>
+                        <div className="text-xs text-muted-foreground">Безлимитный тариф</div>
+                      </div>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed">
                     <BadgeCheck className="mr-2 size-4" />
                     Аккаунт
+                    <span className="ml-auto text-[10px] text-muted-foreground">Скоро</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed">
                     <Bell className="mr-2 size-4" />
                     Уведомления
+                    <span className="ml-auto text-[10px] text-muted-foreground">Скоро</span>
                   </DropdownMenuItem>
-                  {isAdmin && (
-                    <DropdownMenuItem onClick={() => navigate('/design-system')}>
-                      <Palette className="mr-2 size-4" />
-                      Дизайн системы
-                    </DropdownMenuItem>
-                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 size-4" />
