@@ -6,6 +6,7 @@ import { useCourses } from '@/hooks/useCourses';
 import { useFavorites } from '@/hooks/useFavorites';
 import { Course } from '@/types/course';
 import { COURSE_CATEGORIES, getCategoryById } from '@/lib/categories';
+import AnimatedBackground from '@/components/layout/AnimatedBackground';
 
 type FilterType = 'all' | string;
 
@@ -34,7 +35,9 @@ const Catalog: React.FC = () => {
   });
 
   return (
-    <div className="p-6">
+    <div className="min-h-screen relative overflow-hidden bg-[#0f0f12]">
+      <AnimatedBackground />
+      <div className="relative z-10 p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-[15px] font-semibold text-white">Исследовать</h1>
@@ -118,6 +121,7 @@ const Catalog: React.FC = () => {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 };

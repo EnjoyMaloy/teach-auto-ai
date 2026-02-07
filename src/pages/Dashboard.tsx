@@ -22,6 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import AnimatedBackground from '@/components/layout/AnimatedBackground';
 
 type FilterType = 'all' | 'drafts' | 'published';
 
@@ -69,7 +70,9 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="p-6">
+    <div className="min-h-screen relative overflow-hidden bg-[#0f0f12]">
+      <AnimatedBackground />
+      <div className="relative z-10 p-6">
       {/* Top Bar */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -175,6 +178,7 @@ const Dashboard: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      </div>
     </div>
   );
 };

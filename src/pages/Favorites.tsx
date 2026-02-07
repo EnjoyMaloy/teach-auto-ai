@@ -6,6 +6,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { useAuth } from '@/hooks/useAuth';
 import { Course } from '@/types/course';
 import { getCategoryById } from '@/lib/categories';
+import AnimatedBackground from '@/components/layout/AnimatedBackground';
 
 const Favorites: React.FC = () => {
   const navigate = useNavigate();
@@ -72,7 +73,9 @@ const Favorites: React.FC = () => {
   const loading = isLoading || favoritesLoading;
 
   return (
-    <div className="p-6">
+    <div className="min-h-screen relative overflow-hidden bg-[#0f0f12]">
+      <AnimatedBackground />
+      <div className="relative z-10 p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -113,6 +116,7 @@ const Favorites: React.FC = () => {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 };
