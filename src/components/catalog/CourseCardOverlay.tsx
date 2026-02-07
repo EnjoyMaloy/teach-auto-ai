@@ -1,7 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Star, MoreHorizontal, Trash2, Settings, Eye, BarChart3, BookOpen } from 'lucide-react';
+import { Star, MoreHorizontal, Trash2, Settings, Eye, BarChart3, BookOpen, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +17,7 @@ interface CourseCardOverlayProps {
   description?: string;
   coverImage?: string;
   lessonsCount: number;
+  completedCount?: number;
   categoryName?: string;
   isPublished?: boolean;
   isFavorite?: boolean;
@@ -31,6 +33,7 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
   description,
   coverImage,
   lessonsCount,
+  completedCount = 0,
   categoryName,
   isPublished,
   isFavorite,
@@ -42,6 +45,15 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
   const navigate = useNavigate();
 
   const handleClick = () => {
+    if (variant === 'workshop') {
+      navigate(`/editor/${id}`);
+    } else {
+      navigate(`/course/${id}`);
+    }
+  };
+
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (variant === 'workshop') {
       navigate(`/editor/${id}`);
     } else {
@@ -84,112 +96,90 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
       {/* Gradient overlay for text readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-      {/* Top badges */}
-      <div className="absolute top-3 left-3 right-3 flex items-start justify-between">
-        {/* Status/Category badge */}
-        <div>
-          {variant === 'workshop' ? (
-            isPublished ? (
-              <span className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-emerald-500/90 text-white shadow-sm">
-                Опубликован
-              </span>
-            ) : (
-              <span className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-white/20 text-white backdrop-blur-sm">
-                Черновик
-              </span>
-            )
-          ) : categoryName ? (
-            <span className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-white/20 text-white backdrop-blur-sm">
-              {categoryName}
-            </span>
-          ) : null}
-        </div>
+      {/* Top action buttons */}
+      <div className="absolute top-3 right-3 flex items-center gap-1">
+        {/* Favorite button */}
+        {(variant === 'catalog' || variant === 'favorites') && onToggleFavorite && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite();
+            }}
+            className={cn(
+              'w-8 h-8 rounded-lg flex items-center justify-center transition-all',
+              isFavorite
+                ? 'bg-white/30 backdrop-blur-sm text-white'
+                : 'bg-white/20 backdrop-blur-sm text-white/70 opacity-0 group-hover:opacity-100 hover:text-white hover:bg-white/30'
+            )}
+          >
+            <Star className="w-4 h-4" fill={isFavorite ? 'currentColor' : 'none'} />
+          </button>
+        )}
 
-        {/* Action buttons */}
-        <div className="flex items-center gap-1">
-          {/* Favorite button */}
-          {(variant === 'catalog' || variant === 'favorites') && onToggleFavorite && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleFavorite();
-              }}
-              className={cn(
-                'w-8 h-8 rounded-lg flex items-center justify-center transition-all',
-                isFavorite
-                  ? 'bg-white/30 backdrop-blur-sm text-white'
-                  : 'bg-white/20 backdrop-blur-sm text-white/70 opacity-0 group-hover:opacity-100 hover:text-white hover:bg-white/30'
-              )}
-            >
-              <Star className="w-4 h-4" fill={isFavorite ? 'currentColor' : 'none'} />
-            </button>
-          )}
-
-          {/* Workshop menu */}
-          {variant === 'workshop' && (
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                  <button className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center text-white/80 hover:text-white transition-colors">
-                    <MoreHorizontal className="w-4 h-4" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent 
-                  align="end" 
-                  className="min-w-[140px] bg-card dark:bg-[#1a1a1b] border-border dark:border-white/10 p-1"
+        {/* Workshop menu */}
+        {variant === 'workshop' && (
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                <button className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center text-white/80 hover:text-white transition-colors">
+                  <MoreHorizontal className="w-4 h-4" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                align="end" 
+                className="min-w-[140px] bg-card dark:bg-[#1a1a1b] border-border dark:border-white/10 p-1"
+              >
+                <DropdownMenuItem 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/course/${id}/settings`);
+                  }}
+                  className="text-[13px] text-muted-foreground focus:text-foreground focus:bg-muted dark:text-white/70 dark:focus:text-white dark:focus:bg-white/5 rounded px-2 py-1.5"
                 >
+                  <Settings className="w-3.5 h-3.5 mr-2" />
+                  Настройки
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/course/${id}/stats`);
+                  }}
+                  className="text-[13px] text-muted-foreground focus:text-foreground focus:bg-muted dark:text-white/70 dark:focus:text-white dark:focus:bg-white/5 rounded px-2 py-1.5"
+                >
+                  <BarChart3 className="w-3.5 h-3.5 mr-2" />
+                  Статистика
+                </DropdownMenuItem>
+                {isPublished && (
                   <DropdownMenuItem 
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/course/${id}/settings`);
+                      window.open(`/course/${id}`, '_blank');
                     }}
                     className="text-[13px] text-muted-foreground focus:text-foreground focus:bg-muted dark:text-white/70 dark:focus:text-white dark:focus:bg-white/5 rounded px-2 py-1.5"
                   >
-                    <Settings className="w-3.5 h-3.5 mr-2" />
-                    Настройки
+                    <Eye className="w-3.5 h-3.5 mr-2" />
+                    Открыть
                   </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/course/${id}/stats`);
-                    }}
-                    className="text-[13px] text-muted-foreground focus:text-foreground focus:bg-muted dark:text-white/70 dark:focus:text-white dark:focus:bg-white/5 rounded px-2 py-1.5"
-                  >
-                    <BarChart3 className="w-3.5 h-3.5 mr-2" />
-                    Статистика
-                  </DropdownMenuItem>
-                  {isPublished && (
+                )}
+                {onDelete && (
+                  <>
+                    <DropdownMenuSeparator className="my-1 bg-border dark:bg-white/5" />
                     <DropdownMenuItem 
                       onClick={(e) => {
                         e.stopPropagation();
-                        window.open(`/course/${id}`, '_blank');
+                        onDelete();
                       }}
-                      className="text-[13px] text-muted-foreground focus:text-foreground focus:bg-muted dark:text-white/70 dark:focus:text-white dark:focus:bg-white/5 rounded px-2 py-1.5"
+                      className="text-[13px] text-red-400 focus:text-red-400 focus:bg-red-500/10 rounded px-2 py-1.5"
                     >
-                      <Eye className="w-3.5 h-3.5 mr-2" />
-                      Открыть
+                      <Trash2 className="w-3.5 h-3.5 mr-2" />
+                      Удалить
                     </DropdownMenuItem>
-                  )}
-                  {onDelete && (
-                    <>
-                      <DropdownMenuSeparator className="my-1 bg-border dark:bg-white/5" />
-                      <DropdownMenuItem 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDelete();
-                        }}
-                        className="text-[13px] text-red-400 focus:text-red-400 focus:bg-red-500/10 rounded px-2 py-1.5"
-                      >
-                        <Trash2 className="w-3.5 h-3.5 mr-2" />
-                        Удалить
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          )}
-        </div>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
       </div>
 
       {/* Content overlay at bottom */}
@@ -202,12 +192,25 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
           )}
         </div>
 
-        {/* Stats */}
-        <div className="flex items-center gap-4 text-sm text-white/80">
-          <span className="flex items-center gap-1.5">
-            <BookOpen className="w-4 h-4" />
-            {lessonsCount} {getLessonWord(lessonsCount)}
-          </span>
+        {/* Stats and action button */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4 text-sm text-white/80">
+            <span className="flex items-center gap-1.5">
+              <Users className="w-4 h-4" />
+              {completedCount.toLocaleString()}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <BookOpen className="w-4 h-4" />
+              {lessonsCount}
+            </span>
+          </div>
+          <Button
+            size="sm"
+            onClick={handleButtonClick}
+            className="gap-1.5 bg-white/20 text-white backdrop-blur-sm hover:bg-white/30 border-0"
+          >
+            {variant === 'workshop' ? 'Открыть' : 'Смотреть'}
+          </Button>
         </div>
       </div>
     </div>
