@@ -65,7 +65,7 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-background dark:bg-[#0f0f12]">
+    <div className="min-h-screen relative overflow-auto bg-background dark:bg-[#0f0f12]">
       <AnimatedBackground />
       <div 
         className="relative z-10 p-6 transition-all duration-200"
