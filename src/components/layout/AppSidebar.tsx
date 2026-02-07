@@ -474,7 +474,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   ];
 
   return (
-    <Sidebar variant="floating">
+    <Sidebar variant="floating" className="dark">
       <SidebarHeader>
         <WorkspaceSwitcher workspaces={workspaces} />
         <SearchForm />
