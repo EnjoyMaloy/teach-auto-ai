@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, ArrowUp, Loader2 } from 'lucide-react';
+import { Plus, ArrowUp, Loader2, Gauge, Palette, Bot } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/hooks/useAuth';
 import { useCourses } from '@/hooks/useCourses';
 import { supabase } from '@/integrations/supabase/client';
@@ -193,14 +194,72 @@ const Home: React.FC = () => {
           )}
           
           <div className="flex items-center justify-between px-4 py-2 border-t border-white/5">
-            <div className="flex items-center gap-2">
-              <button 
-                disabled
-                className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center opacity-50 cursor-not-allowed"
-              >
-                <Plus className="w-4 h-4 text-white/30" />
-              </button>
-            </div>
+            <TooltipProvider delayDuration={300}>
+              <div className="flex items-center gap-1.5">
+                {/* Add attachment */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button 
+                      disabled
+                      className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center opacity-50 cursor-not-allowed hover:bg-white/[0.08] transition-colors"
+                    >
+                      <Plus className="w-4 h-4 text-white/30" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="bg-[#1a1a1b] border-white/10 text-white/70 text-xs">
+                    Прикрепить файл
+                  </TooltipContent>
+                </Tooltip>
+
+                {/* Difficulty selector */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button 
+                      disabled
+                      className="h-8 px-3 rounded-lg bg-white/5 flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-white/[0.08] transition-colors"
+                    >
+                      <Gauge className="w-3.5 h-3.5 text-white/30" />
+                      <span className="text-[12px] text-white/30">Сложность</span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="bg-[#1a1a1b] border-white/10 text-white/70 text-xs">
+                    Скоро
+                  </TooltipContent>
+                </Tooltip>
+
+                {/* Design system selector */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button 
+                      disabled
+                      className="h-8 px-3 rounded-lg bg-white/5 flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-white/[0.08] transition-colors"
+                    >
+                      <Palette className="w-3.5 h-3.5 text-white/30" />
+                      <span className="text-[12px] text-white/30">Дизайн</span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="bg-[#1a1a1b] border-white/10 text-white/70 text-xs">
+                    Скоро
+                  </TooltipContent>
+                </Tooltip>
+
+                {/* Mascot selector */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button 
+                      disabled
+                      className="h-8 px-3 rounded-lg bg-white/5 flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-white/[0.08] transition-colors"
+                    >
+                      <Bot className="w-3.5 h-3.5 text-white/30" />
+                      <span className="text-[12px] text-white/30">Маскот</span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="bg-[#1a1a1b] border-white/10 text-white/70 text-xs">
+                    Скоро
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            </TooltipProvider>
             <button
               onClick={handleGenerate}
               disabled={!prompt.trim() || isGenerating}
