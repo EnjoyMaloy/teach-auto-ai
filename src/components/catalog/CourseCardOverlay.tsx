@@ -94,7 +94,7 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
       )}
 
       {/* Gradient overlay for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 via-50% to-transparent" />
 
       {/* Top action buttons */}
       <div className="absolute top-3 right-3 flex items-center gap-1">
