@@ -91,8 +91,8 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
 
       {/* Top action buttons */}
       <div className="absolute top-3 right-3 flex items-center gap-1">
-        {/* Favorite button */}
-        {(variant === 'catalog' || variant === 'favorites') && onToggleFavorite && (
+        {/* Favorite button - show for any variant if handler provided */}
+        {onToggleFavorite && (
           <button
             onClick={(e) => {
               e.stopPropagation();
