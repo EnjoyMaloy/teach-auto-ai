@@ -102,6 +102,9 @@ const Favorites: React.FC = () => {
         className="relative z-10 p-6 transition-all duration-200"
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1.5rem)' }}
       >
+        {/* Top spacing like Dashboard */}
+        <div className="h-14" />
+
         {/* Filters */}
         {courses.length > 0 && (
           <div className="flex items-center gap-1 mb-6">
