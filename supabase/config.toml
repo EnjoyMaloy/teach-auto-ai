@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.generate-course-metadata]
 verify_jwt = false
+
+[functions.update-course-banners]
+verify_jwt = false
