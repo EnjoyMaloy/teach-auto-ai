@@ -1,106 +1,117 @@
 
 
-# План: Изменение структуры сайдбара
+# План рефакторинга портала
 
-## Подход
+## Обзор текущего состояния
 
-Используем **существующие компоненты и стили** из текущего `AppSidebar.tsx` — только меняем порядок и содержание секций.
+Проект содержит 14 страниц. После анализа найдены следующие проблемы:
 
-## Новая структура
+| Проблема | Файл/Место | Влияние |
+|----------|------------|---------|
+| Неиспользуемая страница | `DesignSystem.tsx` (438 строк) | Мёртвый код в бандле |
+| Неиспользуемая edge function | `generate-dictionary/` | Лишние деплои |
+| Дублирование хелперов | `getLessonWord`, `getCoursesWord` в 3 файлах | Раздутый код |
+| Тяжёлый анимированный фон | `AnimatedBackground.tsx` на всех страницах | CSS-анимации 24/7 |
+
+## Предлагаемые изменения
+
+### 1. Удалить неиспользуемые файлы
+
+**Файлы на удаление:**
+- `src/pages/DesignSystem.tsx` — не подключена к роутам, 438 строк мёртвого кода
+- `supabase/functions/generate-dictionary/` — функция словаря была удалена
+
+### 2. Вынести общие хелперы
+
+Функции `getLessonWord()` и `getCoursesWord()` дублируются в:
+- `Dashboard.tsx`
+- `Catalog.tsx`
+- `Favorites.tsx`
+- `CourseCardOverlay.tsx`
+
+**Решение:** Создать `src/lib/pluralize.ts`:
 
 ```text
-┌─────────────────────────┐
-│  [Logo SVG]             │
-├─────────────────────────┤
-│  [Avatar] Pavel      ▾  │  → Dropdown: Аккаунт, Уведомления,
-│  pavel@email.com        │              Дизайн системы, Выход
-├─────────────────────────┤
-│  🏠 Главная             │
-├─────────────────────────┤
-│  МОИ КУРСЫ              │
-│  🕐 Недавние        ▸   │  → Collapsible список курсов
-│  📁 Все курсы           │
-│  ⭐ Избранное           │
-├─────────────────────────┤
-│  РЕСУРСЫ                │
-│  🧭 Исследовать         │
-│  📖 Словарь             │
-├─────────────────────────┤
-│  [🌙/☀️]        [RU ▼]  │
-└─────────────────────────┘
+src/lib/pluralize.ts
+├── getLessonWord(count: number): string
+├── getCoursesWord(count: number): string
+└── pluralize(count, one, few, many): string
 ```
 
-## Что изменится
+Удалить локальные копии из страниц.
 
-| Секция | Было | Станет |
-|--------|------|--------|
-| Header | WorkspaceSwitcher + SearchForm | Только Logo SVG |
-| После Header | — | Профиль с DropdownMenu |
-| Content | 4 раздела (Overview, Projects, Team, Workspace) | Главная + Мои курсы + Ресурсы |
-| Footer | NavUser | Переключатели темы и языка |
+### 3. Оптимизировать AnimatedBackground
 
-## Технические детали
+Текущий компонент рендерит 5 больших blur-блобов с CSS-анимациями (12-20 секунд каждая). Это нагружает GPU.
 
-### Файл: `src/components/layout/AppSidebar.tsx`
+**Варианты:**
+1. **Минимум** — отключить анимации на мобильных устройствах
+2. **Лёгкая версия** — уменьшить количество блобов с 5 до 2-3
+3. **Статичный градиент** — заменить на статичный фон для лучшей производительности
 
-**Удаляем:**
-- Компонент `WorkspaceSwitcher`
-- Компонент `SearchForm`
-- Массив `navGroups` с 4 разделами
-- Компонент `NavMenuItem`
+### 4. Общая структура файлов после рефакторинга
 
-**Оставляем без изменений:**
-- Все импорты UI компонентов
-- `useAuth`, `useNavigate`, `useLocation`
-- Загрузка `recentCourses` из Supabase
-- Функцию `handleSignOut`
-- Проверку `isAdmin`
+```text
+УДАЛИТЬ:
+  ├── src/pages/DesignSystem.tsx
+  └── supabase/functions/generate-dictionary/
 
-**Добавляем:**
-- Импорт `useTheme` из `next-themes`
-- Использование `useLanguage` из проекта
-- Иконки: `Home`, `Clock`, `Folder`, `Star`, `Compass`, `BookOpen`, `Sun`, `Moon`, `ChevronDown`
+СОЗДАТЬ:
+  └── src/lib/pluralize.ts
 
-### Маршруты меню
+ИЗМЕНИТЬ:
+  ├── src/pages/Dashboard.tsx      — убрать getLessonWord
+  ├── src/pages/Catalog.tsx        — убрать getLessonWord, getCoursesWord
+  ├── src/pages/Favorites.tsx      — убрать getLessonWord, getCoursesWord  
+  ├── src/components/catalog/CourseCardOverlay.tsx — импорт из pluralize
+  └── src/components/layout/AnimatedBackground.tsx — опционально оптимизация
+```
 
-| Пункт | Маршрут |
-|-------|---------|
-| Главная | `/` |
-| Все курсы | `/workshop` |
-| Избранное | `/favorites` |
-| Исследовать | `/catalog` |
-| Словарь | `/dictionary` |
-| Недавние (курсы) | `/editor/{courseId}` |
+## Оценка эффекта
 
-### Профиль — DropdownMenu
+| Метрика | До | После |
+|---------|-----|-------|
+| Строк удалённого кода | — | ~500+ |
+| Edge functions | 10 | 9 |
+| Дублирующегося кода | ~60 строк | 0 |
 
-| Пункт | Действие | Иконка |
-|-------|----------|--------|
-| Аккаунт | — (пока без действия) | `BadgeCheck` |
-| Уведомления | — (пока без действия) | `Bell` |
-| Дизайн системы | `navigate('/design-system')` (только для admin) | `Palette` |
-| Выход | `handleSignOut()` | `LogOut` |
+## Техническая реализация
 
-### Footer — переключатели
+### Файл `src/lib/pluralize.ts`:
 
-| Элемент | Компонент | Логика |
-|---------|-----------|--------|
-| Тема | `Button` с иконкой `Sun`/`Moon` | `useTheme().setTheme()` |
-| Язык | `DropdownMenu` с флагами | `useLanguage().setLanguage()` |
+```typescript
+export function pluralize(
+  count: number,
+  one: string,
+  few: string,
+  many: string
+): string {
+  const lastTwo = count % 100;
+  const lastOne = count % 10;
+  
+  if (lastTwo >= 11 && lastTwo <= 19) return many;
+  if (lastOne === 1) return one;
+  if (lastOne >= 2 && lastOne <= 4) return few;
+  return many;
+}
 
-## Файлы для изменения
+export const getLessonWord = (count: number) => 
+  pluralize(count, 'урок', 'урока', 'уроков');
 
-| Файл | Действие |
-|------|----------|
-| `src/components/layout/AppSidebar.tsx` | Переработка структуры (компоненты и стили остаются) |
+export const getCoursesWord = (count: number) => 
+  pluralize(count, 'курс', 'курса', 'курсов');
+```
 
-## Сохраняемые стили
+### Обновление импортов:
 
-Все классы из текущего sidebar9 остаются:
-- `variant="floating"` на `<Sidebar>`
-- `size="lg"` на кнопках профиля
-- `text-muted-foreground` для подписей
-- `font-medium` для заголовков
-- `size-4` для иконок
-- `rounded-lg` для аватара
+```typescript
+// Вместо локальной функции:
+import { getLessonWord, getCoursesWord } from '@/lib/pluralize';
+```
+
+## Дополнительные рекомендации
+
+1. **Неиспользуемые хуки** — проверить `useImagePreloader.ts`, `useOverflowDetection.ts` на использование
+2. **Компонент CourseCard** — старый `CourseCard.tsx` можно удалить если используется только `CourseCardOverlay.tsx`
+3. **Модерация** — страница доступна только админам, но загружается в бандл для всех (можно рассмотреть динамический импорт)
 
