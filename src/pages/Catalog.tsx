@@ -41,11 +41,6 @@ const Catalog: React.FC = () => {
         className="relative z-10 p-6 transition-all duration-200"
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1.5rem)' }}
       >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-[15px] font-semibold text-foreground dark:text-white">Исследовать</h1>
-      </div>
-
       {/* Search */}
       <div className="relative max-w-sm mb-6">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground dark:text-white/20" />

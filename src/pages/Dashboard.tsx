@@ -77,11 +77,7 @@ const Dashboard: React.FC = () => {
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1.5rem)' }}
       >
       {/* Top Bar */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-[15px] font-semibold text-foreground dark:text-white">Мои курсы</h1>
-        </div>
-        
+      <div className="flex items-center justify-end mb-6">
         <Button 
           onClick={handleCreate} 
           disabled={isCreating}

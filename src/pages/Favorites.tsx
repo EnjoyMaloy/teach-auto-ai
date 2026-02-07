@@ -79,18 +79,6 @@ const Favorites: React.FC = () => {
         className="relative z-10 p-6 transition-all duration-200"
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1.5rem)' }}
       >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-[15px] font-semibold text-foreground dark:text-white">Избранное</h1>
-          {courses.length > 0 && (
-            <p className="text-[12px] text-muted-foreground dark:text-white/30 mt-0.5">
-              {courses.length} {getCoursesWord(courses.length)}
-            </p>
-          )}
-        </div>
-      </div>
-
       {/* Content */}
       {loading ? (
         <div className="flex items-center justify-center h-64">
