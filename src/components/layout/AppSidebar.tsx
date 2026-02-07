@@ -296,11 +296,12 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) =
               isActive={location.pathname === '/catalog'}
               onClick={() => navigate('/catalog')}
             />
-            <NavItemButton
-              item={{ icon: Library, label: 'Словарь', path: '/dictionary' }}
-              isActive={location.pathname === '/dictionary'}
-              onClick={() => navigate('/dictionary')}
-            />
+            {/* Dictionary - disabled for now */}
+            <div className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium text-white/20 cursor-not-allowed">
+              <Library className="w-4 h-4" strokeWidth={2} />
+              Словарь
+              <span className="ml-auto text-[10px] bg-white/5 px-1.5 py-0.5 rounded">скоро</span>
+            </div>
           </div>
         </div>
       </nav>
