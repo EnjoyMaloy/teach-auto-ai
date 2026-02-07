@@ -10,8 +10,13 @@ const LayoutContent: React.FC = () => {
   
   return (
     <>
-      {/* Full-screen content layer */}
-      <div className="fixed inset-0 z-0">
+      {/* Full-screen content layer - shifts with sidebar */}
+      <div 
+        className="fixed inset-0 z-0 transition-all duration-200"
+        style={{ 
+          paddingLeft: isCollapsed ? '0' : 'var(--sidebar-width)',
+        }}
+      >
         <Outlet />
       </div>
       
