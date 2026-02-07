@@ -1,8 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCourses } from '@/hooks/useCourses';
-import { useFavorites } from '@/hooks/useFavorites';
-import { Course } from '@/types/course';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Plus, Loader2 } from 'lucide-react';
@@ -19,20 +16,17 @@ import {
 } from '@/components/ui/alert-dialog';
 import AnimatedBackground from '@/components/layout/AnimatedBackground';
 import CourseCardOverlay from '@/components/catalog/CourseCardOverlay';
+import { useUserCourses, CourseListItem } from '@/hooks/useCachedCourses';
+import { useCachedFavorites } from '@/hooks/useCachedFavorites';
 
 type FilterType = 'all' | 'drafts' | 'published';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { courses, isLoading, fetchCourses, createCourse, deleteCourse } = useCourses();
-  const { isFavorite, toggleFavorite } = useFavorites();
-  const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
+  const { courses, isLoading, createCourse, deleteCourse, isCreating } = useUserCourses();
+  const { isFavorite, toggleFavorite } = useCachedFavorites();
+  const [courseToDelete, setCourseToDelete] = useState<CourseListItem | null>(null);
   const [filter, setFilter] = useState<FilterType>('all');
-
-  useEffect(() => {
-    fetchCourses();
-  }, [fetchCourses]);
 
   const filteredCourses = courses.filter(course => {
     if (filter === 'all') return true;
@@ -47,16 +41,22 @@ const Dashboard: React.FC = () => {
   };
 
   const handleCreate = async () => {
-    setIsCreating(true);
-    const course = await createCourse('Новый курс');
-    setIsCreating(false);
-    if (course) navigate(`/editor/${course.id}`);
+    try {
+      const course = await createCourse('Новый курс');
+      if (course) navigate(`/editor/${course.id}`);
+    } catch {
+      // Error handled by mutation
+    }
   };
 
   const handleDelete = async () => {
     if (!courseToDelete) return;
-    const success = await deleteCourse(courseToDelete.id);
-    if (success) toast.success('Курс удалён');
+    try {
+      await deleteCourse(courseToDelete.id);
+      toast.success('Курс удалён');
+    } catch {
+      // Error handled by mutation
+    }
     setCourseToDelete(null);
   };
 
@@ -150,7 +150,7 @@ const Dashboard: React.FC = () => {
               title={course.title}
               description={course.description}
               coverImage={course.coverImage}
-              lessonsCount={course.lessons.length}
+              lessonsCount={course.lessonsCount}
               isPublished={course.isPublished}
               variant="workshop"
               isFavorite={isFavorite(course.id)}
