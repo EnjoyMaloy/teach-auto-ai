@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Compass } from 'lucide-react';
+import { Search } from 'lucide-react';
+import emptyCatalogImage from '@/assets/empty-catalog.png';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { useCourses } from '@/hooks/useCourses';
@@ -105,9 +106,11 @@ const Catalog: React.FC = () => {
         </div>
       ) : filteredCourses.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-          <div className="w-16 h-16 mb-6 rounded-2xl bg-muted/50 dark:bg-white/5 flex items-center justify-center">
-            <Compass className="w-8 h-8 text-muted-foreground/50 dark:text-white/20" />
-          </div>
+          <img 
+            src={emptyCatalogImage} 
+            alt="No courses" 
+            className="w-32 h-32 mb-6 object-contain"
+          />
           <h3 className="text-lg font-medium text-foreground dark:text-white/80 mb-2">
             {searchQuery || filter !== 'all'
               ? 'Ничего не найдено' 
