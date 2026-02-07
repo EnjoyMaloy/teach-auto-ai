@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import emptyCatalogImage from '@/assets/empty-catalog.png';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
-import { useCourses } from '@/hooks/useCourses';
-import { useFavorites } from '@/hooks/useFavorites';
-import { Course } from '@/types/course';
+import { usePublishedCourses } from '@/hooks/useCachedCourses';
+import { useCachedFavorites } from '@/hooks/useCachedFavorites';
 import { COURSE_CATEGORIES, getCategoryById } from '@/lib/categories';
 import { getCoursesWord } from '@/lib/pluralize';
 import AnimatedBackground from '@/components/layout/AnimatedBackground';
@@ -16,22 +15,13 @@ type FilterType = 'all' | string;
 
 const Catalog: React.FC = () => {
   const navigate = useNavigate();
-  const { fetchPublishedCourses, isLoading } = useCourses();
-  const { isFavorite, toggleFavorite } = useFavorites();
-  const [courses, setCourses] = useState<Course[]>([]);
+  const { courses, isLoading } = usePublishedCourses();
+  const { isFavorite, toggleFavorite } = useCachedFavorites();
   const [filter, setFilter] = useState<FilterType>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    const loadCourses = async () => {
-      const data = await fetchPublishedCourses();
-      setCourses(data);
-    };
-    loadCourses();
-  }, [fetchPublishedCourses]);
-
   const filteredCourses = courses.filter(course => {
-    const matchesCategory = filter === 'all' || (course as any).category === filter;
+    const matchesCategory = filter === 'all' || course.category === filter;
     const matchesSearch = !searchQuery || 
       course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       course.description?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -128,8 +118,8 @@ const Catalog: React.FC = () => {
               title={course.title}
               description={course.description}
               coverImage={course.coverImage}
-              lessonsCount={course.lessons.length}
-              categoryName={getCategoryById((course as any).category)?.name}
+              lessonsCount={course.lessonsCount}
+              categoryName={getCategoryById(course.category)?.name}
               isFavorite={isFavorite(course.id)}
               onToggleFavorite={() => toggleFavorite(course.id)}
               variant="catalog"

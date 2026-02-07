@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
-import { supabase } from '@/integrations/supabase/client';
-import { useFavorites } from '@/hooks/useFavorites';
 import { useAuth } from '@/hooks/useAuth';
-import { Course } from '@/types/course';
+import { useCachedFavorites } from '@/hooks/useCachedFavorites';
 import { getCategoryById } from '@/lib/categories';
 import AnimatedBackground from '@/components/layout/AnimatedBackground';
 import CourseCardOverlay from '@/components/catalog/CourseCardOverlay';
@@ -14,79 +12,19 @@ type FilterType = 'all' | 'mine' | 'public';
 const Favorites: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { favorites, toggleFavorite, isLoading: favoritesLoading } = useFavorites();
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { favoriteCourses, toggleFavorite, isLoadingCourses } = useCachedFavorites();
   const [filter, setFilter] = useState<FilterType>('all');
 
-  useEffect(() => {
-    const fetchFavoriteCourses = async () => {
-      if (!user || favorites.length === 0) {
-        setCourses([]);
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      const { data, error } = await supabase
-        .from('courses')
-        .select(`
-          id,
-          title,
-          description,
-          cover_image,
-          estimated_minutes,
-          category,
-          is_published,
-          author_id,
-          lessons:published_lessons(id)
-        `)
-        .in('id', favorites)
-        .or(`is_published.eq.true,is_link_accessible.eq.true,author_id.eq.${user.id}`);
-
-      if (error) {
-        console.error('Error fetching favorite courses:', error);
-        setCourses([]);
-      } else {
-        const mappedCourses = (data || []).map((c: any) => ({
-          id: c.id,
-          title: c.title,
-          description: c.description || '',
-          coverImage: c.cover_image,
-          estimatedMinutes: c.estimated_minutes || 0,
-          category: c.category,
-          isPublished: c.is_published,
-          lessons: c.lessons || [],
-          authorId: c.author_id,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          targetAudience: '',
-          currentVersion: 1,
-          versions: [],
-          tags: [],
-        })) as Course[];
-        setCourses(mappedCourses);
-      }
-      setIsLoading(false);
-    };
-
-    if (!favoritesLoading) {
-      fetchFavoriteCourses();
-    }
-  }, [user, favorites, favoritesLoading]);
-
-  const loading = isLoading || favoritesLoading;
-
-  const filteredCourses = courses.filter(course => {
+  const filteredCourses = favoriteCourses.filter(course => {
     if (filter === 'all') return true;
     if (filter === 'mine') return course.authorId === user?.id;
     return course.authorId !== user?.id;
   });
 
   const counts = {
-    all: courses.length,
-    mine: courses.filter(c => c.authorId === user?.id).length,
-    public: courses.filter(c => c.authorId !== user?.id).length,
+    all: favoriteCourses.length,
+    mine: favoriteCourses.filter(c => c.authorId === user?.id).length,
+    public: favoriteCourses.filter(c => c.authorId !== user?.id).length,
   };
 
   const filters: { id: FilterType; label: string }[] = [
@@ -106,7 +44,7 @@ const Favorites: React.FC = () => {
         <div className="h-14" />
 
         {/* Filters */}
-        {courses.length > 0 && (
+        {favoriteCourses.length > 0 && (
           <div className="flex items-center gap-1 mb-6">
             {filters.map(f => (
               <button
@@ -127,13 +65,13 @@ const Favorites: React.FC = () => {
           </div>
         )}
 
-        {loading ? (
+        {isLoadingCourses ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
             {[...Array(6)].map((_, i) => (
               <CourseCardSkeleton key={i} />
             ))}
           </div>
-        ) : courses.length === 0 ? (
+        ) : favoriteCourses.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64 text-center">
             <div className="text-muted-foreground dark:text-white/20 text-[13px] mb-2">
               Нет сохранённых курсов
@@ -160,13 +98,12 @@ const Favorites: React.FC = () => {
                 title={course.title}
                 description={course.description}
                 coverImage={course.coverImage}
-                lessonsCount={course.lessons.length}
-                categoryName={getCategoryById((course as any).category)?.name}
+                lessonsCount={course.lessonsCount}
+                categoryName={getCategoryById(course.category)?.name}
                 isFavorite={true}
                 onToggleFavorite={() => toggleFavorite(course.id)}
                 isPublished={course.isPublished}
                 variant={course.authorId === user?.id ? 'workshop' : 'favorites'}
-                onDelete={course.authorId === user?.id ? undefined : undefined}
               />
             ))}
           </div>
