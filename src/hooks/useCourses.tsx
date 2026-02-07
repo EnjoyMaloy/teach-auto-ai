@@ -53,35 +53,67 @@ const dbLessonToLesson = (row: any, slides: Slide[]): Lesson => ({
   updatedAt: new Date(row.updated_at),
 });
 
+// Extract first image URL from course slides (from sub_blocks)
+const extractFirstImageFromCourse = (lessons: Lesson[]): string | undefined => {
+  for (const lesson of lessons.sort((a, b) => a.order - b.order)) {
+    for (const slide of lesson.slides.sort((a, b) => a.order - b.order)) {
+      // Check sub_blocks for images
+      if (slide.subBlocks && Array.isArray(slide.subBlocks)) {
+        const sortedBlocks = [...slide.subBlocks].sort((a, b) => (a.order || 0) - (b.order || 0));
+        for (const block of sortedBlocks) {
+          if (block.type === 'image' && block.imageUrl) {
+            // Skip base64 images, only use URLs
+            if (!block.imageUrl.startsWith('data:')) {
+              return block.imageUrl;
+            }
+          }
+        }
+      }
+      // Also check slide's direct imageUrl
+      if (slide.imageUrl && !slide.imageUrl.startsWith('data:')) {
+        return slide.imageUrl;
+      }
+    }
+  }
+  return undefined;
+};
+
 // Convert database row to Course type
 const dbCourseToCourse = (row: any, lessons: Lesson[]): Course & { 
   category?: string; 
   isLinkAccessible?: boolean;
   moderationStatus?: string;
   moderationComment?: string;
-} => ({
-  id: row.id,
-  title: row.title,
-  description: row.description || '',
-  authorId: row.author_id,
-  coverImage: row.cover_image,
-  targetAudience: row.target_audience || '',
-  estimatedMinutes: row.estimated_minutes || 0,
-  lessons: lessons.filter(l => l.courseId === row.id).sort((a, b) => a.order - b.order),
-  currentVersion: row.current_version || 1,
-  versions: [],
-  isPublished: row.is_published || false,
-  publishedAt: row.published_at ? new Date(row.published_at) : undefined,
-  createdAt: new Date(row.created_at),
-  updatedAt: new Date(row.updated_at),
-  tags: row.tags || [],
-  designSystem: row.design_system as CourseDesignSystem | undefined,
-  lessonsDisplayType: row.lessons_display_type || 'circle_map',
-  category: row.category || undefined,
-  isLinkAccessible: row.is_link_accessible || false,
-  moderationStatus: row.moderation_status || undefined,
-  moderationComment: row.moderation_comment || undefined,
-});
+} => {
+  const courseLessons = lessons.filter(l => l.courseId === row.id).sort((a, b) => a.order - b.order);
+  
+  // Use cover_image if set, otherwise extract first image from content
+  const coverImage = row.cover_image || extractFirstImageFromCourse(courseLessons);
+  
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description || '',
+    authorId: row.author_id,
+    coverImage,
+    targetAudience: row.target_audience || '',
+    estimatedMinutes: row.estimated_minutes || 0,
+    lessons: courseLessons,
+    currentVersion: row.current_version || 1,
+    versions: [],
+    isPublished: row.is_published || false,
+    publishedAt: row.published_at ? new Date(row.published_at) : undefined,
+    createdAt: new Date(row.created_at),
+    updatedAt: new Date(row.updated_at),
+    tags: row.tags || [],
+    designSystem: row.design_system as CourseDesignSystem | undefined,
+    lessonsDisplayType: row.lessons_display_type || 'circle_map',
+    category: row.category || undefined,
+    isLinkAccessible: row.is_link_accessible || false,
+    moderationStatus: row.moderation_status || undefined,
+    moderationComment: row.moderation_comment || undefined,
+  };
+};
 
 export const useCourses = () => {
   const { user } = useAuth();

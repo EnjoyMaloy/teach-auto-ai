@@ -4,9 +4,8 @@ import { useCourses } from '@/hooks/useCourses';
 import { Course } from '@/types/course';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, Loader2, ImagePlus } from 'lucide-react';
+import { Plus, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,7 +26,6 @@ const Dashboard: React.FC = () => {
   const { courses, isLoading, fetchCourses, createCourse, deleteCourse } = useCourses();
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
   const [isCreating, setIsCreating] = useState(false);
-  const [isGeneratingBanners, setIsGeneratingBanners] = useState(false);
   const [filter, setFilter] = useState<FilterType>('all');
 
   useEffect(() => {
@@ -60,33 +58,6 @@ const Dashboard: React.FC = () => {
     setCourseToDelete(null);
   };
 
-  const handleGenerateBanners = async () => {
-    const coursesWithoutBanners = courses.filter(c => !c.coverImage);
-    if (coursesWithoutBanners.length === 0) {
-      toast.info('Все курсы уже имеют обложки');
-      return;
-    }
-
-    setIsGeneratingBanners(true);
-    toast.info(`Генерация обложек для ${coursesWithoutBanners.length} курсов...`);
-
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-course-banners');
-      
-      if (error) {
-        throw error;
-      }
-
-      toast.success(data.message || 'Баннеры сгенерированы');
-      fetchCourses(); // Refresh to show new banners
-    } catch (err) {
-      console.error('Error generating banners:', err);
-      toast.error('Ошибка генерации баннеров');
-    } finally {
-      setIsGeneratingBanners(false);
-    }
-  };
-
   const filters: { id: FilterType; label: string }[] = [
     { id: 'all', label: 'Все' },
     { id: 'drafts', label: 'Черновики' },
@@ -101,25 +72,7 @@ const Dashboard: React.FC = () => {
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1.5rem)' }}
       >
       {/* Top Bar */}
-      <div className="flex items-center justify-end gap-2 mb-6">
-        {courses.some(c => !c.coverImage) && (
-          <Button 
-            onClick={handleGenerateBanners} 
-            disabled={isGeneratingBanners}
-            size="sm"
-            variant="outline"
-            className="h-8 px-3 text-[13px] border-border dark:border-white/10"
-          >
-            {isGeneratingBanners ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <>
-                <ImagePlus className="w-3.5 h-3.5 mr-1.5" />
-                Сгенерировать обложки
-              </>
-            )}
-          </Button>
-        )}
+      <div className="flex items-center justify-end mb-6">
         <Button 
           onClick={handleCreate} 
           disabled={isCreating}
