@@ -35,7 +35,7 @@ const Catalog: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-[#0f0f12]">
+    <div className="min-h-screen relative overflow-hidden bg-background">
       <AnimatedBackground />
       <div 
         className="relative z-10 p-6 transition-all duration-200"
@@ -43,17 +43,17 @@ const Catalog: React.FC = () => {
       >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-[15px] font-semibold text-white">Исследовать</h1>
+        <h1 className="text-[15px] font-semibold text-foreground">Исследовать</h1>
       </div>
 
       {/* Search */}
       <div className="relative max-w-sm mb-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
         <Input
           placeholder="Поиск курсов..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9 h-9 bg-white/[0.03] border-white/[0.06] text-white text-[13px] placeholder:text-white/30"
+          className="pl-9 h-9 bg-muted/30 border-border text-foreground text-[13px] placeholder:text-muted-foreground/50"
         />
       </div>
 
@@ -64,8 +64,8 @@ const Catalog: React.FC = () => {
           className={`
             px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap
             ${filter === 'all' 
-              ? 'bg-white/10 text-white' 
-              : 'text-white/40 hover:text-white/60'
+              ? 'bg-muted text-foreground' 
+              : 'text-muted-foreground hover:text-foreground/80'
             }
           `}
         >
@@ -78,8 +78,8 @@ const Catalog: React.FC = () => {
             className={`
               px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap
               ${filter === category.id 
-                ? 'bg-white/10 text-white' 
-                : 'text-white/40 hover:text-white/60'
+                ? 'bg-muted text-foreground' 
+                : 'text-muted-foreground hover:text-foreground/80'
               }
             `}
           >
@@ -89,7 +89,7 @@ const Catalog: React.FC = () => {
       </div>
 
       {/* Results count */}
-      <div className="text-[12px] text-white/30 mb-4">
+      <div className="text-[12px] text-muted-foreground/50 mb-4">
         {filter !== 'all' && (
           <span>
             {getCategoryById(filter)?.name} · 
@@ -101,11 +101,11 @@ const Catalog: React.FC = () => {
       {/* Content */}
       {isLoading ? (
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="w-5 h-5 animate-spin text-white/30" />
+          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground/50" />
         </div>
       ) : filteredCourses.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center">
-          <div className="text-white/20 text-[13px]">
+          <div className="text-muted-foreground/40 text-[13px]">
             {searchQuery || filter !== 'all'
               ? 'Ничего не найдено' 
               : 'Пока нет курсов'
@@ -145,11 +145,11 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, isFavorite, onToggleFav
 
   return (
     <div 
-      className="group relative bg-white/[0.02] rounded-lg border border-white/[0.04] hover:border-white/10 transition-colors cursor-pointer overflow-hidden"
+      className="group relative bg-card/30 rounded-lg border border-border/50 hover:border-border transition-colors cursor-pointer overflow-hidden"
       onClick={() => navigate(`/course/${course.id}`)}
     >
       {/* Image */}
-      <div className="aspect-[16/10] bg-white/[0.02] relative">
+      <div className="aspect-[16/10] bg-muted/30 relative">
         {course.coverImage ? (
           <img 
             src={course.coverImage} 
@@ -158,8 +158,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, isFavorite, onToggleFav
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-8 h-8 rounded-lg bg-white/[0.03] flex items-center justify-center">
-              <span className="text-white/10 text-lg font-medium">
+            <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center">
+              <span className="text-muted-foreground/30 text-lg font-medium">
                 {course.title.charAt(0).toUpperCase()}
               </span>
             </div>
@@ -169,7 +169,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, isFavorite, onToggleFav
         {/* Category Badge */}
         {category && (
           <div className="absolute top-2 left-2">
-            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-white/10 text-white/60">
+            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground">
               {category.name}
             </span>
           </div>
@@ -184,8 +184,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, isFavorite, onToggleFav
           className={`
             absolute top-2 right-2 w-6 h-6 rounded flex items-center justify-center transition-colors
             ${isFavorite 
-              ? 'bg-white/20 text-white' 
-              : 'bg-black/40 text-white/40 opacity-0 group-hover:opacity-100 hover:text-white/70'
+              ? 'bg-muted text-foreground' 
+              : 'bg-background/50 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-foreground'
             }
           `}
         >
@@ -195,10 +195,10 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, isFavorite, onToggleFav
 
       {/* Info */}
       <div className="p-3">
-        <h3 className="text-[13px] font-medium text-white/90 truncate mb-1">
+        <h3 className="text-[13px] font-medium text-foreground/90 truncate mb-1">
           {course.title}
         </h3>
-        <div className="text-[11px] text-white/30">
+        <div className="text-[11px] text-muted-foreground/50">
           {course.lessons.length} {getLessonWord(course.lessons.length)}
         </div>
       </div>
