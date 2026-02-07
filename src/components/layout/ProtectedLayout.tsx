@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import AppSidebar from './AppSidebar';
 import { useState, useEffect } from 'react';
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 
 const ProtectedLayout: React.FC = () => {
   const [language, setLanguage] = useState(() => {
@@ -18,13 +18,20 @@ const ProtectedLayout: React.FC = () => {
 
   return (
     <SidebarProvider>
-      <AppSidebar language={language} onLanguageChange={setLanguage} />
-      <SidebarInset>
-        <header className="flex h-12 shrink-0 items-center px-4">
-          <SidebarTrigger className="-ml-1" />
-        </header>
+      {/* Full-screen content layer */}
+      <div className="fixed inset-0 z-0">
         <Outlet />
-      </SidebarInset>
+      </div>
+      
+      {/* Sidebar overlay */}
+      <div className="relative z-10">
+        <AppSidebar language={language} onLanguageChange={setLanguage} />
+      </div>
+      
+      {/* Sidebar trigger - fixed position */}
+      <div className="fixed top-4 left-4 z-20">
+        <SidebarTrigger className="bg-background/80 backdrop-blur-sm border border-border rounded-lg p-2 hover:bg-accent" />
+      </div>
     </SidebarProvider>
   );
 };
