@@ -1,5 +1,5 @@
 import React from 'react';
-import { COURSE_CATEGORIES, CourseCategory } from '@/lib/categories';
+import { COURSE_CATEGORIES } from '@/lib/categories';
 import { cn } from '@/lib/utils';
 
 interface CategoryFilterProps {
@@ -12,7 +12,7 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
   onSelectCategory 
 }) => {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+    <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
       {COURSE_CATEGORIES.map(category => {
         const Icon = category.icon;
         const isSelected = selectedCategory === category.id;
@@ -22,16 +22,34 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
             key={category.id}
             onClick={() => onSelectCategory(isSelected ? null : category.id)}
             className={cn(
-              "relative p-4 rounded-xl transition-all duration-200",
-              "flex flex-col items-center justify-center gap-2 text-center",
-              "hover:scale-105 hover:shadow-md",
-              "border-2 border-transparent",
-              isSelected && "ring-2 ring-primary ring-offset-2 ring-offset-background"
+              "flex-shrink-0 px-4 py-3 rounded-xl transition-all duration-200",
+              "flex items-center gap-2",
+              "border border-white/10 hover:border-white/20",
+              "bg-white/5 hover:bg-white/10",
+              isSelected && "bg-primary/20 border-primary/50 text-primary"
             )}
-            style={{ backgroundColor: category.color }}
           >
-            <Icon className="w-6 h-6 text-foreground/80" strokeWidth={1.5} />
-            <span className="text-xs font-medium text-foreground/80">{category.name}</span>
+            <div 
+              className={cn(
+                "w-8 h-8 rounded-lg flex items-center justify-center",
+                isSelected ? "bg-primary/20" : "bg-white/10"
+              )}
+              style={!isSelected ? { backgroundColor: `${category.color}30` } : undefined}
+            >
+              <Icon 
+                className={cn(
+                  "w-4 h-4",
+                  isSelected ? "text-primary" : "text-white/70"
+                )} 
+                strokeWidth={1.5} 
+              />
+            </div>
+            <span className={cn(
+              "text-sm font-medium",
+              isSelected ? "text-primary" : "text-white/70"
+            )}>
+              {category.name}
+            </span>
           </button>
         );
       })}

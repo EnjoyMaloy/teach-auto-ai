@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useCourses } from '@/hooks/useCourses';
 import { Course } from '@/types/course';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -98,7 +97,7 @@ const Dashboard: React.FC = () => {
   };
 
   const CourseCard = ({ course }: { course: Course & { moderationStatus?: string } }) => (
-    <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 hover:border-primary/30 overflow-hidden bg-card">
+    <div className="card-glow group cursor-pointer overflow-hidden">
       {/* Banner */}
       <div 
         className="h-36 relative overflow-hidden"
@@ -109,24 +108,24 @@ const Dashboard: React.FC = () => {
         } : {}}
       >
         {!course.coverImage && (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/10 to-accent/20" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[hsl(0,0%,10%)] to-transparent" />
         
         {/* Status Badge */}
         <div className="absolute top-3 left-3 flex gap-2">
           {course.moderationStatus === 'pending' ? (
-            <Badge className="bg-yellow-500/90 text-white border-0">
+            <Badge className="bg-yellow-500/90 text-white border-0 backdrop-blur-sm">
               <Clock className="w-3 h-3 mr-1" />
               На модерации
             </Badge>
           ) : course.isPublished ? (
-            <Badge className="bg-emerald-500/90 text-white border-0">
+            <Badge className="bg-emerald-500/90 text-white border-0 backdrop-blur-sm">
               <Globe className="w-3 h-3 mr-1" />
               Опубликован
             </Badge>
           ) : (
-            <Badge variant="secondary" className="bg-white/90 text-foreground border-0">
+            <Badge className="bg-white/20 text-white border-0 backdrop-blur-sm">
               <FileEdit className="w-3 h-3 mr-1" />
               Черновик
             </Badge>
@@ -159,29 +158,41 @@ const Dashboard: React.FC = () => {
                 <MoreHorizontal className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => navigate(`/editor/${course.id}`)}>
+            <DropdownMenuContent align="end" className="bg-[hsl(0,0%,12%)] border-white/10">
+              <DropdownMenuItem 
+                onClick={() => navigate(`/editor/${course.id}`)}
+                className="text-white/80 focus:text-white focus:bg-white/10"
+              >
                 <Edit3 className="w-4 h-4 mr-2" />
                 Редактировать
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate(`/course/${course.id}/settings`)}>
+              <DropdownMenuItem 
+                onClick={() => navigate(`/course/${course.id}/settings`)}
+                className="text-white/80 focus:text-white focus:bg-white/10"
+              >
                 <Settings className="w-4 h-4 mr-2" />
                 Настройки
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate(`/course/${course.id}/stats`)}>
+              <DropdownMenuItem 
+                onClick={() => navigate(`/course/${course.id}/stats`)}
+                className="text-white/80 focus:text-white focus:bg-white/10"
+              >
                 <BarChart3 className="w-4 h-4 mr-2" />
                 Статистика
               </DropdownMenuItem>
               {course.isPublished && (
-                <DropdownMenuItem onClick={() => window.open(`/course/${course.id}`, '_blank')}>
+                <DropdownMenuItem 
+                  onClick={() => window.open(`/course/${course.id}`, '_blank')}
+                  className="text-white/80 focus:text-white focus:bg-white/10"
+                >
                   <Eye className="w-4 h-4 mr-2" />
                   Открыть курс
                 </DropdownMenuItem>
               )}
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator className="bg-white/10" />
               <DropdownMenuItem 
                 onClick={() => setCourseToDelete(course)}
-                className="text-destructive focus:text-destructive"
+                className="text-destructive focus:text-destructive focus:bg-destructive/10"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
                 Удалить
@@ -191,15 +202,15 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <CardHeader className="pb-2" onClick={() => navigate(`/editor/${course.id}`)}>
-        <CardTitle className="text-base font-semibold line-clamp-1">{course.title}</CardTitle>
-        <CardDescription className="line-clamp-2 text-sm">
+      <div className="p-4" onClick={() => navigate(`/editor/${course.id}`)}>
+        <h3 className="font-semibold text-white mb-1 line-clamp-1 group-hover:text-primary transition-colors">
+          {course.title}
+        </h3>
+        <p className="text-sm text-white/50 line-clamp-2 mb-3">
           {course.description || 'Без описания'}
-        </CardDescription>
-      </CardHeader>
+        </p>
 
-      <CardContent onClick={() => navigate(`/editor/${course.id}`)}>
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        <div className="flex items-center gap-4 text-sm text-white/40">
           <div className="flex items-center gap-1.5">
             <FileText className="w-4 h-4" />
             <span>{course.lessons.length} уроков</span>
@@ -209,31 +220,31 @@ const Dashboard: React.FC = () => {
             <span>{course.estimatedMinutes || 0} мин</span>
           </div>
         </div>
-        <div className="mt-3 pt-3 border-t border-border text-xs text-muted-foreground">
+        <div className="mt-3 pt-3 border-t border-white/10 text-xs text-white/30">
           Изменён {formatDate(course.updatedAt)}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 
   const EmptyState = () => (
-    <Card className="border-dashed border-2">
-      <CardContent className="flex flex-col items-center justify-center py-16">
-        <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
+    <div className="card-glow">
+      <div className="flex flex-col items-center justify-center py-16">
+        <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center mb-4">
           <Sparkles className="w-8 h-8 text-primary" />
         </div>
-        <h3 className="text-lg font-semibold text-foreground mb-2">
+        <h3 className="text-lg font-semibold text-white mb-2">
           {activeTab === 'drafts' ? 'Нет черновиков' : 
            activeTab === 'published' ? 'Нет опубликованных курсов' :
            'Создайте первый курс'}
         </h3>
-        <p className="text-muted-foreground text-center max-w-md mb-6">
+        <p className="text-white/50 text-center max-w-md mb-6">
           {activeTab === 'drafts' ? 'Все ваши курсы опубликованы!' :
            activeTab === 'published' ? 'Опубликуйте курс, чтобы он стал доступен ученикам' :
            'Используйте ИИ-ассистента для быстрого создания интерактивных курсов'}
         </p>
         {activeTab !== 'published' && (
-          <Button onClick={handleCreateCourse} disabled={isCreating} size="lg">
+          <Button onClick={handleCreateCourse} disabled={isCreating} size="lg" className="bg-primary hover:bg-primary/90">
             {isCreating ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : (
@@ -242,57 +253,64 @@ const Dashboard: React.FC = () => {
             Создать курс
           </Button>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 
   return (
-    <>
-      {/* Page Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Мастерская авторов</h1>
+    <div className="min-h-screen bg-[hsl(0,0%,4%)] -m-6 p-6">
+      {/* Hero Section */}
+      <div className="relative mb-8">
+        <div className="hero-gradient absolute inset-0 -top-6 h-[200px] pointer-events-none" />
+        
+        <div className="relative">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                <Edit3 className="w-5 h-5 text-primary" />
+              </div>
+              <h1 className="text-2xl font-bold text-white">Мастерская авторов</h1>
+            </div>
+
+            <Button onClick={handleCreateCourse} disabled={isCreating} size="lg" className="bg-primary hover:bg-primary/90">
+              {isCreating ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Plus className="w-4 h-4 mr-2" />
+              )}
+              Новый курс
+            </Button>
           </div>
 
-          <Button onClick={handleCreateCourse} disabled={isCreating} size="lg">
-            {isCreating ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <Plus className="w-4 h-4 mr-2" />
-            )}
-            Новый курс
-          </Button>
-        </div>
+          {/* Search and Filters */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+              <Input
+                placeholder="Поиск курсов..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-xl"
+              />
+            </div>
 
-        {/* Search and Filters */}
-        <div className="flex items-center gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Поиск курсов..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-card"
-            />
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
+              <TabsList className="bg-white/5 border border-white/10">
+                <TabsTrigger value="all" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-white text-white/60">
+                  Все
+                  <Badge variant="secondary" className="ml-1 bg-white/10 text-white/60">{courses.length}</Badge>
+                </TabsTrigger>
+                <TabsTrigger value="drafts" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-white text-white/60">
+                  Черновики
+                  <Badge variant="secondary" className="ml-1 bg-white/10 text-white/60">{draftsCount}</Badge>
+                </TabsTrigger>
+                <TabsTrigger value="published" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-white text-white/60">
+                  Опубликованные
+                  <Badge variant="secondary" className="ml-1 bg-white/10 text-white/60">{publishedCount}</Badge>
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
-
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
-            <TabsList className="bg-card">
-              <TabsTrigger value="all" className="gap-2">
-                Все
-                <Badge variant="secondary" className="ml-1 bg-muted">{courses.length}</Badge>
-              </TabsTrigger>
-              <TabsTrigger value="drafts" className="gap-2">
-                Черновики
-                <Badge variant="secondary" className="ml-1 bg-muted">{draftsCount}</Badge>
-              </TabsTrigger>
-              <TabsTrigger value="published" className="gap-2">
-                Опубликованные
-                <Badge variant="secondary" className="ml-1 bg-muted">{publishedCount}</Badge>
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
         </div>
       </div>
 
@@ -313,15 +331,17 @@ const Dashboard: React.FC = () => {
 
       {/* Delete confirmation dialog */}
       <AlertDialog open={!!courseToDelete} onOpenChange={() => setCourseToDelete(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-[hsl(0,0%,10%)] border-white/10">
           <AlertDialogHeader>
-            <AlertDialogTitle>Удалить курс?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-white">Удалить курс?</AlertDialogTitle>
+            <AlertDialogDescription className="text-white/60">
               Курс «{courseToDelete?.title}» и все его уроки будут удалены безвозвратно.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Отмена</AlertDialogCancel>
+            <AlertDialogCancel className="bg-white/10 border-white/10 text-white hover:bg-white/20">
+              Отмена
+            </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDeleteCourse}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
@@ -331,7 +351,7 @@ const Dashboard: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   );
 };
 

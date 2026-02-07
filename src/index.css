@@ -457,3 +457,32 @@
   0%, 100% { color: hsl(265, 60%, 75%); }
   50% { color: hsl(265, 55%, 65%); }
 }
+
+/* Card glow effect for dark theme */
+.card-glow {
+  @apply bg-[hsl(0,0%,10%)] border border-white/5 rounded-2xl;
+  @apply transition-all duration-300;
+}
+
+.card-glow:hover {
+  @apply border-primary/30;
+  box-shadow: 0 0 30px hsl(265 60% 65% / 0.15);
+}
+
+/* Hero gradient for pages */
+.hero-gradient {
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, 
+    hsl(270 40% 25% / 0.5), transparent);
+}
+
+/* Category chip style */
+.category-chip {
+  @apply relative p-4 rounded-xl transition-all duration-200;
+  @apply flex flex-col items-center justify-center gap-2 text-center;
+  @apply hover:scale-105;
+  @apply border-2 border-transparent;
+}
+
+.category-chip.active {
+  @apply ring-2 ring-primary ring-offset-2 ring-offset-[hsl(0,0%,4%)];
+}
