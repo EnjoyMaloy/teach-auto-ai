@@ -3,26 +3,25 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   BadgeCheck,
   Bell,
-  Briefcase,
-  Check,
+  BookOpen,
+  ChevronDown,
   ChevronRight,
   ChevronsUpDown,
-  Clock3,
+  Clock,
   Compass,
-  CreditCard,
   Folder,
-  Globe2,
-  LayoutDashboard,
+  Home,
   LogOut,
+  Moon,
   Palette,
-  Search,
-  Sparkles,
   Star,
-  Users,
-  type LucideIcon,
+  Sun,
 } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/hooks/useLanguage';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import pavelAvatar from '@/assets/pavel-avatar.jpg';
@@ -35,7 +34,6 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
-  SidebarInput,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -52,321 +50,16 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Label } from '@/components/ui/label';
-
-// Types
-interface Workspace {
-  name: string;
-  logo: string;
-  plan: string;
-}
-
-interface NavItem {
-  label: string;
-  href: string;
-  icon: LucideIcon;
-  isActive?: boolean;
-  children?: { label: string; href: string; isActive?: boolean }[];
-}
-
-interface NavGroup {
-  title: string;
-  items: NavItem[];
-}
 
 interface RecentCourse {
   id: string;
   title: string;
 }
 
-// Static data
-const workspaces: Workspace[] = [
-  { name: "Pavel's Academy", logo: Logo, plan: 'Pro' },
-];
-
-// WorkspaceSwitcher component (exact copy from sidebar9.tsx)
-const WorkspaceSwitcher = ({
-  workspaces,
-}: {
-  workspaces: Workspace[];
-}) => {
-  const [activeWorkspace, setActiveWorkspace] = useState(workspaces[0]);
-
-  return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-sm bg-primary">
-                <img
-                  src={activeWorkspace.logo}
-                  alt={activeWorkspace.name}
-                  className="size-6 text-primary-foreground invert dark:invert-0"
-                />
-              </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">
-                  {activeWorkspace.name}
-                </span>
-                <span className="truncate text-xs text-muted-foreground">
-                  {activeWorkspace.plan}
-                </span>
-              </div>
-              <ChevronsUpDown className="ml-auto" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-            align="start"
-            side="bottom"
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className="text-xs text-muted-foreground">
-              Workspaces
-            </DropdownMenuLabel>
-            {workspaces.map((workspace) => (
-              <DropdownMenuItem
-                key={workspace.name}
-                onClick={() => setActiveWorkspace(workspace)}
-                className="gap-2 p-2"
-              >
-                <div className="flex size-6 items-center justify-center rounded-sm bg-primary">
-                  <img
-                    src={workspace.logo}
-                    alt={workspace.name}
-                    className="size-4 shrink-0 invert dark:invert-0"
-                  />
-                </div>
-                {workspace.name}
-                {workspace.name === activeWorkspace.name && (
-                  <Check className="ml-auto size-4" />
-                )}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
-  );
-};
-
-// SearchForm component (exact copy from sidebar9.tsx)
-const SearchForm = () => {
-  return (
-    <form>
-      <SidebarGroup className="py-0">
-        <SidebarGroupContent className="relative">
-          <Label htmlFor="search" className="sr-only">
-            Search
-          </Label>
-          <SidebarInput
-            id="search"
-            placeholder="Search..."
-            className="pl-8"
-          />
-          <Search className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 select-none opacity-50" />
-        </SidebarGroupContent>
-      </SidebarGroup>
-    </form>
-  );
-};
-
-// NavUser component (exact copy from sidebar9.tsx with adaptations)
-const NavUser = ({
-  user,
-  onSignOut,
-  onDesignSystem,
-  isAdmin,
-}: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-  onSignOut: () => void;
-  onDesignSystem?: () => void;
-  isAdmin?: boolean;
-}) => {
-  return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <Avatar className="size-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">
-                  {user.name
-                    .split(' ')
-                    .map((n) => n[0])
-                    .join('')}
-                </AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs text-muted-foreground">
-                  {user.email}
-                </span>
-              </div>
-              <ChevronsUpDown className="ml-auto size-4" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-            side="bottom"
-            align="end"
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="size-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">
-                    {user.name
-                      .split(' ')
-                      .map((n) => n[0])
-                      .join('')}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs text-muted-foreground">
-                    {user.email}
-                  </span>
-                </div>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles className="mr-2 size-4" />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck className="mr-2 size-4" />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard className="mr-2 size-4" />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell className="mr-2 size-4" />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            {isAdmin && onDesignSystem && (
-              <>
-                <DropdownMenuItem onClick={onDesignSystem}>
-                  <Palette className="mr-2 size-4" />
-                  Design System
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-              </>
-            )}
-            <DropdownMenuItem onClick={onSignOut}>
-              <LogOut className="mr-2 size-4" />
-              Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
-  );
-};
-
-// NavMenuItem component (exact copy from sidebar9.tsx)
-const NavMenuItem = ({
-  item,
-  onClick,
-}: {
-  item: NavItem;
-  onClick?: (href: string) => void;
-}) => {
-  const Icon = item.icon;
-  const hasChildren = item.children && item.children.length > 0;
-
-  if (!hasChildren) {
-    return (
-      <SidebarMenuItem>
-        <SidebarMenuButton
-          asChild
-          isActive={item.isActive}
-        >
-          <a
-            href={item.href}
-            onClick={(e) => {
-              e.preventDefault();
-              onClick?.(item.href);
-            }}
-          >
-            <Icon className="size-4" />
-            <span>{item.label}</span>
-          </a>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-    );
-  }
-
-  return (
-    <Collapsible
-      asChild
-      defaultOpen={item.isActive}
-      className="group/collapsible"
-    >
-      <SidebarMenuItem>
-        <CollapsibleTrigger asChild>
-          <SidebarMenuButton isActive={item.isActive}>
-            <Icon className="size-4" />
-            <span>{item.label}</span>
-            <ChevronRight className="ml-auto size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-          </SidebarMenuButton>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <SidebarMenuSub>
-            {item.children!.map((child) => (
-              <SidebarMenuSubItem key={child.label}>
-                <SidebarMenuSubButton
-                  asChild
-                  isActive={child.isActive}
-                >
-                  <a
-                    href={child.href}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      onClick?.(child.href);
-                    }}
-                  >
-                    {child.label}
-                  </a>
-                </SidebarMenuSubButton>
-              </SidebarMenuSubItem>
-            ))}
-          </SidebarMenuSub>
-        </CollapsibleContent>
-      </SidebarMenuItem>
-    </Collapsible>
-  );
-};
-
-// Main AppSidebar component
 interface AppSidebarProps {
   language: string;
   onLanguageChange: (lang: string) => void;
@@ -376,10 +69,12 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
+  const { language, setLanguage } = useLanguage();
   const [recentCourses, setRecentCourses] = useState<RecentCourse[]>([]);
 
-  const userName = 'John Doe';
-  const userEmail = user?.email || 'john@example.com';
+  const userName = 'Pavel';
+  const userEmail = user?.email || 'pavel@example.com';
   const isAdmin = user?.email === 'trupcgames@gmail.com' || user?.email === 'vazhenka.hello@gmail.com';
 
   // Fetch recent courses
@@ -411,104 +106,232 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   const isActive = (path: string) => location.pathname === path;
   const isEditorRoute = (courseId: string) => location.pathname === `/editor/${courseId}`;
 
-  const handleNavigate = (href: string) => {
-    if (href !== '#') {
-      navigate(href);
-    }
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
-  // Build navigation groups
-  const navGroups: NavGroup[] = [
-    {
-      title: 'Overview',
-      items: [
-        { label: 'Dashboard', href: '/', icon: LayoutDashboard, isActive: isActive('/') },
-        { label: 'Tasks', href: '/workshop', icon: Briefcase, isActive: isActive('/workshop') },
-        { label: 'Roadmap', href: '/catalog', icon: Compass, isActive: isActive('/catalog') },
-      ],
-    },
-    {
-      title: 'Projects',
-      items: [
-        {
-          label: 'Active Projects',
-          href: '#',
-          icon: Folder,
-          isActive: recentCourses.some((c) => isEditorRoute(c.id)),
-          children:
-            recentCourses.length > 0
-              ? recentCourses.slice(0, 3).map((course) => ({
-                  label: course.title,
-                  href: `/editor/${course.id}`,
-                  isActive: isEditorRoute(course.id),
-                }))
-              : [{ label: 'No projects yet', href: '#', isActive: false }],
-        },
-        {
-          label: 'Archived',
-          href: '#',
-          icon: Folder,
-          children: [
-            { label: '2024 Archive', href: '#', isActive: false },
-            { label: '2023 Archive', href: '#', isActive: false },
-          ],
-        },
-      ],
-    },
-    {
-      title: 'Team',
-      items: [
-        { label: 'Members', href: '#', icon: Users },
-        { label: 'Sprints', href: '#', icon: Clock3 },
-        { label: 'Approvals', href: '/favorites', icon: BadgeCheck, isActive: isActive('/favorites') },
-        { label: 'Reviews', href: '#', icon: Star },
-      ],
-    },
-    {
-      title: 'Workspace',
-      items: [
-        { label: 'Integrations', href: '#', icon: Globe2 },
-        { label: 'Automations', href: '#', icon: Sparkles },
-      ],
-    },
+  const languages = [
+    { code: 'ru' as const, label: 'Русский', flag: '🇷🇺' },
+    { code: 'en' as const, label: 'English', flag: '🇬🇧' },
   ];
+
+  const currentLang = languages.find((l) => l.code === language) || languages[0];
 
   return (
     <Sidebar variant="floating">
-      <SidebarHeader>
-        <WorkspaceSwitcher workspaces={workspaces} />
-        <SearchForm />
+      {/* Header — Logo */}
+      <SidebarHeader className="p-4">
+        <img src={Logo} alt="Academy" className="h-8" />
       </SidebarHeader>
+
       <SidebarContent>
-        {navGroups.map((group) => (
-          <SidebarGroup key={group.title}>
-            <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {group.items.map((item) => (
-                  <NavMenuItem
-                    key={item.label}
-                    item={item}
-                    onClick={handleNavigate}
-                  />
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+        {/* Profile with Dropdown */}
+        <SidebarGroup>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton
+                    size="lg"
+                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                  >
+                    <Avatar className="size-8 rounded-lg">
+                      <AvatarImage src={pavelAvatar} alt={userName} />
+                      <AvatarFallback className="rounded-lg">
+                        {userName.split(' ').map((n) => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-medium">{userName}</span>
+                      <span className="truncate text-xs text-muted-foreground">
+                        {userEmail}
+                      </span>
+                    </div>
+                    <ChevronsUpDown className="ml-auto size-4" />
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                  align="start"
+                  side="bottom"
+                  sideOffset={4}
+                >
+                  <DropdownMenuItem>
+                    <BadgeCheck className="mr-2 size-4" />
+                    Аккаунт
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Bell className="mr-2 size-4" />
+                    Уведомления
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem onClick={() => navigate('/design-system')}>
+                      <Palette className="mr-2 size-4" />
+                      Дизайн системы
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="mr-2 size-4" />
+                    Выход
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+
+        {/* Home */}
+        <SidebarGroup>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                isActive={isActive('/')}
+                onClick={() => navigate('/')}
+              >
+                <Home className="size-4" />
+                <span>Главная</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+
+        {/* My Courses */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Мои курсы</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {/* Recent — Collapsible */}
+              <Collapsible
+                defaultOpen={recentCourses.some((c) => isEditorRoute(c.id))}
+                className="group/collapsible"
+              >
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton>
+                      <Clock className="size-4" />
+                      <span>Недавние</span>
+                      <ChevronRight className="ml-auto size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {recentCourses.length > 0 ? (
+                        recentCourses.map((course) => (
+                          <SidebarMenuSubItem key={course.id}>
+                            <SidebarMenuSubButton
+                              isActive={isEditorRoute(course.id)}
+                              onClick={() => navigate(`/editor/${course.id}`)}
+                            >
+                              {course.title}
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))
+                      ) : (
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild>
+                            <span className="text-muted-foreground">Нет курсов</span>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      )}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+
+              {/* All Courses */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive('/workshop')}
+                  onClick={() => navigate('/workshop')}
+                >
+                  <Folder className="size-4" />
+                  <span>Все курсы</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* Favorites */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive('/favorites')}
+                  onClick={() => navigate('/favorites')}
+                >
+                  <Star className="size-4" />
+                  <span>Избранное</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Resources */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Ресурсы</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive('/catalog')}
+                  onClick={() => navigate('/catalog')}
+                >
+                  <Compass className="size-4" />
+                  <span>Исследовать</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive('/dictionary')}
+                  onClick={() => navigate('/dictionary')}
+                >
+                  <BookOpen className="size-4" />
+                  <span>Словарь</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser
-          user={{
-            name: userName,
-            email: userEmail,
-            avatar: pavelAvatar,
-          }}
-          onSignOut={handleSignOut}
-          onDesignSystem={() => navigate('/design-system')}
-          isAdmin={isAdmin}
-        />
+
+      {/* Footer — Theme & Language */}
+      <SidebarFooter className="p-4">
+        <div className="flex items-center justify-between">
+          {/* Theme Toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="size-9"
+          >
+            {theme === 'dark' ? (
+              <Sun className="size-4" />
+            ) : (
+              <Moon className="size-4" />
+            )}
+          </Button>
+
+          {/* Language Selector */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-1">
+                {currentLang.flag} {currentLang.code.toUpperCase()}
+                <ChevronDown className="size-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {languages.map((lang) => (
+                <DropdownMenuItem
+                  key={lang.code}
+                  onClick={() => setLanguage(lang.code)}
+                >
+                  {lang.flag} {lang.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   );
