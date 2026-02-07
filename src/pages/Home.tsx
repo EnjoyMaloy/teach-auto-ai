@@ -160,7 +160,7 @@ const Home: React.FC = () => {
       >
         {/* Welcome Text */}
         <h1 className="text-4xl md:text-5xl font-semibold mb-10 text-foreground dark:text-white text-center">
-          What's on your mind, <span className="text-primary dark:animate-[name-glow_4s_ease-in-out_infinite]" style={{ color: 'hsl(var(--primary))' }}>{userName}</span>?
+          Чему научим мир сегодня, <span className="text-primary dark:animate-[name-glow_4s_ease-in-out_infinite]" style={{ color: 'hsl(var(--primary))' }}>{userName}</span>?
         </h1>
 
         {/* Action Card */}
