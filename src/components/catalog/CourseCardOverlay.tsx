@@ -59,29 +59,26 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
   return (
     <div
       className={cn(
-        'group relative w-full overflow-hidden rounded-xl cursor-pointer transition-transform hover:scale-[1.02]',
-        'bg-muted dark:bg-white/[0.02] border border-border dark:border-white/[0.06]'
+        'group relative w-full overflow-hidden rounded-2xl cursor-pointer transition-all duration-300 hover:scale-[1.02]',
+        'bg-card dark:bg-[#141417] border border-border dark:border-white/[0.06]'
       )}
       onClick={handleClick}
     >
-      {/* Background image or placeholder */}
-      <div className="aspect-[4/5] w-full relative">
+      {/* Image section */}
+      <div className="aspect-[4/3] w-full relative overflow-hidden rounded-t-2xl">
         {coverImage ? (
           <img
             src={coverImage}
             alt={title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 dark:from-white/[0.03] dark:to-white/[0.01] flex items-center justify-center">
-            <span className="text-4xl font-bold text-primary/30 dark:text-white/10">
+          <div className="w-full h-full bg-gradient-to-br from-primary/30 via-primary/20 to-accent/20 dark:from-primary/20 dark:via-primary/10 dark:to-accent/10 flex items-center justify-center">
+            <span className="text-5xl font-bold text-primary/40 dark:text-white/20">
               {title.charAt(0).toUpperCase()}
             </span>
           </div>
         )}
-
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
         {/* Top badges */}
         <div className="absolute top-3 left-3 right-3 flex items-start justify-between">
@@ -89,16 +86,16 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
           <div>
             {variant === 'workshop' ? (
               isPublished ? (
-                <span className="px-2 py-1 rounded-md text-[11px] font-medium bg-emerald-500/90 text-white">
+                <span className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-emerald-500/90 text-white shadow-sm">
                   Опубликован
                 </span>
               ) : (
-                <span className="px-2 py-1 rounded-md text-[11px] font-medium bg-white/20 text-white backdrop-blur-sm">
+                <span className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-black/40 text-white backdrop-blur-sm">
                   Черновик
                 </span>
               )
             ) : categoryName ? (
-              <span className="px-2 py-1 rounded-md text-[11px] font-medium bg-white/20 text-white backdrop-blur-sm">
+              <span className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-black/40 text-white backdrop-blur-sm">
                 {categoryName}
               </span>
             ) : null}
@@ -114,13 +111,13 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
                   onToggleFavorite();
                 }}
                 className={cn(
-                  'w-7 h-7 rounded-md flex items-center justify-center transition-all',
+                  'w-8 h-8 rounded-lg flex items-center justify-center transition-all shadow-sm',
                   isFavorite
-                    ? 'bg-white/30 text-white'
-                    : 'bg-black/30 text-white/60 opacity-0 group-hover:opacity-100 hover:text-white'
+                    ? 'bg-white/30 backdrop-blur-sm text-white'
+                    : 'bg-black/40 backdrop-blur-sm text-white/70 opacity-0 group-hover:opacity-100 hover:text-white'
                 )}
               >
-                <Star className="w-3.5 h-3.5" fill={isFavorite ? 'currentColor' : 'none'} />
+                <Star className="w-4 h-4" fill={isFavorite ? 'currentColor' : 'none'} />
               </button>
             )}
 
@@ -129,7 +126,7 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
               <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                    <button className="w-7 h-7 rounded-md bg-black/40 hover:bg-black/60 flex items-center justify-center text-white/80 hover:text-white transition-colors">
+                    <button className="w-8 h-8 rounded-lg bg-black/40 backdrop-blur-sm hover:bg-black/60 flex items-center justify-center text-white/80 hover:text-white transition-colors shadow-sm">
                       <MoreHorizontal className="w-4 h-4" />
                     </button>
                   </DropdownMenuTrigger>
@@ -190,21 +187,21 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
             )}
           </div>
         </div>
+      </div>
 
-        {/* Bottom content */}
-        <div className="absolute inset-x-0 bottom-0 p-4 text-white">
-          <h3 className="text-[15px] font-semibold leading-tight line-clamp-2 mb-1">
-            {title}
-          </h3>
-          {description && (
-            <p className="text-[12px] text-white/60 line-clamp-2 mb-2 leading-relaxed">
-              {description}
-            </p>
-          )}
-          <div className="flex items-center gap-1.5 text-[12px] text-white/70">
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>{lessonsCount} {getLessonWord(lessonsCount)}</span>
-          </div>
+      {/* Content section */}
+      <div className="p-4">
+        <h3 className="text-[15px] font-semibold leading-tight line-clamp-2 text-foreground dark:text-white mb-1.5">
+          {title}
+        </h3>
+        {description && (
+          <p className="text-[13px] text-muted-foreground dark:text-white/50 line-clamp-2 leading-relaxed mb-3">
+            {description}
+          </p>
+        )}
+        <div className="flex items-center gap-1.5 text-[12px] text-muted-foreground dark:text-white/40">
+          <BookOpen className="w-3.5 h-3.5" />
+          <span>{lessonsCount} {getLessonWord(lessonsCount)}</span>
         </div>
       </div>
     </div>
