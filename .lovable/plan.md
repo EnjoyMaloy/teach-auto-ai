@@ -1,112 +1,179 @@
 
+# План доработки страницы Избранное
 
-# План оптимизации портала — Итерация 2
+## Текущее состояние
 
-## Результаты анализа
+### Проблемы
 
-После детального исследования кодовой базы обнаружены следующие проблемы:
+| Проблема | Описание |
+|----------|----------|
+| Фильтрация по доступности | Запрос содержит `.or('is_published.eq.true,is_link_accessible.eq.true')` — свои черновики не отображаются |
+| Нет author_id | В select не запрашивается `author_id`, нельзя определить "мой" это курс или публичный |
+| Нет фильтров | Отсутствуют табы "Мои / Публичные" |
+| Dashboard без звездочки | Карточки в "Все курсы" (`variant="workshop"`) не имеют кнопки добавления в избранное |
 
-| Проблема | Файлы | Влияние |
-|----------|-------|---------|
-| Неиспользуемый компонент | `CourseCard.tsx` (109 строк) | Дубликат CourseCardOverlay |
-| Неиспользуемые mock-данные | `mockData.ts` (160 строк) | Мёртвый код |
-| Тяжёлая анимация фона | `AnimatedBackground.tsx` на 4 страницах | 5 blur-блобов × 4 страницы = постоянная GPU нагрузка |
-| Хук используется только в редакторе | `useOverflowDetection.ts` | Можно не трогать — относится к редактору |
+## Изменения
 
-## Предлагаемые изменения
+### 1. Обновить запрос в Favorites.tsx
 
-### 1. Удалить неиспользуемые файлы
+Текущий запрос:
+```typescript
+.in('id', favorites)
+.or('is_published.eq.true,is_link_accessible.eq.true')
+```
 
-**Удалить:**
-- `src/components/catalog/CourseCard.tsx` — нигде не импортируется, полностью заменён на `CourseCardOverlay.tsx`
-- `src/lib/mockData.ts` — нигде не используется, остался с ранней разработки
+Новый запрос — получаем ВСЕ курсы из избранного:
+```typescript
+.in('id', favorites)
+.or(`is_published.eq.true,is_link_accessible.eq.true,author_id.eq.${user.id}`)
+```
 
-### 2. Оптимизировать AnimatedBackground
+Также добавляем `author_id` в select для фильтрации.
 
-Текущий компонент используется на 4 страницах:
-- `Home.tsx`
-- `Dashboard.tsx`
-- `Catalog.tsx`
-- `Favorites.tsx`
+### 2. Добавить фильтры "Все / Мои / Публичные"
 
-Каждая страница рендерит 5 больших blur-блобов (800×600, 600×500, 700×550, 400×400, 350×350 px) с CSS-анимациями 12-20 секунд.
+```typescript
+type FilterType = 'all' | 'mine' | 'public';
+const [filter, setFilter] = useState<FilterType>('all');
 
-**Оптимизация:**
-1. Уменьшить количество блобов с 5 до 2
-2. Добавить `will-change: transform` для GPU-ускорения
-3. Отключить анимации на мобильных устройствах (`prefers-reduced-motion`)
-4. Уменьшить размеры блобов для снижения нагрузки на отрисовку
+const filteredCourses = courses.filter(course => {
+  if (filter === 'all') return true;
+  if (filter === 'mine') return course.authorId === user?.id;
+  return course.authorId !== user?.id;
+});
+```
 
-### 3. Страница 404 — локализация
+UI фильтров — аналогично Dashboard и Catalog:
+```text
+[ Все (5) ] [ Мои (2) ] [ Публичные (3) ]
+```
 
-Текст на странице NotFound на английском, хотя весь интерфейс на русском.
+### 3. Добавить звездочку на карточки в Dashboard
 
-**Изменить:**
-- "Oops! Page not found" → "Страница не найдена"
-- "Return to Home" → "Вернуться на главную"
+Изменить вызов `CourseCardOverlay` в `Dashboard.tsx`:
+
+```tsx
+<CourseCardOverlay
+  key={course.id}
+  id={course.id}
+  // ... остальные пропсы
+  variant="workshop"
+  isFavorite={isFavorite(course.id)}
+  onToggleFavorite={() => toggleFavorite(course.id)}
+  onDelete={() => setCourseToDelete(course)}
+/>
+```
+
+### 4. Обновить CourseCardOverlay — показывать звездочку для workshop
+
+Текущая логика:
+```typescript
+{(variant === 'catalog' || variant === 'favorites') && onToggleFavorite && (
+```
+
+Новая логика — добавляем `workshop`:
+```typescript
+{onToggleFavorite && (
+```
+
+Звездочка будет показываться для любого варианта, если передан `onToggleFavorite`.
 
 ## Структура изменений
 
 ```text
-УДАЛИТЬ:
-  ├── src/components/catalog/CourseCard.tsx
-  └── src/lib/mockData.ts
-
 ИЗМЕНИТЬ:
-  ├── src/components/layout/AnimatedBackground.tsx — облегчить
-  └── src/pages/NotFound.tsx — локализовать
+  ├── src/pages/Favorites.tsx
+  │     ├── Добавить author_id в select
+  │     ├── Изменить фильтр .or() для включения своих курсов
+  │     ├── Добавить state для фильтра (all/mine/public)
+  │     └── Добавить UI табов фильтрации
+  │
+  ├── src/pages/Dashboard.tsx
+  │     ├── Импортировать useFavorites
+  │     └── Добавить isFavorite/onToggleFavorite в CourseCardOverlay
+  │
+  └── src/components/catalog/CourseCardOverlay.tsx
+        └── Показывать звездочку если передан onToggleFavorite
 ```
 
-## Оценка эффекта
+## Результат
 
-| Метрика | До | После |
-|---------|-----|-------|
-| Удалённых строк кода | — | ~270 |
-| Blur-блобов на странице | 5 | 2 |
-| Анимаций на мобильных | 5 | 0 |
+| Экран | До | После |
+|-------|-----|-------|
+| Избранное | Только публичные курсы | Мои + публичные с фильтрами |
+| Все курсы | Нет звездочки | Звездочка на каждой карточке |
 
 ## Техническая реализация
 
-### AnimatedBackground (оптимизированный):
+### Favorites.tsx — новая логика
 
-```typescript
-const AnimatedBackground: React.FC = () => {
+```tsx
+type FilterType = 'all' | 'mine' | 'public';
+
+const Favorites: React.FC = () => {
+  const { user } = useAuth();
+  const [filter, setFilter] = useState<FilterType>('all');
+  
+  // Запрос с author_id
+  const { data } = await supabase
+    .from('courses')
+    .select(`
+      id, title, description, cover_image, 
+      estimated_minutes, category, is_published,
+      author_id,
+      lessons:published_lessons(id)
+    `)
+    .in('id', favorites)
+    .or(`is_published.eq.true,is_link_accessible.eq.true,author_id.eq.${user.id}`);
+  
+  // Фильтрация
+  const filteredCourses = courses.filter(course => {
+    if (filter === 'all') return true;
+    if (filter === 'mine') return course.authorId === user?.id;
+    return course.authorId !== user?.id;
+  });
+  
+  const counts = {
+    all: courses.length,
+    mine: courses.filter(c => c.authorId === user?.id).length,
+    public: courses.filter(c => c.authorId !== user?.id).length,
+  };
+  
+  // UI
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {/* Основной блоб — центр */}
-      <div 
-        className="absolute w-[600px] h-[400px] -bottom-[150px] left-1/2 -translate-x-1/2 rounded-full blur-[100px] motion-safe:animate-[blob-float-1_15s_ease-in-out_infinite] will-change-transform"
-        style={{ background: 'hsl(270 40% 35% / 0.35)' }}
-      />
-      {/* Вторичный блоб — справа */}
-      <div 
-        className="absolute w-[400px] h-[300px] -bottom-[100px] right-[10%] rounded-full blur-[80px] motion-safe:animate-[blob-float-2_20s_ease-in-out_infinite] will-change-transform"
-        style={{ background: 'hsl(260 35% 40% / 0.25)' }}
-      />
-    </div>
+    <>
+      {/* Фильтры */}
+      <div className="flex items-center gap-1 mb-6">
+        {[
+          { id: 'all', label: 'Все' },
+          { id: 'mine', label: 'Мои' },
+          { id: 'public', label: 'Публичные' },
+        ].map(f => (
+          <button key={f.id} onClick={() => setFilter(f.id)}>
+            {f.label} <span>{counts[f.id]}</span>
+          </button>
+        ))}
+      </div>
+      
+      {/* Карточки */}
+      {filteredCourses.map(course => (
+        <CourseCardOverlay
+          variant={course.authorId === user?.id ? 'workshop' : 'favorites'}
+          // ...
+        />
+      ))}
+    </>
   );
 };
 ```
 
-### NotFound (локализованный):
+### CourseCardOverlay.tsx — упрощенная логика звездочки
 
-```typescript
-return (
-  <div className="flex min-h-screen items-center justify-center bg-muted">
-    <div className="text-center">
-      <h1 className="mb-4 text-4xl font-bold">404</h1>
-      <p className="mb-4 text-xl text-muted-foreground">Страница не найдена</p>
-      <a href="/" className="text-primary underline hover:text-primary/90">
-        Вернуться на главную
-      </a>
-    </div>
-  </div>
-);
+```tsx
+{/* Favorite button - show for any variant if handler provided */}
+{onToggleFavorite && (
+  <button onClick={onToggleFavorite}>
+    <Star fill={isFavorite ? 'currentColor' : 'none'} />
+  </button>
+)}
 ```
-
-## Что НЕ трогаем
-
-- `useOverflowDetection.ts` — используется в редакторе (`DesignBlockEditor.tsx`)
-- `useImagePreloader.ts` — используется для предзагрузки картинок курсов
-- Компоненты редактора — согласно условию задачи
-
