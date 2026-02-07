@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import AnimatedBackground from "@/components/layout/AnimatedBackground";
-import { useSidebar } from "@/components/ui/sidebar";
 
 const plans = [
   {
@@ -85,18 +84,16 @@ const plans = [
 
 const Pricing = () => {
   const [annualBilling, setAnnualBilling] = useState(true);
-  const { state } = useSidebar();
-  const isExpanded = state === "expanded";
 
   return (
-    <div className="absolute inset-0 bg-[#0a0a0b] overflow-auto">
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-[#0a0a0b]">
       <AnimatedBackground />
       
       {/* Content with sidebar offset */}
       <div 
-        className="relative z-10 py-12 pb-20 md:py-20 md:pb-24 transition-all duration-300"
+        className="flex-1 flex flex-col relative z-10 py-12 md:py-20 px-6 transition-all duration-300"
         style={{
-          paddingLeft: isExpanded ? 'var(--sidebar-width)' : '0px',
+          paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1.5rem)',
         }}
       >
         <div className="container max-w-5xl mx-auto px-6">
