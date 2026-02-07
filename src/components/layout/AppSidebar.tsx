@@ -1,98 +1,304 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, BookOpen, PenTool, Library, Clock, Star, Compass, ChevronDown, ChevronRight, FileText, Settings, UserPlus, LogOut, Globe, Sun, Moon, Palette } from 'lucide-react';
+import {
+  Home,
+  BookOpen,
+  Clock,
+  Star,
+  Compass,
+  Library,
+  ChevronRight,
+  FileText,
+  Settings,
+  LogOut,
+  ChevronsUpDown,
+  Check,
+  Search,
+  HelpCircle,
+  Palette,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import pavelAvatar from '@/assets/pavel-avatar.jpg';
 import Logo from '@/assets/Logo.svg';
-
-interface NavItem {
-  icon: React.ElementType;
-  label: string;
-  path: string;
-}
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInput,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  SidebarRail,
+} from '@/components/ui/sidebar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import { Label } from '@/components/ui/label';
 
 interface RecentCourse {
   id: string;
   title: string;
 }
 
-const mainNav: NavItem[] = [
-  { icon: Home, label: 'Главная', path: '/' },
-];
-
-const languages = [
-  { code: 'ru', label: 'Русский' },
-  { code: 'en', label: 'English' },
-  { code: 'es', label: 'Español' },
-  { code: 'de', label: 'Deutsch' },
-  { code: 'fr', label: 'Français' },
-  { code: 'zh', label: '中文' },
-];
-
-const NavItemButton: React.FC<{
-  item: NavItem;
-  isActive: boolean;
-  onClick: () => void;
-}> = ({ item, isActive, onClick }) => (
-  <button
-    onClick={onClick}
-    className={cn(
-      "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 text-[13px] font-medium",
-      isActive 
-        ? "bg-white/10 text-white" 
-        : "text-white/60 hover:bg-white/5 hover:text-white/90"
-    )}
-  >
-    <item.icon className="w-4 h-4" strokeWidth={isActive ? 2.5 : 2} />
-    {item.label}
-  </button>
-);
-
 interface AppSidebarProps {
   language: string;
   onLanguageChange: (lang: string) => void;
 }
 
+// Workspace type
+interface Workspace {
+  id: string;
+  name: string;
+  logo: string;
+  plan: string;
+}
+
+// Workspace data
+const workspacesList: Workspace[] = [
+  { id: '1', name: "Pavel's Academy", logo: pavelAvatar, plan: 'Pro' },
+];
+
+// Nav items
+const overviewItems = [
+  { label: 'Главная', icon: Home, href: '/' },
+];
+
+const resourceItems = [
+  { label: 'Исследовать', icon: Compass, href: '/catalog' },
+  { label: 'Словарь', icon: Library, href: '/dictionary', disabled: true, badge: 'скоро' },
+];
+
+const footerItems = [
+  { label: 'Помощь', icon: HelpCircle, href: '#' },
+  { label: 'Настройки', icon: Settings, href: '#' },
+];
+
+// Workspace Switcher Component
+const WorkspaceSwitcher = ({
+  workspaces,
+  activeWorkspace,
+}: {
+  workspaces: Workspace[];
+  activeWorkspace: Workspace;
+}) => {
+  const [selected, setSelected] = useState(activeWorkspace);
+
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            >
+              <Avatar className="h-8 w-8 rounded-lg">
+                <AvatarImage src={selected.logo} alt={selected.name} />
+                <AvatarFallback className="rounded-lg bg-primary/20 text-primary">
+                  {selected.name.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-semibold">{selected.name}</span>
+                <span className="truncate text-xs text-muted-foreground">
+                  {selected.plan} Plan
+                </span>
+              </div>
+              <ChevronsUpDown className="ml-auto size-4" />
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+            align="start"
+            side="bottom"
+            sideOffset={4}
+          >
+            <DropdownMenuLabel className="text-xs text-muted-foreground">
+              Workspaces
+            </DropdownMenuLabel>
+            {workspaces.map((workspace) => (
+              <DropdownMenuItem
+                key={workspace.id}
+                onClick={() => setSelected(workspace)}
+                className="gap-2 p-2"
+              >
+                <Avatar className="h-6 w-6 rounded-md">
+                  <AvatarImage src={workspace.logo} />
+                  <AvatarFallback className="rounded-md">
+                    {workspace.name.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                {workspace.name}
+                {workspace.id === selected.id && (
+                  <Check className="ml-auto size-4" />
+                )}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  );
+};
+
+// Search Component
+const SearchForm = () => {
+  return (
+    <form>
+      <SidebarGroup className="py-0">
+        <SidebarGroupContent className="relative">
+          <Label htmlFor="search" className="sr-only">
+            Search
+          </Label>
+          <SidebarInput
+            id="search"
+            placeholder="Поиск курсов..."
+            className="pl-8"
+          />
+          <Search className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 select-none opacity-50" />
+        </SidebarGroupContent>
+      </SidebarGroup>
+    </form>
+  );
+};
+
+// Nav User Component
+const NavUser = ({ 
+  user, 
+  onSignOut,
+  onDesignSystem,
+  isAdmin,
+}: { 
+  user: { name: string; email: string; avatar: string };
+  onSignOut: () => void;
+  onDesignSystem?: () => void;
+  isAdmin?: boolean;
+}) => {
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            >
+              <Avatar className="h-8 w-8 rounded-lg">
+                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarFallback className="rounded-lg">
+                  {user.name
+                    .split(' ')
+                    .map((n) => n[0])
+                    .join('')}
+                </AvatarFallback>
+              </Avatar>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-semibold">{user.name}</span>
+                <span className="truncate text-xs text-muted-foreground">
+                  {user.email}
+                </span>
+              </div>
+              <ChevronsUpDown className="ml-auto size-4" />
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+            side="bottom"
+            align="end"
+            sideOffset={4}
+          >
+            <DropdownMenuLabel className="p-0 font-normal">
+              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                <Avatar className="h-8 w-8 rounded-lg">
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarFallback className="rounded-lg">
+                    {user.name
+                      .split(' ')
+                      .map((n) => n[0])
+                      .join('')}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">{user.name}</span>
+                  <span className="truncate text-xs text-muted-foreground">
+                    {user.email}
+                  </span>
+                </div>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {isAdmin && onDesignSystem && (
+              <>
+                <DropdownMenuItem onClick={onDesignSystem}>
+                  <Palette className="mr-2 size-4" />
+                  Дизайн-система
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </>
+            )}
+            <DropdownMenuItem onClick={onSignOut}>
+              <LogOut className="mr-2 size-4" />
+              Выйти
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  );
+};
+
 const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
-  const [recentExpanded, setRecentExpanded] = useState(true);
   const [recentCourses, setRecentCourses] = useState<RecentCourse[]>([]);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [langOpen, setLangOpen] = useState(false);
+  const [recentOpen, setRecentOpen] = useState(true);
 
-  // Use "Pavel" as hardcoded name per user request
   const userName = 'Pavel';
-  const userInitials = 'PA';
+  const userEmail = user?.email || 'pavel@academy.com';
+
+  const isAdmin = user?.email === 'trupcgames@gmail.com' || user?.email === 'vazhenka.hello@gmail.com';
 
   // Fetch recent courses
   useEffect(() => {
     const fetchRecentCourses = async () => {
       if (!user) return;
-      
+
       const { data, error } = await supabase
         .from('courses')
         .select('id, title, updated_at')
         .eq('author_id', user.id)
         .order('updated_at', { ascending: false })
         .limit(5);
-      
+
       if (!error && data) {
-        setRecentCourses(data.map(c => ({ id: c.id, title: c.title })));
+        setRecentCourses(data.map((c) => ({ id: c.id, title: c.title })));
       }
     };
 
     fetchRecentCourses();
   }, [user]);
-
-  const isEditorRoute = (courseId: string) => location.pathname === `/editor/${courseId}`;
 
   const handleSignOut = async () => {
     await signOut();
@@ -100,274 +306,181 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) =
     navigate('/auth');
   };
 
+  const isActive = (path: string) => location.pathname === path;
+  const isEditorRoute = (courseId: string) => location.pathname === `/editor/${courseId}`;
+
   return (
-    <aside className="w-64 bg-[#0f0f10] flex flex-col h-screen fixed left-0 top-0 border-r border-white/5">
-      {/* Logo & Workspace */}
-      <div className="p-4 pb-2">
+    <Sidebar collapsible="icon">
+      <SidebarHeader>
         {/* Logo */}
-        <div className="mt-2 mb-6">
+        <div className="flex items-center gap-2 px-2 py-2">
           <img src={Logo} alt="Academy" className="h-6" />
         </div>
         
-        {/* Workspace Selector with Dropdown */}
-        <Popover open={profileOpen} onOpenChange={setProfileOpen}>
-          <PopoverTrigger asChild>
-            <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group">
-              <Avatar className="w-6 h-6">
-                <AvatarImage src={pavelAvatar} alt={userName} />
-                <AvatarFallback className="bg-gradient-to-br from-violet-500 to-pink-500 text-[10px] font-bold text-white">
-                  {userInitials}
-                </AvatarFallback>
-              </Avatar>
-              <span className="flex-1 text-left text-[13px] font-medium text-white truncate">
-                {userName}'s Academy
-              </span>
-              <ChevronDown className={cn(
-                "w-4 h-4 text-white/40 group-hover:text-white/60 transition-all",
-                profileOpen && "rotate-180"
-              )} />
-            </button>
-          </PopoverTrigger>
-          
-          <PopoverContent 
-            className="w-64 p-0 bg-[#1a1a1b] border-white/10 shadow-xl" 
-            align="start"
-            sideOffset={8}
-          >
-            {/* Profile Header */}
-            <div className="p-4 border-b border-white/10">
-              <div className="flex items-center gap-3">
-                <Avatar className="w-12 h-12">
-                  <AvatarImage src={pavelAvatar} alt={userName} />
-                  <AvatarFallback className="bg-gradient-to-br from-violet-500 to-pink-500 text-sm font-bold text-white">
-                    {userInitials}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[14px] font-semibold text-white">{userName}'s Academy</div>
-                  <div className="text-[12px] text-white/50">Pro Plan • 1 member</div>
-                </div>
-              </div>
-              
-              {/* Quick Actions */}
-              <div className="flex flex-col gap-2 mt-4">
-                <div className="flex gap-2">
-                  <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-[12px] text-white/70 hover:text-white">
-                    <Settings className="w-4 h-4" />
-                    Settings
-                  </button>
-                  <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-[12px] text-white/70 hover:text-white">
-                    <UserPlus className="w-4 h-4" />
-                    Invite
-                  </button>
-                </div>
-                {/* Design System Link - only show for admin */}
-                {(user?.email === 'trupcgames@gmail.com' || user?.email === 'vazhenka.hello@gmail.com') && (
-                  <button 
-                    onClick={() => {
-                      setProfileOpen(false);
-                      navigate('/design-system');
-                    }}
-                    className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-[hsl(265,60%,75%)]/10 hover:bg-[hsl(265,60%,75%)]/20 transition-colors text-[12px] text-[hsl(265,60%,75%)] hover:text-white"
+        {/* Workspace Switcher */}
+        <WorkspaceSwitcher
+          workspaces={workspacesList}
+          activeWorkspace={workspacesList[0]}
+        />
+        
+        {/* Search */}
+        <SearchForm />
+      </SidebarHeader>
+
+      <SidebarContent>
+        {/* Overview */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Обзор</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {overviewItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton
+                    isActive={isActive(item.href)}
+                    onClick={() => navigate(item.href)}
+                    tooltip={item.label}
                   >
-                    <Palette className="w-4 h-4" />
-                    Дизайн-система
-                  </button>
-                )}
-              </div>
-            </div>
-            
-            {/* Credits Section */}
-            <div className="p-4 border-b border-white/10 bg-primary/10 rounded-lg mx-2 my-2">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[13px] font-medium text-white">Credits</span>
-              </div>
-              <Progress value={100} className="h-1.5 bg-white/20" />
-              <div className="flex items-center gap-2 mt-2">
-                <div className="w-2 h-2 rounded-full bg-primary" />
-                <span className="text-[11px] text-white/60">Unlimited plan</span>
-              </div>
-            </div>
-            
-            {/* Sign Out */}
-            <div className="p-2">
-              <button 
-                onClick={handleSignOut}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* My Courses */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Мои курсы</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {/* Recent Courses - Collapsible */}
+              <Collapsible
+                open={recentOpen}
+                onOpenChange={setRecentOpen}
+                className="group/collapsible"
               >
-                <LogOut className="w-4 h-4" />
-                Выйти
-              </button>
-            </div>
-          </PopoverContent>
-        </Popover>
-      </div>
-
-      {/* Main Navigation */}
-      <nav className="flex-1 px-3 py-2 overflow-y-auto">
-        {/* Primary Nav */}
-        <div className="space-y-0.5 mb-6">
-          {mainNav.map(item => (
-            <NavItemButton
-              key={item.path}
-              item={item}
-              isActive={location.pathname === item.path}
-              onClick={() => navigate(item.path)}
-            />
-          ))}
-        </div>
-
-        {/* My Courses Section */}
-        <div className="mb-4">
-          <div className="flex items-center gap-2 px-3 py-2 text-[11px] font-semibold text-white/40 uppercase tracking-wider">
-            Мои курсы
-          </div>
-          
-          {/* Recent - Collapsible */}
-          <div className="space-y-0.5">
-            <button
-              onClick={() => setRecentExpanded(!recentExpanded)}
-              className={cn(
-                "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 text-[13px] font-medium",
-                "text-white/60 hover:bg-white/5 hover:text-white/90"
-              )}
-            >
-              <ChevronRight 
-                className={cn(
-                  "w-3 h-3 transition-transform duration-200",
-                  recentExpanded && "rotate-90"
-                )} 
-              />
-              <Clock className="w-4 h-4" />
-              <span className="flex-1 text-left">Недавние</span>
-            </button>
-            
-            {/* Recent Courses List */}
-            {recentExpanded && (
-              <div className="ml-3 pl-3 border-l border-white/10 space-y-0.5">
-                {recentCourses.length > 0 ? (
-                  recentCourses.map(course => (
-                    <button
-                      key={course.id}
-                      onClick={() => navigate(`/editor/${course.id}`)}
-                      className={cn(
-                        "w-full flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-150 text-[12px]",
-                        isEditorRoute(course.id)
-                          ? "bg-white/10 text-white"
-                          : "text-white/50 hover:bg-white/5 hover:text-white/80"
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip="Недавние">
+                      <Clock />
+                      <span>Недавние</span>
+                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {recentCourses.length > 0 ? (
+                        recentCourses.map((course) => (
+                          <SidebarMenuSubItem key={course.id}>
+                            <SidebarMenuSubButton
+                              isActive={isEditorRoute(course.id)}
+                              onClick={() => navigate(`/editor/${course.id}`)}
+                            >
+                              <FileText className="size-3.5" />
+                              <span className="truncate">{course.title}</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))
+                      ) : (
+                        <SidebarMenuSubItem>
+                          <span className="px-2 py-1.5 text-xs text-muted-foreground">
+                            Нет недавних курсов
+                          </span>
+                        </SidebarMenuSubItem>
                       )}
-                    >
-                      <FileText className="w-3.5 h-3.5 shrink-0" />
-                      <span className="truncate">{course.title}</span>
-                    </button>
-                  ))
-                ) : (
-                  <div className="px-3 py-2 text-[11px] text-white/30">
-                    Нет недавних курсов
-                  </div>
-                )}
-              </div>
-            )}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
 
-            {/* All Courses */}
-            <NavItemButton
-              item={{ icon: BookOpen, label: 'Все курсы', path: '/workshop' }}
-              isActive={location.pathname === '/workshop'}
-              onClick={() => navigate('/workshop')}
-            />
+              {/* All Courses */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive('/workshop')}
+                  onClick={() => navigate('/workshop')}
+                  tooltip="Все курсы"
+                >
+                  <BookOpen />
+                  <span>Все курсы</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
 
-            {/* Starred */}
-            <NavItemButton
-              item={{ icon: Star, label: 'Избранное', path: '/favorites' }}
-              isActive={location.pathname === '/favorites'}
-              onClick={() => navigate('/favorites')}
-            />
-          </div>
-        </div>
+              {/* Favorites */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive('/favorites')}
+                  onClick={() => navigate('/favorites')}
+                  tooltip="Избранное"
+                >
+                  <Star />
+                  <span>Избранное</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-        {/* Resources Section */}
-        <div className="mb-4">
-          <div className="flex items-center gap-2 px-3 py-2 text-[11px] font-semibold text-white/40 uppercase tracking-wider">
-            Ресурсы
-          </div>
-          <div className="space-y-0.5">
-            <NavItemButton
-              item={{ icon: Compass, label: 'Исследовать', path: '/catalog' }}
-              isActive={location.pathname === '/catalog'}
-              onClick={() => navigate('/catalog')}
-            />
-            {/* Dictionary - disabled for now */}
-            <div className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium text-white/20 cursor-not-allowed">
-              <Library className="w-4 h-4" strokeWidth={2} />
-              Словарь
-              <span className="ml-auto text-[10px] bg-white/5 px-1.5 py-0.5 rounded">скоро</span>
-            </div>
-          </div>
-        </div>
-      </nav>
+        {/* Resources */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Ресурсы</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {resourceItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton
+                    isActive={isActive(item.href)}
+                    onClick={() => !item.disabled && navigate(item.href)}
+                    tooltip={item.label}
+                    disabled={item.disabled}
+                    className={cn(item.disabled && 'opacity-50 cursor-not-allowed')}
+                  >
+                    <item.icon />
+                    <span>{item.label}</span>
+                    {item.badge && (
+                      <span className="ml-auto text-[10px] bg-muted px-1.5 py-0.5 rounded">
+                        {item.badge}
+                      </span>
+                    )}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-      {/* Bottom */}
-      <div className="p-3 space-y-1">
-        {/* Theme Toggle */}
-        <button
-          onClick={() => {
-            const html = document.documentElement;
-            const isDark = html.classList.contains('dark');
-            if (isDark) {
-              html.classList.remove('dark');
-              localStorage.setItem('theme', 'light');
-            } else {
-              html.classList.add('dark');
-              localStorage.setItem('theme', 'dark');
-            }
+        {/* Footer Navigation */}
+        <SidebarGroup className="mt-auto">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {footerItems.map((item) => (
+                <SidebarMenuItem key={item.label}>
+                  <SidebarMenuButton tooltip={item.label}>
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter>
+        <NavUser
+          user={{
+            name: userName,
+            email: userEmail,
+            avatar: pavelAvatar,
           }}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-white/50 hover:bg-white/5 hover:text-white/70 transition-all text-[12px]"
-        >
-          <Sun className="w-3.5 h-3.5 dark:hidden" />
-          <Moon className="w-3.5 h-3.5 hidden dark:block" />
-          <span className="dark:hidden">Light</span>
-          <span className="hidden dark:block">Dark</span>
-        </button>
+          onSignOut={handleSignOut}
+          onDesignSystem={() => navigate('/design-system')}
+          isAdmin={isAdmin}
+        />
+      </SidebarFooter>
 
-        {/* Language Selector */}
-        <Popover open={langOpen} onOpenChange={setLangOpen}>
-          <PopoverTrigger asChild>
-            <button className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-white/50 hover:bg-white/5 hover:text-white/70 transition-all text-[12px]">
-              <div className="flex items-center gap-3">
-                <Globe className="w-3.5 h-3.5" />
-                <span>{languages.find(l => l.code === language)?.label || 'RU'}</span>
-              </div>
-              <ChevronRight className="w-3 h-3" />
-            </button>
-          </PopoverTrigger>
-          <PopoverContent 
-            side="top" 
-            align="start" 
-            className="w-48 p-1 bg-[#1a1a1b] border-white/10"
-          >
-            {languages.map((lang) => (
-              <button
-                key={lang.code}
-                onClick={() => {
-                  onLanguageChange(lang.code);
-                  setLangOpen(false);
-                }}
-                className={cn(
-                  "w-full flex items-center gap-2 px-3 py-2 rounded-md text-[13px] transition-colors",
-                  language === lang.code 
-                    ? "bg-white/10 text-white" 
-                    : "text-white/60 hover:bg-white/5 hover:text-white"
-                )}
-              >
-                {lang.label}
-              </button>
-            ))}
-          </PopoverContent>
-        </Popover>
-      </div>
-
-      {/* User Footer - removed, now in dropdown */}
-    </aside>
+      <SidebarRail />
+    </Sidebar>
   );
 };
 

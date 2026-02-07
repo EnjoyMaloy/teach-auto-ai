@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import AppSidebar from './AppSidebar';
 import { useState, useEffect } from 'react';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 
 const ProtectedLayout: React.FC = () => {
   const [language, setLanguage] = useState(() => {
@@ -16,12 +17,12 @@ const ProtectedLayout: React.FC = () => {
   }, [language]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0b]">
+    <SidebarProvider>
       <AppSidebar language={language} onLanguageChange={setLanguage} />
-      <main className="ml-64 min-h-screen">
+      <SidebarInset>
         <Outlet />
-      </main>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 };
 
