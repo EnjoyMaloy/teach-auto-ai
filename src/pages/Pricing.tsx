@@ -238,15 +238,6 @@ const Pricing = () => {
             ))}
           </div>
 
-          {/* FAQ or Contact */}
-          <div className="mt-16 text-center">
-            <p className="text-white/40">
-              Нужен индивидуальный план?{" "}
-              <Button variant="link" className="h-auto p-0 text-primary">
-                Свяжитесь с нами
-              </Button>
-            </p>
-          </div>
         </div>
       </div>
     </div>
