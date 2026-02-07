@@ -75,7 +75,10 @@ const Favorites: React.FC = () => {
   return (
     <div className="min-h-screen relative overflow-hidden bg-[#0f0f12]">
       <AnimatedBackground />
-      <div className="relative z-10 p-6">
+      <div 
+        className="relative z-10 p-6 transition-all duration-200"
+        style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1.5rem)' }}
+      >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
