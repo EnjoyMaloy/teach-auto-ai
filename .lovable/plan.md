@@ -1,76 +1,106 @@
 
-# План: Полная замена на оригинальный Sidebar9
+
+# План: Изменение структуры сайдбара
 
 ## Подход
 
-Беру **весь код из `sidebar9.tsx`** и вставляю как есть, адаптируя только:
-1. Интеграцию с `react-router-dom` (вместо `<a href>`)
-2. Данные пользователя из `useAuth`
-3. Загрузку курсов из Supabase для "Active Projects"
+Используем **существующие компоненты и стили** из текущего `AppSidebar.tsx` — только меняем порядок и содержание секций.
 
-## Что будет сделано
+## Новая структура
 
-### Файл 1: `src/components/layout/AppSidebar.tsx`
-
-**Полная замена** на код из `sidebar9.tsx` с минимальными адаптациями:
-
-| Оригинал | Адаптация |
-|----------|-----------|
-| `<a href={item.href}>` | `onClick={() => navigate(item.href)}` |
-| `sidebarData.user` (статичный) | Данные из `useAuth()` |
-| `sidebarData.workspaces` | Логотип проекта |
-| Статичные "Project Alpha/Beta" | Динамические курсы из Supabase |
-
-### Файл 2: `src/components/layout/ProtectedLayout.tsx`
-
-Заменяю на структуру `Sidebar9` из оригинала:
-
-```tsx
-<SidebarProvider>
-  <AppSidebar />
-  <SidebarInset>
-    <header className="flex h-16 shrink-0 items-center gap-2 px-4">
-      <SidebarTrigger className="-ml-1" />
-      <Separator
-        orientation="vertical"
-        className="mr-2 data-[orientation=vertical]:h-4"
-      />
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem className="hidden md:block">
-            <BreadcrumbLink href="#">Overview</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator className="hidden md:block" />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Dashboard</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-    </header>
-    <Outlet />
-  </SidebarInset>
-</SidebarProvider>
+```text
+┌─────────────────────────┐
+│  [Logo SVG]             │
+├─────────────────────────┤
+│  [Avatar] Pavel      ▾  │  → Dropdown: Аккаунт, Уведомления,
+│  pavel@email.com        │              Дизайн системы, Выход
+├─────────────────────────┤
+│  🏠 Главная             │
+├─────────────────────────┤
+│  МОИ КУРСЫ              │
+│  🕐 Недавние        ▸   │  → Collapsible список курсов
+│  📁 Все курсы           │
+│  ⭐ Избранное           │
+├─────────────────────────┤
+│  РЕСУРСЫ                │
+│  🧭 Исследовать         │
+│  📖 Словарь             │
+├─────────────────────────┤
+│  [🌙/☀️]        [RU ▼]  │
+└─────────────────────────┘
 ```
 
-## Точное соответствие оригиналу
+## Что изменится
 
-Все стили сохраняются 1 в 1:
-- `font-medium` (не `font-semibold`)
-- `text-muted-foreground` (не `text-sidebar-foreground/50`)
-- `size-8` (не `h-8 w-8`)
-- `variant="floating"` (без `collapsible="icon"`)
-- Классы иконки поиска: `left-2 size-4 -translate-y-1/2 opacity-50 select-none`
+| Секция | Было | Станет |
+|--------|------|--------|
+| Header | WorkspaceSwitcher + SearchForm | Только Logo SVG |
+| После Header | — | Профиль с DropdownMenu |
+| Content | 4 раздела (Overview, Projects, Team, Workspace) | Главная + Мои курсы + Ресурсы |
+| Footer | NavUser | Переключатели темы и языка |
+
+## Технические детали
+
+### Файл: `src/components/layout/AppSidebar.tsx`
+
+**Удаляем:**
+- Компонент `WorkspaceSwitcher`
+- Компонент `SearchForm`
+- Массив `navGroups` с 4 разделами
+- Компонент `NavMenuItem`
+
+**Оставляем без изменений:**
+- Все импорты UI компонентов
+- `useAuth`, `useNavigate`, `useLocation`
+- Загрузка `recentCourses` из Supabase
+- Функцию `handleSignOut`
+- Проверку `isAdmin`
+
+**Добавляем:**
+- Импорт `useTheme` из `next-themes`
+- Использование `useLanguage` из проекта
+- Иконки: `Home`, `Clock`, `Folder`, `Star`, `Compass`, `BookOpen`, `Sun`, `Moon`, `ChevronDown`
+
+### Маршруты меню
+
+| Пункт | Маршрут |
+|-------|---------|
+| Главная | `/` |
+| Все курсы | `/workshop` |
+| Избранное | `/favorites` |
+| Исследовать | `/catalog` |
+| Словарь | `/dictionary` |
+| Недавние (курсы) | `/editor/{courseId}` |
+
+### Профиль — DropdownMenu
+
+| Пункт | Действие | Иконка |
+|-------|----------|--------|
+| Аккаунт | — (пока без действия) | `BadgeCheck` |
+| Уведомления | — (пока без действия) | `Bell` |
+| Дизайн системы | `navigate('/design-system')` (только для admin) | `Palette` |
+| Выход | `handleSignOut()` | `LogOut` |
+
+### Footer — переключатели
+
+| Элемент | Компонент | Логика |
+|---------|-----------|--------|
+| Тема | `Button` с иконкой `Sun`/`Moon` | `useTheme().setTheme()` |
+| Язык | `DropdownMenu` с флагами | `useLanguage().setLanguage()` |
 
 ## Файлы для изменения
 
 | Файл | Действие |
 |------|----------|
-| `src/components/layout/AppSidebar.tsx` | Полная замена на код sidebar9.tsx |
-| `src/components/layout/ProtectedLayout.tsx` | Структура SidebarInset + header из sidebar9.tsx |
+| `src/components/layout/AppSidebar.tsx` | Переработка структуры (компоненты и стили остаются) |
 
-## Итог
+## Сохраняемые стили
 
-После замены сайдбар будет **идентичен** shadcnblocks.com:
-- Все классы, шрифты, цвета, отступы — точно как в оригинале
-- Интеграция с роутингом и авторизацией проекта
-- Динамические данные (курсы) вместо статичных проектов
+Все классы из текущего sidebar9 остаются:
+- `variant="floating"` на `<Sidebar>`
+- `size="lg"` на кнопках профиля
+- `text-muted-foreground` для подписей
+- `font-medium` для заголовков
+- `size-4` для иконок
+- `rounded-lg` для аватара
+
