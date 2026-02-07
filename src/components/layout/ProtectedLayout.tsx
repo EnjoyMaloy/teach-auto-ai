@@ -18,11 +18,9 @@ const ProtectedLayout: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#0a0a0b]">
       <AppSidebar language={language} onLanguageChange={setLanguage} />
-      <div className="ml-64">
-        <main>
-          <Outlet />
-        </main>
-      </div>
+      <main className="ml-64 p-6">
+        <Outlet />
+      </main>
     </div>
   );
 };
