@@ -13,6 +13,7 @@ import {
 interface CourseCardOverlayProps {
   id: string;
   title: string;
+  description?: string;
   coverImage?: string;
   lessonsCount: number;
   categoryName?: string;
@@ -26,6 +27,7 @@ interface CourseCardOverlayProps {
 const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
   id,
   title,
+  description,
   coverImage,
   lessonsCount,
   categoryName,
@@ -191,9 +193,14 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
 
         {/* Bottom content */}
         <div className="absolute inset-x-0 bottom-0 p-4 text-white">
-          <h3 className="text-[15px] font-semibold leading-tight line-clamp-2 mb-2">
+          <h3 className="text-[15px] font-semibold leading-tight line-clamp-2 mb-1">
             {title}
           </h3>
+          {description && (
+            <p className="text-[12px] text-white/60 line-clamp-2 mb-2 leading-relaxed">
+              {description}
+            </p>
+          )}
           <div className="flex items-center gap-1.5 text-[12px] text-white/70">
             <BookOpen className="w-3.5 h-3.5" />
             <span>{lessonsCount} {getLessonWord(lessonsCount)}</span>
