@@ -179,8 +179,11 @@ const Home: React.FC = () => {
         style={{ background: 'radial-gradient(ellipse 100% 80% at 50% 100%, hsl(270 45% 50% / 0.15), transparent 60%)' }}
       />
       
-      {/* Content */}
-      <div className="flex-1 flex flex-col items-center justify-center relative z-10 px-6">
+      {/* Content - centered accounting for sidebar */}
+      <div 
+        className="flex-1 flex flex-col items-center justify-center relative z-10 px-6 transition-all duration-200"
+        style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1.5rem)' }}
+      >
         {/* Welcome Text */}
         <h1 className="text-4xl md:text-5xl font-semibold mb-10 text-white text-center">
           What's on your mind, <span className="animate-[name-glow_4s_ease-in-out_infinite]" style={{ color: 'hsl(265, 60%, 75%)' }}>{userName}</span>?
