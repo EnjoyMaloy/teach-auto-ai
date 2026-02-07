@@ -146,6 +146,7 @@ const Dashboard: React.FC = () => {
               key={course.id}
               id={course.id}
               title={course.title}
+              description={course.description}
               coverImage={course.coverImage}
               lessonsCount={course.lessons.length}
               isPublished={course.isPublished}
