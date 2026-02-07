@@ -1,117 +1,112 @@
 
 
-# План рефакторинга портала
+# План оптимизации портала — Итерация 2
 
-## Обзор текущего состояния
+## Результаты анализа
 
-Проект содержит 14 страниц. После анализа найдены следующие проблемы:
+После детального исследования кодовой базы обнаружены следующие проблемы:
 
-| Проблема | Файл/Место | Влияние |
-|----------|------------|---------|
-| Неиспользуемая страница | `DesignSystem.tsx` (438 строк) | Мёртвый код в бандле |
-| Неиспользуемая edge function | `generate-dictionary/` | Лишние деплои |
-| Дублирование хелперов | `getLessonWord`, `getCoursesWord` в 3 файлах | Раздутый код |
-| Тяжёлый анимированный фон | `AnimatedBackground.tsx` на всех страницах | CSS-анимации 24/7 |
+| Проблема | Файлы | Влияние |
+|----------|-------|---------|
+| Неиспользуемый компонент | `CourseCard.tsx` (109 строк) | Дубликат CourseCardOverlay |
+| Неиспользуемые mock-данные | `mockData.ts` (160 строк) | Мёртвый код |
+| Тяжёлая анимация фона | `AnimatedBackground.tsx` на 4 страницах | 5 blur-блобов × 4 страницы = постоянная GPU нагрузка |
+| Хук используется только в редакторе | `useOverflowDetection.ts` | Можно не трогать — относится к редактору |
 
 ## Предлагаемые изменения
 
 ### 1. Удалить неиспользуемые файлы
 
-**Файлы на удаление:**
-- `src/pages/DesignSystem.tsx` — не подключена к роутам, 438 строк мёртвого кода
-- `supabase/functions/generate-dictionary/` — функция словаря была удалена
+**Удалить:**
+- `src/components/catalog/CourseCard.tsx` — нигде не импортируется, полностью заменён на `CourseCardOverlay.tsx`
+- `src/lib/mockData.ts` — нигде не используется, остался с ранней разработки
 
-### 2. Вынести общие хелперы
+### 2. Оптимизировать AnimatedBackground
 
-Функции `getLessonWord()` и `getCoursesWord()` дублируются в:
+Текущий компонент используется на 4 страницах:
+- `Home.tsx`
 - `Dashboard.tsx`
 - `Catalog.tsx`
 - `Favorites.tsx`
-- `CourseCardOverlay.tsx`
 
-**Решение:** Создать `src/lib/pluralize.ts`:
+Каждая страница рендерит 5 больших blur-блобов (800×600, 600×500, 700×550, 400×400, 350×350 px) с CSS-анимациями 12-20 секунд.
 
-```text
-src/lib/pluralize.ts
-├── getLessonWord(count: number): string
-├── getCoursesWord(count: number): string
-└── pluralize(count, one, few, many): string
-```
+**Оптимизация:**
+1. Уменьшить количество блобов с 5 до 2
+2. Добавить `will-change: transform` для GPU-ускорения
+3. Отключить анимации на мобильных устройствах (`prefers-reduced-motion`)
+4. Уменьшить размеры блобов для снижения нагрузки на отрисовку
 
-Удалить локальные копии из страниц.
+### 3. Страница 404 — локализация
 
-### 3. Оптимизировать AnimatedBackground
+Текст на странице NotFound на английском, хотя весь интерфейс на русском.
 
-Текущий компонент рендерит 5 больших blur-блобов с CSS-анимациями (12-20 секунд каждая). Это нагружает GPU.
+**Изменить:**
+- "Oops! Page not found" → "Страница не найдена"
+- "Return to Home" → "Вернуться на главную"
 
-**Варианты:**
-1. **Минимум** — отключить анимации на мобильных устройствах
-2. **Лёгкая версия** — уменьшить количество блобов с 5 до 2-3
-3. **Статичный градиент** — заменить на статичный фон для лучшей производительности
-
-### 4. Общая структура файлов после рефакторинга
+## Структура изменений
 
 ```text
 УДАЛИТЬ:
-  ├── src/pages/DesignSystem.tsx
-  └── supabase/functions/generate-dictionary/
-
-СОЗДАТЬ:
-  └── src/lib/pluralize.ts
+  ├── src/components/catalog/CourseCard.tsx
+  └── src/lib/mockData.ts
 
 ИЗМЕНИТЬ:
-  ├── src/pages/Dashboard.tsx      — убрать getLessonWord
-  ├── src/pages/Catalog.tsx        — убрать getLessonWord, getCoursesWord
-  ├── src/pages/Favorites.tsx      — убрать getLessonWord, getCoursesWord  
-  ├── src/components/catalog/CourseCardOverlay.tsx — импорт из pluralize
-  └── src/components/layout/AnimatedBackground.tsx — опционально оптимизация
+  ├── src/components/layout/AnimatedBackground.tsx — облегчить
+  └── src/pages/NotFound.tsx — локализовать
 ```
 
 ## Оценка эффекта
 
 | Метрика | До | После |
 |---------|-----|-------|
-| Строк удалённого кода | — | ~500+ |
-| Edge functions | 10 | 9 |
-| Дублирующегося кода | ~60 строк | 0 |
+| Удалённых строк кода | — | ~270 |
+| Blur-блобов на странице | 5 | 2 |
+| Анимаций на мобильных | 5 | 0 |
 
 ## Техническая реализация
 
-### Файл `src/lib/pluralize.ts`:
+### AnimatedBackground (оптимизированный):
 
 ```typescript
-export function pluralize(
-  count: number,
-  one: string,
-  few: string,
-  many: string
-): string {
-  const lastTwo = count % 100;
-  const lastOne = count % 10;
-  
-  if (lastTwo >= 11 && lastTwo <= 19) return many;
-  if (lastOne === 1) return one;
-  if (lastOne >= 2 && lastOne <= 4) return few;
-  return many;
-}
-
-export const getLessonWord = (count: number) => 
-  pluralize(count, 'урок', 'урока', 'уроков');
-
-export const getCoursesWord = (count: number) => 
-  pluralize(count, 'курс', 'курса', 'курсов');
+const AnimatedBackground: React.FC = () => {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {/* Основной блоб — центр */}
+      <div 
+        className="absolute w-[600px] h-[400px] -bottom-[150px] left-1/2 -translate-x-1/2 rounded-full blur-[100px] motion-safe:animate-[blob-float-1_15s_ease-in-out_infinite] will-change-transform"
+        style={{ background: 'hsl(270 40% 35% / 0.35)' }}
+      />
+      {/* Вторичный блоб — справа */}
+      <div 
+        className="absolute w-[400px] h-[300px] -bottom-[100px] right-[10%] rounded-full blur-[80px] motion-safe:animate-[blob-float-2_20s_ease-in-out_infinite] will-change-transform"
+        style={{ background: 'hsl(260 35% 40% / 0.25)' }}
+      />
+    </div>
+  );
+};
 ```
 
-### Обновление импортов:
+### NotFound (локализованный):
 
 ```typescript
-// Вместо локальной функции:
-import { getLessonWord, getCoursesWord } from '@/lib/pluralize';
+return (
+  <div className="flex min-h-screen items-center justify-center bg-muted">
+    <div className="text-center">
+      <h1 className="mb-4 text-4xl font-bold">404</h1>
+      <p className="mb-4 text-xl text-muted-foreground">Страница не найдена</p>
+      <a href="/" className="text-primary underline hover:text-primary/90">
+        Вернуться на главную
+      </a>
+    </div>
+  </div>
+);
 ```
 
-## Дополнительные рекомендации
+## Что НЕ трогаем
 
-1. **Неиспользуемые хуки** — проверить `useImagePreloader.ts`, `useOverflowDetection.ts` на использование
-2. **Компонент CourseCard** — старый `CourseCard.tsx` можно удалить если используется только `CourseCardOverlay.tsx`
-3. **Модерация** — страница доступна только админам, но загружается в бандл для всех (можно рассмотреть динамический импорт)
+- `useOverflowDetection.ts` — используется в редакторе (`DesignBlockEditor.tsx`)
+- `useImagePreloader.ts` — используется для предзагрузки картинок курсов
+- Компоненты редактора — согласно условию задачи
 
