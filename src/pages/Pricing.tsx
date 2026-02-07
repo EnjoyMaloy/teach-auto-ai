@@ -94,7 +94,7 @@ const Pricing = () => {
       
       {/* Content with sidebar offset */}
       <div 
-        className="relative z-10 min-h-full py-12 md:py-20 transition-all duration-300"
+        className="relative z-10 py-12 pb-20 md:py-20 md:pb-24 transition-all duration-300"
         style={{
           paddingLeft: isExpanded ? 'var(--sidebar-width)' : '0px',
         }}
