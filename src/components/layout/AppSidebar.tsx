@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   BadgeCheck,
   Bell,
-  BookOpen,
   ChevronDown,
   ChevronRight,
   ChevronsUpDown,
@@ -16,6 +15,7 @@ import {
   Moon,
   Star,
   Sun,
+  Wand2,
   Zap,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
@@ -308,7 +308,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                   disabled
                   className="opacity-50 cursor-not-allowed"
                 >
-                  <BookOpen className="size-4" />
+                  <Wand2 className="size-4" />
                   <span>Словарь</span>
                   <span className="ml-auto text-[10px] text-muted-foreground px-1.5 py-0.5 rounded bg-muted">скоро</span>
                 </SidebarMenuButton>
