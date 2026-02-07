@@ -111,8 +111,8 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   };
 
   const languages = [
-    { code: 'ru' as const, label: 'Русский', flag: '🇷🇺' },
-    { code: 'en' as const, label: 'English', flag: '🇬🇧' },
+    { code: 'ru' as const, label: 'RU' },
+    { code: 'en' as const, label: 'EN' },
   ];
 
   const currentLang = languages.find((l) => l.code === language) || languages[0];
@@ -313,18 +313,19 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
           {/* Language Selector */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-1">
-                {currentLang.flag} {currentLang.code.toUpperCase()}
-                <ChevronDown className="size-3" />
+              <Button variant="ghost" size="sm" className="text-xs font-medium text-muted-foreground hover:text-foreground">
+                {currentLang.label}
+                <ChevronDown className="ml-1 size-3" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="min-w-[80px]">
               {languages.map((lang) => (
                 <DropdownMenuItem
                   key={lang.code}
                   onClick={() => setLanguage(lang.code)}
+                  className="text-xs justify-center"
                 >
-                  {lang.flag} {lang.label}
+                  {lang.label}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
