@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCourses } from '@/hooks/useCourses';
 import { Course } from '@/types/course';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Plus, Loader2, MoreHorizontal, Trash2, Settings, Eye, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -115,10 +116,11 @@ const Dashboard: React.FC = () => {
         ))}
       </div>
 
-      {/* Content */}
       {isLoading ? (
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground dark:text-white/30" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+          {[...Array(8)].map((_, i) => (
+            <CourseCardSkeleton key={i} />
+          ))}
         </div>
       ) : filteredCourses.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center">
@@ -302,6 +304,20 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onDelete }) => {
     </div>
   );
 };
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Skeleton
+───────────────────────────────────────────────────────────────────────────── */
+
+const CourseCardSkeleton: React.FC = () => (
+  <div className="bg-muted/50 dark:bg-white/[0.02] rounded-lg border border-border dark:border-white/[0.04] overflow-hidden">
+    <Skeleton className="aspect-[16/10] rounded-none" />
+    <div className="p-3">
+      <Skeleton className="h-4 w-3/4 mb-2" />
+      <Skeleton className="h-3 w-1/3" />
+    </div>
+  </div>
+);
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Helpers

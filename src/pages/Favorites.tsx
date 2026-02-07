@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star, Loader2 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useAuth } from '@/hooks/useAuth';
@@ -79,10 +80,11 @@ const Favorites: React.FC = () => {
         className="relative z-10 p-6 transition-all duration-200"
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1.5rem)' }}
       >
-      {/* Content */}
       {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground dark:text-white/30" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <CourseCardSkeleton key={i} />
+          ))}
         </div>
       ) : courses.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center">
@@ -181,6 +183,20 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onRemove }) => {
     </div>
   );
 };
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Skeleton
+───────────────────────────────────────────────────────────────────────────── */
+
+const CourseCardSkeleton: React.FC = () => (
+  <div className="bg-muted/50 dark:bg-white/[0.02] rounded-lg border border-border dark:border-white/[0.04] overflow-hidden">
+    <Skeleton className="aspect-[16/10] rounded-none" />
+    <div className="p-3">
+      <Skeleton className="h-4 w-3/4 mb-2" />
+      <Skeleton className="h-3 w-1/3" />
+    </div>
+  </div>
+);
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Helpers
