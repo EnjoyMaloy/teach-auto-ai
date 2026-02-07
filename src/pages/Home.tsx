@@ -162,8 +162,8 @@ const Home: React.FC = () => {
           What's on your mind, <span className="animate-[name-glow_4s_ease-in-out_infinite]" style={{ color: 'hsl(265, 60%, 75%)' }}>{userName}</span>?
         </h1>
 
-        {/* Action Card - styled like sidebar */}
-        <div className="w-full max-w-2xl bg-[#0f0f10] border border-white/[0.08] rounded-2xl p-2 shadow-2xl transition-all">
+        {/* Action Card */}
+        <div className="w-full max-w-2xl bg-[#1a1a1b] border border-white/[0.08] rounded-2xl p-2 shadow-2xl transition-all">
           <div className="flex items-start gap-3 px-4 py-3">
             <textarea
               value={prompt}
