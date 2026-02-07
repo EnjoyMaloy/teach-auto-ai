@@ -44,7 +44,7 @@ const Catalog: React.FC = () => {
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1.5rem)' }}
       >
       {/* Search */}
-      <div className="relative max-w-sm mb-6">
+      <div className="relative max-w-sm mb-6 ml-10">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground dark:text-white/20" />
         <Input
           placeholder="Поиск курсов..."
