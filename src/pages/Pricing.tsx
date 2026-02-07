@@ -4,6 +4,8 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import AnimatedBackground from "@/components/layout/AnimatedBackground";
 
 const plans = [
   {
@@ -12,15 +14,14 @@ const plans = [
     price: { monthly: "Бесплатно", annually: "Бесплатно" },
     recommended: false,
     current: false,
-    icon: null,
     featureGroups: [
       {
         title: "Возможности",
         features: [
-          { title: "3 курса", icon: Check },
-          { title: "Базовые шаблоны", icon: Check },
-          { title: "AI-генерация", icon: X },
-          { title: "Аналитика", icon: X },
+          { title: "3 курса", available: true },
+          { title: "Базовые шаблоны", available: true },
+          { title: "AI-генерация", available: false },
+          { title: "Аналитика", available: false },
         ],
       },
     ],
@@ -30,24 +31,20 @@ const plans = [
     description: "Для профессионалов",
     price: {
       monthly: "₽2 490",
-      annually: (
-        <span className="flex items-center">
-          ₽1 990<Badge className="ml-2">-20%</Badge>
-        </span>
-      ),
+      annually: "₽1 990",
     },
+    discount: "-20%",
     recommended: true,
     current: false,
-    icon: null,
     featureGroups: [
       {
         title: "Возможности",
         features: [
-          { title: "Безлимитные курсы", icon: Check },
-          { title: "Все шаблоны", icon: Check },
-          { title: "Безлимитная AI-генерация", icon: Check },
-          { title: "Расширенная аналитика", icon: Check },
-          { title: "Приоритетная поддержка", icon: Check },
+          { title: "Безлимитные курсы", available: true },
+          { title: "Все шаблоны", available: true },
+          { title: "Безлимитная AI-генерация", available: true },
+          { title: "Расширенная аналитика", available: true },
+          { title: "Приоритетная поддержка", available: true },
         ],
       },
     ],
@@ -57,24 +54,20 @@ const plans = [
     description: "Для организаций",
     price: {
       monthly: "₽9 990",
-      annually: (
-        <span className="flex items-center">
-          ₽7 990<Badge className="ml-2">-20%</Badge>
-        </span>
-      ),
+      annually: "₽7 990",
     },
+    discount: "-20%",
     recommended: false,
     current: false,
-    icon: null,
     featureGroups: [
       {
         title: "Возможности",
         features: [
-          { title: "Всё из Pro", icon: Check },
-          { title: "До 10 участников", icon: Check },
-          { title: "Брендирование", icon: Check },
-          { title: "API доступ", icon: Check },
-          { title: "Персональный менеджер", icon: Check },
+          { title: "Всё из Pro", available: true },
+          { title: "До 10 участников", available: true },
+          { title: "Брендирование", available: true },
+          { title: "API доступ", available: true },
+          { title: "Персональный менеджер", available: true },
         ],
       },
     ],
@@ -86,7 +79,10 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden bg-background">
-      {/* Content with sidebar offset */}
+      {/* Animated background for consistency */}
+      <AnimatedBackground />
+
+      {/* Content */}
       <div 
         className="flex-1 flex flex-col relative z-10 py-12 md:py-20 px-6 transition-all duration-300"
         style={{
@@ -106,10 +102,10 @@ const Pricing = () => {
 
           {/* Billing Toggle */}
           <div className="mb-12 flex justify-center">
-            <div className="flex items-center gap-3 rounded-full bg-muted/50 border border-border p-1.5 px-4">
+            <div className="flex items-center gap-3 rounded-full bg-sidebar/80 backdrop-blur-sm border border-sidebar-border p-1.5 px-4">
               <span className={cn(
                 "text-sm font-medium transition-colors",
-                !annualBilling ? "text-foreground" : "text-muted-foreground"
+                !annualBilling ? "text-sidebar-foreground" : "text-sidebar-foreground/60"
               )}>
                 Ежемесячно
               </span>
@@ -120,23 +116,25 @@ const Pricing = () => {
               />
               <span className={cn(
                 "text-sm font-medium transition-colors",
-                annualBilling ? "text-foreground" : "text-muted-foreground"
+                annualBilling ? "text-sidebar-foreground" : "text-sidebar-foreground/60"
               )}>
                 Ежегодно
               </span>
             </div>
           </div>
 
-          {/* Plans Grid - 3 columns */}
+          {/* Plans Grid */}
           <div className="grid gap-6 md:grid-cols-3">
             {plans.map((plan, index) => (
-              <article
+              <Card
                 key={plan.title}
                 className={cn(
-                  "relative rounded-2xl border overflow-hidden transition-all bg-card",
+                  "relative overflow-hidden transition-all duration-300",
+                  "bg-sidebar/80 backdrop-blur-sm border-sidebar-border",
+                  "hover:bg-sidebar/90 hover:border-sidebar-accent",
                   plan.recommended 
-                    ? "border-primary shadow-2xl shadow-primary/20 md:scale-105 z-10" 
-                    : "border-border hover:border-primary/50",
+                    ? "border-primary shadow-lg shadow-primary/10 md:scale-105 z-10" 
+                    : "",
                   index === 0 && "md:-mr-2",
                   index === 2 && "md:-ml-2"
                 )}
@@ -144,7 +142,7 @@ const Pricing = () => {
                 {/* Current Plan Badge */}
                 {plan.current && (
                   <div className="absolute top-4 right-4">
-                    <Badge variant="secondary" className="gap-1">
+                    <Badge variant="secondary" className="gap-1 bg-sidebar-accent text-sidebar-accent-foreground">
                       <Check className="size-3" />
                       Ваш план
                     </Badge>
@@ -158,30 +156,28 @@ const Pricing = () => {
                   </div>
                 )}
 
-                <header className="p-6">
-                  {/* Plan Icon & Title */}
+                <CardHeader className="p-6">
+                  {/* Plan Title */}
                   <div className="mb-6">
-                    <div className="mb-3 flex items-center gap-2">
-                      {plan.icon && (
-                        <div className="flex size-8 items-center justify-center rounded-lg bg-primary/20">
-                          <plan.icon className="size-4 text-primary" />
-                        </div>
-                      )}
-                      <h2 className="text-xl font-semibold text-foreground">{plan.title}</h2>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
+                    <h2 className="mb-2 text-xl font-semibold text-sidebar-foreground">{plan.title}</h2>
+                    <p className="text-sm text-sidebar-foreground/60">
                       {plan.description}
                     </p>
                   </div>
 
                   {/* Price */}
                   <div className="mb-6">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-bold text-foreground">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-bold text-sidebar-foreground">
                         {annualBilling ? plan.price.annually : plan.price.monthly}
                       </span>
                       {plan.title !== "Стартовый" && (
-                        <span className="text-sm text-muted-foreground">/ месяц</span>
+                        <span className="text-sm text-sidebar-foreground/60">/ месяц</span>
+                      )}
+                      {annualBilling && plan.discount && (
+                        <Badge className="bg-primary/20 text-primary border-0 text-xs">
+                          {plan.discount}
+                        </Badge>
                       )}
                     </div>
                   </div>
@@ -189,18 +185,21 @@ const Pricing = () => {
                   {/* CTA Button */}
                   <Button
                     variant={plan.current ? "secondary" : plan.recommended ? "default" : "outline"}
-                    className="w-full"
+                    className={cn(
+                      "w-full",
+                      !plan.recommended && !plan.current && "border-sidebar-border hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    )}
                     disabled={plan.current}
                   >
                     {plan.current ? "Текущий план" : "Выбрать план"}
                   </Button>
-                </header>
+                </CardHeader>
 
                 {/* Features */}
-                <main className="space-y-4 border-t border-border p-6">
+                <CardContent className="space-y-4 border-t border-sidebar-border p-6">
                   {plan.featureGroups.map((group) => (
                     <div key={group.title}>
-                      <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/50">
                         {group.title}
                       </h3>
                       <ul className="space-y-2.5">
@@ -209,26 +208,26 @@ const Pricing = () => {
                             key={feature.title}
                             className={cn(
                               "flex items-center gap-2 text-sm",
-                              feature.icon === Check 
-                                ? "text-foreground" 
-                                : "text-muted-foreground/50"
+                              feature.available 
+                                ? "text-sidebar-foreground" 
+                                : "text-sidebar-foreground/30"
                             )}
                           >
-                            <feature.icon className={cn(
-                              "size-4 shrink-0",
-                              feature.icon === Check ? "text-primary" : ""
-                            )} />
+                            {feature.available ? (
+                              <Check className="size-4 shrink-0 text-primary" />
+                            ) : (
+                              <X className="size-4 shrink-0" />
+                            )}
                             {feature.title}
                           </li>
                         ))}
                       </ul>
                     </div>
                   ))}
-                </main>
-              </article>
+                </CardContent>
+              </Card>
             ))}
           </div>
-
         </div>
       </div>
     </div>
