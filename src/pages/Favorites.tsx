@@ -72,7 +72,7 @@ const Favorites: React.FC = () => {
   const loading = isLoading || favoritesLoading;
 
   return (
-    <div className="h-full">
+    <div className="p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>

@@ -34,7 +34,7 @@ const Catalog: React.FC = () => {
   });
 
   return (
-    <div className="h-full">
+    <div className="p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-[15px] font-semibold text-white">Исследовать</h1>

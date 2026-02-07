@@ -69,7 +69,7 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="h-full">
+    <div className="p-6">
       {/* Top Bar */}
       <div className="flex items-center justify-between mb-8">
         <div>
