@@ -1,12 +1,11 @@
-import { Check, X, ArrowLeft, Zap } from "lucide-react";
+import { Check, X, Zap } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import AnimatedBackground from "@/components/layout/AnimatedBackground";
+import { useSidebar } from "@/components/ui/sidebar";
 
 const plans = [
   {
@@ -85,31 +84,22 @@ const plans = [
 ];
 
 const Pricing = () => {
-  const navigate = useNavigate();
   const [annualBilling, setAnnualBilling] = useState(true);
+  const { state } = useSidebar();
+  const isExpanded = state === "expanded";
 
   return (
-    <div className="relative min-h-screen bg-[#0a0a0b] overflow-hidden">
+    <div className="fixed inset-0 bg-[#0a0a0b] overflow-auto">
       <AnimatedBackground />
       
-      {/* Header */}
-      <header className="relative z-10 border-b border-white/5 bg-[#0a0a0b]/80 backdrop-blur-xl">
-        <div className="container flex h-14 items-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(-1)}
-            className="gap-2 text-white/60 hover:text-white hover:bg-white/5"
-          >
-            <ArrowLeft className="size-4" />
-            Назад
-          </Button>
-        </div>
-      </header>
-
-      {/* Content */}
-      <section className="relative z-10 py-12 md:py-20">
-        <div className="container">
+      {/* Content with sidebar offset */}
+      <div 
+        className="relative z-10 min-h-full py-12 md:py-20 transition-all duration-300"
+        style={{
+          paddingLeft: isExpanded ? 'var(--sidebar-width)' : '0px',
+        }}
+      >
+        <div className="container max-w-5xl mx-auto px-6">
           {/* Title */}
           <div className="mb-12 text-center">
             <h1 className="mb-4 text-3xl font-bold text-white md:text-4xl xl:text-5xl">
@@ -144,14 +134,14 @@ const Pricing = () => {
           </div>
 
           {/* Plans Grid - 3 columns */}
-          <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto">
+          <div className="grid gap-6 md:grid-cols-3">
             {plans.map((plan, index) => (
               <article
                 key={plan.title}
                 className={cn(
                   "relative rounded-2xl border overflow-hidden transition-all",
                   plan.recommended 
-                    ? "border-primary bg-white/[0.03] shadow-2xl shadow-primary/20 scale-105 z-10" 
+                    ? "border-primary bg-white/[0.03] shadow-2xl shadow-primary/20 md:scale-105 z-10" 
                     : "border-white/10 bg-white/[0.02] hover:border-white/20",
                   index === 0 && "md:-mr-2",
                   index === 2 && "md:-ml-2"
@@ -258,7 +248,7 @@ const Pricing = () => {
             </p>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 };
