@@ -22,8 +22,8 @@ const PublicCourse = lazy(() => import("./pages/PublicCourse"));
 const ShortCourse = lazy(() => import("./pages/ShortCourse"));
 const Moderation = lazy(() => import("./pages/Moderation"));
 const Dictionary = lazy(() => import("./pages/Dictionary"));
-const DesignSystem = lazy(() => import("./pages/DesignSystem"));
 const Favorites = lazy(() => import("./pages/Favorites"));
+const Pricing = lazy(() => import("./pages/Pricing"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -87,7 +87,7 @@ const AppRoutes = () => (
       <Route path="/moderation" element={<Suspense fallback={<PageLoader />}><Moderation /></Suspense>} />
       <Route path="/dictionary" element={<Suspense fallback={<PageLoader />}><Dictionary /></Suspense>} />
       <Route path="/favorites" element={<Suspense fallback={<PageLoader />}><Favorites /></Suspense>} />
-      <Route path="/design-system" element={<Suspense fallback={<PageLoader />}><DesignSystem /></Suspense>} />
+      <Route path="/pricing" element={<Suspense fallback={<PageLoader />}><Pricing /></Suspense>} />
     </Route>
     
     {/* Protected routes without sidebar layout */}
