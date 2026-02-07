@@ -89,26 +89,26 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
       {/* Gradient overlay for text readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 via-50% to-transparent" />
 
+      {/* Favorite button - positioned based on state */}
+      {onToggleFavorite && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleFavorite();
+          }}
+          className={cn(
+            'absolute top-3 w-8 h-8 rounded-lg flex items-center justify-center transition-all z-10',
+            isFavorite
+              ? 'left-3 bg-white/30 backdrop-blur-sm text-white'
+              : 'right-3 bg-white/20 backdrop-blur-sm text-white/70 opacity-0 group-hover:opacity-100 hover:text-white hover:bg-white/30'
+          )}
+        >
+          <Star className="w-4 h-4" fill={isFavorite ? 'currentColor' : 'none'} />
+        </button>
+      )}
+
       {/* Top action buttons */}
       <div className="absolute top-3 right-3 flex items-center gap-1">
-        {/* Favorite button - show for any variant if handler provided */}
-        {onToggleFavorite && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleFavorite();
-            }}
-            className={cn(
-              'w-8 h-8 rounded-lg flex items-center justify-center transition-all',
-              isFavorite
-                ? 'bg-white/30 backdrop-blur-sm text-white'
-                : 'bg-white/20 backdrop-blur-sm text-white/70 opacity-0 group-hover:opacity-100 hover:text-white hover:bg-white/30'
-            )}
-          >
-            <Star className="w-4 h-4" fill={isFavorite ? 'currentColor' : 'none'} />
-          </button>
-        )}
-
         {/* Workshop menu */}
         {variant === 'workshop' && (
           <div className="opacity-0 group-hover:opacity-100 transition-opacity">
