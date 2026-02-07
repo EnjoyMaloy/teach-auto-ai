@@ -367,7 +367,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
         </div>
       </SidebarFooter>
 
-      <SidebarRail />
+      
     </Sidebar>
   );
 };
