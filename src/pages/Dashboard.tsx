@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCourses } from '@/hooks/useCourses';
+import { useFavorites } from '@/hooks/useFavorites';
 import { Course } from '@/types/course';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,6 +25,7 @@ type FilterType = 'all' | 'drafts' | 'published';
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { courses, isLoading, fetchCourses, createCourse, deleteCourse } = useCourses();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [filter, setFilter] = useState<FilterType>('all');
@@ -151,6 +153,8 @@ const Dashboard: React.FC = () => {
               lessonsCount={course.lessons.length}
               isPublished={course.isPublished}
               variant="workshop"
+              isFavorite={isFavorite(course.id)}
+              onToggleFavorite={() => toggleFavorite(course.id)}
               onDelete={() => setCourseToDelete(course)}
             />
           ))}

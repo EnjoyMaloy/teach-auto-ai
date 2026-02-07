@@ -9,12 +9,15 @@ import { getCategoryById } from '@/lib/categories';
 import AnimatedBackground from '@/components/layout/AnimatedBackground';
 import CourseCardOverlay from '@/components/catalog/CourseCardOverlay';
 
+type FilterType = 'all' | 'mine' | 'public';
+
 const Favorites: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { favorites, toggleFavorite, isLoading: favoritesLoading } = useFavorites();
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [filter, setFilter] = useState<FilterType>('all');
 
   useEffect(() => {
     const fetchFavoriteCourses = async () => {
@@ -35,10 +38,11 @@ const Favorites: React.FC = () => {
           estimated_minutes,
           category,
           is_published,
+          author_id,
           lessons:published_lessons(id)
         `)
         .in('id', favorites)
-        .or('is_published.eq.true,is_link_accessible.eq.true');
+        .or(`is_published.eq.true,is_link_accessible.eq.true,author_id.eq.${user.id}`);
 
       if (error) {
         console.error('Error fetching favorite courses:', error);
@@ -53,7 +57,7 @@ const Favorites: React.FC = () => {
           category: c.category,
           isPublished: c.is_published,
           lessons: c.lessons || [],
-          authorId: '',
+          authorId: c.author_id,
           createdAt: new Date(),
           updatedAt: new Date(),
           targetAudience: '',
@@ -73,6 +77,24 @@ const Favorites: React.FC = () => {
 
   const loading = isLoading || favoritesLoading;
 
+  const filteredCourses = courses.filter(course => {
+    if (filter === 'all') return true;
+    if (filter === 'mine') return course.authorId === user?.id;
+    return course.authorId !== user?.id;
+  });
+
+  const counts = {
+    all: courses.length,
+    mine: courses.filter(c => c.authorId === user?.id).length,
+    public: courses.filter(c => c.authorId !== user?.id).length,
+  };
+
+  const filters: { id: FilterType; label: string }[] = [
+    { id: 'all', label: 'Все' },
+    { id: 'mine', label: 'Мои' },
+    { id: 'public', label: 'Публичные' },
+  ];
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-background dark:bg-[#0f0f12]">
       <AnimatedBackground />
@@ -80,42 +102,72 @@ const Favorites: React.FC = () => {
         className="relative z-10 p-6 transition-all duration-200"
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1.5rem)' }}
       >
-      {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
-          {[...Array(6)].map((_, i) => (
-            <CourseCardSkeleton key={i} />
-          ))}
-        </div>
-      ) : courses.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 text-center">
-          <div className="text-muted-foreground dark:text-white/20 text-[13px] mb-2">
-            Нет сохранённых курсов
+        {/* Filters */}
+        {courses.length > 0 && (
+          <div className="flex items-center gap-1 mb-6">
+            {filters.map(f => (
+              <button
+                key={f.id}
+                onClick={() => setFilter(f.id)}
+                className={`
+                  px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors
+                  ${filter === f.id 
+                    ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
+                    : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
+                  }
+                `}
+              >
+                {f.label}
+                <span className="ml-1.5 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
+              </button>
+            ))}
           </div>
-          <button 
-            onClick={() => navigate('/catalog')}
-            className="text-[13px] text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60 transition-colors"
-          >
-            Исследовать курсы →
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
-          {courses.map(course => (
-            <CourseCardOverlay
-              key={course.id}
-              id={course.id}
-              title={course.title}
-              description={course.description}
-              coverImage={course.coverImage}
-              lessonsCount={course.lessons.length}
-              categoryName={getCategoryById((course as any).category)?.name}
-              isFavorite={true}
-              onToggleFavorite={() => toggleFavorite(course.id)}
-              variant="favorites"
-            />
-          ))}
-        </div>
-      )}
+        )}
+
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
+            {[...Array(6)].map((_, i) => (
+              <CourseCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : courses.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-64 text-center">
+            <div className="text-muted-foreground dark:text-white/20 text-[13px] mb-2">
+              Нет сохранённых курсов
+            </div>
+            <button 
+              onClick={() => navigate('/catalog')}
+              className="text-[13px] text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60 transition-colors"
+            >
+              Исследовать курсы →
+            </button>
+          </div>
+        ) : filteredCourses.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-64 text-center">
+            <div className="text-muted-foreground dark:text-white/20 text-[13px]">
+              {filter === 'mine' ? 'Нет ваших курсов в избранном' : 'Нет публичных курсов в избранном'}
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
+            {filteredCourses.map(course => (
+              <CourseCardOverlay
+                key={course.id}
+                id={course.id}
+                title={course.title}
+                description={course.description}
+                coverImage={course.coverImage}
+                lessonsCount={course.lessons.length}
+                categoryName={getCategoryById((course as any).category)?.name}
+                isFavorite={true}
+                onToggleFavorite={() => toggleFavorite(course.id)}
+                isPublished={course.isPublished}
+                variant={course.authorId === user?.id ? 'workshop' : 'favorites'}
+                onDelete={course.authorId === user?.id ? undefined : undefined}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
