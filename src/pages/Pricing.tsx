@@ -1,4 +1,4 @@
-import { Check, X, Zap } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -38,8 +38,8 @@ const plans = [
       ),
     },
     recommended: true,
-    current: true,
-    icon: Zap,
+    current: false,
+    icon: null,
     featureGroups: [
       {
         title: "Возможности",
