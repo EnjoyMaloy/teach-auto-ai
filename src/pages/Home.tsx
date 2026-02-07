@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, ArrowUp, Loader2, Gauge, Palette, Bot } from 'lucide-react';
+import { Plus, ArrowUp, Loader2, Gauge, Palette, Sparkles } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/hooks/useAuth';
 import { useCourses } from '@/hooks/useCourses';
@@ -250,7 +250,7 @@ const Home: React.FC = () => {
                       disabled
                       className="h-8 px-3 rounded-lg bg-white/5 flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-white/[0.08] transition-colors"
                     >
-                      <Bot className="w-3.5 h-3.5 text-white/30" />
+                      <Sparkles className="w-3.5 h-3.5 text-white/30" />
                       <span className="text-[12px] text-white/30">Маскот</span>
                     </button>
                   </TooltipTrigger>
