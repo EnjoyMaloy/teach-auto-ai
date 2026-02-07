@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, Compass } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { useCourses } from '@/hooks/useCourses';
@@ -85,15 +85,17 @@ const Catalog: React.FC = () => {
         ))}
       </div>
 
-      {/* Results count */}
-      <div className="text-[12px] text-muted-foreground dark:text-white/30 mb-4">
-        {filter !== 'all' && (
-          <span>
-            {getCategoryById(filter)?.name} · 
-          </span>
-        )}
-        {' '}{filteredCourses.length} {getCoursesWord(filteredCourses.length)}
-      </div>
+      {/* Results count - only show if there are results */}
+      {filteredCourses.length > 0 && (
+        <div className="text-[12px] text-muted-foreground dark:text-white/30 mb-4">
+          {filter !== 'all' && (
+            <span>
+              {getCategoryById(filter)?.name} · 
+            </span>
+          )}
+          {' '}{filteredCourses.length} {getCoursesWord(filteredCourses.length)}
+        </div>
+      )}
 
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
@@ -102,13 +104,22 @@ const Catalog: React.FC = () => {
           ))}
         </div>
       ) : filteredCourses.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 text-center">
-          <div className="text-muted-foreground dark:text-white/20 text-[13px]">
+        <div className="flex flex-col items-center justify-center h-[60vh] text-center">
+          <div className="w-16 h-16 mb-6 rounded-2xl bg-muted/50 dark:bg-white/5 flex items-center justify-center">
+            <Compass className="w-8 h-8 text-muted-foreground/50 dark:text-white/20" />
+          </div>
+          <h3 className="text-lg font-medium text-foreground dark:text-white/80 mb-2">
             {searchQuery || filter !== 'all'
               ? 'Ничего не найдено' 
-              : 'Пока нет курсов'
+              : 'На платформе ещё нет публичных курсов'
             }
-          </div>
+          </h3>
+          <p className="text-sm text-muted-foreground dark:text-white/40 max-w-sm">
+            {searchQuery || filter !== 'all'
+              ? 'Попробуйте изменить параметры поиска'
+              : 'Скоро здесь появятся интересные курсы от авторов'
+            }
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
