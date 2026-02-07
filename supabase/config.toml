@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.generate-dictionary]
 verify_jwt = false
+
+[functions.generate-course-banners]
+verify_jwt = false
