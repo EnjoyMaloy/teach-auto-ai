@@ -112,16 +112,10 @@ const Catalog: React.FC = () => {
             className="w-32 h-32 mb-6 object-contain"
           />
           <h3 className="text-lg font-medium text-foreground dark:text-white/80 mb-2">
-            {searchQuery || filter !== 'all'
-              ? 'Ничего не найдено' 
-              : 'На платформе ещё нет публичных курсов'
-            }
+            На платформе ещё нет публичных курсов
           </h3>
           <p className="text-sm text-muted-foreground dark:text-white/40 max-w-sm">
-            {searchQuery || filter !== 'all'
-              ? 'Попробуйте изменить параметры поиска'
-              : 'Скоро здесь появятся интересные курсы от авторов'
-            }
+            Скоро здесь появятся интересные курсы от авторов
           </p>
         </div>
       ) : (
