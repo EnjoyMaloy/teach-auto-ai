@@ -70,7 +70,7 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-background">
+    <div className="min-h-screen relative overflow-hidden bg-[#0f0f12]">
       <AnimatedBackground />
       <div 
         className="relative z-10 p-6 transition-all duration-200"
@@ -79,7 +79,7 @@ const Dashboard: React.FC = () => {
       {/* Top Bar */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-[15px] font-semibold text-foreground">Мои курсы</h1>
+          <h1 className="text-[15px] font-semibold text-white">Мои курсы</h1>
         </div>
         
         <Button 
@@ -108,13 +108,13 @@ const Dashboard: React.FC = () => {
             className={`
               px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors
               ${filter === f.id 
-                ? 'bg-muted text-foreground' 
-                : 'text-muted-foreground hover:text-foreground/80'
+                ? 'bg-white/10 text-white' 
+                : 'text-white/40 hover:text-white/60'
               }
             `}
           >
             {f.label}
-            <span className="ml-1.5 text-muted-foreground/50">{counts[f.id]}</span>
+            <span className="ml-1.5 text-white/30">{counts[f.id]}</span>
           </button>
         ))}
       </div>
@@ -122,11 +122,11 @@ const Dashboard: React.FC = () => {
       {/* Content */}
       {isLoading ? (
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground/50" />
+          <Loader2 className="w-5 h-5 animate-spin text-white/30" />
         </div>
       ) : filteredCourses.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center">
-          <div className="text-muted-foreground/40 text-[13px] mb-4">
+          <div className="text-white/20 text-[13px] mb-4">
             {filter === 'all' 
               ? 'У вас пока нет курсов' 
               : filter === 'drafts'
@@ -140,7 +140,7 @@ const Dashboard: React.FC = () => {
               disabled={isCreating}
               variant="outline"
               size="sm"
-              className="border-border text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              className="border-white/10 text-white/60 hover:text-white hover:bg-white/5"
             >
               <Plus className="w-3.5 h-3.5 mr-1.5" />
               Создать первый курс
@@ -161,15 +161,15 @@ const Dashboard: React.FC = () => {
 
       {/* Delete Dialog */}
       <AlertDialog open={!!courseToDelete} onOpenChange={() => setCourseToDelete(null)}>
-        <AlertDialogContent className="bg-card border-border max-w-sm">
+        <AlertDialogContent className="bg-[#1a1a1b] border-white/10 max-w-sm">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-[15px] text-foreground">Удалить курс?</AlertDialogTitle>
-            <AlertDialogDescription className="text-[13px] text-muted-foreground">
+            <AlertDialogTitle className="text-[15px] text-white">Удалить курс?</AlertDialogTitle>
+            <AlertDialogDescription className="text-[13px] text-white/50">
               «{courseToDelete?.title}» будет удалён без возможности восстановления.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
-            <AlertDialogCancel className="h-8 px-3 text-[13px] bg-transparent border-border text-muted-foreground hover:text-foreground hover:bg-muted/50">
+            <AlertDialogCancel className="h-8 px-3 text-[13px] bg-transparent border-white/10 text-white/60 hover:text-white hover:bg-white/5">
               Отмена
             </AlertDialogCancel>
             <AlertDialogAction 
@@ -200,11 +200,11 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onDelete }) => {
 
   return (
     <div 
-      className="group relative bg-card/30 rounded-lg border border-border/50 hover:border-border transition-colors cursor-pointer overflow-hidden"
+      className="group relative bg-white/[0.02] rounded-lg border border-white/[0.04] hover:border-white/10 transition-colors cursor-pointer overflow-hidden"
       onClick={() => navigate(`/editor/${course.id}`)}
     >
       {/* Image */}
-      <div className="aspect-[16/10] bg-muted/30 relative">
+      <div className="aspect-[16/10] bg-white/[0.02] relative">
         {course.coverImage ? (
           <img 
             src={course.coverImage} 
@@ -213,8 +213,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onDelete }) => {
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center">
-              <span className="text-muted-foreground/30 text-lg font-medium">
+            <div className="w-8 h-8 rounded-lg bg-white/[0.03] flex items-center justify-center">
+              <span className="text-white/10 text-lg font-medium">
                 {course.title.charAt(0).toUpperCase()}
               </span>
             </div>
@@ -228,7 +228,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onDelete }) => {
               Опубликован
             </span>
           ) : (
-            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground">
+            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-white/10 text-white/50">
               Черновик
             </span>
           )}
@@ -238,20 +238,20 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onDelete }) => {
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <DropdownMenu>
             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-              <button className="w-6 h-6 rounded bg-background/50 hover:bg-background/70 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+              <button className="w-6 h-6 rounded bg-black/50 hover:bg-black/70 flex items-center justify-center text-white/70 hover:text-white transition-colors">
                 <MoreHorizontal className="w-3.5 h-3.5" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent 
               align="end" 
-              className="min-w-[140px] bg-card border-border p-1"
+              className="min-w-[140px] bg-[#1a1a1b] border-white/10 p-1"
             >
               <DropdownMenuItem 
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate(`/course/${course.id}/settings`);
                 }}
-                className="text-[13px] text-muted-foreground focus:text-foreground focus:bg-muted/50 rounded px-2 py-1.5"
+                className="text-[13px] text-white/70 focus:text-white focus:bg-white/5 rounded px-2 py-1.5"
               >
                 <Settings className="w-3.5 h-3.5 mr-2" />
                 Настройки
@@ -261,7 +261,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onDelete }) => {
                   e.stopPropagation();
                   navigate(`/course/${course.id}/stats`);
                 }}
-                className="text-[13px] text-muted-foreground focus:text-foreground focus:bg-muted/50 rounded px-2 py-1.5"
+                className="text-[13px] text-white/70 focus:text-white focus:bg-white/5 rounded px-2 py-1.5"
               >
                 <BarChart3 className="w-3.5 h-3.5 mr-2" />
                 Статистика
@@ -272,13 +272,13 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onDelete }) => {
                     e.stopPropagation();
                     window.open(`/course/${course.id}`, '_blank');
                   }}
-                  className="text-[13px] text-muted-foreground focus:text-foreground focus:bg-muted/50 rounded px-2 py-1.5"
+                  className="text-[13px] text-white/70 focus:text-white focus:bg-white/5 rounded px-2 py-1.5"
                 >
                   <Eye className="w-3.5 h-3.5 mr-2" />
                   Открыть
                 </DropdownMenuItem>
               )}
-              <DropdownMenuSeparator className="my-1 bg-border/50" />
+              <DropdownMenuSeparator className="my-1 bg-white/5" />
               <DropdownMenuItem 
                 onClick={(e) => {
                   e.stopPropagation();
@@ -296,10 +296,10 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onDelete }) => {
 
       {/* Info */}
       <div className="p-3">
-        <h3 className="text-[13px] font-medium text-foreground/90 truncate mb-1">
+        <h3 className="text-[13px] font-medium text-white/90 truncate mb-1">
           {course.title}
         </h3>
-        <div className="text-[11px] text-muted-foreground/50">
+        <div className="text-[11px] text-white/30">
           {course.lessons.length} {getLessonWord(course.lessons.length)}
         </div>
       </div>

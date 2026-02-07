@@ -24,29 +24,29 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
             className={cn(
               "flex-shrink-0 px-4 py-3 rounded-xl transition-all duration-200",
               "flex items-center gap-2",
-              "border border-border hover:border-border/80",
-              "bg-muted/50 hover:bg-muted",
+              "border border-white/10 hover:border-white/20",
+              "bg-white/5 hover:bg-white/10",
               isSelected && "bg-primary/20 border-primary/50 text-primary"
             )}
           >
             <div 
               className={cn(
                 "w-8 h-8 rounded-lg flex items-center justify-center",
-                isSelected ? "bg-primary/20" : "bg-muted"
+                isSelected ? "bg-primary/20" : "bg-white/10"
               )}
               style={!isSelected ? { backgroundColor: `${category.color}30` } : undefined}
             >
               <Icon 
                 className={cn(
                   "w-4 h-4",
-                  isSelected ? "text-primary" : "text-muted-foreground"
-                )}
+                  isSelected ? "text-primary" : "text-white/70"
+                )} 
                 strokeWidth={1.5} 
               />
             </div>
             <span className={cn(
               "text-sm font-medium",
-              isSelected ? "text-primary" : "text-muted-foreground"
+              isSelected ? "text-primary" : "text-white/70"
             )}>
               {category.name}
             </span>

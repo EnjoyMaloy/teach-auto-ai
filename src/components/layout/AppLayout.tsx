@@ -18,7 +18,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }, [language]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#0f0f10]">
       <AppSidebar language={language} onLanguageChange={setLanguage} />
       <main className="ml-64 min-h-screen">
         <div className="px-8 py-6">
