@@ -1,164 +1,76 @@
 
+# План: Полная замена на оригинальный Sidebar9
 
-# План: Внедрение Sidebar9 точно по коду shadcnblocks.com
+## Подход
 
-## Текущая проблема
-
-Сейчас в `AppSidebar.tsx` реализация отличается от оригинального Sidebar9:
-
-1. **WorkspaceSwitcher** — используется буква вместо логотипа (`<img>`)
-2. **Sidebar variant** — не указан `variant="floating"` (в оригинале есть)
-3. **NavMenuItem** — в проекте кастомный компонент, в оригинале другая структура
-4. **Стили иконок** — в оригинале `className="size-4"`, у нас без этого класса
-5. **ProtectedLayout header** — не добавлен хедер с `SidebarTrigger`, `Separator` и `Breadcrumb` как в Sidebar9
+Беру **весь код из `sidebar9.tsx`** и вставляю как есть, адаптируя только:
+1. Интеграцию с `react-router-dom` (вместо `<a href>`)
+2. Данные пользователя из `useAuth`
+3. Загрузку курсов из Supabase для "Active Projects"
 
 ## Что будет сделано
 
-### 1. Полная замена `AppSidebar.tsx`
+### Файл 1: `src/components/layout/AppSidebar.tsx`
 
-Скопирую структуру Sidebar9 точь-в-точь, адаптируя только:
-- Данные навигации под приложение (Dashboard → Мои курсы и т.д.)
-- Интеграцию с `useAuth` и `react-router-dom` для навигации
-- Загрузку реальных недавних курсов из Supabase
+**Полная замена** на код из `sidebar9.tsx` с минимальными адаптациями:
 
-**Ключевые изменения:**
-- `variant="floating"` на компоненте `<Sidebar>`
-- `<img>` в WorkspaceSwitcher с логотипом
-- `NavMenuItem` — точная копия из Sidebar9 (с Collapsible для подменю)
-- Классы `size-4`, `size-6`, `size-8` на иконках как в оригинале
+| Оригинал | Адаптация |
+|----------|-----------|
+| `<a href={item.href}>` | `onClick={() => navigate(item.href)}` |
+| `sidebarData.user` (статичный) | Данные из `useAuth()` |
+| `sidebarData.workspaces` | Логотип проекта |
+| Статичные "Project Alpha/Beta" | Динамические курсы из Supabase |
 
-### 2. Обновление `ProtectedLayout.tsx`
+### Файл 2: `src/components/layout/ProtectedLayout.tsx`
 
-Добавлю header внутрь `SidebarInset` как в Sidebar9:
+Заменяю на структуру `Sidebar9` из оригинала:
 
 ```tsx
-<SidebarInset>
-  <header className="flex h-16 shrink-0 items-center gap-2 px-4">
-    <SidebarTrigger className="-ml-1" />
-    <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-    <Breadcrumb>
-      <BreadcrumbList>
-        <BreadcrumbItem className="hidden md:block">
-          <BreadcrumbLink href="#">Overview</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator className="hidden md:block" />
-        <BreadcrumbItem>
-          <BreadcrumbPage>Dashboard</BreadcrumbPage>
-        </BreadcrumbItem>
-      </BreadcrumbList>
-    </Breadcrumb>
-  </header>
-  <Outlet />
-</SidebarInset>
+<SidebarProvider>
+  <AppSidebar />
+  <SidebarInset>
+    <header className="flex h-16 shrink-0 items-center gap-2 px-4">
+      <SidebarTrigger className="-ml-1" />
+      <Separator
+        orientation="vertical"
+        className="mr-2 data-[orientation=vertical]:h-4"
+      />
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem className="hidden md:block">
+            <BreadcrumbLink href="#">Overview</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator className="hidden md:block" />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Dashboard</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+    </header>
+    <Outlet />
+  </SidebarInset>
+</SidebarProvider>
 ```
 
-### 3. Структура файлов
+## Точное соответствие оригиналу
+
+Все стили сохраняются 1 в 1:
+- `font-medium` (не `font-semibold`)
+- `text-muted-foreground` (не `text-sidebar-foreground/50`)
+- `size-8` (не `h-8 w-8`)
+- `variant="floating"` (без `collapsible="icon"`)
+- Классы иконки поиска: `left-2 size-4 -translate-y-1/2 opacity-50 select-none`
+
+## Файлы для изменения
 
 | Файл | Действие |
 |------|----------|
-| `src/components/layout/AppSidebar.tsx` | Полная замена на структуру Sidebar9 |
-| `src/components/layout/ProtectedLayout.tsx` | Добавить header с SidebarTrigger и Breadcrumb |
-
----
-
-## Техническая реализация
-
-### WorkspaceSwitcher (оригинал Sidebar9)
-
-```tsx
-<div className="flex aspect-square size-8 items-center justify-center rounded-sm bg-primary">
-  <img
-    src={selected.logo}
-    alt={selected.name}
-    className="size-6 text-primary-foreground invert dark:invert-0"
-  />
-</div>
-```
-
-### NavMenuItem (оригинал Sidebar9)
-
-```tsx
-const NavMenuItem = ({ item }: { item: NavItem }) => {
-  const Icon = item.icon;
-  const hasChildren = item.children && item.children.length > 0;
-
-  if (!hasChildren) {
-    return (
-      <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={item.isActive}>
-          <a href={item.href}>
-            <Icon className="size-4" />
-            <span>{item.label}</span>
-          </a>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-    );
-  }
-
-  return (
-    <Collapsible asChild defaultOpen={item.isActive} className="group/collapsible">
-      <SidebarMenuItem>
-        <CollapsibleTrigger asChild>
-          <SidebarMenuButton isActive={item.isActive}>
-            <Icon className="size-4" />
-            <span>{item.label}</span>
-            <ChevronRight className="ml-auto size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-          </SidebarMenuButton>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <SidebarMenuSub>
-            {item.children!.map((child) => (
-              <SidebarMenuSubItem key={child.label}>
-                <SidebarMenuSubButton asChild isActive={child.isActive}>
-                  <a href={child.href}>{child.label}</a>
-                </SidebarMenuSubButton>
-              </SidebarMenuSubItem>
-            ))}
-          </SidebarMenuSub>
-        </CollapsibleContent>
-      </SidebarMenuItem>
-    </Collapsible>
-  );
-};
-```
-
-### AppSidebar (оригинал Sidebar9)
-
-```tsx
-<Sidebar variant="floating" {...props}>
-  <SidebarHeader>
-    <WorkspaceSwitcher ... />
-    <SearchForm />
-  </SidebarHeader>
-  <SidebarContent>
-    {navGroups.map((group) => (
-      <SidebarGroup key={group.title}>
-        <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
-        <SidebarGroupContent>
-          <SidebarMenu>
-            {group.items.map((item) => (
-              <NavMenuItem key={item.label} item={item} />
-            ))}
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
-    ))}
-  </SidebarContent>
-  <SidebarFooter>
-    <NavUser user={...} />
-  </SidebarFooter>
-  <SidebarRail />
-</Sidebar>
-```
-
----
+| `src/components/layout/AppSidebar.tsx` | Полная замена на код sidebar9.tsx |
+| `src/components/layout/ProtectedLayout.tsx` | Структура SidebarInset + header из sidebar9.tsx |
 
 ## Итог
 
-После реализации сайдбар будет выглядеть **точно как на скриншоте** с shadcnblocks.com:
-- Floating sidebar с закруглёнными краями
-- Workspace switcher с логотипом
-- Группы навигации с подменю (Collapsible)
-- Header с SidebarTrigger и Breadcrumb
-- User footer с dropdown меню
-
+После замены сайдбар будет **идентичен** shadcnblocks.com:
+- Все классы, шрифты, цвета, отступы — точно как в оригинале
+- Интеграция с роутингом и авторизацией проекта
+- Динамические данные (курсы) вместо статичных проектов
