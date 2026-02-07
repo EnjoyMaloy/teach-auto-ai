@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Compass, BookOpen, Clock, Layers, Star, Loader2 } from 'lucide-react';
+import { Search, Star, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useCourses } from '@/hooks/useCourses';
 import { useFavorites } from '@/hooks/useFavorites';
 import { Course } from '@/types/course';
 import { COURSE_CATEGORIES, getCategoryById } from '@/lib/categories';
-import { cn } from '@/lib/utils';
+
+type FilterType = 'all' | string;
 
 const Catalog: React.FC = () => {
   const navigate = useNavigate();
   const { fetchPublishedCourses, isLoading } = useCourses();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [courses, setCourses] = useState<Course[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [filter, setFilter] = useState<FilterType>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
@@ -25,7 +26,7 @@ const Catalog: React.FC = () => {
   }, [fetchPublishedCourses]);
 
   const filteredCourses = courses.filter(course => {
-    const matchesCategory = !selectedCategory || (course as any).category === selectedCategory;
+    const matchesCategory = filter === 'all' || (course as any).category === filter;
     const matchesSearch = !searchQuery || 
       course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       course.description?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -33,94 +34,83 @@ const Catalog: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="h-full">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-            <Compass className="w-5 h-5 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-xl font-semibold text-white">Исследовать</h1>
-            <p className="text-sm text-white/40">Открывай новые знания</p>
-          </div>
-        </div>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-[15px] font-semibold text-white">Исследовать</h1>
       </div>
 
       {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+      <div className="relative max-w-sm mb-6">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
         <Input
           placeholder="Поиск курсов..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-white/30 h-10"
+          className="pl-9 h-9 bg-white/[0.03] border-white/[0.06] text-white text-[13px] placeholder:text-white/30"
         />
       </div>
 
       {/* Categories */}
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex items-center gap-1 mb-6 overflow-x-auto pb-1">
         <button
-          onClick={() => setSelectedCategory(null)}
-          className={cn(
-            "px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors",
-            !selectedCategory 
-              ? "bg-primary text-white" 
-              : "bg-white/5 text-white/50 hover:text-white/70"
-          )}
+          onClick={() => setFilter('all')}
+          className={`
+            px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap
+            ${filter === 'all' 
+              ? 'bg-white/10 text-white' 
+              : 'text-white/40 hover:text-white/60'
+            }
+          `}
         >
           Все
         </button>
-        {COURSE_CATEGORIES.map(category => {
-          const Icon = category.icon;
-          return (
-            <button
-              key={category.id}
-              onClick={() => setSelectedCategory(category.id)}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors",
-                selectedCategory === category.id
-                  ? "bg-primary text-white"
-                  : "bg-white/5 text-white/50 hover:text-white/70"
-              )}
-            >
-              <Icon className="w-3.5 h-3.5" />
-              {category.name}
-            </button>
-          );
-        })}
+        {COURSE_CATEGORIES.map(category => (
+          <button
+            key={category.id}
+            onClick={() => setFilter(category.id)}
+            className={`
+              px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap
+              ${filter === category.id 
+                ? 'bg-white/10 text-white' 
+                : 'text-white/40 hover:text-white/60'
+              }
+            `}
+          >
+            {category.name}
+          </button>
+        ))}
       </div>
 
-      {/* Results Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm text-white/50">
-          {selectedCategory 
-            ? getCategoryById(selectedCategory)?.name 
-            : 'Все курсы'}
-          <span className="ml-1.5 text-white/30">({filteredCourses.length})</span>
-        </h2>
-        {selectedCategory && (
-          <button 
-            onClick={() => setSelectedCategory(null)}
-            className="text-xs text-primary hover:text-primary/80"
-          >
-            Сбросить
-          </button>
+      {/* Results count */}
+      <div className="text-[12px] text-white/30 mb-4">
+        {filter !== 'all' && (
+          <span>
+            {getCategoryById(filter)?.name} · 
+          </span>
         )}
+        {' '}{filteredCourses.length} {getCoursesWord(filteredCourses.length)}
       </div>
 
       {/* Content */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-5 h-5 animate-spin text-white/30" />
         </div>
       ) : filteredCourses.length === 0 ? (
-        <EmptyState hasFilters={!!selectedCategory || !!searchQuery} />
+        <div className="flex flex-col items-center justify-center h-64 text-center">
+          <div className="text-white/20 text-[13px]">
+            {searchQuery || filter !== 'all'
+              ? 'Ничего не найдено' 
+              : 'Пока нет курсов'
+            }
+          </div>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
           {filteredCourses.map(course => (
             <CourseCard 
-              key={course.id}
+              key={course.id} 
               course={course}
               isFavorite={isFavorite(course.id)}
               onToggleFavorite={() => toggleFavorite(course.id)}
@@ -132,7 +122,10 @@ const Catalog: React.FC = () => {
   );
 };
 
-// Course Card
+/* ─────────────────────────────────────────────────────────────────────────────
+   Course Card
+───────────────────────────────────────────────────────────────────────────── */
+
 interface CourseCardProps {
   course: Course & { category?: string };
   isFavorite: boolean;
@@ -145,91 +138,89 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, isFavorite, onToggleFav
 
   return (
     <div 
-      className="group bg-white/[0.03] border border-white/5 rounded-xl overflow-hidden hover:border-white/10 transition-colors cursor-pointer"
+      className="group relative bg-white/[0.02] rounded-lg border border-white/[0.04] hover:border-white/10 transition-colors cursor-pointer overflow-hidden"
       onClick={() => navigate(`/course/${course.id}`)}
     >
-      {/* Cover */}
-      <div className="h-32 relative">
+      {/* Image */}
+      <div className="aspect-[16/10] bg-white/[0.02] relative">
         {course.coverImage ? (
           <img 
             src={course.coverImage} 
-            alt={course.title}
+            alt=""
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-            <BookOpen className="w-8 h-8 text-white/10" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-white/[0.03] flex items-center justify-center">
+              <span className="text-white/10 text-lg font-medium">
+                {course.title.charAt(0).toUpperCase()}
+              </span>
+            </div>
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         
-        {/* Category */}
+        {/* Category Badge */}
         {category && (
-          <span 
-            className="absolute top-2 left-2 px-2 py-0.5 rounded-md text-xs font-medium"
-            style={{ 
-              backgroundColor: `${category.color}30`,
-              color: category.color
-            }}
-          >
-            {category.name}
-          </span>
+          <div className="absolute top-2 left-2">
+            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-white/10 text-white/60">
+              {category.name}
+            </span>
+          </div>
         )}
 
-        {/* Favorite */}
+        {/* Favorite Button */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             onToggleFavorite();
           }}
-          className={cn(
-            "absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center transition-colors",
-            "bg-black/30 hover:bg-black/50",
-            isFavorite ? "text-yellow-400" : "text-white/50 hover:text-white/70"
-          )}
+          className={`
+            absolute top-2 right-2 w-6 h-6 rounded flex items-center justify-center transition-colors
+            ${isFavorite 
+              ? 'bg-white/20 text-white' 
+              : 'bg-black/40 text-white/40 opacity-0 group-hover:opacity-100 hover:text-white/70'
+            }
+          `}
         >
-          <Star className="w-3.5 h-3.5" fill={isFavorite ? "currentColor" : "none"} />
+          <Star className="w-3 h-3" fill={isFavorite ? "currentColor" : "none"} />
         </button>
       </div>
 
-      {/* Content */}
+      {/* Info */}
       <div className="p-3">
-        <h3 className="font-medium text-white text-sm line-clamp-1 mb-1">
+        <h3 className="text-[13px] font-medium text-white/90 truncate mb-1">
           {course.title}
         </h3>
-        <p className="text-xs text-white/40 line-clamp-2 mb-2 min-h-[2rem]">
-          {course.description || 'Без описания'}
-        </p>
-        <div className="flex items-center gap-3 text-xs text-white/30">
-          <span className="flex items-center gap-1">
-            <Layers className="w-3 h-3" />
-            {course.lessons.length}
-          </span>
-          {course.estimatedMinutes > 0 && (
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              {course.estimatedMinutes} мин
-            </span>
-          )}
+        <div className="text-[11px] text-white/30">
+          {course.lessons.length} {getLessonWord(course.lessons.length)}
         </div>
       </div>
     </div>
   );
 };
 
-// Empty State
-const EmptyState: React.FC<{ hasFilters: boolean }> = ({ hasFilters }) => (
-  <div className="flex flex-col items-center justify-center py-16 bg-white/[0.02] rounded-xl border border-white/5">
-    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
-      <Compass className="w-6 h-6 text-primary" />
-    </div>
-    <h3 className="text-white font-medium mb-1">
-      {hasFilters ? 'Ничего не найдено' : 'Пока нет курсов'}
-    </h3>
-    <p className="text-white/40 text-sm">
-      {hasFilters ? 'Попробуйте изменить параметры поиска' : 'Здесь появятся опубликованные курсы'}
-    </p>
-  </div>
-);
+/* ─────────────────────────────────────────────────────────────────────────────
+   Helpers
+───────────────────────────────────────────────────────────────────────────── */
+
+function getLessonWord(count: number): string {
+  const lastTwo = count % 100;
+  const lastOne = count % 10;
+  
+  if (lastTwo >= 11 && lastTwo <= 19) return 'уроков';
+  if (lastOne === 1) return 'урок';
+  if (lastOne >= 2 && lastOne <= 4) return 'урока';
+  return 'уроков';
+}
+
+function getCoursesWord(count: number): string {
+  const lastTwo = count % 100;
+  const lastOne = count % 10;
+  
+  if (lastTwo >= 11 && lastTwo <= 19) return 'курсов';
+  if (lastOne === 1) return 'курс';
+  if (lastOne >= 2 && lastOne <= 4) return 'курса';
+  return 'курсов';
+}
 
 export default Catalog;
