@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard,
-  BookOpen,
-  ChevronRight,
-  FileText,
-  LogOut,
-  ChevronsUpDown,
-  Check,
-  Search,
-  Briefcase,
-  Folder,
-  Users,
-  Clock3,
   BadgeCheck,
+  Bell,
+  Briefcase,
+  Check,
+  ChevronRight,
+  ChevronsUpDown,
+  Clock3,
+  Compass,
+  CreditCard,
+  Folder,
   Globe2,
+  LayoutDashboard,
+  LogOut,
+  Palette,
+  Search,
   Sparkles,
   Star,
-  Compass,
-  Palette,
+  Users,
   type LucideIcon,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
@@ -45,44 +45,28 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 import { Label } from '@/components/ui/label';
 
-interface RecentCourse {
-  id: string;
-  title: string;
-}
-
-interface AppSidebarProps {
-  language: string;
-  onLanguageChange: (lang: string) => void;
-}
-
-// Workspace type
+// Types
 interface Workspace {
-  id: string;
   name: string;
   logo: string;
   plan: string;
 }
 
-// Workspace data
-const workspacesList: Workspace[] = [
-  { id: '1', name: "Pavel's Academy", logo: Logo, plan: 'Pro' },
-];
-
-// NavItem type (from Sidebar9)
 interface NavItem {
   label: string;
   href: string;
@@ -96,15 +80,23 @@ interface NavGroup {
   items: NavItem[];
 }
 
-// Workspace Switcher Component (exact Sidebar9 structure)
+interface RecentCourse {
+  id: string;
+  title: string;
+}
+
+// Static data
+const workspaces: Workspace[] = [
+  { name: "Pavel's Academy", logo: Logo, plan: 'Pro' },
+];
+
+// WorkspaceSwitcher component (exact copy from sidebar9.tsx)
 const WorkspaceSwitcher = ({
   workspaces,
-  activeWorkspace,
 }: {
   workspaces: Workspace[];
-  activeWorkspace: Workspace;
 }) => {
-  const [selected, setSelected] = useState(activeWorkspace);
+  const [activeWorkspace, setActiveWorkspace] = useState(workspaces[0]);
 
   return (
     <SidebarMenu>
@@ -117,18 +109,20 @@ const WorkspaceSwitcher = ({
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-sm bg-primary">
                 <img
-                  src={selected.logo}
-                  alt={selected.name}
+                  src={activeWorkspace.logo}
+                  alt={activeWorkspace.name}
                   className="size-6 text-primary-foreground invert dark:invert-0"
                 />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{selected.name}</span>
-                <span className="truncate text-xs text-sidebar-foreground/50">
-                  {selected.plan}
+                <span className="truncate font-medium">
+                  {activeWorkspace.name}
+                </span>
+                <span className="truncate text-xs text-muted-foreground">
+                  {activeWorkspace.plan}
                 </span>
               </div>
-              <ChevronsUpDown className="ml-auto size-4" />
+              <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -142,19 +136,19 @@ const WorkspaceSwitcher = ({
             </DropdownMenuLabel>
             {workspaces.map((workspace) => (
               <DropdownMenuItem
-                key={workspace.id}
-                onClick={() => setSelected(workspace)}
+                key={workspace.name}
+                onClick={() => setActiveWorkspace(workspace)}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-sm bg-primary">
                   <img
                     src={workspace.logo}
                     alt={workspace.name}
-                    className="size-4 invert dark:invert-0"
+                    className="size-4 shrink-0 invert dark:invert-0"
                   />
                 </div>
                 {workspace.name}
-                {workspace.id === selected.id && (
+                {workspace.name === activeWorkspace.name && (
                   <Check className="ml-auto size-4" />
                 )}
               </DropdownMenuItem>
@@ -166,7 +160,7 @@ const WorkspaceSwitcher = ({
   );
 };
 
-// Search Component (exact Sidebar9 structure)
+// SearchForm component (exact copy from sidebar9.tsx)
 const SearchForm = () => {
   return (
     <form>
@@ -187,14 +181,18 @@ const SearchForm = () => {
   );
 };
 
-// Nav User Component (exact Sidebar9 structure)
-const NavUser = ({ 
-  user, 
+// NavUser component (exact copy from sidebar9.tsx with adaptations)
+const NavUser = ({
+  user,
   onSignOut,
   onDesignSystem,
   isAdmin,
-}: { 
-  user: { name: string; email: string; avatar: string };
+}: {
+  user: {
+    name: string;
+    email: string;
+    avatar: string;
+  };
   onSignOut: () => void;
   onDesignSystem?: () => void;
   isAdmin?: boolean;
@@ -208,7 +206,7 @@ const NavUser = ({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
+              <Avatar className="size-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback className="rounded-lg">
                   {user.name
@@ -218,8 +216,8 @@ const NavUser = ({
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs text-sidebar-foreground/50">
+                <span className="truncate font-medium">{user.name}</span>
+                <span className="truncate text-xs text-muted-foreground">
                   {user.email}
                 </span>
               </div>
@@ -234,7 +232,7 @@ const NavUser = ({
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
+                <Avatar className="size-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
                   <AvatarFallback className="rounded-lg">
                     {user.name
@@ -244,7 +242,7 @@ const NavUser = ({
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user.name}</span>
+                  <span className="truncate font-medium">{user.name}</span>
                   <span className="truncate text-xs text-muted-foreground">
                     {user.email}
                   </span>
@@ -252,11 +250,33 @@ const NavUser = ({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <Sparkles className="mr-2 size-4" />
+                Upgrade to Pro
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <BadgeCheck className="mr-2 size-4" />
+                Account
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <CreditCard className="mr-2 size-4" />
+                Billing
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Bell className="mr-2 size-4" />
+                Notifications
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
             {isAdmin && onDesignSystem && (
               <>
                 <DropdownMenuItem onClick={onDesignSystem}>
                   <Palette className="mr-2 size-4" />
-                  Дизайн-система
+                  Design System
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
               </>
@@ -272,11 +292,11 @@ const NavUser = ({
   );
 };
 
-// NavMenuItem Component (exact Sidebar9 structure)
-const NavMenuItem = ({ 
+// NavMenuItem component (exact copy from sidebar9.tsx)
+const NavMenuItem = ({
   item,
   onClick,
-}: { 
+}: {
   item: NavItem;
   onClick?: (href: string) => void;
 }) => {
@@ -286,12 +306,17 @@ const NavMenuItem = ({
   if (!hasChildren) {
     return (
       <SidebarMenuItem>
-        <SidebarMenuButton 
-          asChild 
+        <SidebarMenuButton
+          asChild
           isActive={item.isActive}
-          onClick={() => onClick?.(item.href)}
         >
-          <a href={item.href} onClick={(e) => { e.preventDefault(); onClick?.(item.href); }}>
+          <a
+            href={item.href}
+            onClick={(e) => {
+              e.preventDefault();
+              onClick?.(item.href);
+            }}
+          >
             <Icon className="size-4" />
             <span>{item.label}</span>
           </a>
@@ -301,7 +326,11 @@ const NavMenuItem = ({
   }
 
   return (
-    <Collapsible asChild defaultOpen={item.isActive} className="group/collapsible">
+    <Collapsible
+      asChild
+      defaultOpen={item.isActive}
+      className="group/collapsible"
+    >
       <SidebarMenuItem>
         <CollapsibleTrigger asChild>
           <SidebarMenuButton isActive={item.isActive}>
@@ -314,12 +343,17 @@ const NavMenuItem = ({
           <SidebarMenuSub>
             {item.children!.map((child) => (
               <SidebarMenuSubItem key={child.label}>
-                <SidebarMenuSubButton 
-                  asChild 
+                <SidebarMenuSubButton
+                  asChild
                   isActive={child.isActive}
-                  onClick={() => onClick?.(child.href)}
                 >
-                  <a href={child.href} onClick={(e) => { e.preventDefault(); onClick?.(child.href); }}>
+                  <a
+                    href={child.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onClick?.(child.href);
+                    }}
+                  >
                     {child.label}
                   </a>
                 </SidebarMenuSubButton>
@@ -332,7 +366,13 @@ const NavMenuItem = ({
   );
 };
 
-const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) => {
+// Main AppSidebar component
+interface AppSidebarProps {
+  language: string;
+  onLanguageChange: (lang: string) => void;
+}
+
+const AppSidebar: React.FC<AppSidebarProps> = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
@@ -340,7 +380,6 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) =
 
   const userName = 'John Doe';
   const userEmail = user?.email || 'john@example.com';
-
   const isAdmin = user?.email === 'trupcgames@gmail.com' || user?.email === 'vazhenka.hello@gmail.com';
 
   // Fetch recent courses
@@ -373,38 +412,41 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) =
   const isEditorRoute = (courseId: string) => location.pathname === `/editor/${courseId}`;
 
   const handleNavigate = (href: string) => {
-    navigate(href);
+    if (href !== '#') {
+      navigate(href);
+    }
   };
 
-  // Build navigation groups with active course children
+  // Build navigation groups
   const navGroups: NavGroup[] = [
     {
       title: 'Overview',
       items: [
         { label: 'Dashboard', href: '/', icon: LayoutDashboard, isActive: isActive('/') },
-        { label: 'Tasks', href: '/workshop', icon: BookOpen, isActive: isActive('/workshop') },
+        { label: 'Tasks', href: '/workshop', icon: Briefcase, isActive: isActive('/workshop') },
         { label: 'Roadmap', href: '/catalog', icon: Compass, isActive: isActive('/catalog') },
       ],
     },
     {
       title: 'Projects',
       items: [
-        { 
-          label: 'Active Projects', 
-          href: '#', 
-          icon: Briefcase, 
-          isActive: recentCourses.some(c => isEditorRoute(c.id)),
-          children: recentCourses.length > 0 
-            ? recentCourses.slice(0, 3).map((course) => ({
-                label: course.title,
-                href: `/editor/${course.id}`,
-                isActive: isEditorRoute(course.id),
-              }))
-            : [{ label: 'No projects yet', href: '#', isActive: false }],
+        {
+          label: 'Active Projects',
+          href: '#',
+          icon: Folder,
+          isActive: recentCourses.some((c) => isEditorRoute(c.id)),
+          children:
+            recentCourses.length > 0
+              ? recentCourses.slice(0, 3).map((course) => ({
+                  label: course.title,
+                  href: `/editor/${course.id}`,
+                  isActive: isEditorRoute(course.id),
+                }))
+              : [{ label: 'No projects yet', href: '#', isActive: false }],
         },
-        { 
-          label: 'Archived', 
-          href: '#', 
+        {
+          label: 'Archived',
+          href: '#',
           icon: Folder,
           children: [
             { label: '2024 Archive', href: '#', isActive: false },
@@ -432,15 +474,11 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) =
   ];
 
   return (
-    <Sidebar variant="floating" collapsible="icon">
+    <Sidebar variant="floating">
       <SidebarHeader>
-        <WorkspaceSwitcher
-          workspaces={workspacesList}
-          activeWorkspace={workspacesList[0]}
-        />
+        <WorkspaceSwitcher workspaces={workspaces} />
         <SearchForm />
       </SidebarHeader>
-
       <SidebarContent>
         {navGroups.map((group) => (
           <SidebarGroup key={group.title}>
@@ -448,8 +486,8 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) =
             <SidebarGroupContent>
               <SidebarMenu>
                 {group.items.map((item) => (
-                  <NavMenuItem 
-                    key={item.label} 
+                  <NavMenuItem
+                    key={item.label}
                     item={item}
                     onClick={handleNavigate}
                   />
@@ -459,7 +497,6 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) =
           </SidebarGroup>
         ))}
       </SidebarContent>
-
       <SidebarFooter>
         <NavUser
           user={{
@@ -472,7 +509,6 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ language, onLanguageChange }) =
           isAdmin={isAdmin}
         />
       </SidebarFooter>
-
       <SidebarRail />
     </Sidebar>
   );

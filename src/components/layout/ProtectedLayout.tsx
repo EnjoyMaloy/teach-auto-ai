@@ -38,17 +38,16 @@ const ProtectedLayout: React.FC = () => {
   // Get current page name from route
   const getCurrentPageName = () => {
     const path = location.pathname;
-    
+
     // Check if it's an editor route
     if (path.startsWith('/editor/')) {
       return 'Editor';
     }
-    
+
     return routeLabels[path] || 'Page';
   };
 
   const currentPage = getCurrentPageName();
-  const isEditorPage = location.pathname.startsWith('/editor/');
 
   return (
     <SidebarProvider>
@@ -56,13 +55,14 @@ const ProtectedLayout: React.FC = () => {
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
+          <Separator
+            orientation="vertical"
+            className="mr-2 data-[orientation=vertical]:h-4"
+          />
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/">
-                  Overview
-                </BreadcrumbLink>
+                <BreadcrumbLink href="#">Overview</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
