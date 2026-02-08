@@ -32,7 +32,7 @@ const LayoutContent: React.FC = () => {
         <div className="fixed top-0 left-0 right-0 z-20 flex items-center justify-center h-20 px-4 pt-2">
           {/* Sidebar trigger - left */}
           <div className="absolute left-4 top-1/2 -translate-y-1/2">
-            <SidebarTrigger className="h-12 w-12" iconSize={28} />
+            <SidebarTrigger className="h-12 w-12 p-2" />
           </div>
           
           {/* Centered logo - slightly lower */}
