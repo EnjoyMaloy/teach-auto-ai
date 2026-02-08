@@ -153,8 +153,8 @@ const Home: React.FC = () => {
     <div className="min-h-screen flex flex-col relative overflow-hidden bg-background dark:bg-[#0f0f12]">
       <AnimatedBackground />
       
-      {/* Mobile spacer for header (matches header height h-16 = 64px) */}
-      <div className="h-16 md:h-0 shrink-0" />
+      {/* Mobile spacer for header (matches header height h-20 = 80px) */}
+      <div className="h-20 md:h-0 shrink-0" />
       
       {/* Content - centered accounting for sidebar */}
       <div 
