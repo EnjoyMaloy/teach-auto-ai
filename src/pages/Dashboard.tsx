@@ -77,7 +77,7 @@ const Dashboard: React.FC = () => {
       <div className="h-10 md:h-0" />
       
       {/* Top Bar */}
-      <div className="flex items-center justify-end mb-4 md:mb-6">
+      <div className="flex items-center justify-end mb-4 md:mb-6 pr-1">
         <Button 
           onClick={handleCreate} 
           disabled={isCreating}
@@ -117,7 +117,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
           {[...Array(8)].map((_, i) => (
             <CourseCardSkeleton key={i} />
           ))}
@@ -146,7 +146,7 @@ const Dashboard: React.FC = () => {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
           {filteredCourses.map(course => (
             <CourseCardOverlay
               key={course.id}
