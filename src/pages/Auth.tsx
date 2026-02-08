@@ -105,17 +105,17 @@ const Auth: React.FC = () => {
       setIsGoogleLoading(false);
     }
   };
-  return <div className="min-h-screen flex bg-white relative">
+  return <div className="min-h-screen flex flex-col lg:flex-row bg-white relative">
       {/* Logo - Top Left Corner */}
-      <div className="absolute top-6 left-8 lg:left-16 xl:left-24 flex items-center gap-3 z-10">
-        <img src={Logo} alt="Academy Logo" className="h-8" />
+      <div className="absolute top-4 left-4 sm:top-6 sm:left-8 lg:left-16 xl:left-24 flex items-center gap-3 z-10">
+        <img src={Logo} alt="Academy Logo" className="h-6 sm:h-8" />
       </div>
 
       {/* Left side - Form */}
-      <div className="flex-1 flex flex-col justify-center px-8 lg:px-16 xl:px-24">
+      <div className="flex-1 flex flex-col justify-center px-4 sm:px-8 lg:px-16 xl:px-24 pt-16 pb-8 lg:py-0">
         <div className="w-full max-w-[400px] mx-auto">
           {/* Title */}
-          <h1 className="text-4xl font-semibold text-foreground mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-foreground mb-6 sm:mb-8">
             {isSignUp ? 'Создайте аккаунт' : 'Войдите в аккаунт'}
           </h1>
 

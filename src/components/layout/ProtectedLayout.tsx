@@ -3,11 +3,15 @@ import { Outlet } from 'react-router-dom';
 import AppSidebar from './AppSidebar';
 import { useState, useEffect } from 'react';
 import { SidebarProvider, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const LayoutContent: React.FC = () => {
   const { state } = useSidebar();
+  const isMobile = useIsMobile();
   const isCollapsed = state === 'collapsed';
-  const sidebarOffset = isCollapsed ? '0px' : 'var(--sidebar-width)';
+  
+  // On mobile, no offset needed (sidebar is overlay)
+  const sidebarOffset = isMobile ? '0px' : (isCollapsed ? '0px' : 'var(--sidebar-width)');
   
   return (
     <>
@@ -25,7 +29,9 @@ const LayoutContent: React.FC = () => {
       {/* Sidebar trigger - positioned relative to sidebar */}
       <div 
         className="fixed top-4 z-20 transition-all duration-200"
-        style={{ left: isCollapsed ? '1rem' : 'calc(var(--sidebar-width) + 1rem)' }}
+        style={{ 
+          left: isMobile ? '1rem' : (isCollapsed ? '1rem' : 'calc(var(--sidebar-width) + 1rem)')
+        }}
       >
         <SidebarTrigger />
       </div>
