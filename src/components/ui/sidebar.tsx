@@ -218,8 +218,8 @@ Sidebar.displayName = "Sidebar";
 
 const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
-  React.ComponentProps<typeof Button> & { iconSize?: number }
->(({ className, onClick, iconSize, ...props }, ref) => {
+  React.ComponentProps<typeof Button>
+>(({ className, onClick, ...props }, ref) => {
   const { toggleSidebar } = useSidebar();
 
   return (
@@ -235,7 +235,7 @@ const SidebarTrigger = React.forwardRef<
       }}
       {...props}
     >
-      <PanelLeft size={iconSize ?? 16} />
+      <PanelLeft className="!w-full !h-full" />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );
