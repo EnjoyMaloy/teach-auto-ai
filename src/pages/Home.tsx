@@ -155,7 +155,7 @@ const Home: React.FC = () => {
       
       {/* Content - centered accounting for sidebar */}
       <div 
-        className="flex-1 flex flex-col items-center justify-center relative z-10 px-4 md:px-6 transition-all duration-200 pb-32 md:pb-0"
+        className="flex-1 flex flex-col items-center justify-center relative z-10 px-4 md:px-6 transition-all duration-200 pt-20 pb-40 md:pt-0 md:pb-0"
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
       >
         {/* Welcome Text */}
