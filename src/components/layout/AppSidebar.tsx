@@ -132,7 +132,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   return (
     <Sidebar variant="floating">
       {/* Header — Logo */}
-      <SidebarHeader className="p-4">
+      <SidebarHeader className="px-4 pt-6 pb-4">
         <AcademyLogo className="h-6" />
       </SidebarHeader>
 
