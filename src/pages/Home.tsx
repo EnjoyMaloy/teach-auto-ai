@@ -153,8 +153,8 @@ const Home: React.FC = () => {
     <div className="min-h-screen flex flex-col relative overflow-hidden bg-background dark:bg-[#0f0f12]">
       <AnimatedBackground />
       
-      {/* Mobile spacer for header */}
-      <div className="h-20 md:h-0 shrink-0" />
+      {/* Mobile spacer for header (matches header height h-16 = 64px) */}
+      <div className="h-16 md:h-0 shrink-0" />
       
       {/* Content - centered accounting for sidebar */}
       <div 
@@ -286,8 +286,8 @@ const Home: React.FC = () => {
         </div>
       </div>
       
-      {/* Mobile spacer for bottom input */}
-      <div className="h-28 md:h-0 shrink-0" />
+      {/* Mobile spacer for bottom input (matches input bar height ~120px) */}
+      <div className="h-[120px] md:h-0 shrink-0" />
 
       {/* Mobile bottom input bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-20 p-4 pb-6 bg-gradient-to-t from-background dark:from-[#0f0f12] via-background/80 dark:via-[#0f0f12]/80 to-transparent pt-8">
