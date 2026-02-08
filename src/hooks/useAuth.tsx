@@ -21,14 +21,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [hasInitialized, setHasInitialized] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        // Only update state if meaningful change or first init
-        if (!hasInitialized || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-          setSession(session);
-          setUser(session?.user ?? null);
+      (event, currentSession) => {
+        if (!mounted) return;
+
+        // Handle all meaningful auth events
+        if (
+          event === 'INITIAL_SESSION' ||
+          event === 'SIGNED_IN' ||
+          event === 'SIGNED_OUT' ||
+          event === 'TOKEN_REFRESHED' ||
+          event === 'USER_UPDATED'
+        ) {
+          setSession(currentSession);
+          setUser(currentSession?.user ?? null);
         }
+
         if (!hasInitialized) {
           setIsLoading(false);
           setHasInitialized(true);
@@ -37,17 +48,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!hasInitialized) {
-        setSession(session);
-        setUser(session?.user ?? null);
+    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
+      if (mounted && !hasInitialized) {
+        setSession(existingSession);
+        setUser(existingSession?.user ?? null);
         setIsLoading(false);
         setHasInitialized(true);
       }
     });
 
-    return () => subscription.unsubscribe();
-  }, [hasInitialized]);
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const signUp = async (email: string, password: string, name?: string) => {
     const redirectUrl = `${window.location.origin}/`;
