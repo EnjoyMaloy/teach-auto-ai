@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import AppSidebar from './AppSidebar';
+import AcademyLogo from './AcademyLogo';
 import { useState, useEffect } from 'react';
 import { SidebarProvider, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -26,15 +27,30 @@ const LayoutContent: React.FC = () => {
         <Outlet />
       </div>
       
-      {/* Sidebar trigger - positioned relative to sidebar */}
-      <div 
-        className="fixed top-4 z-20 transition-all duration-200"
-        style={{ 
-          left: isMobile ? '1rem' : (isCollapsed ? '1rem' : 'calc(var(--sidebar-width) + 1rem)')
-        }}
-      >
-        <SidebarTrigger />
-      </div>
+      {/* Mobile header with sidebar trigger and centered logo */}
+      {isMobile && (
+        <div className="fixed top-0 left-0 right-0 z-20 flex items-center justify-center h-14 px-4">
+          {/* Sidebar trigger - left */}
+          <div className="absolute left-4">
+            <SidebarTrigger className="h-9 w-9 [&>svg]:size-6" />
+          </div>
+          
+          {/* Centered logo */}
+          <AcademyLogo className="h-7" />
+        </div>
+      )}
+      
+      {/* Desktop sidebar trigger */}
+      {!isMobile && (
+        <div 
+          className="fixed top-4 z-20 transition-all duration-200"
+          style={{ 
+            left: isCollapsed ? '1rem' : 'calc(var(--sidebar-width) + 1rem)'
+          }}
+        >
+          <SidebarTrigger />
+        </div>
+      )}
     </>
   );
 };
