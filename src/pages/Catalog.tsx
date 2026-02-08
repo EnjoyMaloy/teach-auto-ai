@@ -32,11 +32,14 @@ const Catalog: React.FC = () => {
     <div className="min-h-screen relative overflow-hidden bg-background dark:bg-[#0f0f12]">
       <AnimatedBackground />
       <div 
-        className="relative z-10 p-6 transition-all duration-200"
-        style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1.5rem)' }}
+        className="relative z-10 p-4 md:p-6 transition-all duration-200"
+        style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
       >
+      {/* Top spacer for sidebar trigger on mobile */}
+      <div className="h-10 md:h-0" />
+      
       {/* Search */}
-      <div className="relative max-w-sm mb-6 ml-10">
+      <div className="relative max-w-sm mb-4 md:mb-6 ml-0 md:ml-10">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground dark:text-white/20" />
         <Input
           placeholder="Поиск курсов..."
@@ -47,7 +50,7 @@ const Catalog: React.FC = () => {
       </div>
 
       {/* Categories */}
-      <div className="flex items-center gap-1 mb-6 overflow-x-auto pb-1">
+      <div className="flex items-center gap-1 mb-4 md:mb-6 overflow-x-auto pb-1 scrollbar-hide">
         <button
           onClick={() => setFilter('all')}
           className={`
@@ -90,7 +93,7 @@ const Catalog: React.FC = () => {
       )}
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
           {[...Array(10)].map((_, i) => (
             <CourseCardSkeleton key={i} />
           ))}
@@ -110,7 +113,7 @@ const Catalog: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
           {filteredCourses.map(course => (
             <CourseCardOverlay
               key={course.id}

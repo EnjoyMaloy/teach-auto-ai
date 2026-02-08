@@ -210,48 +210,54 @@ const CourseSettings: React.FC = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+        <div className="container mx-auto px-3 md:px-4 py-3 md:py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="shrink-0">
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <div>
-              <h1 className="font-semibold text-foreground">{title}</h1>
-              <p className="text-sm text-muted-foreground">Настройки курса</p>
+            <div className="min-w-0">
+              <h1 className="font-semibold text-foreground text-sm md:text-base truncate">{title}</h1>
+              <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">Настройки курса</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => navigate(`/editor/${courseId}`)}>
+          <div className="flex items-center gap-1 md:gap-2 shrink-0">
+            <Button variant="outline" size="sm" onClick={() => navigate(`/editor/${courseId}`)} className="hidden sm:flex">
               <Edit3 className="w-4 h-4 mr-2" />
               Редактор
             </Button>
-            <Button variant="outline" onClick={() => navigate(`/course/${courseId}/stats`)}>
+            <Button variant="outline" size="icon" onClick={() => navigate(`/editor/${courseId}`)} className="sm:hidden">
+              <Edit3 className="w-4 h-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => navigate(`/course/${courseId}/stats`)} className="hidden md:flex">
               <BarChart3 className="w-4 h-4 mr-2" />
               Статистика
             </Button>
-            <Button onClick={handleSave} disabled={isSaving}>
+            <Button onClick={handleSave} disabled={isSaving} size="sm">
               {isSaving ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                <Save className="w-4 h-4 mr-2" />
+                <>
+                  <Save className="w-4 h-4 md:mr-2" />
+                  <span className="hidden md:inline">Сохранить</span>
+                </>
               )}
-              Сохранить
             </Button>
           </div>
         </div>
       </header>
 
       {/* Content */}
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
+      <main className="container mx-auto px-3 md:px-4 py-4 md:py-8 max-w-4xl">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-6">
-            <TabsTrigger value="general" className="gap-2">
-              <Settings className="w-4 h-4" />
-              Основные
+          <TabsList className="mb-4 md:mb-6 w-full sm:w-auto">
+            <TabsTrigger value="general" className="gap-1 md:gap-2 flex-1 sm:flex-initial text-xs md:text-sm">
+              <Settings className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              <span className="hidden sm:inline">Основные</span>
+              <span className="sm:hidden">Инфо</span>
             </TabsTrigger>
-            <TabsTrigger value="design" className="gap-2">
-              <Palette className="w-4 h-4" />
+            <TabsTrigger value="design" className="gap-1 md:gap-2 flex-1 sm:flex-initial text-xs md:text-sm">
+              <Palette className="w-3.5 h-3.5 md:w-4 md:h-4" />
               Дизайн
             </TabsTrigger>
           </TabsList>

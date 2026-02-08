@@ -199,34 +199,40 @@ const CourseStats: React.FC = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+        <div className="container mx-auto px-3 md:px-4 py-3 md:py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="shrink-0">
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <div>
-              <h1 className="font-semibold text-foreground">{course?.title}</h1>
-              <p className="text-sm text-muted-foreground">Статистика курса</p>
+            <div className="min-w-0">
+              <h1 className="font-semibold text-foreground text-sm md:text-base truncate">{course?.title}</h1>
+              <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">Статистика курса</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => navigate(`/editor/${courseId}`)}>
+          <div className="flex items-center gap-1 md:gap-2 shrink-0">
+            <Button variant="outline" size="sm" onClick={() => navigate(`/editor/${courseId}`)} className="hidden sm:flex">
               <Edit3 className="w-4 h-4 mr-2" />
               Редактор
             </Button>
-            <Button variant="outline" onClick={() => navigate(`/course/${courseId}/settings`)}>
+            <Button variant="outline" size="icon" onClick={() => navigate(`/editor/${courseId}`)} className="sm:hidden">
+              <Edit3 className="w-4 h-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => navigate(`/course/${courseId}/settings`)} className="hidden md:flex">
               <Settings className="w-4 h-4 mr-2" />
               Настройки
+            </Button>
+            <Button variant="outline" size="icon" onClick={() => navigate(`/course/${courseId}/settings`)} className="md:hidden">
+              <Settings className="w-4 h-4" />
             </Button>
           </div>
         </div>
       </header>
 
       {/* Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-3 md:px-4 py-4 md:py-8">
         {/* Summary Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4 mb-6 md:mb-8">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-2 text-muted-foreground mb-1">
@@ -288,7 +294,7 @@ const CourseStats: React.FC = () => {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           {/* Slide Retention */}
           <Card>
             <CardHeader>

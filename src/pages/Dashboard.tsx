@@ -70,11 +70,14 @@ const Dashboard: React.FC = () => {
     <div className="min-h-screen relative overflow-auto bg-background dark:bg-[#0f0f12]">
       <AnimatedBackground />
       <div 
-        className="relative z-10 p-6 transition-all duration-200"
-        style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1.5rem)' }}
+        className="relative z-10 p-4 md:p-6 transition-all duration-200"
+        style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
       >
+      {/* Top spacer for sidebar trigger on mobile */}
+      <div className="h-10 md:h-0" />
+      
       {/* Top Bar */}
-      <div className="flex items-center justify-end mb-6">
+      <div className="flex items-center justify-end mb-4 md:mb-6">
         <Button 
           onClick={handleCreate} 
           disabled={isCreating}
@@ -86,20 +89,21 @@ const Dashboard: React.FC = () => {
           ) : (
             <>
               <Plus className="w-3.5 h-3.5 mr-1.5" />
-              Новый курс
+              <span className="hidden sm:inline">Новый курс</span>
+              <span className="sm:hidden">Создать</span>
             </>
           )}
         </Button>
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-1 mb-6">
+      <div className="flex items-center gap-1 mb-4 md:mb-6 overflow-x-auto pb-1 scrollbar-hide">
         {filters.map(f => (
           <button
             key={f.id}
             onClick={() => setFilter(f.id)}
             className={`
-              px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors
+              px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap
               ${filter === f.id 
                 ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
                 : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
@@ -113,7 +117,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
           {[...Array(8)].map((_, i) => (
             <CourseCardSkeleton key={i} />
           ))}
@@ -142,7 +146,7 @@ const Dashboard: React.FC = () => {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
           {filteredCourses.map(course => (
             <CourseCardOverlay
               key={course.id}

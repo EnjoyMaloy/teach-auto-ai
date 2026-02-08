@@ -495,3 +495,12 @@
 .category-chip.active {
   @apply ring-2 ring-primary ring-offset-2 ring-offset-[hsl(0,0%,4%)];
 }
+
+/* Hide scrollbar but allow scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

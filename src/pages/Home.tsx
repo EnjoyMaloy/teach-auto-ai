@@ -155,24 +155,24 @@ const Home: React.FC = () => {
       
       {/* Content - centered accounting for sidebar */}
       <div 
-        className="flex-1 flex flex-col items-center justify-center relative z-10 px-6 transition-all duration-200"
-        style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1.5rem)' }}
+        className="flex-1 flex flex-col items-center justify-center relative z-10 px-4 md:px-6 transition-all duration-200"
+        style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
       >
         {/* Welcome Text */}
-        <h1 className="text-4xl md:text-5xl font-semibold mb-10 text-foreground dark:text-white text-center">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold mb-6 md:mb-10 text-foreground dark:text-white text-center px-2">
           Чему научим мир сегодня, <span className="text-primary dark:animate-[name-glow_4s_ease-in-out_infinite]" style={{ color: 'hsl(var(--primary))' }}>{userName}</span>?
         </h1>
 
         {/* Action Card */}
-        <div className="w-full max-w-2xl bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/[0.08] rounded-2xl p-2 shadow-2xl transition-all">
-          <div className="flex items-start gap-3 px-4 py-3">
+        <div className="w-full max-w-2xl bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/[0.08] rounded-2xl p-2 shadow-2xl transition-all mx-2">
+          <div className="flex items-start gap-3 px-3 md:px-4 py-3">
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Опиши идею курса, который ты хочешь создать..."
+              placeholder="Опиши идею курса..."
               disabled={isGenerating}
-              className="flex-1 bg-transparent text-foreground dark:text-white placeholder:text-muted-foreground dark:placeholder:text-white/40 resize-none outline-none text-[15px] min-h-[24px] max-h-[120px]"
+              className="flex-1 bg-transparent text-foreground dark:text-white placeholder:text-muted-foreground dark:placeholder:text-white/40 resize-none outline-none text-[14px] md:text-[15px] min-h-[24px] max-h-[120px]"
               rows={1}
               style={{ height: 'auto' }}
               onInput={(e) => {
@@ -193,17 +193,17 @@ const Home: React.FC = () => {
             </div>
           )}
           
-          <div className="flex items-center justify-between px-4 py-2 border-t border-border dark:border-white/5">
+          <div className="flex items-center justify-between px-3 md:px-4 py-2 border-t border-border dark:border-white/5">
             <TooltipProvider delayDuration={300}>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 md:gap-1.5">
                 {/* Add attachment */}
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button 
                       disabled
-                      className="w-8 h-8 rounded-lg bg-muted dark:bg-white/5 flex items-center justify-center opacity-50 cursor-not-allowed hover:bg-muted/80 dark:hover:bg-white/[0.08] transition-colors"
+                      className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-muted dark:bg-white/5 flex items-center justify-center opacity-50 cursor-not-allowed hover:bg-muted/80 dark:hover:bg-white/[0.08] transition-colors"
                     >
-                      <Plus className="w-4 h-4 text-muted-foreground dark:text-white/30" />
+                      <Plus className="w-3.5 h-3.5 md:w-4 md:h-4 text-muted-foreground dark:text-white/30" />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="top">
@@ -211,53 +211,56 @@ const Home: React.FC = () => {
                   </TooltipContent>
                 </Tooltip>
 
-                {/* Difficulty selector */}
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button 
-                      disabled
-                      className="h-8 px-3 rounded-lg bg-muted dark:bg-white/5 flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-muted/80 dark:hover:bg-white/[0.08] transition-colors"
-                    >
-                      <Gauge className="w-3.5 h-3.5 text-muted-foreground dark:text-white/30" />
-                      <span className="text-[12px] text-muted-foreground dark:text-white/30">Сложность</span>
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    Скоро
-                  </TooltipContent>
-                </Tooltip>
+                {/* Options - hidden on mobile, show fewer items */}
+                <div className="hidden sm:flex items-center gap-1.5">
+                  {/* Difficulty selector */}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button 
+                        disabled
+                        className="h-8 px-3 rounded-lg bg-muted dark:bg-white/5 flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-muted/80 dark:hover:bg-white/[0.08] transition-colors"
+                      >
+                        <Gauge className="w-3.5 h-3.5 text-muted-foreground dark:text-white/30" />
+                        <span className="text-[12px] text-muted-foreground dark:text-white/30">Сложность</span>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      Скоро
+                    </TooltipContent>
+                  </Tooltip>
 
-                {/* Design system selector */}
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button 
-                      disabled
-                      className="h-8 px-3 rounded-lg bg-muted dark:bg-white/5 flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-muted/80 dark:hover:bg-white/[0.08] transition-colors"
-                    >
-                      <Palette className="w-3.5 h-3.5 text-muted-foreground dark:text-white/30" />
-                      <span className="text-[12px] text-muted-foreground dark:text-white/30">Дизайн</span>
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    Скоро
-                  </TooltipContent>
-                </Tooltip>
+                  {/* Design system selector */}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button 
+                        disabled
+                        className="h-8 px-3 rounded-lg bg-muted dark:bg-white/5 flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-muted/80 dark:hover:bg-white/[0.08] transition-colors"
+                      >
+                        <Palette className="w-3.5 h-3.5 text-muted-foreground dark:text-white/30" />
+                        <span className="text-[12px] text-muted-foreground dark:text-white/30">Дизайн</span>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      Скоро
+                    </TooltipContent>
+                  </Tooltip>
 
-                {/* Mascot selector */}
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button 
-                      disabled
-                      className="h-8 px-3 rounded-lg bg-muted dark:bg-white/5 flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-muted/80 dark:hover:bg-white/[0.08] transition-colors"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 text-muted-foreground dark:text-white/30" />
-                      <span className="text-[12px] text-muted-foreground dark:text-white/30">Маскот</span>
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    Скоро
-                  </TooltipContent>
-                </Tooltip>
+                  {/* Mascot selector */}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button 
+                        disabled
+                        className="h-8 px-3 rounded-lg bg-muted dark:bg-white/5 flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-muted/80 dark:hover:bg-white/[0.08] transition-colors"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-muted-foreground dark:text-white/30" />
+                        <span className="text-[12px] text-muted-foreground dark:text-white/30">Маскот</span>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      Скоро
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
               </div>
             </TooltipProvider>
             <button

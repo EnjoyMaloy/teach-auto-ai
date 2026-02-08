@@ -84,27 +84,30 @@ const Pricing = () => {
 
       {/* Content */}
       <div 
-        className="flex-1 flex flex-col relative z-10 py-12 md:py-20 px-6 transition-all duration-300"
+        className="flex-1 flex flex-col relative z-10 py-8 md:py-12 lg:py-20 px-4 md:px-6 transition-all duration-300"
         style={{
-          paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1.5rem)',
+          paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)',
         }}
       >
-        <div className="container max-w-5xl mx-auto px-6">
+        {/* Top spacer for sidebar trigger on mobile */}
+        <div className="h-10 md:h-0" />
+        
+        <div className="container max-w-5xl mx-auto px-2 sm:px-6">
           {/* Title */}
-          <div className="mb-12 text-center">
-            <h1 className="mb-4 text-3xl font-bold text-foreground md:text-4xl xl:text-5xl">
+          <div className="mb-8 md:mb-12 text-center">
+            <h1 className="mb-3 md:mb-4 text-2xl sm:text-3xl md:text-4xl xl:text-5xl font-bold text-foreground">
               Тарифы и цены
             </h1>
-            <p className="text-muted-foreground lg:text-lg">
+            <p className="text-sm md:text-base text-muted-foreground lg:text-lg">
               Выберите план, который подходит именно вам
             </p>
           </div>
 
           {/* Billing Toggle */}
-          <div className="mb-12 flex justify-center">
-            <div className="flex items-center gap-3 rounded-full bg-sidebar/80 backdrop-blur-sm border border-sidebar-border p-1.5 px-4">
+          <div className="mb-8 md:mb-12 flex justify-center">
+            <div className="flex items-center gap-2 md:gap-3 rounded-full bg-sidebar/80 backdrop-blur-sm border border-sidebar-border p-1 md:p-1.5 px-3 md:px-4">
               <span className={cn(
-                "text-sm font-medium transition-colors",
+                "text-xs md:text-sm font-medium transition-colors",
                 !annualBilling ? "text-sidebar-foreground" : "text-sidebar-foreground/60"
               )}>
                 Ежемесячно
@@ -115,7 +118,7 @@ const Pricing = () => {
                 onCheckedChange={setAnnualBilling}
               />
               <span className={cn(
-                "text-sm font-medium transition-colors",
+                "text-xs md:text-sm font-medium transition-colors",
                 annualBilling ? "text-sidebar-foreground" : "text-sidebar-foreground/60"
               )}>
                 Ежегодно
@@ -124,7 +127,7 @@ const Pricing = () => {
           </div>
 
           {/* Plans Grid */}
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-3">
             {plans.map((plan, index) => (
               <Card
                 key={plan.title}
