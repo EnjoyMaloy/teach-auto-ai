@@ -76,7 +76,7 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
         <img
           src={coverImage}
           alt={title}
-          className="aspect-[2/3] w-full object-cover"
+          className="aspect-[2/3] w-full object-cover block"
         />
       ) : (
         <div className="aspect-[2/3] w-full bg-gradient-to-br from-primary/40 via-primary/20 to-accent/30 flex items-center justify-center">
