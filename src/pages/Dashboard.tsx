@@ -67,14 +67,14 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen relative overflow-auto bg-background dark:bg-[#0f0f12]">
+    <div className="min-h-screen relative bg-background dark:bg-[#0f0f12]">
       <AnimatedBackground />
       <div 
-        className="relative z-10 p-4 md:p-6 transition-all duration-200"
+        className="relative z-10 p-4 md:p-6 transition-all duration-200 min-h-screen overflow-y-auto"
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
       >
       {/* Top spacer for sidebar trigger on mobile */}
-      <div className="h-10 md:h-0" />
+      <div className="h-6 md:h-0" />
       
       {/* Top Bar */}
       <div className="flex items-center justify-end mb-4 md:mb-6 pr-1">
