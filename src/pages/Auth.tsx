@@ -108,7 +108,7 @@ const Auth: React.FC = () => {
   return <div className="min-h-screen flex flex-col lg:flex-row bg-white relative">
       {/* Logo - Centered on mobile, top-left on desktop */}
       <div className="w-full flex justify-center lg:justify-start lg:absolute lg:top-6 lg:left-16 xl:left-24 pt-14 pb-8 lg:pt-0 lg:pb-0 z-10">
-        <AcademyLogo className="h-32 sm:h-36 lg:h-8" />
+        <AcademyLogo className="h-16 sm:h-20 lg:h-8" />
       </div>
 
       {/* Left side - Form */}
