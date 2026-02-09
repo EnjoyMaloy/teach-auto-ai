@@ -24,9 +24,9 @@ const LayoutContent: React.FC = () => {
         <AnimatedBackground />
       </div>
       
-      {/* Scrollable content layer */}
+      {/* Scrollable content layer - fixed but with overflow for scrolling */}
       <div 
-        className="relative z-0 min-h-screen"
+        className="fixed inset-0 z-0 overflow-auto"
         style={{ 
           // Pass sidebar offset as CSS variable for pages to use for centering
           '--sidebar-offset': sidebarOffset,
