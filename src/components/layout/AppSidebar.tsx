@@ -9,6 +9,7 @@ import {
   ChevronsUpDown,
   Clock,
   Compass,
+  Crown,
   Folder,
   Globe,
   Home,
@@ -16,7 +17,6 @@ import {
   Moon,
   Star,
   Sun,
-  Zap,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/hooks/useAuth';
@@ -188,12 +188,12 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                     }}
                   >
                     <div className="w-full px-2 py-2">
-                      <div className="flex items-center gap-2 px-2 py-2 rounded-md bg-primary/10 hover:bg-primary/15 transition-colors">
-                        <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/20">
-                          <Zap className="size-4 text-primary" />
+                      <div className="flex items-center gap-2 px-2 py-2 rounded-md bg-[hsl(265_60%_75%_/_0.15)] hover:bg-[hsl(265_60%_75%_/_0.25)] transition-colors">
+                        <div className="flex items-center justify-center w-8 h-8 rounded-md bg-[hsl(265_60%_75%_/_0.25)]">
+                          <Crown className="size-4 text-[hsl(265_60%_75%)]" />
                         </div>
                         <div className="flex-1">
-                          <div className="text-sm font-medium">Pro Plan</div>
+                          <div className="text-sm font-medium text-[hsl(265_60%_75%)]">Creator Pro</div>
                           <div className="text-xs text-muted-foreground">Безлимитный тариф</div>
                         </div>
                       </div>
