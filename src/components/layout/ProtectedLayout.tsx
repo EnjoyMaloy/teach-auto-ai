@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { SidebarProvider, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AcademyLogo from './AcademyLogo';
+import AnimatedBackground from './AnimatedBackground';
 
 const LayoutContent: React.FC = () => {
   const { state } = useSidebar();
@@ -18,7 +19,12 @@ const LayoutContent: React.FC = () => {
   
   return (
     <>
-      {/* Full-screen content layer - background fills entire screen */}
+      {/* Persistent background - never unmounts during navigation */}
+      <div className="fixed inset-0 z-0 bg-background dark:bg-[#0f0f12]">
+        <AnimatedBackground />
+      </div>
+      
+      {/* Full-screen content layer */}
       <div 
         className="fixed inset-0 z-0"
         style={{ 

@@ -7,7 +7,7 @@ import { useCourses } from '@/hooks/useCourses';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import AnimatedBackground from '@/components/layout/AnimatedBackground';
+
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -278,8 +278,7 @@ const Home: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden bg-background dark:bg-[#0f0f12]">
-      <AnimatedBackground />
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
       
       {/* Mobile top spacer for header */}
       <div className="h-16 md:hidden shrink-0" />
