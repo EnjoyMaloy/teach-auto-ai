@@ -152,10 +152,10 @@ const Home: React.FC = () => {
   // Input card component (reused for desktop and mobile)
   const InputCard = ({ className = '', isMobile = false }: { className?: string; isMobile?: boolean }) => (
     <div className={cn(
-      "w-full max-w-2xl transition-all",
+      "w-full max-w-2xl rounded-2xl p-2 transition-all",
       isMobile 
-        ? "bg-transparent p-0" 
-        : "bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/[0.08] rounded-2xl p-2 shadow-2xl"
+        ? "bg-transparent border-0 shadow-none" 
+        : "bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/[0.08] shadow-2xl"
       , className)}>
       <div className="flex items-start gap-3 px-3 md:px-4 py-3">
         <textarea
