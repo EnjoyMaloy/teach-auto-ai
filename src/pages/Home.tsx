@@ -153,9 +153,6 @@ const Home: React.FC = () => {
     <div className="min-h-screen flex flex-col relative overflow-hidden bg-background dark:bg-[#0f0f12]">
       <AnimatedBackground />
       
-      {/* Mobile spacer for header (matches header height h-16 = 64px) */}
-      <div className="h-16 md:h-0 shrink-0" />
-      
       {/* Content - centered accounting for sidebar */}
       <div 
         className="flex-1 flex flex-col items-center justify-center relative z-10 px-4 md:px-6 transition-all duration-200"
@@ -163,11 +160,11 @@ const Home: React.FC = () => {
       >
         {/* Welcome Text */}
         <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold mb-6 md:mb-10 text-foreground dark:text-white text-center px-2">
-          Чему научим мир сегодня, <span className="text-primary dark:animate-[name-glow_4s_ease-in-out_infinite]">{userName}</span>?
+          Чему научим мир сегодня, <span className="text-primary dark:animate-[name-glow_4s_ease-in-out_infinite]" style={{ color: 'hsl(var(--primary))' }}>{userName}</span>?
         </h1>
 
-        {/* Action Card - Desktop only (centered) */}
-        <div className="hidden md:block w-full max-w-2xl bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/10 rounded-2xl p-2 transition-all mx-2">
+        {/* Action Card */}
+        <div className="w-full max-w-2xl bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/[0.08] rounded-2xl p-2 shadow-2xl transition-all mx-2">
           <div className="flex items-start gap-3 px-3 md:px-4 py-3">
             <textarea
               value={prompt}
@@ -214,8 +211,8 @@ const Home: React.FC = () => {
                   </TooltipContent>
                 </Tooltip>
 
-                {/* Options */}
-                <div className="flex items-center gap-1.5">
+                {/* Options - hidden on mobile, show fewer items */}
+                <div className="hidden sm:flex items-center gap-1.5">
                   {/* Difficulty selector */}
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -273,72 +270,16 @@ const Home: React.FC = () => {
                 "w-7 h-7 rounded-full flex items-center justify-center transition-all",
                 prompt.trim() && !isGenerating
                   ? "bg-primary dark:bg-white text-primary-foreground dark:text-black hover:bg-primary/90 dark:hover:bg-white/90 cursor-pointer"
-                  : "bg-muted dark:bg-white/20 text-muted-foreground cursor-not-allowed"
+                  : "bg-muted dark:bg-white/20 cursor-not-allowed"
               )}
             >
               {isGenerating ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-4 h-4 text-muted-foreground dark:text-black/50 animate-spin" />
               ) : (
                 <ArrowUp className="w-4 h-4" strokeWidth={2.5} />
               )}
             </button>
           </div>
-        </div>
-      </div>
-      
-      {/* Mobile spacer for bottom input (matches input bar height ~120px) */}
-      <div className="h-[120px] md:h-0 shrink-0" />
-
-      {/* Mobile bottom input bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-20 p-4 pb-6 bg-gradient-to-t from-background dark:from-[#0f0f12] via-background/80 dark:via-[#0f0f12]/80 to-transparent pt-8">
-        <div className="w-full bg-card dark:bg-[#2a2a2b] border border-border dark:border-white/10 rounded-2xl p-2">
-          <div className="flex items-center gap-3 px-3 py-2">
-            {/* Add button */}
-            <button 
-              disabled
-              className="w-8 h-8 rounded-full bg-muted dark:bg-white/10 flex items-center justify-center opacity-50"
-            >
-              <Plus className="w-4 h-4 text-muted-foreground dark:text-white/40" />
-            </button>
-            
-            <input
-              type="text"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Опиши идею курса..."
-              disabled={isGenerating}
-              className="flex-1 bg-transparent text-foreground dark:text-white placeholder:text-muted-foreground dark:placeholder:text-white/40 outline-none text-[15px]"
-            />
-            
-            {/* Send button */}
-            <button
-              onClick={handleGenerate}
-              disabled={!prompt.trim() || isGenerating}
-              className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center transition-all",
-                prompt.trim() && !isGenerating
-                  ? "bg-primary dark:bg-white text-primary-foreground dark:text-black"
-                  : "bg-muted dark:bg-white/20 text-muted-foreground"
-              )}
-            >
-              {isGenerating ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <ArrowUp className="w-4 h-4" strokeWidth={2.5} />
-              )}
-            </button>
-          </div>
-          
-          {/* Generation status - mobile */}
-          {isGenerating && generationStatus && (
-            <div className="px-4 py-2 border-t border-border dark:border-white/5">
-              <div className="flex items-center gap-2 text-muted-foreground dark:text-white/60 text-sm">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>{generationStatus}</span>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

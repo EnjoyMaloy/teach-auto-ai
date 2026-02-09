@@ -27,7 +27,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import pavelAvatar from '@/assets/pavel-avatar.jpg';
 import AcademyLogo from './AcademyLogo';
-import { useIsMobile } from '@/hooks/use-mobile';
 import {
   Sidebar,
   SidebarContent,
@@ -42,7 +41,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  useSidebar,
+  SidebarRail,
 } from '@/components/ui/sidebar';
 import {
   Collapsible,
@@ -73,17 +72,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   const { user, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   const { language, setLanguage } = useLanguage();
-  const { setOpenMobile } = useSidebar();
-  const isMobile = useIsMobile();
   const [recentCourses, setRecentCourses] = useState<RecentCourse[]>([]);
-
-  // Navigate and close sidebar on mobile
-  const handleNavigate = (path: string) => {
-    navigate(path);
-    if (isMobile) {
-      setOpenMobile(false);
-    }
-  };
 
   const userName = 'Pavel';
   const userEmail = user?.email || 'pavel@example.com';
@@ -143,7 +132,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   return (
     <Sidebar variant="floating">
       {/* Header — Logo */}
-      <SidebarHeader className="px-4 pt-6 pb-4">
+      <SidebarHeader className="p-4">
         <AcademyLogo className="h-6" />
       </SidebarHeader>
 
@@ -183,7 +172,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                   <div className="px-2 py-2 mb-1">
                     <div 
                       className="flex items-center gap-2 px-2 py-2 rounded-md bg-primary/10 cursor-pointer hover:bg-primary/15 transition-colors"
-                      onClick={() => handleNavigate('/pricing')}
+                      onClick={() => navigate('/pricing')}
                     >
                       <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/20">
                         <Zap className="size-4 text-primary" />
@@ -222,7 +211,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
             <SidebarMenuItem>
               <SidebarMenuButton
                 isActive={isActive('/')}
-                onClick={() => handleNavigate('/')}
+                onClick={() => navigate('/')}
               >
                 <Home className="size-4" />
                 <span>Главная</span>
@@ -256,7 +245,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                           <SidebarMenuSubItem key={course.id}>
                             <SidebarMenuSubButton
                               isActive={isEditorRoute(course.id)}
-                              onClick={() => handleNavigate(`/editor/${course.id}`)}
+                              onClick={() => navigate(`/editor/${course.id}`)}
                             >
                               {course.title}
                             </SidebarMenuSubButton>
@@ -278,7 +267,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   isActive={isActive('/workshop')}
-                  onClick={() => handleNavigate('/workshop')}
+                  onClick={() => navigate('/workshop')}
                 >
                   <Folder className="size-4" />
                   <span>Все курсы</span>
@@ -289,7 +278,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   isActive={isActive('/favorites')}
-                  onClick={() => handleNavigate('/favorites')}
+                  onClick={() => navigate('/favorites')}
                 >
                   <Star className="size-4" />
                   <span>Избранное</span>
@@ -307,7 +296,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   isActive={isActive('/catalog')}
-                  onClick={() => handleNavigate('/catalog')}
+                  onClick={() => navigate('/catalog')}
                 >
                   <Compass className="size-4" />
                   <span>Исследовать</span>

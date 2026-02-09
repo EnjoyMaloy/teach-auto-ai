@@ -7,10 +7,12 @@ interface AcademyLogoProps {
 const AcademyLogo: React.FC<AcademyLogoProps> = ({ className = 'h-8' }) => {
   return (
     <svg 
+      width="108" 
+      height="22" 
       viewBox="0 0 108 22" 
       fill="none" 
       xmlns="http://www.w3.org/2000/svg"
-      className={`w-auto ${className}`}
+      className={className}
     >
       {/* Letter A */}
       <path 

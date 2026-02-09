@@ -67,11 +67,17 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen relative bg-background dark:bg-[#0f0f12]">
+    <div className="min-h-screen relative overflow-auto bg-background dark:bg-[#0f0f12]">
       <AnimatedBackground />
+      <div 
+        className="relative z-10 p-4 md:p-6 transition-all duration-200"
+        style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
+      >
+      {/* Top spacer for sidebar trigger on mobile */}
+      <div className="h-10 md:h-0" />
       
-      {/* Mobile: Fixed create button in header area */}
-      <div className="md:hidden fixed top-0 right-0 z-20 h-16 px-4 pt-2 flex items-center">
+      {/* Top Bar */}
+      <div className="flex items-center justify-end mb-4 md:mb-6">
         <Button 
           onClick={handleCreate} 
           disabled={isCreating}
@@ -83,61 +89,35 @@ const Dashboard: React.FC = () => {
           ) : (
             <>
               <Plus className="w-3.5 h-3.5 mr-1.5" />
-              <span>Создать</span>
-            </>
-          )}
-        </Button>
-      </div>
-      
-      <div 
-        className="relative z-10 p-4 md:p-6 transition-all duration-200 min-h-screen overflow-y-auto"
-        style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
-      >
-      {/* Top spacer for mobile header */}
-      <div className="h-16 md:h-0" />
-      
-      {/* Top Bar - filters and create button (desktop only for button) */}
-      <div className="flex items-center justify-between gap-2 mb-4 md:mb-6">
-        {/* Filters */}
-        <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
-          {filters.map(f => (
-            <button
-              key={f.id}
-              onClick={() => setFilter(f.id)}
-              className={`
-                px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap
-                ${filter === f.id 
-                  ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
-                  : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
-                }
-              `}
-            >
-              {f.label}
-              <span className="ml-1.5 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
-            </button>
-          ))}
-        </div>
-        
-        {/* Create button - desktop only */}
-        <Button 
-          onClick={handleCreate} 
-          disabled={isCreating}
-          size="sm"
-          className="hidden md:flex h-8 px-3 bg-primary hover:bg-primary/90 text-[13px]"
-        >
-          {isCreating ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          ) : (
-            <>
-              <Plus className="w-3.5 h-3.5 mr-1.5" />
-              <span>Новый курс</span>
+              <span className="hidden sm:inline">Новый курс</span>
+              <span className="sm:hidden">Создать</span>
             </>
           )}
         </Button>
       </div>
 
+      {/* Filters */}
+      <div className="flex items-center gap-1 mb-4 md:mb-6 overflow-x-auto pb-1 scrollbar-hide">
+        {filters.map(f => (
+          <button
+            key={f.id}
+            onClick={() => setFilter(f.id)}
+            className={`
+              px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap
+              ${filter === f.id 
+                ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
+                : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
+              }
+            `}
+          >
+            {f.label}
+            <span className="ml-1.5 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
+          </button>
+        ))}
+      </div>
+
       {isLoading ? (
-        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
           {[...Array(8)].map((_, i) => (
             <CourseCardSkeleton key={i} />
           ))}
@@ -166,7 +146,7 @@ const Dashboard: React.FC = () => {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
           {filteredCourses.map(course => (
             <CourseCardOverlay
               key={course.id}
