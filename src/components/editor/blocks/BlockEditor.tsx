@@ -3,7 +3,7 @@ import { Block, BlockType, BLOCK_CONFIGS, BlockOption } from '@/types/blocks';
 import { SubBlock, SubBlockType, SUB_BLOCK_CONFIGS, createSubBlock } from '@/types/designBlock';
 import { BackgroundPreset } from '@/types/designSystem';
 import { SubBlockSettingsEditor } from './SubBlockSettingsEditor';
-import { DesignAIChat } from './DesignAIChat';
+
 import { BlockBackgroundSelector } from './BlockBackgroundSelector';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -728,19 +728,6 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
           </>
         )}
       </div>
-      
-      {/* AI Chat - pinned at bottom for design blocks */}
-      {isDesignBlock && (
-        <div className="flex-shrink-0">
-          <DesignAIChat
-            blockId={block.id}
-            subBlocks={block.subBlocks || []}
-            onReplaceAllBlocks={(newBlocks) => {
-              onUpdate({ subBlocks: newBlocks });
-            }}
-          />
-        </div>
-      )}
     </div>
   );
 };

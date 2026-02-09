@@ -36,7 +36,7 @@ import { TextEditorProvider } from '@/components/editor/blocks/TextEditorContext
 import { SortableBlockItem } from '@/components/editor/SortableBlockItem'; // Keep for potential future use
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Loader2, Plus, Smartphone, Volume2, VolumeX, Sparkles } from 'lucide-react';
+import { Loader2, Plus, Smartphone, Volume2, VolumeX } from 'lucide-react';
 import { AIGenerationProvider, useAIGeneration } from '@/hooks/useAIGeneration';
 
 // Adapter: Convert Slide to Block for the new editor
@@ -500,6 +500,8 @@ const Editor: React.FC = () => {
         isSaving={isSaving}
         hasUnsavedChanges={hasUnsavedChanges}
         lastSavedAt={lastSavedAt}
+        isAISidebarOpen={isAISidebarOpen}
+        onToggleAISidebar={() => setIsAISidebarOpen(!isAISidebarOpen)}
         onUndo={handleUndo}
         onRedo={handleRedo}
         onPreview={() => setIsPreviewMode(true)}
@@ -514,13 +516,11 @@ const Editor: React.FC = () => {
         onAIGenerate={(generatedLessons) => {
           if (!course) return;
           pushToUndo();
-          // Replace or merge lessons
           setCourse(prev => prev ? ({
             ...prev,
             lessons: generatedLessons.map((l, i) => ({ ...l, courseId: prev.id, order: i + 1 })),
             updatedAt: new Date(),
           }) : null);
-          // Select first lesson
           if (generatedLessons.length > 0) {
             setSelectedLessonId(generatedLessons[0].id);
             if (generatedLessons[0].slides.length > 0) {
@@ -566,18 +566,7 @@ const Editor: React.FC = () => {
             <div className="flex-1 flex flex-col overflow-hidden bg-muted/30">
               {/* Preview header */}
               <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card shrink-0">
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant={isAISidebarOpen ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setIsAISidebarOpen(!isAISidebarOpen)}
-                    className="gap-1.5"
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    AI
-                  </Button>
-                  <span className="text-sm font-medium text-muted-foreground">Fast View</span>
-                </div>
+                <span className="text-sm font-medium text-muted-foreground">Fast View</span>
                 <Button
                   variant="ghost"
                   size="sm"
