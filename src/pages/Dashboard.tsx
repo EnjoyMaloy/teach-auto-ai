@@ -93,7 +93,7 @@ const Dashboard: React.FC = () => {
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
       >
       {/* Top spacer for mobile header */}
-      <div className="h-16 md:h-0" />
+      <div className="h-16 md:h-14" />
       
       {/* Desktop Top Bar */}
       <div className="hidden md:flex items-center justify-end mb-4 md:mb-6">
