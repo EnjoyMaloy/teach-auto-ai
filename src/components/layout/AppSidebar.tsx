@@ -41,7 +41,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarRail,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import {
   Collapsible,
@@ -73,7 +73,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   const { theme, setTheme } = useTheme();
   const { language, setLanguage } = useLanguage();
   const [recentCourses, setRecentCourses] = useState<RecentCourse[]>([]);
-  const { setOpenMobile, isMobile } = require('@/components/ui/sidebar').useSidebar();
+  const { setOpenMobile, isMobile } = useSidebar();
 
   const userName = 'Pavel';
   const userEmail = user?.email || 'pavel@example.com';
