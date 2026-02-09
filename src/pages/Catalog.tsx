@@ -8,7 +8,7 @@ import { usePublishedCourses } from '@/hooks/useCachedCourses';
 import { useCachedFavorites } from '@/hooks/useCachedFavorites';
 import { COURSE_CATEGORIES, getCategoryById } from '@/lib/categories';
 import { getCoursesWord } from '@/lib/pluralize';
-import AnimatedBackground from '@/components/layout/AnimatedBackground';
+
 import CourseCardOverlay from '@/components/catalog/CourseCardOverlay';
 
 type FilterType = 'all' | string;
@@ -29,8 +29,7 @@ const Catalog: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-background dark:bg-[#0f0f12]">
-      <AnimatedBackground />
+    <div className="min-h-screen relative overflow-hidden">
       <div 
         className="relative z-10 p-4 md:p-6 transition-all duration-200"
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}

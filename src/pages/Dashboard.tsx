@@ -14,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import AnimatedBackground from '@/components/layout/AnimatedBackground';
+
 import CourseCardOverlay from '@/components/catalog/CourseCardOverlay';
 import { useUserCourses, CourseListItem } from '@/hooks/useCachedCourses';
 import { useCachedFavorites } from '@/hooks/useCachedFavorites';
@@ -67,8 +67,7 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen relative overflow-auto bg-background dark:bg-[#0f0f12]">
-      <AnimatedBackground />
+    <div className="min-h-screen relative overflow-auto">
       
       {/* Mobile header with Create button */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 z-20 flex items-center justify-end px-4">

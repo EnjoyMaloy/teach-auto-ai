@@ -4,7 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/useAuth';
 import { useCachedFavorites } from '@/hooks/useCachedFavorites';
 import { getCategoryById } from '@/lib/categories';
-import AnimatedBackground from '@/components/layout/AnimatedBackground';
+
 import CourseCardOverlay from '@/components/catalog/CourseCardOverlay';
 
 type FilterType = 'all' | 'mine' | 'public';
@@ -34,8 +34,7 @@ const Favorites: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-background dark:bg-[#0f0f12]">
-      <AnimatedBackground />
+    <div className="min-h-screen relative overflow-hidden">
       <div 
         className="relative z-10 p-4 md:p-6 transition-all duration-200"
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
