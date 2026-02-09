@@ -22,6 +22,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCourses } from '@/hooks/useCourses';
 import { EditorHeader } from '@/components/editor/EditorHeader';
 import { CourseTimeline } from '@/components/editor/CourseTimeline';
+import { EditorAISidebar } from '@/components/editor/EditorAISidebar';
 
 import { CoursePlayer } from '@/components/runtime/CoursePlayer';
 
@@ -35,8 +36,8 @@ import { TextEditorProvider } from '@/components/editor/blocks/TextEditorContext
 import { SortableBlockItem } from '@/components/editor/SortableBlockItem'; // Keep for potential future use
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Loader2, Plus, Smartphone, Volume2, VolumeX } from 'lucide-react';
-import { AIGenerationProvider } from '@/hooks/useAIGeneration';
+import { Loader2, Plus, Smartphone, Volume2, VolumeX, Sparkles } from 'lucide-react';
+import { AIGenerationProvider, useAIGeneration } from '@/hooks/useAIGeneration';
 
 // Adapter: Convert Slide to Block for the new editor
 const slideToBlock = (slide: Slide): Block => ({
@@ -122,7 +123,8 @@ const Editor: React.FC = () => {
   const [isPreviewMuted, setIsPreviewMuted] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
-  
+  const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
+
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -530,14 +532,71 @@ const Editor: React.FC = () => {
         onBack={() => navigate('/')}
       />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex overflow-hidden">
+        {/* AI Sidebar - Left */}
+        <EditorAISidebar
+          isOpen={isAISidebarOpen}
+          onClose={() => setIsAISidebarOpen(false)}
+          courseId={course.id}
+          designSystem={course.designSystem}
+          selectedBlock={selectedBlock}
+          onAIGenerate={(generatedLessons) => {
+            pushToUndo();
+            setCourse(prev => prev ? ({
+              ...prev,
+              lessons: generatedLessons.map((l, i) => ({ ...l, courseId: prev.id, order: i + 1 })),
+              updatedAt: new Date(),
+            }) : null);
+            if (generatedLessons.length > 0) {
+              setSelectedLessonId(generatedLessons[0].id);
+              if (generatedLessons[0].slides.length > 0) {
+                setSelectedBlockId(generatedLessons[0].slides[0].id);
+              }
+            }
+            toast.success(`Курс сгенерирован: ${generatedLessons.length} уроков`);
+          }}
+          onUpdateBlock={handleUpdateBlock}
+        />
+
         {/* Main content area */}
-        <div className="flex-1 flex w-full overflow-hidden">
-          {/* Mobile Preview - HIGHEST PRIORITY, centered with flex-1 */}
-          <div className="flex-1 flex flex-col overflow-hidden bg-muted/30">
-            {/* Preview header with mute button */}
-            <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card">
-              <span className="text-sm font-medium text-muted-foreground">Fast View</span>
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Content row */}
+          <div className="flex-1 flex w-full overflow-hidden">
+            {/* Mobile Preview - HIGHEST PRIORITY, centered with flex-1 */}
+            <div className="flex-1 flex flex-col overflow-hidden bg-muted/30">
+              {/* Preview header with AI button and mute button */}
+              <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={isAISidebarOpen ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setIsAISidebarOpen(!isAISidebarOpen)}
+                    className="gap-1.5"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    AI
+                  </Button>
+                  <span className="text-sm font-medium text-muted-foreground">Fast View</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsPreviewMuted(!isPreviewMuted)}
+                  className="gap-2"
+                >
+                  {isPreviewMuted ? (
+                    <>
+                      <VolumeX className="w-4 h-4" />
+                      <span className="text-xs">Звук выкл</span>
+                    </>
+                  ) : (
+                    <>
+                      <Volume2 className="w-4 h-4" />
+                      <span className="text-xs">Звук вкл</span>
+                    </>
+                  )}
+                </Button>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
