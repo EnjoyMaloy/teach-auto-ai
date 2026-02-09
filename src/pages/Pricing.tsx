@@ -173,7 +173,7 @@ const Pricing = () => {
                   </div>
 
                   {/* Price */}
-                  <div className="mb-14">
+                  <div className="pb-8">
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-bold text-sidebar-foreground">
                         {annualBilling ? plan.price.annually : plan.price.monthly}
@@ -191,6 +191,9 @@ const Pricing = () => {
                       )}
                     </div>
                   </div>
+
+                  {/* Spacer for more breathing room */}
+                  <div className="h-6" />
 
                   {/* CTA Button */}
                   <Button
