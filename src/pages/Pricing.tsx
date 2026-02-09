@@ -6,11 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
+// Pastel violet color matching logo "A" - hsl(265, 60%, 75%)
+const PASTEL_VIOLET = "hsl(265 60% 75%)";
+
 const plans = [
   {
     title: "Стартовый",
     description: "Для знакомства с платформой",
-    price: { monthly: "Бесплатно", annually: "Бесплатно" },
+    price: { monthly: "Free", annually: "Free" },
     recommended: false,
     current: false,
     featureGroups: [
@@ -29,8 +32,8 @@ const plans = [
     title: "Pro",
     description: "Для профессионалов",
     price: {
-      monthly: "₽2 490",
-      annually: "₽1 990",
+      monthly: "$24",
+      annually: "$19",
     },
     discount: "-20%",
     recommended: true,
@@ -52,8 +55,8 @@ const plans = [
     title: "Команда",
     description: "Для организаций",
     price: {
-      monthly: "₽9 990",
-      annually: "₽7 990",
+      monthly: "$99",
+      annually: "$79",
     },
     discount: "-20%",
     recommended: false,
@@ -113,6 +116,7 @@ const Pricing = () => {
                 id="annual-billing"
                 checked={annualBilling}
                 onCheckedChange={setAnnualBilling}
+                className="data-[state=checked]:bg-[hsl(265_60%_75%)]"
               />
               <span className={cn(
                 "text-xs md:text-sm font-medium transition-colors",
@@ -133,7 +137,7 @@ const Pricing = () => {
                   "bg-sidebar/80 backdrop-blur-sm border-sidebar-border",
                   "hover:bg-sidebar/90 hover:border-sidebar-accent",
                   plan.recommended 
-                    ? "border-primary shadow-lg shadow-primary/10 lg:scale-105 z-10" 
+                    ? "border-[hsl(265_60%_75%)] shadow-lg shadow-[hsl(265_60%_75%_/_0.2)] lg:scale-105 z-10" 
                     : "",
                   index === 0 && "lg:-mr-2",
                   index === 2 && "lg:-ml-2 sm:col-span-2 lg:col-span-1"
@@ -151,7 +155,10 @@ const Pricing = () => {
 
                 {/* Recommended Badge */}
                 {plan.recommended && (
-                  <div className="flex h-8 items-center justify-center bg-primary text-center text-xs font-semibold text-primary-foreground">
+                  <div 
+                    className="flex h-8 items-center justify-center text-center text-xs font-semibold text-white"
+                    style={{ backgroundColor: PASTEL_VIOLET }}
+                  >
                     Рекомендуем
                   </div>
                 )}
@@ -175,7 +182,10 @@ const Pricing = () => {
                         <span className="text-sm text-sidebar-foreground/60">/ месяц</span>
                       )}
                       {annualBilling && plan.discount && (
-                        <Badge className="bg-primary/20 text-primary border-0 text-xs">
+                        <Badge 
+                          className="border-0 text-xs text-white"
+                          style={{ backgroundColor: `hsl(265 60% 75% / 0.3)`, color: PASTEL_VIOLET }}
+                        >
                           {plan.discount}
                         </Badge>
                       )}
@@ -186,8 +196,10 @@ const Pricing = () => {
                   <Button
                     variant={plan.current ? "secondary" : plan.recommended ? "default" : "outline"}
                     className={cn(
-                      "w-full",
-                      !plan.recommended && !plan.current && "border-sidebar-border hover:bg-primary/20 hover:text-white hover:border-primary/40"
+                      "w-full transition-all",
+                      plan.recommended 
+                        ? "bg-[hsl(265_60%_75%)] hover:bg-[hsl(265_60%_70%)] text-white border-0"
+                        : !plan.current && "border-sidebar-border hover:bg-[hsl(265_60%_75%)] hover:text-white hover:border-[hsl(265_60%_75%)]"
                     )}
                     disabled={plan.current}
                   >
@@ -214,7 +226,7 @@ const Pricing = () => {
                             )}
                           >
                             {feature.available ? (
-                              <Check className="size-4 shrink-0 text-primary" />
+                              <Check className="size-4 shrink-0" style={{ color: PASTEL_VIOLET }} />
                             ) : (
                               <X className="size-4 shrink-0" />
                             )}
