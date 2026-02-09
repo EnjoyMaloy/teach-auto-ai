@@ -37,15 +37,17 @@ const Catalog: React.FC = () => {
       {/* Top spacer for mobile header */}
       <div className="h-16 md:h-14" />
       
-      {/* Search */}
-      <div className="relative max-w-sm mb-4 md:mb-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground dark:text-white/20" />
-        <Input
-          placeholder="Поиск курсов..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9 h-9 bg-muted dark:bg-white/[0.03] border-border dark:border-white/[0.06] text-foreground dark:text-white text-[13px] placeholder:text-muted-foreground dark:placeholder:text-white/30"
-        />
+      {/* Search - centered on top */}
+      <div className="flex justify-center mb-6">
+        <div className="relative w-full max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground dark:text-white/20" />
+          <Input
+            placeholder="Поиск курсов..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 h-9 bg-muted dark:bg-white/[0.03] border-border dark:border-white/[0.06] text-foreground dark:text-white text-[13px] placeholder:text-muted-foreground dark:placeholder:text-white/30"
+          />
+        </div>
       </div>
 
       {/* Categories */}
