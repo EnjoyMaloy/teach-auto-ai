@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import AnimatedBackground from "@/components/layout/AnimatedBackground";
 
 const plans = [
   {
@@ -78,9 +77,7 @@ const Pricing = () => {
   const [annualBilling, setAnnualBilling] = useState(true);
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden bg-background">
-      {/* Animated background for consistency */}
-      <AnimatedBackground />
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
 
       {/* Content */}
       <div 
@@ -126,8 +123,8 @@ const Pricing = () => {
             </div>
           </div>
 
-          {/* Plans Grid */}
-          <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-3">
+          {/* Plans Grid - responsive for tablets */}
+          <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {plans.map((plan, index) => (
               <Card
                 key={plan.title}
@@ -136,10 +133,10 @@ const Pricing = () => {
                   "bg-sidebar/80 backdrop-blur-sm border-sidebar-border",
                   "hover:bg-sidebar/90 hover:border-sidebar-accent",
                   plan.recommended 
-                    ? "border-primary shadow-lg shadow-primary/10 md:scale-105 z-10" 
+                    ? "border-primary shadow-lg shadow-primary/10 lg:scale-105 z-10" 
                     : "",
-                  index === 0 && "md:-mr-2",
-                  index === 2 && "md:-ml-2"
+                  index === 0 && "lg:-mr-2",
+                  index === 2 && "lg:-ml-2 sm:col-span-2 lg:col-span-1"
                 )}
               >
                 {/* Current Plan Badge */}
@@ -190,7 +187,7 @@ const Pricing = () => {
                     variant={plan.current ? "secondary" : plan.recommended ? "default" : "outline"}
                     className={cn(
                       "w-full",
-                      !plan.recommended && !plan.current && "border-sidebar-border hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                      !plan.recommended && !plan.current && "border-sidebar-border hover:bg-primary/20 hover:text-white hover:border-primary/40"
                     )}
                     disabled={plan.current}
                   >
