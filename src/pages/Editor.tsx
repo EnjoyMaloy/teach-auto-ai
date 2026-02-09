@@ -625,8 +625,8 @@ const Editor: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Block Editor - fills remaining space */}
-        <div className="hidden md:flex min-w-[300px] flex-1 flex-col border-l border-border bg-card overflow-hidden order-3">
+        {/* Right: Block Editor - fixed width, pinned to right */}
+        <div className="hidden md:flex w-[380px] flex-shrink-0 flex-col border-l border-border bg-card overflow-hidden order-3">
           {selectedBlock ? (
             <BlockEditor
               block={selectedBlock}
