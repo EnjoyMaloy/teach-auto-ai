@@ -21,7 +21,7 @@ import { DesignSystemConfig } from '@/types/designSystem';
 import { useAuth } from '@/hooks/useAuth';
 import { useCourses } from '@/hooks/useCourses';
 import { EditorHeader } from '@/components/editor/EditorHeader';
-import { LessonsList } from '@/components/editor/LessonsList';
+import { CourseLayerTree } from '@/components/editor/CourseLayerTree';
 
 import { CoursePlayer } from '@/components/runtime/CoursePlayer';
 
@@ -32,7 +32,7 @@ import {
   BlockEditor 
 } from '@/components/editor/blocks';
 import { TextEditorProvider } from '@/components/editor/blocks/TextEditorContext';
-import { SortableBlockItem } from '@/components/editor/SortableBlockItem';
+import { SortableBlockItem } from '@/components/editor/SortableBlockItem'; // Keep for potential future use
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Loader2, Plus, Smartphone, Volume2, VolumeX } from 'lucide-react';
@@ -531,24 +531,21 @@ const Editor: React.FC = () => {
       />
 
       <div className="flex-1 flex w-full overflow-hidden">
-        {/* Left: Lessons sidebar - hides first on resize, flexible width */}
-        <div className="hidden xl:flex w-[540px] min-w-[400px] max-w-[600px] flex-1 flex-col border-r border-border bg-card order-1">
-          <LessonsList
+        {/* Left: Course Layer Tree - unified structure */}
+        <div className="hidden lg:flex order-1">
+          <CourseLayerTree
             lessons={course.lessons}
             selectedLessonId={selectedLessonId}
+            selectedBlockId={selectedBlockId}
             onSelectLesson={handleSelectLesson}
+            onSelectBlock={(blockId, lessonId) => {
+              setSelectedLessonId(lessonId);
+              setSelectedBlockId(blockId);
+            }}
             onAddLesson={handleAddLesson}
             onDeleteLesson={handleDeleteLesson}
             onDuplicateLesson={handleDuplicateLesson}
             onReorderLessons={handleReorderLessons}
-            onUpdateLessonIcon={(lessonId, icon) => {
-              pushToUndo();
-              setCourse(prev => prev ? ({
-                ...prev,
-                lessons: prev.lessons.map(l => l.id === lessonId ? { ...l, icon, updatedAt: new Date() } : l),
-                updatedAt: new Date(),
-              }) : null);
-            }}
             onUpdateLessonTitle={(lessonId, title) => {
               pushToUndo();
               setCourse(prev => prev ? ({
@@ -557,78 +554,38 @@ const Editor: React.FC = () => {
                 updatedAt: new Date(),
               }) : null);
             }}
+            onDeleteBlock={handleDeleteBlock}
+            onDuplicateBlock={handleDuplicateBlock}
+            onReorderBlocks={(lessonId, event) => {
+              const { active, over } = event;
+              if (!over || active.id === over.id || !course) return;
+              
+              pushToUndo();
+              setCourse(prev => prev ? ({
+                ...prev,
+                lessons: prev.lessons.map(lesson => {
+                  if (lesson.id !== lessonId) return lesson;
+                  const oldIndex = lesson.slides.findIndex(s => s.id === active.id);
+                  const newIndex = lesson.slides.findIndex(s => s.id === over.id);
+                  return {
+                    ...lesson,
+                    slides: arrayMove(lesson.slides, oldIndex, newIndex).map((s, i) => ({
+                      ...s,
+                      order: i + 1,
+                    })),
+                    updatedAt: new Date(),
+                  };
+                }),
+                updatedAt: new Date(),
+              }) : null);
+            }}
+            onAddBlock={() => setShowBlockSelector(true)}
+            slideToBlock={slideToBlock}
           />
         </div>
 
-        {/* Blocks list - hides second on resize, flexible width */}
-        <div className="hidden lg:flex w-80 min-w-[280px] max-w-[420px] flex-1 flex-col border-r border-border bg-card order-2">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-            <div>
-              <h3 className="font-bold text-foreground">Блоки</h3>
-              <p className="text-xs text-muted-foreground">{Math.floor((blocks.length * 30) / 60)} мин</p>
-            </div>
-            <Button 
-              variant="default" 
-              size="sm"
-              onClick={() => setShowBlockSelector(true)}
-              className="rounded-xl"
-            >
-              <Plus className="w-4 h-4 mr-1.5" />
-              Добавить
-            </Button>
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-3">
-            {blocks.length > 0 ? (
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleReorderBlocks}
-              >
-                <SortableContext
-                  items={blocks.map(b => b.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="space-y-2">
-                    {blocks.map((block, index) => (
-                      <SortableBlockItem
-                        key={block.id}
-                        block={block}
-                        index={index}
-                        isSelected={selectedBlockId === block.id}
-                        onSelect={() => setSelectedBlockId(block.id)}
-                        onDelete={() => handleDeleteBlock(block.id)}
-                        onDuplicate={() => handleDuplicateBlock(block.id)}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
-            ) : (
-              <div className="text-center py-16">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 mx-auto mb-4 flex items-center justify-center">
-                  <Smartphone className="w-8 h-8 text-primary" />
-                </div>
-                <p className="text-foreground font-medium mb-2">Начните создавать</p>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Добавьте первый блок урока
-                </p>
-                <Button 
-                  variant="default" 
-                  size="sm"
-                  onClick={() => setShowBlockSelector(true)}
-                  className="rounded-xl"
-                >
-                  <Plus className="w-4 h-4 mr-1.5" />
-                  Добавить блок
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-
         {/* Mobile Preview - HIGHEST PRIORITY, fixed width, never shrinks */}
-        <div className="flex flex-col overflow-hidden bg-muted/30 flex-shrink-0 order-3" style={{ width: 'calc((100vh - 120px) * 9 / 16)', minWidth: '280px' }}>
+        <div className="flex flex-col overflow-hidden bg-muted/30 flex-shrink-0 order-2" style={{ width: 'calc((100vh - 120px) * 9 / 16)', minWidth: '280px' }}>
           {/* Preview header with mute button */}
           <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card">
             <span className="text-sm font-medium text-muted-foreground">Fast View</span>
@@ -669,7 +626,7 @@ const Editor: React.FC = () => {
         </div>
 
         {/* Right: Block Editor - fills remaining space */}
-        <div className="hidden md:flex min-w-[300px] flex-1 flex-col border-l border-border bg-card overflow-hidden order-4">
+        <div className="hidden md:flex min-w-[300px] flex-1 flex-col border-l border-border bg-card overflow-hidden order-3">
           {selectedBlock ? (
             <BlockEditor
               block={selectedBlock}
