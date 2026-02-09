@@ -109,7 +109,6 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
               >
                 <Settings className="w-3.5 h-3.5 mr-2" />
                 Настройки
-                <span className="ml-auto text-[10px]">скоро</span>
               </DropdownMenuItem>
               <DropdownMenuItem 
                 disabled
@@ -117,7 +116,6 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
               >
                 <BarChart3 className="w-3.5 h-3.5 mr-2" />
                 Статистика
-                <span className="ml-auto text-[10px]">скоро</span>
               </DropdownMenuItem>
               {isPublished && (
                 <DropdownMenuItem 
