@@ -181,7 +181,12 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                   <div className="px-2 py-2 mb-1">
                     <div 
                       className="flex items-center gap-2 px-2 py-2 rounded-md bg-primary/10 cursor-pointer hover:bg-primary/15 transition-colors"
-                      onClick={() => navigate('/pricing')}
+                      onClick={() => {
+                        if (isMobile) {
+                          setOpenMobile(false);
+                        }
+                        navigate('/pricing');
+                      }}
                     >
                       <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/20">
                         <Zap className="size-4 text-primary" />
