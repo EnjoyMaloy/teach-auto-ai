@@ -268,8 +268,9 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                             <SidebarMenuSubButton
                               isActive={isEditorRoute(course.id)}
                               onClick={() => handleNavigate(`/editor/${course.id}`)}
+                              className="truncate"
                             >
-                              {course.title}
+                              <span className="truncate">{course.title}</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         ))
