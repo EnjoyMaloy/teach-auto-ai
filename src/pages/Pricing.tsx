@@ -173,7 +173,7 @@ const Pricing = () => {
                   </div>
 
                   {/* Price */}
-                  <div className="mb-6">
+                  <div className="mb-8">
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-bold text-sidebar-foreground">
                         {annualBilling ? plan.price.annually : plan.price.monthly}
