@@ -150,13 +150,11 @@ const Home: React.FC = () => {
   };
 
   // Input card component (reused for desktop and mobile)
-  const InputCard = ({ className = '', isMobile = false }: { className?: string; isMobile?: boolean }) => (
+  const InputCard = ({ className = '' }: { className?: string }) => (
     <div className={cn(
-      "w-full max-w-2xl rounded-2xl p-2 transition-all",
-      isMobile 
-        ? "bg-transparent border-0 shadow-none" 
-        : "bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/[0.08] shadow-2xl"
-      , className)}>
+      "w-full max-w-2xl rounded-2xl p-2 transition-all bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/[0.08] shadow-2xl",
+      className
+    )}>
       <div className="flex items-start gap-3 px-3 md:px-4 py-3">
         <textarea
           value={prompt}
@@ -177,7 +175,7 @@ const Home: React.FC = () => {
       
       {/* Generation status */}
       {isGenerating && generationStatus && (
-        <div className={cn("px-4 py-2", !isMobile && "border-t border-border dark:border-white/5")}>
+        <div className="px-4 py-2 border-t border-border dark:border-white/5">
           <div className="flex items-center gap-2 text-muted-foreground dark:text-white/60 text-sm">
             <Loader2 className="w-4 h-4 animate-spin" />
             <span>{generationStatus}</span>
@@ -185,7 +183,7 @@ const Home: React.FC = () => {
         </div>
       )}
       
-      <div className={cn("flex items-center justify-between px-3 md:px-4 py-2", !isMobile && "border-t border-border dark:border-white/5")}>
+      <div className="flex items-center justify-between px-3 md:px-4 py-2 border-t border-border dark:border-white/5">
         <TooltipProvider delayDuration={300}>
           <div className="flex items-center gap-1 md:gap-1.5">
             {/* Add attachment */}
@@ -305,7 +303,7 @@ const Home: React.FC = () => {
       
       {/* Mobile bottom input bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 z-20">
-        <InputCard isMobile />
+        <InputCard />
       </div>
       
       {/* Mobile bottom spacer to prevent content from being hidden behind fixed input */}
