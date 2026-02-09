@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Undo2, Redo2, Eye, 
-  Share2, Loader2, Pencil, Check, X, Palette, ChevronRight, Map, Sparkles
+  Share2, Check, X, Palette, ChevronRight, Map, Sparkles,
+  Cloud, RefreshCw
 } from 'lucide-react';
 import { Course, Lesson, LessonsDisplayType } from '@/types/course';
 import { DesignSystemConfig } from '@/types/designSystem';
@@ -376,23 +377,25 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
         {/* Right section */}
         <div className="flex items-center gap-2 shrink-0">
-          {/* Auto-save status - minimal */}
-          {isSaving ? (
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Loader2 className="w-3 h-3 animate-spin" />
-              <span>Сохранение...</span>
+          {/* Cloud save status - icon only */}
+          <div className="relative flex items-center justify-center w-8 h-8">
+            <Cloud className={cn(
+              "w-5 h-5 transition-colors",
+              isSaving ? "text-muted-foreground" : 
+              hasUnsavedChanges ? "text-amber-500" : 
+              lastSavedAt ? "text-emerald-500" : "text-muted-foreground"
+            )} />
+            {/* Status indicator */}
+            <div className="absolute -bottom-0.5 -right-0.5">
+              {isSaving ? (
+                <RefreshCw className="w-3 h-3 text-primary animate-spin" />
+              ) : hasUnsavedChanges ? (
+                <X className="w-3 h-3 text-amber-500" />
+              ) : lastSavedAt ? (
+                <Check className="w-3 h-3 text-emerald-500" />
+              ) : null}
             </div>
-          ) : hasUnsavedChanges ? (
-            <div className="flex items-center gap-1.5 text-xs text-amber-500">
-              <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-              <span>Не сохранено</span>
-            </div>
-          ) : lastSavedAt ? (
-            <div className="flex items-center gap-1.5 text-xs text-emerald-600">
-              <Check className="w-3 h-3" />
-              <span>Сохранено</span>
-            </div>
-          ) : null}
+          </div>
 
           <div className="w-px h-5 bg-border/50" />
 
