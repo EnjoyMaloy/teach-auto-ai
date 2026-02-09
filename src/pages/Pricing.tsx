@@ -11,7 +11,7 @@ const PASTEL_VIOLET = "hsl(265 60% 75%)";
 
 const plans = [
   {
-    title: "Стартовый",
+    title: "Explorer",
     description: "Для знакомства с платформой",
     price: { monthly: "Free", annually: "Free" },
     recommended: false,
@@ -20,20 +20,22 @@ const plans = [
       {
         title: "Возможности",
         features: [
-          { title: "3 курса", available: true },
-          { title: "Базовые шаблоны", available: true },
-          { title: "AI-генерация", available: false },
-          { title: "Аналитика", available: false },
+          { title: "До 3 курсов", available: true },
+          { title: "Базовые шаблоны уроков", available: true },
+          { title: "Ограниченная AI-генерация", available: true },
+          { title: "Публикация в Open Academy Marketplace", available: true },
+          { title: "Брендинг Open Academy на курсах", available: true },
+          { title: "Базовая поддержка", available: true },
         ],
       },
     ],
   },
   {
-    title: "Pro",
-    description: "Для профессионалов",
+    title: "Creator Pro",
+    description: "Для экспертов и авторов курсов",
     price: {
-      monthly: "$24",
-      annually: "$19",
+      monthly: "$29",
+      annually: "$23",
     },
     discount: "-20%",
     recommended: true,
@@ -43,17 +45,19 @@ const plans = [
         title: "Возможности",
         features: [
           { title: "Безлимитные курсы", available: true },
-          { title: "Все шаблоны", available: true },
-          { title: "Безлимитная AI-генерация", available: true },
-          { title: "Расширенная аналитика", available: true },
+          { title: "Все шаблоны уроков", available: true },
+          { title: "Полная AI-генерация курсов и уроков", available: true },
+          { title: "Экспорт и embed курсов", available: true },
+          { title: "Аналитика прохождения", available: true },
+          { title: "Продажа курсов без watermark", available: true },
           { title: "Приоритетная поддержка", available: true },
         ],
       },
     ],
   },
   {
-    title: "Команда",
-    description: "Для организаций",
+    title: "Studio",
+    description: "Для команд и проектов",
     price: {
       monthly: "$99",
       annually: "$79",
@@ -65,10 +69,12 @@ const plans = [
       {
         title: "Возможности",
         features: [
-          { title: "Всё из Pro", available: true },
-          { title: "До 10 участников", available: true },
-          { title: "Брендирование", available: true },
-          { title: "API доступ", available: true },
+          { title: "Всё из Creator Pro", available: true },
+          { title: "Командный workspace", available: true },
+          { title: "До 10 авторов", available: true },
+          { title: "Брендирование (white-label)", available: true },
+          { title: "Расширенная аналитика", available: true },
+          { title: "API и интеграции", available: true },
           { title: "Персональный менеджер", available: true },
         ],
       },
@@ -178,7 +184,7 @@ const Pricing = () => {
                       <span className="text-3xl font-bold text-sidebar-foreground">
                         {annualBilling ? plan.price.annually : plan.price.monthly}
                       </span>
-                      {plan.title !== "Стартовый" && (
+                      {plan.title !== "Explorer" && (
                         <span className="text-sm text-sidebar-foreground/60">/ месяц</span>
                       )}
                       {annualBilling && plan.discount && (
