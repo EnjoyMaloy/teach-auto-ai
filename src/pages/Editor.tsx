@@ -21,7 +21,7 @@ import { DesignSystemConfig } from '@/types/designSystem';
 import { useAuth } from '@/hooks/useAuth';
 import { useCourses } from '@/hooks/useCourses';
 import { EditorHeader } from '@/components/editor/EditorHeader';
-import { CourseLayerTree } from '@/components/editor/CourseLayerTree';
+import { CourseTimeline } from '@/components/editor/CourseTimeline';
 
 import { CoursePlayer } from '@/components/runtime/CoursePlayer';
 
@@ -530,126 +530,99 @@ const Editor: React.FC = () => {
         onBack={() => navigate('/')}
       />
 
-      <div className="flex-1 flex w-full overflow-hidden">
-        {/* Left: Course Layer Tree - unified structure */}
-        <div className="hidden lg:flex order-1">
-          <CourseLayerTree
-            lessons={course.lessons}
-            selectedLessonId={selectedLessonId}
-            selectedBlockId={selectedBlockId}
-            onSelectLesson={handleSelectLesson}
-            onSelectBlock={(blockId, lessonId) => {
-              setSelectedLessonId(lessonId);
-              setSelectedBlockId(blockId);
-            }}
-            onAddLesson={handleAddLesson}
-            onDeleteLesson={handleDeleteLesson}
-            onDuplicateLesson={handleDuplicateLesson}
-            onReorderLessons={handleReorderLessons}
-            onUpdateLessonTitle={(lessonId, title) => {
-              pushToUndo();
-              setCourse(prev => prev ? ({
-                ...prev,
-                lessons: prev.lessons.map(l => l.id === lessonId ? { ...l, title, updatedAt: new Date() } : l),
-                updatedAt: new Date(),
-              }) : null);
-            }}
-            onDeleteBlock={handleDeleteBlock}
-            onDuplicateBlock={handleDuplicateBlock}
-            onReorderBlocks={(lessonId, event) => {
-              const { active, over } = event;
-              if (!over || active.id === over.id || !course) return;
-              
-              pushToUndo();
-              setCourse(prev => prev ? ({
-                ...prev,
-                lessons: prev.lessons.map(lesson => {
-                  if (lesson.id !== lessonId) return lesson;
-                  const oldIndex = lesson.slides.findIndex(s => s.id === active.id);
-                  const newIndex = lesson.slides.findIndex(s => s.id === over.id);
-                  return {
-                    ...lesson,
-                    slides: arrayMove(lesson.slides, oldIndex, newIndex).map((s, i) => ({
-                      ...s,
-                      order: i + 1,
-                    })),
-                    updatedAt: new Date(),
-                  };
-                }),
-                updatedAt: new Date(),
-              }) : null);
-            }}
-            onAddBlock={() => setShowBlockSelector(true)}
-            slideToBlock={slideToBlock}
-          />
-        </div>
-
-        {/* Mobile Preview - HIGHEST PRIORITY, fixed width, never shrinks */}
-        <div className="flex flex-col overflow-hidden bg-muted/30 flex-shrink-0 order-2" style={{ width: 'calc((100vh - 120px) * 9 / 16)', minWidth: '280px' }}>
-          {/* Preview header with mute button */}
-          <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card">
-            <span className="text-sm font-medium text-muted-foreground">Fast View</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsPreviewMuted(!isPreviewMuted)}
-              className="gap-2"
-            >
-              {isPreviewMuted ? (
-                <>
-                  <VolumeX className="w-4 h-4" />
-                  <span className="text-xs">Звук выкл</span>
-                </>
-              ) : (
-                <>
-                  <Volume2 className="w-4 h-4" />
-                  <span className="text-xs">Звук вкл</span>
-                </>
-              )}
-            </Button>
-          </div>
-          {/* Mobile frame - fixed 9:16 aspect ratio */}
-          <div className="flex-1 overflow-hidden">
-            <MobilePreviewFrame
-              block={selectedBlock}
-              lessonTitle={selectedLesson?.title}
-              blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
-              totalBlocks={blocks.length}
-              onContinue={handleContinueToNextBlock}
-              onUpdateBlock={handleUpdateBlock}
-              designSystem={course.designSystem}
-              isMuted={isPreviewMuted}
-              selectedSubBlockId={selectedSubBlockId}
-              onSelectSubBlock={setSelectedSubBlockId}
-            />
-          </div>
-        </div>
-
-        {/* Right: Block Editor - fixed width, pinned to right */}
-        <div className="hidden md:flex w-[380px] flex-shrink-0 flex-col border-l border-border bg-card overflow-hidden order-3">
-          {selectedBlock ? (
-            <BlockEditor
-              block={selectedBlock}
-              onUpdate={handleUpdateBlock}
-              onDelete={handleDeleteBlock}
-              selectedSubBlockId={selectedSubBlockId}
-              onSelectSubBlock={setSelectedSubBlockId}
-              themeBackgrounds={(course.designSystem as any)?.themeBackgrounds || []}
-            />
-          ) : (
-            <div className="h-full flex items-center justify-center p-8 text-center">
-              <div>
-                <div className="w-20 h-20 rounded-3xl bg-muted mx-auto mb-5 flex items-center justify-center">
-                  <Smartphone className="w-10 h-10 text-muted-foreground" />
-                </div>
-                <p className="text-foreground font-medium mb-2">Редактор блока</p>
-                <p className="text-sm text-muted-foreground">
-                  Выберите блок слева для редактирования
-                </p>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Main content area */}
+        <div className="flex-1 flex w-full overflow-hidden">
+          {/* Mobile Preview - HIGHEST PRIORITY, centered with flex-1 */}
+          <div className="flex-1 flex flex-col overflow-hidden bg-muted/30">
+            {/* Preview header with mute button */}
+            <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card">
+              <span className="text-sm font-medium text-muted-foreground">Fast View</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsPreviewMuted(!isPreviewMuted)}
+                className="gap-2"
+              >
+                {isPreviewMuted ? (
+                  <>
+                    <VolumeX className="w-4 h-4" />
+                    <span className="text-xs">Звук выкл</span>
+                  </>
+                ) : (
+                  <>
+                    <Volume2 className="w-4 h-4" />
+                    <span className="text-xs">Звук вкл</span>
+                  </>
+                )}
+              </Button>
+            </div>
+            {/* Mobile frame container - centers the preview */}
+            <div className="flex-1 flex items-center justify-center overflow-hidden p-4">
+              <div 
+                className="h-full overflow-hidden rounded-2xl shadow-xl"
+                style={{ 
+                  aspectRatio: '9/16',
+                  maxHeight: '100%',
+                }}
+              >
+                <MobilePreviewFrame
+                  block={selectedBlock}
+                  lessonTitle={selectedLesson?.title}
+                  blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
+                  totalBlocks={blocks.length}
+                  onContinue={handleContinueToNextBlock}
+                  onUpdateBlock={handleUpdateBlock}
+                  designSystem={course.designSystem}
+                  isMuted={isPreviewMuted}
+                  selectedSubBlockId={selectedSubBlockId}
+                  onSelectSubBlock={setSelectedSubBlockId}
+                />
               </div>
             </div>
-          )}
+          </div>
+
+          {/* Right: Block Editor - fixed width, pinned to right */}
+          <div className="hidden md:flex w-[380px] flex-shrink-0 flex-col border-l border-border bg-card overflow-hidden">
+            {selectedBlock ? (
+              <BlockEditor
+                block={selectedBlock}
+                onUpdate={handleUpdateBlock}
+                onDelete={handleDeleteBlock}
+                selectedSubBlockId={selectedSubBlockId}
+                onSelectSubBlock={setSelectedSubBlockId}
+                themeBackgrounds={(course.designSystem as any)?.themeBackgrounds || []}
+              />
+            ) : (
+              <div className="h-full flex items-center justify-center p-8 text-center">
+                <div>
+                  <div className="w-20 h-20 rounded-3xl bg-muted mx-auto mb-5 flex items-center justify-center">
+                    <Smartphone className="w-10 h-10 text-muted-foreground" />
+                  </div>
+                  <p className="text-foreground font-medium mb-2">Редактор блока</p>
+                  <p className="text-sm text-muted-foreground">
+                    Выберите блок снизу для редактирования
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Bottom: Course Timeline */}
+        <CourseTimeline
+          lessons={course.lessons}
+          selectedLessonId={selectedLessonId}
+          selectedBlockId={selectedBlockId}
+          onSelectLesson={handleSelectLesson}
+          onSelectBlock={(blockId, lessonId) => {
+            setSelectedLessonId(lessonId);
+            setSelectedBlockId(blockId);
+          }}
+          onAddLesson={handleAddLesson}
+          onAddBlock={() => setShowBlockSelector(true)}
+          slideToBlock={slideToBlock}
+        />
       </div>
 
       {/* Block Type Selector Modal */}
