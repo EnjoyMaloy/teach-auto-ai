@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useSidebar } from "@/components/ui/sidebar";
-import { useIsMobile } from "@/hooks/use-mobile";
+
 
 // Pastel violet color matching logo "A" - hsl(265, 60%, 75%)
 const PASTEL_VIOLET = "hsl(265 60% 75%)";
@@ -86,8 +86,7 @@ const plans = [
 
 const Pricing = () => {
   const [annualBilling, setAnnualBilling] = useState(true);
-  const { setOpenMobile } = useSidebar();
-  const isMobile = useIsMobile();
+  const { setOpenMobile, isMobile } = useSidebar();
 
   const handleSelectPlan = () => {
     if (isMobile) {
