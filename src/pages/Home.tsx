@@ -149,12 +149,15 @@ const Home: React.FC = () => {
     }
   };
 
-  // Input card component (reused for desktop and mobile)
-  const InputCard = ({ className = '' }: { className?: string }) => (
-    <div className={cn(
-      "w-full max-w-2xl rounded-2xl p-2 transition-all bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/[0.08] shadow-2xl",
-      className
-    )}>
+  const handleTextareaInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
+    const target = e.target as HTMLTextAreaElement;
+    target.style.height = 'auto';
+    target.style.height = Math.min(target.scrollHeight, 120) + 'px';
+  };
+
+  // Shared input card JSX
+  const inputCardContent = (
+    <>
       <div className="flex items-start gap-3 px-3 md:px-4 py-3">
         <textarea
           value={prompt}
@@ -165,11 +168,7 @@ const Home: React.FC = () => {
           className="flex-1 bg-transparent text-foreground dark:text-white placeholder:text-muted-foreground dark:placeholder:text-white/40 resize-none outline-none text-[14px] md:text-[15px] min-h-[24px] max-h-[120px]"
           rows={1}
           style={{ height: 'auto' }}
-          onInput={(e) => {
-            const target = e.target as HTMLTextAreaElement;
-            target.style.height = 'auto';
-            target.style.height = Math.min(target.scrollHeight, 120) + 'px';
-          }}
+          onInput={handleTextareaInput}
         />
       </div>
       
@@ -275,7 +274,7 @@ const Home: React.FC = () => {
           )}
         </button>
       </div>
-    </div>
+    </>
   );
 
   return (
@@ -290,20 +289,24 @@ const Home: React.FC = () => {
         className="flex-1 flex flex-col items-center justify-center relative z-10 px-4 md:px-6 transition-all duration-200"
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
       >
-        {/* Welcome Text */}
-        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold mb-6 md:mb-10 text-foreground dark:text-white text-center px-2">
+        {/* Welcome Text - smaller on desktop */}
+        <h1 className="text-2xl sm:text-3xl md:text-3xl lg:text-4xl font-semibold mb-6 md:mb-10 text-foreground dark:text-white text-center px-2">
           Чему научим мир сегодня, <span className="text-primary dark:animate-[name-glow_4s_ease-in-out_infinite]" style={{ color: 'hsl(var(--primary))' }}>{userName}</span>?
         </h1>
 
-        {/* Desktop Action Card */}
-        <div className="hidden md:block">
-          <InputCard />
+        {/* Desktop Action Card - wider */}
+        <div className="hidden md:block w-full max-w-3xl">
+          <div className="w-full rounded-2xl p-2 transition-all bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/[0.08] shadow-2xl">
+            {inputCardContent}
+          </div>
         </div>
       </div>
       
       {/* Mobile bottom input bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 z-20">
-        <InputCard />
+        <div className="w-full rounded-2xl p-2 transition-all bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/[0.08] shadow-2xl">
+          {inputCardContent}
+        </div>
       </div>
       
       {/* Mobile bottom spacer to prevent content from being hidden behind fixed input */}
