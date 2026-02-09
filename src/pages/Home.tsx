@@ -294,8 +294,8 @@ const Home: React.FC = () => {
           Чему научим мир сегодня, <span className="text-primary dark:animate-[name-glow_4s_ease-in-out_infinite]" style={{ color: 'hsl(var(--primary))' }}>{userName}</span>?
         </h1>
 
-        {/* Desktop Action Card - wider */}
-        <div className="hidden md:block w-full max-w-3xl">
+        {/* Desktop Action Card */}
+        <div className="hidden md:block w-full max-w-[700px]">
           <div className="w-full rounded-2xl p-2 transition-all bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/[0.08] shadow-2xl">
             {inputCardContent}
           </div>
