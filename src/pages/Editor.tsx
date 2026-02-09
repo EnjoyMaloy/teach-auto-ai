@@ -492,29 +492,15 @@ const Editor: React.FC = () => {
 
   return (
     <TextEditorProvider>
-    <div className="h-screen flex flex-col bg-background">
-      <EditorHeader
-        course={course}
-        canUndo={undoStack.length > 0}
-        canRedo={redoStack.length > 0}
-        isSaving={isSaving}
-        hasUnsavedChanges={hasUnsavedChanges}
-        lastSavedAt={lastSavedAt}
-        isAISidebarOpen={isAISidebarOpen}
-        onToggleAISidebar={() => setIsAISidebarOpen(!isAISidebarOpen)}
-        onUndo={handleUndo}
-        onRedo={handleRedo}
-        onPreview={() => setIsPreviewMode(true)}
-        onPublish={handlePublish}
-        onSave={handleSave}
-        onUpdateTitle={handleUpdateTitle}
-        onUpdateDesignSystem={handleUpdateDesignSystem}
-        onUpdateLessonsDisplayType={(type) => {
-          pushToUndo();
-          setCourse(prev => prev ? ({ ...prev, lessonsDisplayType: type, updatedAt: new Date() }) : null);
-        }}
+    <div className="h-screen flex bg-background">
+      {/* AI Sidebar - Left, full height */}
+      <EditorAISidebar
+        isOpen={isAISidebarOpen}
+        onClose={() => setIsAISidebarOpen(false)}
+        courseId={course.id}
+        designSystem={course.designSystem}
+        selectedBlock={selectedBlock}
         onAIGenerate={(generatedLessons) => {
-          if (!course) return;
           pushToUndo();
           setCourse(prev => prev ? ({
             ...prev,
@@ -529,18 +515,33 @@ const Editor: React.FC = () => {
           }
           toast.success(`Курс сгенерирован: ${generatedLessons.length} уроков`);
         }}
-        onBack={() => navigate('/')}
+        onUpdateBlock={handleUpdateBlock}
       />
 
-      <div className="flex-1 flex overflow-hidden">
-        {/* AI Sidebar - Left */}
-        <EditorAISidebar
-          isOpen={isAISidebarOpen}
-          onClose={() => setIsAISidebarOpen(false)}
-          courseId={course.id}
-          designSystem={course.designSystem}
-          selectedBlock={selectedBlock}
+      {/* Main content area - header + content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <EditorHeader
+          course={course}
+          canUndo={undoStack.length > 0}
+          canRedo={redoStack.length > 0}
+          isSaving={isSaving}
+          hasUnsavedChanges={hasUnsavedChanges}
+          lastSavedAt={lastSavedAt}
+          isAISidebarOpen={isAISidebarOpen}
+          onToggleAISidebar={() => setIsAISidebarOpen(!isAISidebarOpen)}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          onPreview={() => setIsPreviewMode(true)}
+          onPublish={handlePublish}
+          onSave={handleSave}
+          onUpdateTitle={handleUpdateTitle}
+          onUpdateDesignSystem={handleUpdateDesignSystem}
+          onUpdateLessonsDisplayType={(type) => {
+            pushToUndo();
+            setCourse(prev => prev ? ({ ...prev, lessonsDisplayType: type, updatedAt: new Date() }) : null);
+          }}
           onAIGenerate={(generatedLessons) => {
+            if (!course) return;
             pushToUndo();
             setCourse(prev => prev ? ({
               ...prev,
@@ -555,12 +556,12 @@ const Editor: React.FC = () => {
             }
             toast.success(`Курс сгенерирован: ${generatedLessons.length} уроков`);
           }}
-          onUpdateBlock={handleUpdateBlock}
+          onBack={() => navigate('/')}
         />
 
-        {/* Main content area - vertical flex */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Top: Preview + Block Editor row */}
+        {/* Content area */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Preview + Block Editor row */}
           <div className="flex-1 flex overflow-hidden">
             {/* Mobile Preview - centered */}
             <div className="flex-1 flex flex-col overflow-hidden bg-muted/30">
@@ -638,22 +639,22 @@ const Editor: React.FC = () => {
               )}
             </div>
           </div>
-
-          {/* Bottom: Course Timeline */}
-          <CourseTimeline
-            lessons={course.lessons}
-            selectedLessonId={selectedLessonId}
-            selectedBlockId={selectedBlockId}
-            onSelectLesson={handleSelectLesson}
-            onSelectBlock={(blockId, lessonId) => {
-              setSelectedLessonId(lessonId);
-              setSelectedBlockId(blockId);
-            }}
-            onAddLesson={handleAddLesson}
-            onAddBlock={() => setShowBlockSelector(true)}
-            slideToBlock={slideToBlock}
-          />
         </div>
+
+        {/* Bottom: Course Timeline */}
+        <CourseTimeline
+          lessons={course.lessons}
+          selectedLessonId={selectedLessonId}
+          selectedBlockId={selectedBlockId}
+          onSelectLesson={handleSelectLesson}
+          onSelectBlock={(blockId, lessonId) => {
+            setSelectedLessonId(lessonId);
+            setSelectedBlockId(blockId);
+          }}
+          onAddLesson={handleAddLesson}
+          onAddBlock={() => setShowBlockSelector(true)}
+          slideToBlock={slideToBlock}
+        />
       </div>
 
       {/* Block Type Selector Modal */}
