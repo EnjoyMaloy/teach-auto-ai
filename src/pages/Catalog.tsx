@@ -36,7 +36,7 @@ const Catalog: React.FC = () => {
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
       >
       {/* Top spacer for mobile header */}
-      <div className="h-14 md:h-0" />
+      <div className="h-16 md:h-0" />
       
       {/* Search */}
       <div className="relative max-w-sm mb-4 md:mb-6">

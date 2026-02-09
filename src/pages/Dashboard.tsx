@@ -71,7 +71,7 @@ const Dashboard: React.FC = () => {
       <AnimatedBackground />
       
       {/* Mobile: Fixed create button in header area */}
-      <div className="md:hidden fixed top-0 right-0 z-20 h-14 px-4 flex items-center">
+      <div className="md:hidden fixed top-0 right-0 z-20 h-16 px-4 pt-2 flex items-center">
         <Button 
           onClick={handleCreate} 
           disabled={isCreating}
@@ -94,7 +94,7 @@ const Dashboard: React.FC = () => {
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
       >
       {/* Top spacer for mobile header */}
-      <div className="h-14 md:h-0" />
+      <div className="h-16 md:h-0" />
       
       {/* Top Bar - filters and create button (desktop only for button) */}
       <div className="flex items-center justify-between gap-2 mb-4 md:mb-6">

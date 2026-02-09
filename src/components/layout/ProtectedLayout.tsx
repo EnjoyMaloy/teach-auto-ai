@@ -33,7 +33,7 @@ const LayoutContent: React.FC = () => {
       
       {/* Mobile header with sidebar trigger and conditionally centered logo */}
       {isMobile && (
-        <div className="fixed top-0 left-0 right-0 z-20 h-14 px-4 flex items-center">
+        <div className="fixed top-0 left-0 right-0 z-20 h-16 px-4 pt-2 flex items-center">
           {/* Sidebar trigger - left aligned */}
           <SidebarTrigger className="h-8 w-8 p-1.5" />
           
