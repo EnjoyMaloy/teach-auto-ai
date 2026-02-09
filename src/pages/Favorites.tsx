@@ -40,7 +40,7 @@ const Favorites: React.FC = () => {
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
       >
         {/* Top spacing for header/sidebar trigger */}
-        <div className="h-16 md:h-10" />
+        <div className="h-16 md:h-14" />
 
         {/* Filters */}
         {favoriteCourses.length > 0 && (

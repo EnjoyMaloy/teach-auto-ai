@@ -35,10 +35,10 @@ const Catalog: React.FC = () => {
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
       >
       {/* Top spacer for mobile header */}
-      <div className="h-16 md:h-0" />
+      <div className="h-16 md:h-14" />
       
       {/* Search */}
-      <div className="relative max-w-sm mb-4 md:mb-6 ml-0 md:ml-10">
+      <div className="relative max-w-sm mb-4 md:mb-6">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground dark:text-white/20" />
         <Input
           placeholder="Поиск курсов..."
