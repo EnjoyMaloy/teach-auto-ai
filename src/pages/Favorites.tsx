@@ -39,8 +39,8 @@ const Favorites: React.FC = () => {
         className="relative z-10 p-4 md:p-6 transition-all duration-200"
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
       >
-        {/* Top spacing for mobile header */}
-        <div className="h-16 md:h-0" />
+        {/* Top spacing for header/sidebar trigger */}
+        <div className="h-16 md:h-10" />
 
         {/* Filters */}
         {favoriteCourses.length > 0 && (
