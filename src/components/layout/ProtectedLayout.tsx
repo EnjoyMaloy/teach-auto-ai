@@ -29,14 +29,16 @@ const LayoutContent: React.FC = () => {
       
       {/* Mobile header with sidebar trigger and centered logo */}
       {isMobile && (
-        <div className="fixed top-0 left-0 right-0 z-20 flex items-center justify-center h-20 px-4 pt-2">
-          {/* Sidebar trigger - left */}
+        <div className="fixed top-0 left-0 right-0 z-20 flex items-center h-16 px-4">
+          {/* Sidebar trigger - left, aligned with logo */}
           <div className="absolute left-4 top-1/2 -translate-y-1/2">
-            <SidebarTrigger className="h-12 w-12 p-2" />
+            <SidebarTrigger className="h-8 w-8 p-1.5" />
           </div>
           
-          {/* Centered logo - slightly lower */}
-          <AcademyLogo className="h-7 mt-2" />
+          {/* Centered logo */}
+          <div className="flex-1 flex justify-center">
+            <AcademyLogo className="h-7" />
+          </div>
         </div>
       )}
       
