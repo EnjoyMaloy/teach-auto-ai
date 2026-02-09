@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Undo2, Redo2, Eye, 
-  Share2, Check, X, Palette, ChevronRight, Map, Sparkles,
-  Cloud, RefreshCw
+  Share2, Check, X, Palette, ChevronRight, Map,
+  Cloud, RefreshCw, PanelLeft
 } from 'lucide-react';
 import { Course, Lesson, LessonsDisplayType } from '@/types/course';
 import { DesignSystemConfig } from '@/types/designSystem';
@@ -239,25 +239,22 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   return (
     <>
       <header className="h-14 border-b border-border/40 bg-background/95 backdrop-blur-sm flex items-center justify-between px-4 gap-4">
-        {/* Left section - AI Button + Breadcrumbs */}
+        {/* Left section - Sidebar trigger + Breadcrumbs */}
         <div className="flex items-center gap-2 min-w-0">
-          {/* AI Sidebar Toggle */}
+          {/* AI Sidebar Toggle - simple icon */}
           {onToggleAISidebar && (
             <button
               onClick={onToggleAISidebar}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors",
+                "p-2 rounded-lg transition-colors",
                 isAISidebarOpen 
-                  ? "bg-primary text-primary-foreground" 
+                  ? "bg-muted text-foreground" 
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               )}
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              AI
+              <PanelLeft className="w-5 h-5" />
             </button>
           )}
-
-          <div className="w-px h-5 bg-border/50" />
 
           {/* Breadcrumb navigation */}
           <nav className="flex items-center gap-1 min-w-0">
