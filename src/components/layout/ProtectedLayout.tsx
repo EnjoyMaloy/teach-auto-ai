@@ -1,14 +1,17 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import AppSidebar from './AppSidebar';
 import { useState, useEffect } from 'react';
 import { SidebarProvider, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
+import AcademyLogo from './AcademyLogo';
 
 const LayoutContent: React.FC = () => {
   const { state } = useSidebar();
   const isMobile = useIsMobile();
+  const location = useLocation();
   const isCollapsed = state === 'collapsed';
+  const isHomePage = location.pathname === '/';
   
   // On mobile, no offset needed (sidebar is overlay)
   const sidebarOffset = isMobile ? '0px' : (isCollapsed ? '0px' : 'var(--sidebar-width)');
@@ -26,15 +29,30 @@ const LayoutContent: React.FC = () => {
         <Outlet />
       </div>
       
-      {/* Sidebar trigger - positioned relative to sidebar */}
-      <div 
-        className="fixed top-4 z-20 transition-all duration-200"
-        style={{ 
-          left: isMobile ? '1rem' : (isCollapsed ? '1rem' : 'calc(var(--sidebar-width) + 1rem)')
-        }}
-      >
-        <SidebarTrigger />
-      </div>
+      {/* Mobile header - only on mobile */}
+      {isMobile && (
+        <div className="fixed top-0 left-0 right-0 h-16 z-20 flex items-center justify-between px-4 bg-background/80 backdrop-blur-sm">
+          <SidebarTrigger />
+          {isHomePage && (
+            <div className="absolute left-1/2 -translate-x-1/2">
+              <AcademyLogo className="h-5" />
+            </div>
+          )}
+          <div className="w-9" /> {/* Spacer for balance */}
+        </div>
+      )}
+      
+      {/* Desktop sidebar trigger - positioned relative to sidebar */}
+      {!isMobile && (
+        <div 
+          className="fixed top-4 z-20 transition-all duration-200"
+          style={{ 
+            left: isCollapsed ? '1rem' : 'calc(var(--sidebar-width) + 1rem)'
+          }}
+        >
+          <SidebarTrigger />
+        </div>
+      )}
     </>
   );
 };

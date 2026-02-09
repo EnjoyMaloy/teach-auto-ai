@@ -73,6 +73,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   const { theme, setTheme } = useTheme();
   const { language, setLanguage } = useLanguage();
   const [recentCourses, setRecentCourses] = useState<RecentCourse[]>([]);
+  const { setOpenMobile, isMobile } = require('@/components/ui/sidebar').useSidebar();
 
   const userName = 'Pavel';
   const userEmail = user?.email || 'pavel@example.com';
@@ -102,6 +103,14 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
     await signOut();
     toast.success('Вы вышли из аккаунта');
     navigate('/auth');
+  };
+
+  // Auto-close sidebar on navigation (mobile only)
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    if (isMobile) {
+      setOpenMobile(false);
+    }
   };
 
   const isActive = (path: string) => location.pathname === path;
@@ -211,7 +220,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
             <SidebarMenuItem>
               <SidebarMenuButton
                 isActive={isActive('/')}
-                onClick={() => navigate('/')}
+                onClick={() => handleNavigate('/')}
               >
                 <Home className="size-4" />
                 <span>Главная</span>
@@ -245,7 +254,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                           <SidebarMenuSubItem key={course.id}>
                             <SidebarMenuSubButton
                               isActive={isEditorRoute(course.id)}
-                              onClick={() => navigate(`/editor/${course.id}`)}
+                              onClick={() => handleNavigate(`/editor/${course.id}`)}
                             >
                               {course.title}
                             </SidebarMenuSubButton>
@@ -267,7 +276,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   isActive={isActive('/workshop')}
-                  onClick={() => navigate('/workshop')}
+                  onClick={() => handleNavigate('/workshop')}
                 >
                   <Folder className="size-4" />
                   <span>Все курсы</span>
@@ -278,7 +287,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   isActive={isActive('/favorites')}
-                  onClick={() => navigate('/favorites')}
+                  onClick={() => handleNavigate('/favorites')}
                 >
                   <Star className="size-4" />
                   <span>Избранное</span>
@@ -296,7 +305,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   isActive={isActive('/catalog')}
-                  onClick={() => navigate('/catalog')}
+                  onClick={() => handleNavigate('/catalog')}
                 >
                   <Compass className="size-4" />
                   <span>Исследовать</span>

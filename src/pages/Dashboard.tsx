@@ -69,15 +69,9 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen relative overflow-auto bg-background dark:bg-[#0f0f12]">
       <AnimatedBackground />
-      <div 
-        className="relative z-10 p-4 md:p-6 transition-all duration-200"
-        style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
-      >
-      {/* Top spacer for sidebar trigger on mobile */}
-      <div className="h-10 md:h-0" />
       
-      {/* Top Bar */}
-      <div className="flex items-center justify-end mb-4 md:mb-6">
+      {/* Mobile header with Create button */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 z-20 flex items-center justify-end px-4 bg-background/80 backdrop-blur-sm">
         <Button 
           onClick={handleCreate} 
           disabled={isCreating}
@@ -89,8 +83,33 @@ const Dashboard: React.FC = () => {
           ) : (
             <>
               <Plus className="w-3.5 h-3.5 mr-1.5" />
-              <span className="hidden sm:inline">Новый курс</span>
-              <span className="sm:hidden">Создать</span>
+              Создать
+            </>
+          )}
+        </Button>
+      </div>
+      
+      <div 
+        className="relative z-10 p-4 md:p-6 transition-all duration-200"
+        style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
+      >
+      {/* Top spacer for mobile header */}
+      <div className="h-16 md:h-0" />
+      
+      {/* Desktop Top Bar */}
+      <div className="hidden md:flex items-center justify-end mb-4 md:mb-6">
+        <Button 
+          onClick={handleCreate} 
+          disabled={isCreating}
+          size="sm"
+          className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px]"
+        >
+          {isCreating ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <>
+              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              Новый курс
             </>
           )}
         </Button>
@@ -117,7 +136,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
           {[...Array(8)].map((_, i) => (
             <CourseCardSkeleton key={i} />
           ))}
@@ -146,7 +165,7 @@ const Dashboard: React.FC = () => {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
           {filteredCourses.map(course => (
             <CourseCardOverlay
               key={course.id}
