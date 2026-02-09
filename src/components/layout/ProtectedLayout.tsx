@@ -32,10 +32,10 @@ const LayoutContent: React.FC = () => {
       {/* Mobile header - only on mobile */}
       {isMobile && (
         <div className="fixed top-0 left-0 right-0 h-16 z-20 flex items-center justify-between px-4">
-          <SidebarTrigger />
+          <SidebarTrigger className="h-9 w-9 [&_svg]:size-5" />
           {isHomePage && (
             <div className="absolute left-1/2 -translate-x-1/2">
-              <AcademyLogo className="h-5" />
+              <AcademyLogo className="h-7" />
             </div>
           )}
           <div className="w-9" /> {/* Spacer for balance */}
