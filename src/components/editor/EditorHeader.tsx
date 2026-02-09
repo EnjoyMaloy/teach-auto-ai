@@ -233,7 +233,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
   return (
     <>
-      <header className="h-16 border-b border-border bg-card flex items-center justify-between px-4">
+      <header className="h-16 border-b border-border/50 bg-background/80 backdrop-blur-md flex items-center justify-between px-4">
         {/* Left section - Breadcrumbs */}
         <div className="flex items-center gap-2">
           {/* Breadcrumb navigation */}
