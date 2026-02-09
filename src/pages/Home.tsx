@@ -296,7 +296,7 @@ const Home: React.FC = () => {
 
         {/* Desktop Action Card */}
         <div className="hidden md:block w-full max-w-[700px]">
-          <div className="w-full rounded-2xl p-2 transition-all bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/[0.08] shadow-2xl">
+          <div className="w-full rounded-2xl p-2 transition-all bg-card dark:bg-[#1a1a1b] border border-foreground/20 dark:border-white/[0.08] dark:shadow-2xl">
             {inputCardContent}
           </div>
         </div>
@@ -304,7 +304,7 @@ const Home: React.FC = () => {
       
       {/* Mobile bottom input bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 z-20">
-        <div className="w-full rounded-2xl p-2 transition-all bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/[0.08] shadow-2xl">
+        <div className="w-full rounded-2xl p-2 transition-all bg-card dark:bg-[#1a1a1b] border border-foreground/20 dark:border-white/[0.08] dark:shadow-2xl">
           {inputCardContent}
         </div>
       </div>
