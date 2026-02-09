@@ -133,10 +133,13 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="w-[380px] h-full flex flex-col border-r border-border bg-card/95 backdrop-blur-sm">
+    <div 
+      className={cn(
+        "h-full flex flex-col border-r border-border bg-card/95 backdrop-blur-sm transition-all duration-300 ease-out overflow-hidden",
+        isOpen ? "w-[380px]" : "w-0"
+      )}
+    >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <div className="flex items-center gap-2">
