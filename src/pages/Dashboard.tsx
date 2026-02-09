@@ -73,11 +73,32 @@ const Dashboard: React.FC = () => {
         className="relative z-10 p-4 md:p-6 transition-all duration-200 min-h-screen overflow-y-auto"
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
       >
-      {/* Top spacer for sidebar trigger on mobile */}
-      <div className="h-6 md:h-0" />
+      {/* Top spacer for mobile header */}
+      <div className="h-14 md:h-0" />
       
-      {/* Top Bar */}
-      <div className="flex items-center justify-end mb-4 md:mb-6 pr-1">
+      {/* Top Bar - filters and create button on same row */}
+      <div className="flex items-center justify-between gap-2 mb-4 md:mb-6">
+        {/* Filters */}
+        <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+          {filters.map(f => (
+            <button
+              key={f.id}
+              onClick={() => setFilter(f.id)}
+              className={`
+                px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap
+                ${filter === f.id 
+                  ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
+                  : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
+                }
+              `}
+            >
+              {f.label}
+              <span className="ml-1.5 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
+            </button>
+          ))}
+        </div>
+        
+        {/* Create button */}
         <Button 
           onClick={handleCreate} 
           disabled={isCreating}
@@ -91,29 +112,9 @@ const Dashboard: React.FC = () => {
               <Plus className="w-3.5 h-3.5 mr-1.5" />
               <span className="hidden sm:inline">Новый курс</span>
               <span className="sm:hidden">Создать</span>
-            </>
-          )}
-        </Button>
-      </div>
-
-      {/* Filters */}
-      <div className="flex items-center gap-1 mb-4 md:mb-6 overflow-x-auto pb-1 scrollbar-hide">
-        {filters.map(f => (
-          <button
-            key={f.id}
-            onClick={() => setFilter(f.id)}
-            className={`
-              px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap
-              ${filter === f.id 
-                ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
-                : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
-              }
-            `}
-          >
-            {f.label}
-            <span className="ml-1.5 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
-          </button>
-        ))}
+          </>
+        )}
+      </Button>
       </div>
 
       {isLoading ? (
