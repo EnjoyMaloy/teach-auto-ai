@@ -1,8 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Play, Volume2 } from 'lucide-react';
+import { Plus, Play, Volume2, Heading, Type, Image, LayoutList, CircleDot, CheckSquare, ToggleLeft, PenLine, Link2, ListOrdered, SlidersHorizontal, Layers } from 'lucide-react';
 import { Lesson } from '@/types/course';
-import { Block, BLOCK_CONFIGS } from '@/types/blocks';
+import { Block, BLOCK_CONFIGS, BlockType } from '@/types/blocks';
 import { cn } from '@/lib/utils';
+
+const iconMap: Record<string, React.FC<{ className?: string }>> = {
+  Heading, Type, Image, Play, Volume2, LayoutList,
+  CircleDot, CheckSquare, ToggleLeft, PenLine,
+  Link2, ListOrdered, SlidersHorizontal, Layers
+};
 
 interface CourseTimelineProps {
   lessons: Lesson[];
@@ -18,6 +24,7 @@ interface CourseTimelineProps {
 // Mini block preview component
 const MiniBlockPreview: React.FC<{ block: Block; index: number }> = ({ block, index }) => {
   const config = BLOCK_CONFIGS[block.type];
+  const IconComponent = config?.icon ? iconMap[config.icon] : null;
 
   // Get background style
   const getBgStyle = () => {
@@ -40,94 +47,47 @@ const MiniBlockPreview: React.FC<{ block: Block; index: number }> = ({ block, in
       );
     }
 
-    // Design block - show gradient or sub-blocks indicator
+    // Design block - check for sub-block images
     if (block.type === 'design') {
-      // Check if any sub-block has an image
       const imageSubBlock = block.subBlocks?.find(sb => sb.type === 'image' && sb.imageUrl);
       
       if (imageSubBlock?.imageUrl) {
         return (
-          <div className="w-full h-full relative">
-            <img 
-              src={imageSubBlock.imageUrl} 
-              alt="" 
-              className="w-full h-full object-cover opacity-60"
-            />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className={cn('text-[10px] font-medium', config?.colorClass)}>
-                Дизайн
-              </span>
-            </div>
-          </div>
+          <img 
+            src={imageSubBlock.imageUrl} 
+            alt="" 
+            className="w-full h-full object-cover"
+          />
         );
       }
 
+      // Show gradient for design blocks without images
       return (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-ai/20 to-ai/5">
-          <span className={cn('text-[10px] font-medium', config?.colorClass)}>
-            Дизайн
-          </span>
-        </div>
+        <div className="w-full h-full bg-gradient-to-br from-ai/30 to-ai/10" />
       );
     }
 
-    // Video - show play icon
+    // Video - show dark background
     if (block.type === 'video') {
       return (
-        <div className="w-full h-full flex items-center justify-center bg-destructive/10">
-          <Play className="w-4 h-4 text-destructive fill-destructive" />
+        <div className="w-full h-full flex items-center justify-center bg-destructive/20">
+          <Play className="w-5 h-5 text-destructive fill-destructive/50" />
         </div>
       );
     }
 
-    // Audio - show volume icon
+    // Audio - show background
     if (block.type === 'audio') {
       return (
-        <div className="w-full h-full flex items-center justify-center bg-warning/10">
-          <Volume2 className="w-4 h-4 text-warning-foreground" />
+        <div className="w-full h-full flex items-center justify-center bg-warning/20">
+          <Volume2 className="w-5 h-5 text-warning-foreground" />
         </div>
       );
     }
 
-    // Quiz types - show type label
-    if (['single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'matching', 'ordering', 'slider'].includes(block.type)) {
-      const shortLabels: Record<string, string> = {
-        single_choice: 'Один о',
-        multiple_choice: 'Много',
-        true_false: 'Да/Нет',
-        fill_blank: 'Пропуск',
-        matching: 'Пары',
-        ordering: 'Порядок',
-        slider: 'Слайдер'
-      };
-      
-      return (
-        <div className={cn('w-full h-full flex items-center justify-center', config?.bgClass)}>
-          <span className={cn('text-[10px] font-medium', config?.colorClass)}>
-            {shortLabels[block.type] || config?.labelRu?.slice(0, 6)}
-          </span>
-        </div>
-      );
-    }
-
-    // Text/Heading - show snippet
-    if (block.type === 'text' || block.type === 'heading') {
-      return (
-        <div className={cn('w-full h-full flex items-center justify-center p-1', config?.bgClass)}>
-          <span className={cn('text-[8px] text-center line-clamp-3 leading-tight', config?.colorClass)}>
-            {block.content?.replace(/<[^>]*>/g, '').slice(0, 30) || config?.labelRu}
-          </span>
-        </div>
-      );
-    }
-
-    // Default - show type label
+    // Default - show colored background based on type
     return (
-      <div className={cn('w-full h-full flex items-center justify-center', config?.bgClass)}>
-        <span className={cn('text-[10px] font-medium', config?.colorClass)}>
-          {config?.labelRu?.slice(0, 6) || block.type}
-        </span>
-      </div>
+      <div className={cn('w-full h-full', config?.bgClass || 'bg-muted')} />
     );
   };
 
@@ -136,9 +96,16 @@ const MiniBlockPreview: React.FC<{ block: Block; index: number }> = ({ block, in
       className="w-full h-full rounded-md overflow-hidden bg-muted/50"
       style={getBgStyle()}
     >
-      {/* Block number badge */}
-      <div className="absolute top-1 left-1 z-10 w-4 h-4 rounded bg-background/90 text-[9px] font-bold flex items-center justify-center text-foreground shadow-sm">
-        {index + 1}
+      {/* Header with block number and type icon */}
+      <div className="absolute top-1 left-1 right-1 z-10 flex items-center gap-1">
+        <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-background/90 shadow-sm">
+          <span className="text-[9px] font-bold text-foreground">
+            {index + 1}
+          </span>
+          {IconComponent && (
+            <IconComponent className={cn('w-2.5 h-2.5', config?.colorClass)} />
+          )}
+        </div>
       </div>
       {renderContent()}
     </div>
