@@ -41,7 +41,7 @@ const Favorites: React.FC = () => {
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
       >
         {/* Top spacer for mobile header */}
-        <div className="h-14 md:h-14" />
+        <div className="h-16 md:h-14" />
 
         {/* Filters */}
         {favoriteCourses.length > 0 && (
