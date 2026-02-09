@@ -35,8 +35,8 @@ const Catalog: React.FC = () => {
         className="relative z-10 p-4 md:p-6 transition-all duration-200"
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
       >
-      {/* Top spacer for sidebar trigger on mobile */}
-      <div className="h-10 md:h-0" />
+      {/* Top spacer for mobile header */}
+      <div className="h-16 md:h-0" />
       
       {/* Search */}
       <div className="relative max-w-sm mb-4 md:mb-6 ml-0 md:ml-10">
@@ -93,7 +93,7 @@ const Catalog: React.FC = () => {
       )}
 
       {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
           {[...Array(10)].map((_, i) => (
             <CourseCardSkeleton key={i} />
           ))}
@@ -113,7 +113,7 @@ const Catalog: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
           {filteredCourses.map(course => (
             <CourseCardOverlay
               key={course.id}
