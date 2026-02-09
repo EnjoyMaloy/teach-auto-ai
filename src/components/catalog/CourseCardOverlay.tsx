@@ -66,7 +66,7 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
   return (
     <div
       className={cn(
-        'group relative w-full overflow-hidden rounded-2xl cursor-pointer bg-black dark:shadow-lg transition-transform duration-300 hover:scale-[1.02]',
+        'group relative w-full overflow-hidden rounded-2xl cursor-pointer bg-black transition-transform duration-300 hover:scale-[1.02]',
         className
       )}
       onClick={handleClick}
