@@ -95,8 +95,8 @@ const Dashboard: React.FC = () => {
       {/* Top spacer for mobile header */}
       <div className="h-16 md:h-14" />
       
-      {/* Desktop Top Bar */}
-      <div className="hidden md:flex items-center justify-end mb-4 md:mb-6">
+      {/* Desktop Top Bar - positioned absolutely to not affect spacing */}
+      <div className="hidden md:flex items-center justify-end mb-6">
         <Button 
           onClick={handleCreate} 
           disabled={isCreating}
