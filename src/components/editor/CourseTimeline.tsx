@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Play, Volume2 } from 'lucide-react';
 import { Lesson } from '@/types/course';
 import { Block, BLOCK_CONFIGS } from '@/types/blocks';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 interface CourseTimelineProps {
   lessons: Lesson[];
@@ -16,6 +14,136 @@ interface CourseTimelineProps {
   onAddBlock: () => void;
   slideToBlock: (slide: any) => Block;
 }
+
+// Mini block preview component
+const MiniBlockPreview: React.FC<{ block: Block; index: number }> = ({ block, index }) => {
+  const config = BLOCK_CONFIGS[block.type];
+
+  // Get background style
+  const getBgStyle = () => {
+    if (block.backgroundColor) {
+      return { backgroundColor: block.backgroundColor };
+    }
+    return {};
+  };
+
+  // Render mini preview based on block type
+  const renderContent = () => {
+    // If has image, show it
+    if (block.imageUrl) {
+      return (
+        <img 
+          src={block.imageUrl} 
+          alt="" 
+          className="w-full h-full object-cover"
+        />
+      );
+    }
+
+    // Design block - show gradient or sub-blocks indicator
+    if (block.type === 'design') {
+      // Check if any sub-block has an image
+      const imageSubBlock = block.subBlocks?.find(sb => sb.type === 'image' && sb.imageUrl);
+      
+      if (imageSubBlock?.imageUrl) {
+        return (
+          <div className="w-full h-full relative">
+            <img 
+              src={imageSubBlock.imageUrl} 
+              alt="" 
+              className="w-full h-full object-cover opacity-60"
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className={cn('text-[10px] font-medium', config?.colorClass)}>
+                Дизайн
+              </span>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-ai/20 to-ai/5">
+          <span className={cn('text-[10px] font-medium', config?.colorClass)}>
+            Дизайн
+          </span>
+        </div>
+      );
+    }
+
+    // Video - show play icon
+    if (block.type === 'video') {
+      return (
+        <div className="w-full h-full flex items-center justify-center bg-destructive/10">
+          <Play className="w-4 h-4 text-destructive fill-destructive" />
+        </div>
+      );
+    }
+
+    // Audio - show volume icon
+    if (block.type === 'audio') {
+      return (
+        <div className="w-full h-full flex items-center justify-center bg-warning/10">
+          <Volume2 className="w-4 h-4 text-warning-foreground" />
+        </div>
+      );
+    }
+
+    // Quiz types - show type label
+    if (['single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'matching', 'ordering', 'slider'].includes(block.type)) {
+      const shortLabels: Record<string, string> = {
+        single_choice: 'Один о',
+        multiple_choice: 'Много',
+        true_false: 'Да/Нет',
+        fill_blank: 'Пропуск',
+        matching: 'Пары',
+        ordering: 'Порядок',
+        slider: 'Слайдер'
+      };
+      
+      return (
+        <div className={cn('w-full h-full flex items-center justify-center', config?.bgClass)}>
+          <span className={cn('text-[10px] font-medium', config?.colorClass)}>
+            {shortLabels[block.type] || config?.labelRu?.slice(0, 6)}
+          </span>
+        </div>
+      );
+    }
+
+    // Text/Heading - show snippet
+    if (block.type === 'text' || block.type === 'heading') {
+      return (
+        <div className={cn('w-full h-full flex items-center justify-center p-1', config?.bgClass)}>
+          <span className={cn('text-[8px] text-center line-clamp-3 leading-tight', config?.colorClass)}>
+            {block.content?.replace(/<[^>]*>/g, '').slice(0, 30) || config?.labelRu}
+          </span>
+        </div>
+      );
+    }
+
+    // Default - show type label
+    return (
+      <div className={cn('w-full h-full flex items-center justify-center', config?.bgClass)}>
+        <span className={cn('text-[10px] font-medium', config?.colorClass)}>
+          {config?.labelRu?.slice(0, 6) || block.type}
+        </span>
+      </div>
+    );
+  };
+
+  return (
+    <div 
+      className="w-full h-full rounded-md overflow-hidden bg-muted/50"
+      style={getBgStyle()}
+    >
+      {/* Block number badge */}
+      <div className="absolute top-1 left-1 z-10 w-4 h-4 rounded bg-background/90 text-[9px] font-bold flex items-center justify-center text-foreground shadow-sm">
+        {index + 1}
+      </div>
+      {renderContent()}
+    </div>
+  );
+};
 
 export const CourseTimeline: React.FC<CourseTimelineProps> = ({
   lessons,
@@ -51,10 +179,8 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
 
   const handleLessonClick = (lessonId: string) => {
     if (expandedLessonId === lessonId) {
-      // If already expanded, just select it
       onSelectLesson(lessonId);
     } else {
-      // Expand and select
       setExpandedLessonId(lessonId);
       onSelectLesson(lessonId);
     }
@@ -97,7 +223,6 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
                   {isExpanded && (
                     <div className="flex items-center gap-1.5 animate-in slide-in-from-left-5 duration-200">
                       {blocks.map((block, blockIndex) => {
-                        const config = BLOCK_CONFIGS[block.type];
                         const isSelected = selectedBlockId === block.id;
 
                         return (
@@ -113,24 +238,7 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
                                 : 'hover:ring-2 hover:ring-primary/50 hover:scale-105'
                             )}
                           >
-                            {/* Mini preview background */}
-                            <div className={cn(
-                              'absolute inset-0 flex items-center justify-center',
-                              config?.bgClass || 'bg-muted'
-                            )}>
-                              {/* Block number */}
-                              <span className="absolute top-1 left-1 w-5 h-5 rounded bg-background/80 text-[10px] font-bold flex items-center justify-center text-foreground">
-                                {blockIndex + 1}
-                              </span>
-                              
-                              {/* Block type indicator */}
-                              <span className={cn(
-                                'text-xs font-medium px-2 py-1 rounded bg-background/90',
-                                config?.colorClass || 'text-foreground'
-                              )}>
-                                {config?.labelRu?.slice(0, 6) || block.type}
-                              </span>
-                            </div>
+                            <MiniBlockPreview block={block} index={blockIndex} />
                           </div>
                         );
                       })}
