@@ -15,6 +15,7 @@ import {
   Home,
   LogOut,
   Moon,
+  Settings,
   Star,
   Sun,
 } from 'lucide-react';
@@ -208,6 +209,11 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                   <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed">
                     <Bell className="mr-2 size-4" />
                     Уведомления
+                    <span className="ml-auto text-[10px] text-muted-foreground">Скоро</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed">
+                    <Settings className="mr-2 size-4" />
+                    Настройки
                     <span className="ml-auto text-[10px] text-muted-foreground">Скоро</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
