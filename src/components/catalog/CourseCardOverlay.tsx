@@ -93,67 +93,61 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
       <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
         {/* Workshop menu - always first (left) */}
         {variant === 'workshop' && (
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                <button className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center text-white/80 hover:text-white transition-colors">
-                  <MoreHorizontal className="w-4 h-4" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="end" 
-                className="min-w-[140px] bg-card dark:bg-[#1a1a1b] border-border dark:border-white/10 p-1"
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+              <button className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center text-white/80 hover:text-white transition-colors opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100">
+                <MoreHorizontal className="w-4 h-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              align="end" 
+              className="min-w-[140px] bg-card dark:bg-[#1a1a1b] border-border dark:border-white/10 p-1 z-50"
+            >
+              <DropdownMenuItem 
+                disabled
+                className="text-[13px] text-muted-foreground/50 dark:text-white/30 rounded px-2 py-1.5 cursor-not-allowed"
               >
+                <Settings className="w-3.5 h-3.5 mr-2" />
+                Настройки
+                <span className="ml-auto text-[10px]">скоро</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                disabled
+                className="text-[13px] text-muted-foreground/50 dark:text-white/30 rounded px-2 py-1.5 cursor-not-allowed"
+              >
+                <BarChart3 className="w-3.5 h-3.5 mr-2" />
+                Статистика
+                <span className="ml-auto text-[10px]">скоро</span>
+              </DropdownMenuItem>
+              {isPublished && (
                 <DropdownMenuItem 
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigate(`/course/${id}/settings`);
+                    window.open(`/course/${id}`, '_blank');
                   }}
                   className="text-[13px] text-muted-foreground focus:text-foreground focus:bg-muted dark:text-white/70 dark:focus:text-white dark:focus:bg-white/5 rounded px-2 py-1.5"
                 >
-                  <Settings className="w-3.5 h-3.5 mr-2" />
-                  Настройки
+                  <Eye className="w-3.5 h-3.5 mr-2" />
+                  Открыть
                 </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/course/${id}/stats`);
-                  }}
-                  className="text-[13px] text-muted-foreground focus:text-foreground focus:bg-muted dark:text-white/70 dark:focus:text-white dark:focus:bg-white/5 rounded px-2 py-1.5"
-                >
-                  <BarChart3 className="w-3.5 h-3.5 mr-2" />
-                  Статистика
-                </DropdownMenuItem>
-                {isPublished && (
+              )}
+              {onDelete && (
+                <>
+                  <DropdownMenuSeparator className="my-1 bg-border dark:bg-white/5" />
                   <DropdownMenuItem 
                     onClick={(e) => {
                       e.stopPropagation();
-                      window.open(`/course/${id}`, '_blank');
+                      onDelete();
                     }}
-                    className="text-[13px] text-muted-foreground focus:text-foreground focus:bg-muted dark:text-white/70 dark:focus:text-white dark:focus:bg-white/5 rounded px-2 py-1.5"
+                    className="text-[13px] text-red-400 focus:text-red-400 focus:bg-red-500/10 rounded px-2 py-1.5"
                   >
-                    <Eye className="w-3.5 h-3.5 mr-2" />
-                    Открыть
+                    <Trash2 className="w-3.5 h-3.5 mr-2" />
+                    Удалить
                   </DropdownMenuItem>
-                )}
-                {onDelete && (
-                  <>
-                    <DropdownMenuSeparator className="my-1 bg-border dark:bg-white/5" />
-                    <DropdownMenuItem 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete();
-                      }}
-                      className="text-[13px] text-red-400 focus:text-red-400 focus:bg-red-500/10 rounded px-2 py-1.5"
-                    >
-                      <Trash2 className="w-3.5 h-3.5 mr-2" />
-                      Удалить
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
 
         {/* Favorite button - always last (rightmost) */}
