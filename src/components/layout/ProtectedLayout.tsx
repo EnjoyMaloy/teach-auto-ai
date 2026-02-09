@@ -31,7 +31,7 @@ const LayoutContent: React.FC = () => {
       
       {/* Mobile header - only on mobile */}
       {isMobile && (
-        <div className="fixed top-0 left-0 right-0 h-16 z-20 flex items-center justify-between px-4 bg-background/80 backdrop-blur-sm">
+        <div className="fixed top-0 left-0 right-0 h-16 z-20 flex items-center justify-between px-4">
           <SidebarTrigger />
           {isHomePage && (
             <div className="absolute left-1/2 -translate-x-1/2">

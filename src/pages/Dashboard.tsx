@@ -71,7 +71,7 @@ const Dashboard: React.FC = () => {
       <AnimatedBackground />
       
       {/* Mobile header with Create button */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 z-20 flex items-center justify-end px-4 bg-background/80 backdrop-blur-sm">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 z-20 flex items-center justify-end px-4">
         <Button 
           onClick={handleCreate} 
           disabled={isCreating}
