@@ -167,7 +167,7 @@ const Home: React.FC = () => {
         </h1>
 
         {/* Action Card - Desktop only (centered) */}
-        <div className="hidden md:block w-full max-w-2xl bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/[0.08] rounded-2xl p-2 shadow-2xl transition-all mx-2">
+        <div className="hidden md:block w-full max-w-2xl bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/10 rounded-2xl p-2 transition-all mx-2">
           <div className="flex items-start gap-3 px-3 md:px-4 py-3">
             <textarea
               value={prompt}
@@ -291,7 +291,7 @@ const Home: React.FC = () => {
 
       {/* Mobile bottom input bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-20 p-4 pb-6 bg-gradient-to-t from-background dark:from-[#0f0f12] via-background/80 dark:via-[#0f0f12]/80 to-transparent pt-8">
-        <div className="w-full bg-card dark:bg-[#2a2a2b] border border-border dark:border-white/[0.08] rounded-2xl p-2 shadow-2xl">
+        <div className="w-full bg-card dark:bg-[#2a2a2b] border border-border dark:border-white/10 rounded-2xl p-2">
           <div className="flex items-center gap-3 px-3 py-2">
             {/* Add button */}
             <button 
