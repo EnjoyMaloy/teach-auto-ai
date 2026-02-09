@@ -133,8 +133,8 @@ const Pricing = () => {
             </div>
           </div>
 
-          {/* Plans Grid - responsive for tablets */}
-          <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Plans Grid - 1 column on mobile/tablet, 3 on desktop */}
+          <div className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-3">
             {plans.map((plan, index) => (
               <Card
                 key={plan.title}
@@ -146,7 +146,7 @@ const Pricing = () => {
                     ? "border-[hsl(265_60%_75%)] dark:border-[hsl(265_60%_75%)] shadow-lg shadow-[hsl(265_60%_75%_/_0.2)] lg:scale-105 z-10" 
                     : "",
                   index === 0 && "lg:-mr-2",
-                  index === 2 && "lg:-ml-2 sm:col-span-2 lg:col-span-1"
+                  index === 2 && "lg:-ml-2"
                 )}
               >
                 {/* Current Plan Badge */}
