@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useSidebar } from "@/components/ui/sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Pastel violet color matching logo "A" - hsl(265, 60%, 75%)
 const PASTEL_VIOLET = "hsl(265 60% 75%)";
@@ -84,6 +86,15 @@ const plans = [
 
 const Pricing = () => {
   const [annualBilling, setAnnualBilling] = useState(true);
+  const { setOpenMobile } = useSidebar();
+  const isMobile = useIsMobile();
+
+  const handleSelectPlan = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+    // TODO: Add actual plan selection logic
+  };
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
@@ -208,6 +219,7 @@ const Pricing = () => {
                         : !plan.current && "border-foreground/20 dark:border-sidebar-border hover:bg-[hsl(265_60%_75%)] hover:text-white hover:border-[hsl(265_60%_75%)]"
                     )}
                     disabled={plan.current}
+                    onClick={handleSelectPlan}
                   >
                     {plan.current ? "Текущий план" : "Выбрать план"}
                   </Button>
