@@ -134,10 +134,10 @@ const Pricing = () => {
                 key={plan.title}
                 className={cn(
                   "relative overflow-hidden transition-all duration-300",
-                  "bg-sidebar/80 backdrop-blur-sm border-sidebar-border",
-                  "hover:bg-sidebar/90 hover:border-sidebar-accent",
+                  "bg-sidebar/80 backdrop-blur-sm border border-foreground/10 dark:border-sidebar-border",
+                  "hover:bg-sidebar/90 hover:border-foreground/20 dark:hover:border-sidebar-accent",
                   plan.recommended 
-                    ? "border-[hsl(265_60%_75%)] shadow-lg shadow-[hsl(265_60%_75%_/_0.2)] lg:scale-105 z-10" 
+                    ? "border-[hsl(265_60%_75%)] dark:border-[hsl(265_60%_75%)] shadow-lg shadow-[hsl(265_60%_75%_/_0.2)] lg:scale-105 z-10" 
                     : "",
                   index === 0 && "lg:-mr-2",
                   index === 2 && "lg:-ml-2 sm:col-span-2 lg:col-span-1"
@@ -173,7 +173,7 @@ const Pricing = () => {
                   </div>
 
                   {/* Price */}
-                  <div className="mb-8">
+                  <div className="mb-10">
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-bold text-sidebar-foreground">
                         {annualBilling ? plan.price.annually : plan.price.monthly}
@@ -199,7 +199,7 @@ const Pricing = () => {
                       "w-full transition-all",
                       plan.recommended 
                         ? "bg-[hsl(265_60%_75%)] hover:bg-[hsl(265_60%_70%)] text-white border-0"
-                        : !plan.current && "border-sidebar-border hover:bg-[hsl(265_60%_75%)] hover:text-white hover:border-[hsl(265_60%_75%)]"
+                        : !plan.current && "border-foreground/20 dark:border-sidebar-border hover:bg-[hsl(265_60%_75%)] hover:text-white hover:border-[hsl(265_60%_75%)]"
                     )}
                     disabled={plan.current}
                   >
