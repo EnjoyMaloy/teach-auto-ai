@@ -26,6 +26,8 @@ interface EditorHeaderProps {
   isSaving: boolean;
   hasUnsavedChanges?: boolean;
   lastSavedAt?: Date | null;
+  isAISidebarOpen?: boolean;
+  onToggleAISidebar?: () => void;
   onUndo: () => void;
   onRedo: () => void;
   onPreview: () => void;
@@ -45,6 +47,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   isSaving,
   hasUnsavedChanges = false,
   lastSavedAt,
+  isAISidebarOpen = false,
+  onToggleAISidebar,
   onUndo,
   onRedo,
   onPreview,
@@ -234,8 +238,21 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   return (
     <>
       <header className="h-16 border-b border-border/50 bg-background/80 backdrop-blur-md flex items-center justify-between px-4">
-        {/* Left section - Breadcrumbs */}
-        <div className="flex items-center gap-2">
+        {/* Left section - AI Button + Breadcrumbs */}
+        <div className="flex items-center gap-3">
+          {/* AI Sidebar Toggle */}
+          {onToggleAISidebar && (
+            <Button
+              variant={isAISidebarOpen ? "default" : "outline"}
+              size="sm"
+              onClick={onToggleAISidebar}
+              className="gap-1.5"
+            >
+              <Sparkles className="w-4 h-4" />
+              AI
+            </Button>
+          )}
+
           {/* Breadcrumb navigation */}
           <nav className="flex items-center gap-1">
             <button
@@ -384,36 +401,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
           <div className="h-6 w-px bg-border" />
 
-          {/* AI Generator Button */}
-          {onAIGenerate && (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setDialogOpen(true)}
-              className={cn(
-                "gap-1.5 transition-all duration-300",
-                showCompletionFlash 
-                  ? "border-emerald-500 bg-emerald-500/20 text-emerald-600 animate-pulse"
-                  : aiState.status === 'generating'
-                    ? "border-primary/50 bg-primary/10 text-primary"
-                    : aiState.status === 'completed'
-                      ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600"
-                      : "border-primary/30 text-primary hover:bg-primary/10 hover:text-primary"
-              )}
-            >
-              {aiState.status === 'generating' ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : showCompletionFlash || aiState.status === 'completed' ? (
-                <Check className="w-4 h-4" />
-              ) : (
-                <Sparkles className="w-4 h-4" />
-              )}
-              AI
-              {aiState.status === 'generating' && (
-                <span className="text-xs opacity-70">...</span>
-              )}
-            </Button>
-          )}
+          {/* AI status indicator (when generating in sidebar) */}
 
           <Button variant="outline" size="sm" onClick={onPreview}>
             <Eye className="w-4 h-4 mr-1" />
