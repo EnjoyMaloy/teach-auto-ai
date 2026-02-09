@@ -273,11 +273,11 @@ const Home: React.FC = () => {
                 "w-7 h-7 rounded-full flex items-center justify-center transition-all",
                 prompt.trim() && !isGenerating
                   ? "bg-primary dark:bg-white text-primary-foreground dark:text-black hover:bg-primary/90 dark:hover:bg-white/90 cursor-pointer"
-                  : "bg-muted dark:bg-white/20 cursor-not-allowed"
+                  : "bg-muted dark:bg-white/20 text-muted-foreground cursor-not-allowed"
               )}
             >
               {isGenerating ? (
-                <Loader2 className="w-4 h-4 text-muted-foreground dark:text-black/50 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <ArrowUp className="w-4 h-4" strokeWidth={2.5} />
               )}
@@ -319,7 +319,7 @@ const Home: React.FC = () => {
                 "w-8 h-8 rounded-full flex items-center justify-center transition-all",
                 prompt.trim() && !isGenerating
                   ? "bg-primary dark:bg-white text-primary-foreground dark:text-black"
-                  : "bg-muted dark:bg-white/20"
+                  : "bg-muted dark:bg-white/20 text-muted-foreground"
               )}
             >
               {isGenerating ? (
