@@ -37,9 +37,22 @@ const Catalog: React.FC = () => {
       {/* Top spacer for mobile header */}
       <div className="h-16 md:h-14" />
       
-      {/* Search - centered on top */}
-      <div className="flex justify-center mb-6">
-        <div className="relative w-full max-w-md">
+      {/* Desktop Search - aligned with sidebar trigger */}
+      <div className="hidden md:block fixed top-4 right-6 z-20">
+        <div className="relative w-64">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground dark:text-white/20" />
+          <Input
+            placeholder="Поиск курсов..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 h-8 bg-muted dark:bg-white/[0.03] border-border dark:border-white/[0.06] text-foreground dark:text-white text-[13px] placeholder:text-muted-foreground dark:placeholder:text-white/30"
+          />
+        </div>
+      </div>
+      
+      {/* Mobile Search */}
+      <div className="md:hidden mb-4">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground dark:text-white/20" />
           <Input
             placeholder="Поиск курсов..."
