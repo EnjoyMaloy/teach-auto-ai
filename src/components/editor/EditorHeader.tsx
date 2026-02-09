@@ -237,61 +237,62 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
   return (
     <>
-      <header className="h-16 border-b border-border/50 bg-background/80 backdrop-blur-md flex items-center justify-between px-4">
+      <header className="h-14 border-b border-border/40 bg-background/95 backdrop-blur-sm flex items-center justify-between px-4 gap-4">
         {/* Left section - AI Button + Breadcrumbs */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 min-w-0">
           {/* AI Sidebar Toggle */}
           {onToggleAISidebar && (
-            <Button
-              variant={isAISidebarOpen ? "default" : "outline"}
-              size="sm"
+            <button
               onClick={onToggleAISidebar}
-              className="gap-1.5"
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors",
+                isAISidebarOpen 
+                  ? "bg-primary text-primary-foreground" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
             >
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-3.5 h-3.5" />
               AI
-            </Button>
+            </button>
           )}
 
+          <div className="w-px h-5 bg-border/50" />
+
           {/* Breadcrumb navigation */}
-          <nav className="flex items-center gap-1">
+          <nav className="flex items-center gap-1 min-w-0">
             <button
               onClick={onBack}
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors shrink-0"
             >
               Мастерская
             </button>
-            <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
+            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
             
             {isEditing ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <Input
                   value={editedTitle}
                   onChange={(e) => setEditedTitle(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="h-8 w-64 font-semibold"
+                  className="h-7 w-48 text-sm border-border/50"
                   autoFocus
                 />
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
+                <button
                   onClick={handleSaveTitle}
-                  className="h-7 w-7 text-emerald-600 hover:text-emerald-600 hover:bg-emerald-500/10"
+                  className="p-1.5 rounded-md text-emerald-600 hover:bg-emerald-500/10"
                 >
-                  <Check className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
+                  <Check className="w-3.5 h-3.5" />
+                </button>
+                <button
                   onClick={handleCancelEditing}
-                  className="h-7 w-7 text-muted-foreground hover:bg-muted"
+                  className="p-1.5 rounded-md text-muted-foreground hover:bg-muted"
                 >
-                  <X className="w-4 h-4" />
-                </Button>
+                  <X className="w-3.5 h-3.5" />
+                </button>
               </div>
             ) : (
               <span 
-                className="text-sm font-semibold text-foreground line-clamp-1 max-w-[300px] cursor-pointer hover:text-primary transition-colors"
+                className="text-sm font-medium text-foreground truncate max-w-[200px] cursor-pointer hover:text-primary transition-colors"
                 onDoubleClick={handleStartEditing}
                 title="Двойной клик для редактирования"
               >
@@ -300,25 +301,24 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
             )}
           </nav>
 
-          {/* Design System Button */}
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="ml-4"
-            onClick={() => setShowDesignSystem(true)}
-          >
-            <Palette className="w-4 h-4 mr-1" />
-            Дизайн
-          </Button>
+          <div className="w-px h-5 bg-border/50 ml-1" />
 
-          {/* Map Settings Button */}
+          {/* Design & Map buttons */}
+          <button 
+            onClick={() => setShowDesignSystem(true)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          >
+            <Palette className="w-3.5 h-3.5" />
+            Дизайн
+          </button>
+
           {onUpdateLessonsDisplayType && (
             <Popover open={showMapSettings} onOpenChange={setShowMapSettings}>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Map className="w-4 h-4 mr-1" />
+                <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                  <Map className="w-3.5 h-3.5" />
                   Карта
-                </Button>
+                </button>
               </PopoverTrigger>
               <PopoverContent 
                 className="w-[320px] p-4" 
@@ -357,61 +357,60 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         </div>
 
         {/* Center section - Undo/Redo */}
-        <div className="flex items-center gap-1 bg-card border border-border/50 rounded-xl p-1.5 shadow-sm">
-          <Button
-            variant="ghost"
-            size="icon-sm"
+        <div className="flex items-center gap-0.5 shrink-0">
+          <button
             onClick={onUndo}
             disabled={!canUndo}
-            className="rounded-lg hover:bg-primary/10 hover:text-primary disabled:opacity-30 transition-all"
+            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:pointer-events-none transition-colors"
           >
             <Undo2 className="w-4 h-4" />
-          </Button>
-          <div className="w-px h-4 bg-border/50" />
-          <Button
-            variant="ghost"
-            size="icon-sm"
+          </button>
+          <button
             onClick={onRedo}
             disabled={!canRedo}
-            className="rounded-lg hover:bg-primary/10 hover:text-primary disabled:opacity-30 transition-all"
+            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:pointer-events-none transition-colors"
           >
             <Redo2 className="w-4 h-4" />
-          </Button>
+          </button>
         </div>
 
         {/* Right section */}
-        <div className="flex items-center gap-3">
-          {/* Auto-save status */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Auto-save status - minimal */}
           {isSaving ? (
-            <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
-              <span className="text-primary font-medium">Сохранение...</span>
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Loader2 className="w-3 h-3 animate-spin" />
+              <span>Сохранение...</span>
             </div>
           ) : hasUnsavedChanges ? (
-            <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20">
+            <div className="flex items-center gap-1.5 text-xs text-amber-500">
               <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-              <span className="text-amber-600 font-medium">Не сохранено</span>
+              <span>Не сохранено</span>
             </div>
           ) : lastSavedAt ? (
-            <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-              <Check className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="text-emerald-600 font-medium">Сохранено</span>
+            <div className="flex items-center gap-1.5 text-xs text-emerald-600">
+              <Check className="w-3 h-3" />
+              <span>Сохранено</span>
             </div>
           ) : null}
 
-          <div className="h-6 w-px bg-border" />
+          <div className="w-px h-5 bg-border/50" />
 
-          {/* AI status indicator (when generating in sidebar) */}
-
-          <Button variant="outline" size="sm" onClick={onPreview}>
-            <Eye className="w-4 h-4 mr-1" />
+          <button 
+            onClick={onPreview}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          >
+            <Eye className="w-3.5 h-3.5" />
             Предпросмотр
-          </Button>
+          </button>
 
-          <Button size="sm" onClick={handlePublishClick}>
-            <Share2 className="w-4 h-4 mr-1" />
+          <button 
+            onClick={handlePublishClick}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            <Share2 className="w-3.5 h-3.5" />
             Опубликовать
-          </Button>
+          </button>
         </div>
       </header>
 
