@@ -150,8 +150,13 @@ const Home: React.FC = () => {
   };
 
   // Input card component (reused for desktop and mobile)
-  const InputCard = ({ className = '' }: { className?: string }) => (
-    <div className={cn("w-full max-w-2xl bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/[0.08] rounded-2xl p-2 shadow-2xl transition-all", className)}>
+  const InputCard = ({ className = '', isMobile = false }: { className?: string; isMobile?: boolean }) => (
+    <div className={cn(
+      "w-full max-w-2xl transition-all",
+      isMobile 
+        ? "bg-transparent p-0" 
+        : "bg-card dark:bg-[#1a1a1b] border border-border dark:border-white/[0.08] rounded-2xl p-2 shadow-2xl"
+      , className)}>
       <div className="flex items-start gap-3 px-3 md:px-4 py-3">
         <textarea
           value={prompt}
@@ -172,7 +177,7 @@ const Home: React.FC = () => {
       
       {/* Generation status */}
       {isGenerating && generationStatus && (
-        <div className="px-4 py-2 border-t border-border dark:border-white/5">
+        <div className={cn("px-4 py-2", !isMobile && "border-t border-border dark:border-white/5")}>
           <div className="flex items-center gap-2 text-muted-foreground dark:text-white/60 text-sm">
             <Loader2 className="w-4 h-4 animate-spin" />
             <span>{generationStatus}</span>
@@ -180,7 +185,7 @@ const Home: React.FC = () => {
         </div>
       )}
       
-      <div className="flex items-center justify-between px-3 md:px-4 py-2 border-t border-border dark:border-white/5">
+      <div className={cn("flex items-center justify-between px-3 md:px-4 py-2", !isMobile && "border-t border-border dark:border-white/5")}>
         <TooltipProvider delayDuration={300}>
           <div className="flex items-center gap-1 md:gap-1.5">
             {/* Add attachment */}
@@ -263,7 +268,12 @@ const Home: React.FC = () => {
           {isGenerating ? (
             <Loader2 className="w-4 h-4 text-muted-foreground dark:text-black/50 animate-spin" />
           ) : (
-            <ArrowUp className="w-4 h-4" strokeWidth={2.5} />
+            <ArrowUp className={cn(
+              "w-4 h-4",
+              prompt.trim() && !isGenerating 
+                ? "text-primary-foreground dark:text-black" 
+                : "text-muted-foreground dark:text-white/30"
+            )} strokeWidth={2.5} />
           )}
         </button>
       </div>
@@ -295,7 +305,7 @@ const Home: React.FC = () => {
       
       {/* Mobile bottom input bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-background/80 dark:bg-[#0f0f12]/80 backdrop-blur-sm border-t border-border dark:border-white/[0.08] z-20">
-        <InputCard />
+        <InputCard isMobile />
       </div>
       
       {/* Mobile bottom spacer to prevent content from being hidden behind fixed input */}
