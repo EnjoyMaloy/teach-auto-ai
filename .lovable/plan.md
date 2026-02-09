@@ -1,179 +1,148 @@
 
-# План доработки страницы Избранное
+# План редизайна редактора: Минималистичный Layer Tree
 
-## Текущее состояние
+## Цель
+Упростить UX редактора с 4 панелей до 3, объединив Уроки и Блоки в единое дерево структуры курса слева, сохраняя Fast View в центре внимания.
 
-### Проблемы
+---
 
-| Проблема | Описание |
-|----------|----------|
-| Фильтрация по доступности | Запрос содержит `.or('is_published.eq.true,is_link_accessible.eq.true')` — свои черновики не отображаются |
-| Нет author_id | В select не запрашивается `author_id`, нельзя определить "мой" это курс или публичный |
-| Нет фильтров | Отсутствуют табы "Мои / Публичные" |
-| Dashboard без звездочки | Карточки в "Все курсы" (`variant="workshop"`) не имеют кнопки добавления в избранное |
-
-## Изменения
-
-### 1. Обновить запрос в Favorites.tsx
-
-Текущий запрос:
-```typescript
-.in('id', favorites)
-.or('is_published.eq.true,is_link_accessible.eq.true')
-```
-
-Новый запрос — получаем ВСЕ курсы из избранного:
-```typescript
-.in('id', favorites)
-.or(`is_published.eq.true,is_link_accessible.eq.true,author_id.eq.${user.id}`)
-```
-
-Также добавляем `author_id` в select для фильтрации.
-
-### 2. Добавить фильтры "Все / Мои / Публичные"
-
-```typescript
-type FilterType = 'all' | 'mine' | 'public';
-const [filter, setFilter] = useState<FilterType>('all');
-
-const filteredCourses = courses.filter(course => {
-  if (filter === 'all') return true;
-  if (filter === 'mine') return course.authorId === user?.id;
-  return course.authorId !== user?.id;
-});
-```
-
-UI фильтров — аналогично Dashboard и Catalog:
-```text
-[ Все (5) ] [ Мои (2) ] [ Публичные (3) ]
-```
-
-### 3. Добавить звездочку на карточки в Dashboard
-
-Изменить вызов `CourseCardOverlay` в `Dashboard.tsx`:
-
-```tsx
-<CourseCardOverlay
-  key={course.id}
-  id={course.id}
-  // ... остальные пропсы
-  variant="workshop"
-  isFavorite={isFavorite(course.id)}
-  onToggleFavorite={() => toggleFavorite(course.id)}
-  onDelete={() => setCourseToDelete(course)}
-/>
-```
-
-### 4. Обновить CourseCardOverlay — показывать звездочку для workshop
-
-Текущая логика:
-```typescript
-{(variant === 'catalog' || variant === 'favorites') && onToggleFavorite && (
-```
-
-Новая логика — добавляем `workshop`:
-```typescript
-{onToggleFavorite && (
-```
-
-Звездочка будет показываться для любого варианта, если передан `onToggleFavorite`.
-
-## Структура изменений
+## Архитектура: До и После
 
 ```text
-ИЗМЕНИТЬ:
-  ├── src/pages/Favorites.tsx
-  │     ├── Добавить author_id в select
-  │     ├── Изменить фильтр .or() для включения своих курсов
-  │     ├── Добавить state для фильтра (all/mine/public)
-  │     └── Добавить UI табов фильтрации
-  │
-  ├── src/pages/Dashboard.tsx
-  │     ├── Импортировать useFavorites
-  │     └── Добавить isFavorite/onToggleFavorite в CourseCardOverlay
-  │
-  └── src/components/catalog/CourseCardOverlay.tsx
-        └── Показывать звездочку если передан onToggleFavorite
+СЕЙЧАС (4 панели):
+┌─────────────┬──────────────┬─────────────┬───────────────┐
+│   Уроки     │    Блоки     │  Fast View  │ Редактор блока│
+│   540px     │    320px     │    9:16     │   flex-1      │
+│  (xl only)  │  (lg only)   │   центр     │   (md+)       │
+└─────────────┴──────────────┴─────────────┴───────────────┘
+
+ПОСЛЕ (3 панели):
+┌──────────────────────┬─────────────────┬───────────────────┐
+│     Layer Tree       │    Fast View    │  Редактор блока   │
+│   Уроки > Блоки      │      9:16       │     flex-1        │
+│   320-400px          │     ЦЕНТР       │    свойства       │
+│   (collapsible)      │   ВНИМАНИЯ      │   (всегда видна)  │
+└──────────────────────┴─────────────────┴───────────────────┘
 ```
+
+---
+
+## Компоненты для изменения
+
+### 1. Новый компонент: `CourseLayerTree.tsx`
+Единая левая панель с древовидной структурой:
+
+**Структура:**
+- Заголовок "Структура" с кнопкой "+" для добавления урока
+- Список уроков (collapsible)
+  - Каждый урок раскрывается и показывает свои блоки внутри
+  - Клик по уроку — раскрыть/свернуть
+  - Клик по блоку — выбрать его
+
+**Визуальный стиль:**
+```text
+┌─────────────────────────────┐
+│ Структура           [+ ▾]  │
+├─────────────────────────────┤
+│ ▼ 📘 Урок 1 (5 блоков)     │
+│   ├─ 1. Заголовок          │ ← выбран (подсветка)
+│   ├─ 2. Текст              │
+│   └─ 3. Квиз               │
+│                             │
+│ ▶ 📘 Урок 2 (3 блока)      │
+│ ▶ 📘 Урок 3 (7 блоков)     │
+│                             │
+│        [+ Добавить блок]   │
+└─────────────────────────────┘
+```
+
+**Функции:**
+- Drag-n-drop уроков между собой
+- Drag-n-drop блоков внутри урока
+- Перенос блока в другой урок (опционально)
+- Автораскрытие активного урока
+- Индикатор количества блоков в свёрнутом уроке
+
+### 2. Обновление: `src/pages/Editor.tsx`
+- Удалить отдельные панели LessonsList и Blocks
+- Заменить на единый CourseLayerTree
+- Упростить layout с 4 колонок до 3
+- Добавить кнопку сворачивания левой панели (hover chevron)
+
+### 3. Обновление стилей панелей
+**Левая панель (Layer Tree):**
+- Ширина: 320px (минимум 280px)
+- Glassmorphism фон
+- Сворачиваемая до 0px или мини-режим (48px с иконками)
+
+**Fast View (центр):**
+- Занимает больше места без конкуренции
+- Серый фон остаётся для контраста
+- Заголовок "Fast View" с mute-кнопкой
+
+**Правая панель (свойства):**
+- Остаётся без изменений
+- Всегда видна
+
+---
+
+## Детали UX
+
+### Раскрытие/сворачивание уроков
+- По умолчанию: выбранный урок развёрнут, остальные свёрнуты
+- Клик по шеврону или области урока: toggle
+- Выбор блока автоматически раскрывает его урок
+
+### Добавление контента
+- "+" в хедере — добавить урок
+- "+" внизу раскрытого урока — добавить блок (открывает BlockTypeSelector)
+- Контекстное меню по правому клику: Дублировать / Удалить
+
+### Визуальная иерархия
+- Уроки: более крупный шрифт, иконка книги, бейдж с количеством
+- Блоки: отступ слева (indent), мелкий шрифт, иконка типа блока
+- Выбранный элемент: primary/10 фон + primary border
+
+---
+
+## Технические детали
+
+### Файлы для создания
+| Файл | Описание |
+|------|----------|
+| `src/components/editor/CourseLayerTree.tsx` | Новый единый компонент структуры |
+| `src/components/editor/LayerLessonItem.tsx` | Collapsible урок с вложенными блоками |
+| `src/components/editor/LayerBlockItem.tsx` | Элемент блока в дереве |
+
+### Файлы для изменения
+| Файл | Изменение |
+|------|-----------|
+| `src/pages/Editor.tsx` | Заменить 2 панели на 1 CourseLayerTree |
+| `src/components/editor/EditorHeader.tsx` | Добавить toggle для левой панели (опционально) |
+
+### Зависимости
+- Используем существующий `@dnd-kit/core` для drag-n-drop
+- Используем `@radix-ui/react-collapsible` для сворачивания уроков
+- Стили из текущей дизайн-системы
+
+---
+
+## Этапы реализации
+
+1. **Создать CourseLayerTree** — базовая структура с уроками и блоками
+2. **Добавить collapsible** — уроки разворачиваются/сворачиваются
+3. **Интегрировать в Editor.tsx** — заменить 2 панели на 1
+4. **Добавить drag-n-drop** — сортировка уроков и блоков
+5. **Стилизация** — glassmorphism, hover-эффекты, анимации
+6. **Финальная полировка** — адаптивность, edge cases
+
+---
 
 ## Результат
 
-| Экран | До | После |
-|-------|-----|-------|
-| Избранное | Только публичные курсы | Мои + публичные с фильтрами |
-| Все курсы | Нет звездочки | Звездочка на каждой карточке |
-
-## Техническая реализация
-
-### Favorites.tsx — новая логика
-
-```tsx
-type FilterType = 'all' | 'mine' | 'public';
-
-const Favorites: React.FC = () => {
-  const { user } = useAuth();
-  const [filter, setFilter] = useState<FilterType>('all');
-  
-  // Запрос с author_id
-  const { data } = await supabase
-    .from('courses')
-    .select(`
-      id, title, description, cover_image, 
-      estimated_minutes, category, is_published,
-      author_id,
-      lessons:published_lessons(id)
-    `)
-    .in('id', favorites)
-    .or(`is_published.eq.true,is_link_accessible.eq.true,author_id.eq.${user.id}`);
-  
-  // Фильтрация
-  const filteredCourses = courses.filter(course => {
-    if (filter === 'all') return true;
-    if (filter === 'mine') return course.authorId === user?.id;
-    return course.authorId !== user?.id;
-  });
-  
-  const counts = {
-    all: courses.length,
-    mine: courses.filter(c => c.authorId === user?.id).length,
-    public: courses.filter(c => c.authorId !== user?.id).length,
-  };
-  
-  // UI
-  return (
-    <>
-      {/* Фильтры */}
-      <div className="flex items-center gap-1 mb-6">
-        {[
-          { id: 'all', label: 'Все' },
-          { id: 'mine', label: 'Мои' },
-          { id: 'public', label: 'Публичные' },
-        ].map(f => (
-          <button key={f.id} onClick={() => setFilter(f.id)}>
-            {f.label} <span>{counts[f.id]}</span>
-          </button>
-        ))}
-      </div>
-      
-      {/* Карточки */}
-      {filteredCourses.map(course => (
-        <CourseCardOverlay
-          variant={course.authorId === user?.id ? 'workshop' : 'favorites'}
-          // ...
-        />
-      ))}
-    </>
-  );
-};
-```
-
-### CourseCardOverlay.tsx — упрощенная логика звездочки
-
-```tsx
-{/* Favorite button - show for any variant if handler provided */}
-{onToggleFavorite && (
-  <button onClick={onToggleFavorite}>
-    <Star fill={isFavorite ? 'currentColor' : 'none'} />
-  </button>
-)}
-```
+После реализации редактор будет иметь:
+- **3 панели** вместо 4 — меньше когнитивной нагрузки
+- **Единый Layer Tree** слева — понятная иерархия курс → урок → блок
+- **Fast View в центре** — главный фокус для предпросмотра
+- **Свойства справа** — контекстное редактирование выбранного блока
+- **Профессиональный вид** — как в Figma, Notion, VS Code
