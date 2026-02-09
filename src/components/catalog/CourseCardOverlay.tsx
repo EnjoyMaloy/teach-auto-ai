@@ -89,32 +89,11 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
       {/* Gradient overlay for text readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 via-50% to-transparent" />
 
-      {/* Favorite button - positioned based on state */}
-      {onToggleFavorite && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleFavorite();
-          }}
-          className={cn(
-            'absolute top-3 w-8 h-8 rounded-lg flex items-center justify-center transition-all z-10',
-            isFavorite
-              ? 'left-3 bg-white/30 backdrop-blur-sm text-white'
-              : 'right-3 bg-white/20 backdrop-blur-sm text-white/70 opacity-0 group-hover:opacity-100 hover:text-white hover:bg-white/30'
-          )}
-        >
-          <Star className="w-4 h-4" fill={isFavorite ? 'currentColor' : 'none'} />
-        </button>
-      )}
-
-      {/* Workshop menu - shift left when unfavorited star is on right */}
-      {variant === 'workshop' && (
-        <div 
-          className={cn(
-            "absolute top-3 opacity-0 group-hover:opacity-100 transition-opacity",
-            onToggleFavorite && !isFavorite ? "right-14" : "right-3"
-          )}
-        >
+      {/* Top right controls container */}
+      <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+        {/* Workshop menu - always first (left) */}
+        {variant === 'workshop' && (
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity">
             <DropdownMenu>
               <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                 <button className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center text-white/80 hover:text-white transition-colors">
@@ -174,8 +153,27 @@ const CourseCardOverlay: React.FC<CourseCardOverlayProps> = ({
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
-        </div>
-      )}
+          </div>
+        )}
+
+        {/* Favorite button - always last (rightmost) */}
+        {onToggleFavorite && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite();
+            }}
+            className={cn(
+              'w-8 h-8 rounded-lg flex items-center justify-center transition-all',
+              isFavorite
+                ? 'bg-white/30 backdrop-blur-sm text-white'
+                : 'bg-white/20 backdrop-blur-sm text-white/70 opacity-0 group-hover:opacity-100 hover:text-white hover:bg-white/30'
+            )}
+          >
+            <Star className="w-4 h-4" fill={isFavorite ? 'currentColor' : 'none'} />
+          </button>
+        )}
+      </div>
 
       {/* Content overlay at bottom */}
       <div className="absolute inset-x-0 bottom-0 space-y-3 p-5 text-white">
