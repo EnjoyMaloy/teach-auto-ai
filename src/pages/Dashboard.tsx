@@ -69,6 +69,26 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen relative bg-background dark:bg-[#0f0f12]">
       <AnimatedBackground />
+      
+      {/* Mobile: Fixed create button in header area */}
+      <div className="md:hidden fixed top-0 right-0 z-20 h-14 px-4 flex items-center">
+        <Button 
+          onClick={handleCreate} 
+          disabled={isCreating}
+          size="sm"
+          className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px]"
+        >
+          {isCreating ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <>
+              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              <span>Создать</span>
+            </>
+          )}
+        </Button>
+      </div>
+      
       <div 
         className="relative z-10 p-4 md:p-6 transition-all duration-200 min-h-screen overflow-y-auto"
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
@@ -76,7 +96,7 @@ const Dashboard: React.FC = () => {
       {/* Top spacer for mobile header */}
       <div className="h-14 md:h-0" />
       
-      {/* Top Bar - filters and create button on same row */}
+      {/* Top Bar - filters and create button (desktop only for button) */}
       <div className="flex items-center justify-between gap-2 mb-4 md:mb-6">
         {/* Filters */}
         <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
@@ -98,23 +118,22 @@ const Dashboard: React.FC = () => {
           ))}
         </div>
         
-        {/* Create button */}
+        {/* Create button - desktop only */}
         <Button 
           onClick={handleCreate} 
           disabled={isCreating}
           size="sm"
-          className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px]"
+          className="hidden md:flex h-8 px-3 bg-primary hover:bg-primary/90 text-[13px]"
         >
           {isCreating ? (
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
           ) : (
             <>
               <Plus className="w-3.5 h-3.5 mr-1.5" />
-              <span className="hidden sm:inline">Новый курс</span>
-              <span className="sm:hidden">Создать</span>
-          </>
-        )}
-      </Button>
+              <span>Новый курс</span>
+            </>
+          )}
+        </Button>
       </div>
 
       {isLoading ? (
