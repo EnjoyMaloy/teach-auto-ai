@@ -20,13 +20,13 @@ const LayoutContent: React.FC = () => {
   return (
     <>
       {/* Persistent background - never unmounts during navigation */}
-      <div className="fixed inset-0 z-0 bg-background dark:bg-[#0f0f12]">
+      <div className="fixed inset-0 z-0 bg-background dark:bg-[#0f0f12] pointer-events-none">
         <AnimatedBackground />
       </div>
       
-      {/* Full-screen content layer */}
+      {/* Scrollable content layer */}
       <div 
-        className="fixed inset-0 z-0"
+        className="relative z-0 min-h-screen"
         style={{ 
           // Pass sidebar offset as CSS variable for pages to use for centering
           '--sidebar-offset': sidebarOffset,
