@@ -213,10 +213,10 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
 
       {/* Chat / Messages area */}
       <ScrollArea className="flex-1">
-        <div className="p-4 space-y-3">
+        <div className="p-4 space-y-3 h-full">
           {/* Idle state - nothing selected */}
           {mode === 'idle' && !isGenerating && !isCompleted && !isError && (
-            <div className="flex items-center justify-center h-32">
+            <div className="flex items-center justify-center min-h-[60vh]">
               <p className="text-sm text-muted-foreground text-center px-8">
                 Выберите действие внизу, чтобы начать
               </p>
