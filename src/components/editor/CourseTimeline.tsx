@@ -46,11 +46,11 @@ interface CourseTimelineProps {
 
 // Scaled block thumbnail - renders real MobilePreviewFrame at full size, 
 // then shrinks it with CSS transform for a pixel-perfect miniature
-const THUMB_W = 72;
-const THUMB_H = 128;
 const FULL_W = 390;
 const FULL_H = 760;
-const SCALE = Math.min(THUMB_W / FULL_W, THUMB_H / FULL_H); // ~0.168
+const THUMB_H = 128;
+const SCALE = THUMB_H / FULL_H; // ~0.168
+const THUMB_W = Math.round(FULL_W * SCALE); // ~66, perfectly matching scaled content
 
 const ScaledBlockThumbnail = memo<{ 
   block: Block; 
