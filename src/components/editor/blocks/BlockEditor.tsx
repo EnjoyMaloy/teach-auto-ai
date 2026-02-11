@@ -104,7 +104,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
   const isDesignBlock = block.type === 'design';
   
   return (
-    <div className="h-full flex flex-col bg-secondary/50 dark:bg-background overflow-hidden">
+    <div className="h-full flex flex-col bg-secondary/50 dark:bg-white/[0.02] overflow-hidden">
       {/* Header */}
       <div className="px-5 py-4 border-b border-border/5 dark:border-transparent flex items-center justify-between">
         <div className="flex items-center gap-3">
