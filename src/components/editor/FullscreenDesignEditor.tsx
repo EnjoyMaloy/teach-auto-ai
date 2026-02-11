@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ArrowLeft, Shield, User } from 'lucide-react';
+import { ArrowLeft, Shield, User, Home } from 'lucide-react';
 import { DesignSystemConfig } from '@/types/designSystem';
 import { DesignSystemEditor } from './DesignSystemEditor';
 import { DesignPreviewBlocks } from './DesignPreviewBlocks';
@@ -9,6 +9,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { SaveStatusIndicator, SaveStatus } from './design-system/SaveStatusIndicator';
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from '@/components/ui/breadcrumb';
 
 interface FullscreenDesignEditorProps {
   config: DesignSystemConfig;
@@ -83,8 +91,8 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col">
       {/* Header with breadcrumbs */}
-      <header className="h-16 border-b border-border bg-card flex items-center justify-between px-4 flex-shrink-0">
-        <nav className="flex items-center gap-2">
+      <header className="h-14 border-b border-border/5 bg-background/95 backdrop-blur-sm flex items-center justify-between px-4 flex-shrink-0">
+        <div className="flex items-center gap-3">
           <Button 
             variant="ghost" 
             size="sm" 
@@ -94,28 +102,34 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
             <ArrowLeft className="w-4 h-4" />
             Назад
           </Button>
-          <div className="h-5 w-px bg-border" />
-          <button
-            onClick={handleGoToWorkshop}
-            className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-          >
-            Мастерская
-          </button>
-          <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
-          <button
-            onClick={onClose}
-            className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors max-w-[200px] truncate"
-          >
-            {courseTitle}
-          </button>
-          <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
-          <span className="text-sm font-semibold text-foreground">
-            Дизайн-система
-          </span>
+          <div className="h-5 w-px bg-border/20" />
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <button onClick={handleGoToWorkshop} className="flex items-center">
+                    <Home className="w-4 h-4" />
+                  </button>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <button onClick={onClose} className="truncate max-w-[200px]">
+                    {courseTitle}
+                  </button>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Дизайн</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
           
           {/* Save status indicator */}
           <SaveStatusIndicator status={saveStatus} className="ml-2" />
-        </nav>
+        </div>
 
         {/* Role toggle for testing (only visible to real admins) */}
         {realIsAdmin && (
