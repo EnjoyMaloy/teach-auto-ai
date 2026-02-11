@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Undo2, Redo2, Eye, 
-  Share2, Check, X, Palette, ChevronRight, Map,
-  Cloud, RefreshCw, PanelLeft, Volume2, VolumeX
+  Share2, Check, X, Palette, Map,
+  Cloud, RefreshCw, PanelLeft, Volume2, VolumeX, Home
 } from 'lucide-react';
 import { Course, Lesson, LessonsDisplayType } from '@/types/course';
 import { DesignSystemConfig } from '@/types/designSystem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PublishDialog } from './PublishDialog';
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from '@/components/ui/breadcrumb';
 import { AIGeneratorDialog } from './AIGeneratorDialog';
 import { FullscreenDesignEditor } from './FullscreenDesignEditor';
 import {
@@ -261,47 +269,53 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           )}
 
           {/* Breadcrumb navigation */}
-          <nav className="flex items-center gap-1 min-w-0">
-            <button
-              onClick={onBack}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors shrink-0"
-            >
-              Мастерская
-            </button>
-            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
-            
-            {isEditing ? (
-              <div className="flex items-center gap-1.5">
-                <Input
-                  value={editedTitle}
-                  onChange={(e) => setEditedTitle(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  className="h-7 w-48 text-sm border-border/50"
-                  autoFocus
-                />
-                <button
-                  onClick={handleSaveTitle}
-                  className="p-1.5 rounded-md text-emerald-600 hover:bg-emerald-500/10"
-                >
-                  <Check className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={handleCancelEditing}
-                  className="p-1.5 rounded-md text-muted-foreground hover:bg-muted"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ) : (
-              <span 
-                className="text-sm font-medium text-foreground truncate max-w-[200px] cursor-pointer hover:text-primary transition-colors"
-                onDoubleClick={handleStartEditing}
-                title="Двойной клик для редактирования"
-              >
-                {course.title}
-              </span>
-            )}
-          </nav>
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <button onClick={onBack} className="flex items-center">
+                    <Home className="w-4 h-4" />
+                  </button>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                {isEditing ? (
+                  <div className="flex items-center gap-1.5">
+                    <Input
+                      value={editedTitle}
+                      onChange={(e) => setEditedTitle(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      className="h-7 w-48 text-sm border-border/50"
+                      autoFocus
+                    />
+                    <button
+                      onClick={handleSaveTitle}
+                      className="p-1.5 rounded-md text-emerald-600 hover:bg-emerald-500/10"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={handleCancelEditing}
+                      className="p-1.5 rounded-md text-muted-foreground hover:bg-muted"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <BreadcrumbPage>
+                    <span 
+                      className="truncate max-w-[200px] cursor-pointer hover:text-primary transition-colors"
+                      onDoubleClick={handleStartEditing}
+                      title="Двойной клик для редактирования"
+                    >
+                      {course.title}
+                    </span>
+                  </BreadcrumbPage>
+                )}
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
 
           <div className="w-px h-5 bg-border/50 ml-1" />
 
