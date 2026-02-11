@@ -520,9 +520,9 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
               onKeyDown={handleKeyDown}
               placeholder={getPlaceholder()}
               disabled={isInputDisabled}
-              className="w-full bg-transparent px-4 pt-3 pb-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none disabled:opacity-50"
+              className="w-full bg-transparent px-4 pt-3 pb-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none disabled:opacity-50"
             />
-            <div className="flex items-center justify-between px-2.5 pb-2.5">
+            <div className="flex items-center justify-between px-2.5 pb-2.5 pt-1">
               <div className="flex items-center gap-1">
                 <button
                   className="p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-foreground/5"
