@@ -588,7 +588,7 @@ const Editor: React.FC = () => {
 
           {/* Right: Block Editor - floating overlay */}
           {selectedBlock && (
-            <div className="hidden md:flex absolute right-3 top-3 bottom-3 w-[380px] flex-col rounded-2xl bg-secondary/80 dark:bg-[#1a1a1f]/95 backdrop-blur-xl shadow-sm dark:shadow-black/10 overflow-hidden z-10 border border-border/10 dark:border-white/[0.06]">
+            <div className="hidden md:flex absolute right-3 top-3 bottom-3 w-[380px] flex-col rounded-2xl bg-secondary/50 dark:bg-white/[0.02] backdrop-blur-xl shadow-sm dark:shadow-black/10 overflow-hidden z-10 border border-border/10 dark:border-white/[0.06]">
               <BlockEditor
                 block={selectedBlock}
                 onUpdate={handleUpdateBlock}
