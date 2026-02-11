@@ -103,11 +103,8 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       if (response.error) throw response.error;
 
       const result = response.data;
-      if (result.content) {
-        onUpdateBlock({ content: result.content });
-      }
-      if (result.subBlocks) {
-        onUpdateBlock({ subBlocks: result.subBlocks });
+      if (result.newBlocks && Array.isArray(result.newBlocks)) {
+        onUpdateBlock({ subBlocks: result.newBlocks });
       }
     } catch (error) {
       console.error('Block edit error:', error);
