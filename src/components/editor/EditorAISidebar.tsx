@@ -141,16 +141,13 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3">
+      <div className="flex items-center px-4 py-3">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-ai flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
           <span className="font-semibold text-foreground">AI Помощник</span>
         </div>
-        <Button variant="ghost" size="icon-sm" onClick={onClose}>
-          <X className="w-4 h-4" />
-        </Button>
       </div>
 
       {/* Content */}
