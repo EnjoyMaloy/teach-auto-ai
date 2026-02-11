@@ -280,7 +280,13 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                {isEditing ? (
+                {showDesignSystem ? (
+                  <BreadcrumbLink asChild>
+                    <button onClick={() => setShowDesignSystem(false)} className="transition-colors">
+                      {course.title}
+                    </button>
+                  </BreadcrumbLink>
+                ) : isEditing ? (
                   <div className="flex items-center gap-1.5">
                     <Input
                       value={editedTitle}
@@ -314,6 +320,14 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                   </BreadcrumbPage>
                 )}
               </BreadcrumbItem>
+              {showDesignSystem && (
+                <>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Дизайн</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </>
+              )}
             </BreadcrumbList>
           </Breadcrumb>
 
