@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Sparkles, X, MessageSquare, Wand2, Loader2, Check, 
+  Sparkles, MessageSquare, Wand2, Loader2, Check, 
   AlertCircle, Search, Brain, Layers, BookOpen, CheckCircle2, 
-  Image, Clock, RotateCcw, PartyPopper, Send, ChevronRight
+  Image, Clock, RotateCcw, PartyPopper, Send, CornerDownLeft,
+  Plus, MousePointerClick
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -25,7 +25,7 @@ interface EditorAISidebarProps {
   onUpdateBlock: (updates: Partial<Block>) => void;
 }
 
-type SidebarMode = 'chat' | 'generate' | 'edit-block';
+type SidebarMode = 'idle' | 'generate' | 'edit-block';
 
 export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   isOpen,
@@ -36,12 +36,12 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   onAIGenerate,
   onUpdateBlock,
 }) => {
-  const [mode, setMode] = useState<SidebarMode>('chat');
+  const [mode, setMode] = useState<SidebarMode>('idle');
   const [chatInput, setChatInput] = useState('');
-  const [editInput, setEditInput] = useState('');
   const [isEditingBlock, setIsEditingBlock] = useState(false);
+  const [localSkipImages, setLocalSkipImages] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Course generation state
   const {
     state,
     startGeneration,
@@ -55,7 +55,6 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   } = useAIGeneration();
 
   const [localPrompt, setLocalPrompt] = useState('');
-  const [localSkipImages, setLocalSkipImages] = useState(false);
   const isGeneratingRef = useRef(false);
 
   useEffect(() => {
@@ -67,27 +66,32 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   const isError = state.status === 'error';
   const duration = getGenerationDuration(state.startTime, state.endTime);
 
-  // Quick suggestions
-  const quickSuggestions = [
-    { icon: BookOpen, label: 'Создать курс', action: () => setMode('generate') },
-    { icon: Wand2, label: 'Редактировать блок', action: () => selectedBlock && setMode('edit-block') },
-  ];
+  // Auto-scroll to bottom when steps update
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [state.steps, isCompleted, isError]);
 
-  const editSuggestions = selectedBlock ? [
-    'Сделай текст короче',
-    'Добавь эмодзи',
-    'Сделай более формальным',
-    'Переведи на английский',
-  ] : [];
+  const handleSubmit = () => {
+    if (!chatInput.trim()) return;
+    
+    if (mode === 'generate') {
+      setLocalPrompt(chatInput);
+      startGeneration(chatInput, localSkipImages);
+      setChatInput('');
+    } else if (mode === 'edit-block' && selectedBlock) {
+      handleEditBlock(chatInput);
+      setChatInput('');
+    }
+  };
 
-  const handleEditBlock = async () => {
-    if (!selectedBlock || !editInput.trim()) return;
+  const handleEditBlock = async (prompt: string) => {
+    if (!selectedBlock || !prompt.trim()) return;
     
     setIsEditingBlock(true);
     try {
       const response = await supabase.functions.invoke('subblock-ai', {
         body: {
-          prompt: editInput,
+          prompt,
           context: {
             blockType: selectedBlock.type,
             currentContent: selectedBlock.content,
@@ -106,8 +110,6 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       if (result.subBlocks) {
         onUpdateBlock({ subBlocks: result.subBlocks });
       }
-
-      setEditInput('');
     } catch (error) {
       console.error('Block edit error:', error);
     } finally {
@@ -115,7 +117,18 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     }
   };
 
-  // Render step icon
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
+  const toggleMode = (newMode: SidebarMode) => {
+    setMode(prev => prev === newMode ? 'idle' : newMode);
+  };
+
+  // Step icon helpers
   const getStepIcon = (step: GenerationStep) => {
     if (step.status === 'completed') return <CheckCircle2 className="w-4 h-4 text-emerald-600" />;
     if (step.status === 'active') return <Loader2 className="w-4 h-4 text-primary animate-spin" />;
@@ -125,13 +138,24 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
 
   const getStepIconByType = (id: string) => {
     switch (id) {
-      case 'research': return <Search className="w-4 h-4" />;
-      case 'structure': return <Layers className="w-4 h-4" />;
-      case 'content': return <Brain className="w-4 h-4" />;
-      case 'images': return <Image className="w-4 h-4" />;
+      case 'research': return <Search className="w-3.5 h-3.5" />;
+      case 'structure': return <Layers className="w-3.5 h-3.5" />;
+      case 'content': return <Brain className="w-3.5 h-3.5" />;
+      case 'images': return <Image className="w-3.5 h-3.5" />;
       default: return null;
     }
   };
+
+  const getPlaceholder = () => {
+    if (mode === 'generate') return 'Опишите тему курса...';
+    if (mode === 'edit-block') {
+      if (!selectedBlock) return 'Сначала выберите блок справа...';
+      return 'Опишите что изменить...';
+    }
+    return 'Design anything...';
+  };
+
+  const isInputDisabled = mode === 'edit-block' && !selectedBlock;
 
   return (
     <div 
@@ -150,87 +174,52 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
         </div>
       </div>
 
-      {/* Content */}
+      {/* Chat / Messages area */}
       <ScrollArea className="flex-1">
-        <div className="p-4 space-y-4">
-          {/* Mode: Chat (default) */}
-          {mode === 'chat' && !isGenerating && !isCompleted && (
-            <>
-              {/* Quick actions */}
-              <div className="space-y-2">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Что сделать?
-                </p>
-                <div className="grid gap-2">
-                  {quickSuggestions.map((suggestion, i) => (
-                    <button
-                      key={i}
-                      onClick={suggestion.action}
-                      disabled={suggestion.label === 'Редактировать блок' && !selectedBlock}
-                      className={cn(
-                        'flex items-center gap-3 p-3 rounded-xl border border-border bg-card',
-                        'hover:border-primary/50 hover:bg-primary/5 transition-all text-left',
-                        'disabled:opacity-50 disabled:cursor-not-allowed'
-                      )}
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <suggestion.icon className="w-5 h-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-foreground">{suggestion.label}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {suggestion.label === 'Редактировать блок' && !selectedBlock 
-                            ? 'Сначала выберите блок'
-                            : suggestion.label === 'Создать курс'
-                              ? 'Сгенерировать уроки и контент'
-                              : 'Изменить выбранный блок'
-                          }
-                        </p>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground ml-auto" />
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Selected block info */}
-              {selectedBlock && (
-                <div className="p-3 rounded-xl bg-muted/50 border border-border">
-                  <p className="text-xs text-muted-foreground mb-1">Выбранный блок:</p>
-                  <p className="font-medium text-foreground">
-                    {BLOCK_CONFIGS[selectedBlock.type]?.labelRu || selectedBlock.type}
-                  </p>
-                </div>
-              )}
-            </>
+        <div className="p-4 space-y-3">
+          {/* Idle state - nothing selected */}
+          {mode === 'idle' && !isGenerating && !isCompleted && !isError && (
+            <div className="flex items-center justify-center h-32">
+              <p className="text-sm text-muted-foreground text-center px-8">
+                Выберите действие внизу, чтобы начать
+              </p>
+            </div>
           )}
 
-          {/* Mode: Generate Course */}
-          {mode === 'generate' && !isGenerating && !isCompleted && !isError && (
-            <div className="space-y-4">
-              <button 
-                onClick={() => setMode('chat')}
-                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-              >
-                ← Назад
-              </button>
+          {/* Edit block mode - waiting for selection */}
+          {mode === 'edit-block' && !selectedBlock && !isGenerating && (
+            <div className="flex flex-col items-center justify-center gap-3 py-8">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <MousePointerClick className="w-6 h-6 text-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground text-center px-4">
+                Выберите блок на таймлайне справа для редактирования
+              </p>
+            </div>
+          )}
 
-              <div>
-                <h3 className="font-semibold text-foreground mb-1">Создать курс с AI</h3>
-                <p className="text-sm text-muted-foreground">
-                  Опишите тему и AI сгенерирует уроки и контент
+          {/* Edit block mode - block selected */}
+          {mode === 'edit-block' && selectedBlock && !isGenerating && (
+            <div className="space-y-3">
+              <div className="p-3 rounded-xl bg-muted/50 border border-border/30">
+                <p className="text-xs text-muted-foreground mb-0.5">Выбранный блок:</p>
+                <p className="font-medium text-foreground text-sm">
+                  {BLOCK_CONFIGS[selectedBlock.type]?.labelRu || selectedBlock.type}
                 </p>
               </div>
+              {isEditingBlock && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground p-3">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Редактирую блок...
+                </div>
+              )}
+            </div>
+          )}
 
-              <Textarea
-                value={localPrompt}
-                onChange={(e) => setLocalPrompt(e.target.value)}
-                placeholder="Например: Курс по основам Python для начинающих..."
-                rows={4}
-                className="resize-none"
-              />
-
-              <div className="flex items-center gap-2">
+          {/* Generate mode - pre-generation settings */}
+          {mode === 'generate' && !isGenerating && !isCompleted && !isError && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 px-1">
                 <Checkbox
                   id="skipImages"
                   checked={localSkipImages}
@@ -240,86 +229,69 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                   Быстрый режим (без иллюстраций)
                 </Label>
               </div>
-
-              <Button
-                onClick={() => {
-                  if (!localPrompt.trim()) return;
-                  startGeneration(localPrompt, localSkipImages);
-                  // Start generation logic here (same as AIGeneratorDialog)
-                }}
-                disabled={!localPrompt.trim()}
-                className="w-full gap-2"
-              >
-                <Sparkles className="w-4 h-4" />
-                Сгенерировать курс
-              </Button>
             </div>
           )}
 
-          {/* Generating state */}
+          {/* Generating - steps as chat messages */}
           {isGenerating && (
-            <div className="space-y-4">
-              <div className="p-3 bg-muted/50 rounded-lg">
-                <p className="text-sm font-medium mb-1">Генерируем курс:</p>
-                <p className="text-xs text-muted-foreground line-clamp-2">{state.prompt}</p>
+            <div className="space-y-2">
+              <div className="p-3 rounded-xl bg-muted/30">
+                <p className="text-xs text-muted-foreground mb-1">Генерирую курс:</p>
+                <p className="text-sm text-foreground line-clamp-2">{state.prompt}</p>
               </div>
 
-              <div className="space-y-2">
-                {state.steps.map((step) => (
-                  <div 
-                    key={step.id}
-                    className={cn(
-                      "flex items-start gap-3 p-3 rounded-lg transition-colors",
-                      step.status === 'active' && "bg-primary/5 border border-primary/20",
-                      step.status === 'completed' && "bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800",
-                      step.status === 'error' && "bg-destructive/5 border border-destructive/20",
-                      step.status === 'pending' && "opacity-50"
-                    )}
-                  >
-                    <div className="flex-shrink-0 mt-0.5">{getStepIcon(step)}</div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground">{getStepIconByType(step.id)}</span>
-                        <span className={cn(
-                          "font-medium text-sm",
-                          step.status === 'completed' && "text-emerald-700 dark:text-emerald-400",
-                          step.status === 'error' && "text-destructive"
-                        )}>
-                          {step.label}
-                        </span>
-                      </div>
-                      {step.message && (
-                        <p className={cn(
-                          "text-xs mt-0.5",
-                          step.status === 'error' ? "text-destructive" : "text-muted-foreground"
-                        )}>
-                          {step.message}
-                        </p>
-                      )}
+              {state.steps.map((step) => (
+                <div 
+                  key={step.id}
+                  className={cn(
+                    "flex items-start gap-2.5 p-3 rounded-xl transition-colors text-sm",
+                    step.status === 'active' && "bg-primary/5",
+                    step.status === 'completed' && "bg-emerald-500/5",
+                    step.status === 'error' && "bg-destructive/5",
+                    step.status === 'pending' && "opacity-40"
+                  )}
+                >
+                  <div className="flex-shrink-0 mt-0.5">{getStepIcon(step)}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-muted-foreground">{getStepIconByType(step.id)}</span>
+                      <span className={cn(
+                        "font-medium",
+                        step.status === 'completed' && "text-emerald-700 dark:text-emerald-400",
+                        step.status === 'error' && "text-destructive"
+                      )}>
+                        {step.label}
+                      </span>
                     </div>
+                    {step.message && (
+                      <p className={cn(
+                        "text-xs mt-0.5",
+                        step.status === 'error' ? "text-destructive" : "text-muted-foreground"
+                      )}>
+                        {step.message}
+                      </p>
+                    )}
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
 
-              <Button 
-                variant="outline" 
-                size="sm"
+              <button
                 onClick={cancelGeneration}
-                className="w-full text-destructive border-destructive hover:bg-destructive/10"
+                className="w-full text-sm text-destructive hover:text-destructive/80 py-2 transition-colors"
               >
                 Отменить генерацию
-              </Button>
+              </button>
             </div>
           )}
 
-          {/* Completed state */}
+          {/* Completed */}
           {isCompleted && state.generatedLessons && (
-            <div className="space-y-4">
-              <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
+            <div className="space-y-3">
+              <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
                 <div className="flex items-center gap-2 mb-2">
                   <PartyPopper className="w-5 h-5 text-emerald-600" />
                   <span className="font-medium text-emerald-700 dark:text-emerald-400">
-                    Курс успешно создан!
+                    Курс создан!
                   </span>
                 </div>
                 <div className="flex items-center gap-4 text-sm text-emerald-600">
@@ -340,6 +312,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                   size="sm"
                   onClick={() => {
                     setLocalPrompt(state.prompt);
+                    setChatInput(state.prompt);
                     resetGeneration();
                   }}
                   className="flex-1 gap-1"
@@ -352,7 +325,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                   onClick={() => {
                     onAIGenerate(state.generatedLessons!);
                     resetGeneration();
-                    setMode('chat');
+                    setMode('idle');
                   }}
                   className="flex-1 gap-1 bg-emerald-600 hover:bg-emerald-700"
                 >
@@ -363,21 +336,22 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
             </div>
           )}
 
-          {/* Error state */}
+          {/* Error */}
           {isError && (
-            <div className="space-y-4">
-              <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+            <div className="space-y-3">
+              <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20">
                 <div className="flex items-center gap-2 mb-2">
                   <AlertCircle className="w-5 h-5 text-destructive" />
-                  <span className="font-medium text-destructive">Ошибка генерации</span>
+                  <span className="font-medium text-destructive">Ошибка</span>
                 </div>
                 <p className="text-sm text-destructive/80">{state.error}</p>
               </div>
 
               <Button 
                 variant="outline" 
+                size="sm"
                 onClick={() => {
-                  setLocalPrompt(state.prompt);
+                  setChatInput(state.prompt);
                   resetGeneration();
                 }}
                 className="w-full"
@@ -387,104 +361,60 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
             </div>
           )}
 
-          {/* Mode: Edit Block */}
-          {mode === 'edit-block' && selectedBlock && (
-            <div className="space-y-4">
-              <button 
-                onClick={() => setMode('chat')}
-                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-              >
-                ← Назад
-              </button>
-
-              <div>
-                <h3 className="font-semibold text-foreground mb-1">Редактировать блок</h3>
-                <p className="text-sm text-muted-foreground">
-                  {BLOCK_CONFIGS[selectedBlock.type]?.labelRu}
-                </p>
-              </div>
-
-              {/* Quick edit suggestions */}
-              <div className="flex flex-wrap gap-2">
-                {editSuggestions.map((suggestion, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setEditInput(suggestion)}
-                    className="px-3 py-1.5 rounded-full text-xs bg-muted hover:bg-primary/10 hover:text-primary transition-colors"
-                  >
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
-
-              <div className="relative">
-                <Textarea
-                  value={editInput}
-                  onChange={(e) => setEditInput(e.target.value)}
-                  placeholder="Опишите что изменить..."
-                  rows={3}
-                  className="resize-none pr-12"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleEditBlock();
-                    }
-                  }}
-                />
-                <Button
-                  size="icon-sm"
-                  onClick={handleEditBlock}
-                  disabled={!editInput.trim() || isEditingBlock}
-                  className="absolute bottom-2 right-2"
-                >
-                  {isEditingBlock ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Send className="w-4 h-4" />
-                  )}
-                </Button>
-              </div>
-            </div>
-          )}
+          <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
 
-      {/* Bottom input - styled chat bar */}
-      {mode === 'chat' && !isGenerating && !isCompleted && (
+      {/* Bottom input area */}
+      {!isGenerating && !isCompleted && (
         <div className="p-3">
           <div className="bg-black/[0.06] dark:bg-[#232326] rounded-2xl border border-border/20 dark:border-white/[0.08]">
             <input
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey && chatInput.trim()) {
-                  e.preventDefault();
-                  setLocalPrompt(chatInput);
-                  setMode('generate');
-                }
-              }}
-              placeholder="Design anything..."
-              className="w-full bg-transparent px-4 pt-3 pb-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+              onKeyDown={handleKeyDown}
+              placeholder={getPlaceholder()}
+              disabled={isInputDisabled}
+              className="w-full bg-transparent px-4 pt-3 pb-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none disabled:opacity-50"
             />
-            <div className="flex items-center justify-between px-3 pb-2.5">
+            <div className="flex items-center justify-between px-2.5 pb-2.5">
+              <div className="flex items-center gap-1">
+                <button
+                  className="p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-foreground/5"
+                  title="Ещё"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => toggleMode('generate')}
+                  className={cn(
+                    "px-2.5 py-1 rounded-lg text-xs font-medium transition-all",
+                    mode === 'generate'
+                      ? "bg-primary/15 text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
+                  )}
+                >
+                  Создать курс
+                </button>
+                <button
+                  onClick={() => toggleMode('edit-block')}
+                  className={cn(
+                    "px-2.5 py-1 rounded-lg text-xs font-medium transition-all",
+                    mode === 'edit-block'
+                      ? "bg-primary/15 text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
+                  )}
+                >
+                  Ред. блок
+                </button>
+              </div>
               <button
-                className="p-1 text-muted-foreground hover:text-foreground transition-colors"
-                title="Добавить контекст"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              </button>
-              <button
-                onClick={() => {
-                  if (chatInput.trim()) {
-                    setLocalPrompt(chatInput);
-                    setMode('generate');
-                  }
-                }}
-                disabled={!chatInput.trim()}
-                className="p-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30"
+                onClick={handleSubmit}
+                disabled={!chatInput.trim() || isInputDisabled}
+                className="p-1.5 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30 rounded-lg hover:bg-foreground/5"
                 title="Отправить"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg>
+                <CornerDownLeft className="w-4 h-4" />
               </button>
             </div>
           </div>
