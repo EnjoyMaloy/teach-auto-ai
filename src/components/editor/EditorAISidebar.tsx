@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { Block, BLOCK_CONFIGS } from '@/types/blocks';
 import { Lesson, CourseDesignSystem } from '@/types/course';
 import { useAIGeneration, GenerationStep, getGenerationDuration } from '@/hooks/useAIGeneration';
+import { useGenerateCourse } from '@/hooks/useGenerateCourse';
 import { supabase } from '@/integrations/supabase/client';
 import { useBaseDesignSystems } from '@/hooks/useBaseDesignSystems';
 
@@ -52,15 +53,12 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
 
   const {
     state,
-    startGeneration,
     cancelGeneration,
     resetGeneration,
-    updateStep,
-    setSteps,
-    completeGeneration,
-    abortController,
     setDesignSystem,
   } = useAIGeneration();
+  
+  const { runGeneration } = useGenerateCourse(courseId);
 
   const [localPrompt, setLocalPrompt] = useState('');
   const isGeneratingRef = useRef(false);
@@ -84,7 +82,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     
     if (mode === 'generate') {
       setLocalPrompt(chatInput);
-      startGeneration(chatInput, localSkipImages);
+      runGeneration(chatInput, localSkipImages);
       setChatInput('');
     } else if (mode === 'edit-block' && selectedBlock) {
       handleEditBlock(chatInput);
