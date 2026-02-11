@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Sparkles, MessageSquare, Wand2, Loader2, Check, 
   AlertCircle, Search, Brain, Layers, BookOpen, CheckCircle2, 
-  Image, Clock, RotateCcw, PartyPopper, Send, CornerDownLeft,
+  Image, Clock, RotateCcw, PartyPopper, Send, CornerDownLeft, Square,
   Plus, MousePointerClick, Palette, GraduationCap, Pencil, BookPlus,
   ImageOff, ImageIcon,
   icons as lucideIcons
@@ -377,55 +377,46 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
             </div>
           )}
 
-          {/* Generating - steps as chat messages */}
+          {/* Generating - chat-style AI messages */}
           {isGenerating && (
-            <div className="space-y-2">
-              <div className="p-3 rounded-xl bg-muted/30">
-                <p className="text-xs text-muted-foreground mb-1">Генерирую курс:</p>
-                <p className="text-sm text-foreground line-clamp-2">{state.prompt}</p>
+            <div className="space-y-3">
+              {/* User message bubble */}
+              <div className="flex justify-end">
+                <div className="max-w-[85%] px-3.5 py-2.5 rounded-2xl rounded-tr-md bg-primary text-primary-foreground text-sm">
+                  {state.prompt}
+                </div>
               </div>
 
-              {state.steps.map((step) => (
-                <div 
-                  key={step.id}
-                  className={cn(
-                    "flex items-start gap-2.5 p-3 rounded-xl transition-colors text-sm",
-                    step.status === 'active' && "bg-primary/5",
-                    step.status === 'completed' && "bg-emerald-500/5",
-                    step.status === 'error' && "bg-destructive/5",
-                    step.status === 'pending' && "opacity-40"
-                  )}
-                >
-                  <div className="flex-shrink-0 mt-0.5">{getStepIcon(step)}</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-muted-foreground">{getStepIconByType(step.id)}</span>
+              {/* AI response bubble with steps */}
+              <div className="flex justify-start">
+                <div className="max-w-[90%] px-3.5 py-3 rounded-2xl rounded-tl-md bg-muted/50 text-foreground text-sm space-y-2">
+                  {state.steps.map((step) => (
+                    <div 
+                      key={step.id}
+                      className={cn(
+                        "flex items-center gap-2 transition-opacity",
+                        step.status === 'pending' && "opacity-30"
+                      )}
+                    >
+                      <div className="flex-shrink-0">{getStepIcon(step)}</div>
                       <span className={cn(
-                        "font-medium",
-                        step.status === 'completed' && "text-emerald-700 dark:text-emerald-400",
+                        "text-sm",
+                        step.status === 'completed' && "text-emerald-600 dark:text-emerald-400",
+                        step.status === 'active' && "text-foreground font-medium",
                         step.status === 'error' && "text-destructive"
                       )}>
                         {step.label}
                       </span>
                     </div>
-                    {step.message && (
-                      <p className={cn(
-                        "text-xs mt-0.5",
-                        step.status === 'error' ? "text-destructive" : "text-muted-foreground"
-                      )}>
-                        {step.message}
-                      </p>
-                    )}
+                  ))}
+                  {/* Typing indicator */}
+                  <div className="flex items-center gap-1 pt-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 animate-pulse [animation-delay:0.2s]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 animate-pulse [animation-delay:0.4s]" />
                   </div>
                 </div>
-              ))}
-
-              <button
-                onClick={cancelGeneration}
-                className="w-full text-sm text-destructive hover:text-destructive/80 py-2 transition-colors"
-              >
-                Отменить генерацию
-              </button>
+              </div>
             </div>
           )}
 
@@ -510,16 +501,16 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
         </div>
       </ScrollArea>
 
-      {/* Bottom input area */}
-      {!isGenerating && !isCompleted && (
+      {/* Bottom input area - always visible */}
+      {!isCompleted && (
         <div className="p-3">
           <div className="bg-black/[0.06] dark:bg-[#232326] rounded-2xl border border-border/20 dark:border-white/[0.08]">
             <input
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={getPlaceholder()}
-              disabled={isInputDisabled}
+              onKeyDown={isGenerating ? undefined : handleKeyDown}
+              placeholder={isGenerating ? 'Генерация...' : getPlaceholder()}
+              disabled={isInputDisabled || isGenerating}
               className="w-full bg-transparent px-4 pt-3 pb-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none disabled:opacity-50"
             />
             <div className="flex items-center justify-between px-2.5 pb-2.5 pt-1">
@@ -527,16 +518,19 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                 <button
                   className="p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-foreground/5"
                   title="Ещё"
+                  disabled={isGenerating}
                 >
                   <Plus className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => toggleMode('generate')}
+                  disabled={isGenerating}
                   className={cn(
                     "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all",
                     mode === 'generate'
                       ? "bg-primary/15 text-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
+                      : "text-muted-foreground hover:text-foreground hover:bg-foreground/5",
+                    isGenerating && "opacity-50 pointer-events-none"
                   )}
                 >
                   <BookPlus className="w-3 h-3" />
@@ -544,25 +538,37 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                 </button>
                 <button
                   onClick={() => toggleMode('edit-block')}
+                  disabled={isGenerating}
                   className={cn(
                     "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all",
                     mode === 'edit-block'
                       ? "bg-primary/15 text-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
+                      : "text-muted-foreground hover:text-foreground hover:bg-foreground/5",
+                    isGenerating && "opacity-50 pointer-events-none"
                   )}
                 >
                   <Pencil className="w-3 h-3" />
                   Ред. блок
                 </button>
               </div>
-              <button
-                onClick={handleSubmit}
-                disabled={!chatInput.trim() || isInputDisabled}
-                className="p-1.5 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30 rounded-lg hover:bg-foreground/5"
-                title="Отправить"
-              >
-                <CornerDownLeft className="w-4 h-4" />
-              </button>
+              {isGenerating ? (
+                <button
+                  onClick={cancelGeneration}
+                  className="p-1.5 text-destructive hover:text-destructive/80 transition-colors rounded-lg hover:bg-destructive/10"
+                  title="Остановить"
+                >
+                  <Square className="w-4 h-4 fill-current" />
+                </button>
+              ) : (
+                <button
+                  onClick={handleSubmit}
+                  disabled={!chatInput.trim() || isInputDisabled}
+                  className="p-1.5 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30 rounded-lg hover:bg-foreground/5"
+                  title="Отправить"
+                >
+                  <CornerDownLeft className="w-4 h-4" />
+                </button>
+              )}
             </div>
           </div>
         </div>
