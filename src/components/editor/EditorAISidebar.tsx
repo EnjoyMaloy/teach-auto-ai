@@ -449,30 +449,44 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
         </div>
       </ScrollArea>
 
-      {/* Bottom input for chat mode */}
+      {/* Bottom input - styled chat bar */}
       {mode === 'chat' && !isGenerating && !isCompleted && (
-        <div className="p-4">
-          <div className="relative">
-            <Textarea
+        <div className="p-3">
+          <div className="bg-[hsl(var(--muted))] dark:bg-[#1a1a1e] rounded-2xl border border-border/50">
+            <input
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
-              placeholder="Задайте вопрос..."
-              rows={2}
-              className="resize-none pr-12"
-            />
-            <Button
-              size="icon-sm"
-              onClick={() => {
-                if (chatInput.trim()) {
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey && chatInput.trim()) {
+                  e.preventDefault();
                   setLocalPrompt(chatInput);
                   setMode('generate');
                 }
               }}
-              disabled={!chatInput.trim()}
-              className="absolute bottom-2 right-2"
-            >
-              <Send className="w-4 h-4" />
-            </Button>
+              placeholder="Design anything..."
+              className="w-full bg-transparent px-4 pt-3 pb-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+            />
+            <div className="flex items-center justify-between px-3 pb-2.5">
+              <button
+                className="p-1 text-muted-foreground hover:text-foreground transition-colors"
+                title="Добавить контекст"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+              <button
+                onClick={() => {
+                  if (chatInput.trim()) {
+                    setLocalPrompt(chatInput);
+                    setMode('generate');
+                  }
+                }}
+                disabled={!chatInput.trim()}
+                className="p-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30"
+                title="Отправить"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg>
+              </button>
+            </div>
           </div>
         </div>
       )}
