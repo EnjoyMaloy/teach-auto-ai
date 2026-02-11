@@ -565,7 +565,7 @@ const Editor: React.FC = () => {
           {/* Preview + Block Editor row */}
           <div className="flex-1 flex overflow-hidden">
             {/* Mobile Preview - centered */}
-            <div className="flex-1 flex items-center justify-center overflow-hidden bg-background dark:bg-[#0f0f12] py-3">
+            <div className="flex-1 flex items-center justify-center overflow-hidden bg-background py-3">
               <div 
                 className="h-full overflow-hidden"
                 style={{ 
@@ -589,7 +589,7 @@ const Editor: React.FC = () => {
             </div>
 
             {/* Right: Block Editor - fixed width */}
-            <div className="hidden md:flex w-[380px] shrink-0 flex-col border-l border-border bg-card overflow-hidden">
+            <div className="hidden md:flex w-[380px] shrink-0 flex-col border-l border-border/10 bg-background overflow-hidden">
               {selectedBlock ? (
                 <BlockEditor
                   block={selectedBlock}
