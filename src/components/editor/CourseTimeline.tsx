@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { Plus, Play, Volume2, Heading, Type, Image, LayoutList, CircleDot, CheckSquare, ToggleLeft, PenLine, Link2, ListOrdered, SlidersHorizontal, Layers } from 'lucide-react';
-import { Lesson } from '@/types/course';
+import { Lesson, CourseDesignSystem } from '@/types/course';
 import { Block, BLOCK_CONFIGS, BlockType } from '@/types/blocks';
+import { DesignSystemConfig } from '@/types/designSystem';
 import { cn } from '@/lib/utils';
+import { MobilePreviewFrame } from './blocks/MobilePreviewFrame';
 
 const iconMap: Record<string, React.FC<{ className?: string }>> = {
   Heading, Type, Image, Play, Volume2, LayoutList,
@@ -19,84 +21,34 @@ interface CourseTimelineProps {
   onAddLesson: () => void;
   onAddBlock: () => void;
   slideToBlock: (slide: any) => Block;
+  designSystem?: CourseDesignSystem | DesignSystemConfig;
 }
 
-// Mini block preview component
-const MiniBlockPreview: React.FC<{ block: Block; index: number }> = ({ block, index }) => {
+// Scaled block thumbnail - renders real MobilePreviewFrame at full size, 
+// then shrinks it with CSS transform for a pixel-perfect miniature
+const THUMB_W = 72;
+const THUMB_H = 128;
+const FULL_W = 390;
+const FULL_H = 760;
+const SCALE = Math.min(THUMB_W / FULL_W, THUMB_H / FULL_H); // ~0.168
+
+const ScaledBlockThumbnail = memo<{ 
+  block: Block; 
+  index: number; 
+  designSystem?: CourseDesignSystem | DesignSystemConfig;
+}>(({ block, index, designSystem }) => {
   const config = BLOCK_CONFIGS[block.type];
   const IconComponent = config?.icon ? iconMap[config.icon] : null;
 
-  // Get background style
-  const getBgStyle = () => {
-    if (block.backgroundColor) {
-      return { backgroundColor: block.backgroundColor };
-    }
-    return {};
-  };
-
-  // Render mini preview based on block type
-  const renderContent = () => {
-    // If has image, show it
-    if (block.imageUrl) {
-      return (
-        <img 
-          src={block.imageUrl} 
-          alt="" 
-          className="w-full h-full object-cover"
-        />
-      );
-    }
-
-    // Design block - check for sub-block images
-    if (block.type === 'design') {
-      const imageSubBlock = block.subBlocks?.find(sb => sb.type === 'image' && sb.imageUrl);
-      
-      if (imageSubBlock?.imageUrl) {
-        return (
-          <img 
-            src={imageSubBlock.imageUrl} 
-            alt="" 
-            className="w-full h-full object-cover"
-          />
-        );
-      }
-
-      // Show gradient for design blocks without images
-      return (
-        <div className="w-full h-full bg-gradient-to-br from-ai/30 to-ai/10" />
-      );
-    }
-
-    // Video - show dark background
-    if (block.type === 'video') {
-      return (
-        <div className="w-full h-full flex items-center justify-center bg-destructive/20">
-          <Play className="w-5 h-5 text-destructive fill-destructive/50" />
-        </div>
-      );
-    }
-
-    // Audio - show background
-    if (block.type === 'audio') {
-      return (
-        <div className="w-full h-full flex items-center justify-center bg-warning/20">
-          <Volume2 className="w-5 h-5 text-warning-foreground" />
-        </div>
-      );
-    }
-
-    // Default - show colored background based on type
-    return (
-      <div className={cn('w-full h-full', config?.bgClass || 'bg-muted')} />
-    );
-  };
+  // For video blocks, skip heavy iframe rendering
+  const isVideo = block.type === 'video';
 
   return (
     <div 
-      className="w-full h-full rounded-md overflow-hidden bg-muted/50"
-      style={getBgStyle()}
+      className="relative bg-muted/50 rounded-md overflow-hidden"
+      style={{ width: THUMB_W, height: THUMB_H }}
     >
-      {/* Header with block number and type icon */}
+      {/* Badge overlay */}
       <div className="absolute top-1 left-1 right-1 z-10 flex items-center gap-1">
         <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-background/90 shadow-sm">
           <span className="text-[9px] font-bold text-foreground">
@@ -107,10 +59,37 @@ const MiniBlockPreview: React.FC<{ block: Block; index: number }> = ({ block, in
           )}
         </div>
       </div>
-      {renderContent()}
+
+      {isVideo ? (
+        // Lightweight fallback for video blocks
+        <div className="w-full h-full flex items-center justify-center bg-black/80">
+          <Play className="w-5 h-5 text-white fill-white/50" />
+        </div>
+      ) : (
+        // Scaled real preview
+        <div 
+          className="origin-top-left pointer-events-none"
+          style={{ 
+            width: FULL_W, 
+            height: FULL_H, 
+            transform: `scale(${SCALE})`,
+          }}
+        >
+          <MobilePreviewFrame
+            block={block}
+            isReadOnly
+            embedded
+            fillContainer
+            designSystem={designSystem}
+            hideHeader
+          />
+        </div>
+      )}
     </div>
   );
-};
+});
+
+ScaledBlockThumbnail.displayName = 'ScaledBlockThumbnail';
 
 export const CourseTimeline: React.FC<CourseTimelineProps> = ({
   lessons,
@@ -121,6 +100,7 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
   onAddLesson,
   onAddBlock,
   slideToBlock,
+  designSystem,
 }) => {
   const [expandedLessonId, setExpandedLessonId] = useState<string | null>(selectedLessonId);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -199,13 +179,16 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
                             onClick={() => onSelectBlock(block.id, lesson.id)}
                             className={cn(
                               'relative flex-shrink-0 rounded-lg cursor-pointer transition-all duration-200 overflow-hidden',
-                              'w-[72px] h-[128px]', // 9:16 aspect ratio scaled down
                               isSelected
                                 ? 'ring-2 ring-primary ring-offset-2 ring-offset-card shadow-lg scale-105'
                                 : 'hover:ring-2 hover:ring-primary/50 hover:scale-105'
                             )}
                           >
-                            <MiniBlockPreview block={block} index={blockIndex} />
+                            <ScaledBlockThumbnail 
+                              block={block} 
+                              index={blockIndex} 
+                              designSystem={designSystem}
+                            />
                           </div>
                         );
                       })}
@@ -218,10 +201,11 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
                           onAddBlock();
                         }}
                         className={cn(
-                          'flex-shrink-0 w-[72px] h-[128px] rounded-lg border-2 border-dashed border-border',
+                          'flex-shrink-0 rounded-lg border-2 border-dashed border-border',
                           'flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary',
                           'transition-all duration-200 hover:bg-primary/5'
                         )}
+                        style={{ width: THUMB_W, height: THUMB_H }}
                       >
                         <Plus className="w-6 h-6" />
                       </button>

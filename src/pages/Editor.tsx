@@ -654,6 +654,7 @@ const Editor: React.FC = () => {
           onAddLesson={handleAddLesson}
           onAddBlock={() => setShowBlockSelector(true)}
           slideToBlock={slideToBlock}
+          designSystem={course.designSystem}
         />
       </div>
 
