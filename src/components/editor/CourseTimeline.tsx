@@ -245,7 +245,7 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
                         onReorderBlocks(e);
                       }}>
                         <SortableContext items={blocks.map(b => b.id)} strategy={horizontalListSortingStrategy}>
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-2.5">
                             {blocks.map((block, blockIndex) => (
                               <SortableBlockThumb
                                 key={block.id}
