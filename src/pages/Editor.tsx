@@ -561,14 +561,14 @@ const Editor: React.FC = () => {
         />
 
         {/* Content area */}
-        <div className="flex-1 flex overflow-hidden relative bg-secondary/50 dark:bg-white/[0.02] p-3">
+        <div className="flex-1 flex overflow-hidden relative bg-secondary/50 dark:bg-white/[0.02]">
           {/* Preview area - full width */}
           <div className="flex-1 flex items-center justify-center overflow-hidden bg-background rounded-2xl">
             <div 
-              className="overflow-hidden"
+              className="overflow-hidden py-3"
               style={{ 
                 aspectRatio: '9/16',
-                height: 'calc(100% - 24px)',
+                height: '100%',
                 maxHeight: '100%',
               }}
             >
