@@ -452,7 +452,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       {/* Bottom input - styled chat bar */}
       {mode === 'chat' && !isGenerating && !isCompleted && (
         <div className="p-3">
-          <div className="bg-[hsl(var(--muted))] dark:bg-[#232326] rounded-2xl border border-border/20 dark:border-white/[0.08]">
+          <div className="bg-black/[0.06] dark:bg-[#232326] rounded-2xl border border-border/20 dark:border-white/[0.08]">
             <input
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
