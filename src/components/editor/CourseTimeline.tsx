@@ -145,8 +145,8 @@ const SortableBlockThumb: React.FC<{
       className={cn(
         'relative flex-shrink-0 rounded-lg cursor-grab active:cursor-grabbing transition-all duration-200',
         isSelected
-          ? 'ring-2 ring-primary ring-offset-2 ring-offset-card shadow-lg scale-105'
-          : 'hover:ring-2 hover:ring-primary/50 hover:scale-105'
+          ? 'ring-[1.5px] ring-primary ring-offset-2 ring-offset-card shadow-lg scale-105'
+          : 'hover:ring-[1.5px] hover:ring-primary/50 hover:scale-105'
       )}
       onClick={() => onSelect(block.id, lessonId)}
     >
@@ -239,7 +239,7 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
 
                   {/* Expanded blocks */}
                   {isExpanded && (
-                    <div className="flex items-center gap-1.5 animate-in slide-in-from-left-5 duration-200">
+                    <div className="flex items-center gap-1.5 pl-1 animate-in slide-in-from-left-5 duration-200">
                       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(e) => {
                         onSelectLesson(lesson.id);
                         onReorderBlocks(e);
@@ -332,7 +332,7 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
 
                   {/* Separator between lessons */}
                   {lessonIndex < lessons.length - 1 && !isExpanded && (
-                    <div className="w-px h-8 bg-border" />
+                    <div className="w-px h-8 bg-border/50" />
                   )}
                 </div>
               );
