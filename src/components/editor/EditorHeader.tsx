@@ -420,15 +420,11 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
               hasUnsavedChanges ? "text-amber-500" : 
               lastSavedAt ? "text-emerald-500" : "text-muted-foreground"
             )} />
-            <div className="absolute -bottom-0.5 -right-0.5">
-              {isSaving ? (
-                <RefreshCw className="w-3 h-3 text-primary animate-spin" />
-              ) : hasUnsavedChanges ? (
-                <X className="w-3 h-3 text-amber-500" />
-              ) : lastSavedAt ? (
-                <Check className="w-3 h-3 text-emerald-500" />
-              ) : null}
-            </div>
+            {isSaving ? (
+              <RefreshCw className="w-3 h-3 text-primary animate-spin absolute bottom-0.5 right-0.5" />
+            ) : hasUnsavedChanges ? null : lastSavedAt ? (
+              <Check className="w-3 h-3 text-emerald-500 absolute bottom-0.5 right-0.5" />
+            ) : null}
           </div>
         </div>
 
