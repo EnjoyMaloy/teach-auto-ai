@@ -561,7 +561,7 @@ const Editor: React.FC = () => {
         />
 
         {/* Content area */}
-        <div className="flex-1 flex overflow-hidden relative bg-secondary/50 dark:bg-white/[0.02]">
+        <div className="flex-1 flex overflow-hidden relative bg-secondary/50 dark:bg-white/[0.02] p-3">
           {/* Preview area - full width */}
           <div className="flex-1 flex items-center justify-center overflow-hidden bg-background rounded-2xl">
             <div 
