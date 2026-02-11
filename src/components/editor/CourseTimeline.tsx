@@ -5,6 +5,11 @@ import { Block, BLOCK_CONFIGS, BlockType } from '@/types/blocks';
 import { DesignSystemConfig } from '@/types/designSystem';
 import { cn } from '@/lib/utils';
 import { MobilePreviewFrame } from './blocks/MobilePreviewFrame';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 const iconMap: Record<string, React.FC<{ className?: string }>> = {
   Heading, Type, Image, Play, Volume2, LayoutList,
@@ -19,7 +24,7 @@ interface CourseTimelineProps {
   onSelectLesson: (lessonId: string) => void;
   onSelectBlock: (blockId: string, lessonId: string) => void;
   onAddLesson: () => void;
-  onAddBlock: () => void;
+  onAddBlock: (type: BlockType) => void;
   slideToBlock: (slide: any) => Block;
   designSystem?: CourseDesignSystem | DesignSystemConfig;
 }
@@ -193,22 +198,48 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
                         );
                       })}
 
-                      {/* Add block button */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onSelectLesson(lesson.id);
-                          onAddBlock();
-                        }}
-                        className={cn(
-                          'flex-shrink-0 rounded-lg border-2 border-dashed border-border',
-                          'flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary',
-                          'transition-all duration-200 hover:bg-primary/5'
-                        )}
-                        style={{ width: THUMB_W, height: THUMB_H }}
-                      >
-                        <Plus className="w-6 h-6" />
-                      </button>
+                      {/* Add block button with popover */}
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onSelectLesson(lesson.id);
+                            }}
+                            className={cn(
+                              'flex-shrink-0 rounded-lg border-2 border-dashed border-border',
+                              'flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary',
+                              'transition-all duration-200 hover:bg-primary/5'
+                            )}
+                            style={{ width: THUMB_W, height: THUMB_H }}
+                          >
+                            <Plus className="w-6 h-6" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent 
+                          side="top" 
+                          align="center" 
+                          className="w-[280px] p-2"
+                          sideOffset={8}
+                        >
+                          <div className="grid grid-cols-4 gap-1">
+                            {Object.values(BLOCK_CONFIGS).map((config) => {
+                              const Icon = iconMap[config.icon as string];
+                              return (
+                                <button
+                                  key={config.type}
+                                  onClick={() => onAddBlock(config.type)}
+                                  className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                                  title={config.labelRu}
+                                >
+                                  {Icon && <Icon className="w-4 h-4" />}
+                                  <span className="text-[10px] leading-tight text-center truncate w-full">{config.labelRu}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   )}
 
