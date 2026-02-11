@@ -264,7 +264,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               )}
             >
-              <PanelLeft className="w-5 h-5" />
+              <PanelLeft className="w-4 h-4" />
             </button>
           )}
 
@@ -273,7 +273,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
-                  <button onClick={onBack} className="flex items-center">
+                  <button onClick={onBack} className="flex items-center p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
                     <Home className="w-4 h-4" />
                   </button>
                 </BreadcrumbLink>
