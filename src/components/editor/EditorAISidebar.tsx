@@ -84,26 +84,59 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     }
   };
 
+  const isQuizBlock = (type: string) => 
+    ['single_choice', 'multiple_choice', 'true_false', 'fill_blank', 'matching', 'ordering', 'slider'].includes(type);
+
   const handleEditBlock = async (prompt: string) => {
     if (!selectedBlock || !prompt.trim()) return;
     
     setIsEditingBlock(true);
     try {
-      const response = await supabase.functions.invoke('subblock-ai', {
-        body: {
-          message: prompt,
-          currentSubBlock: {
-            type: selectedBlock.type,
-            content: selectedBlock.content,
-          },
-          allSubBlocks: selectedBlock.subBlocks || [],
-        },
-      });
+      const isQuiz = isQuizBlock(selectedBlock.type);
+      
+      // Build request body based on block type
+      const body: Record<string, unknown> = { message: prompt };
+      
+      if (isQuiz) {
+        // Send full quiz block data
+        body.blockData = {
+          type: selectedBlock.type,
+          content: selectedBlock.content,
+          options: selectedBlock.options,
+          correctAnswer: selectedBlock.correctAnswer,
+          explanation: selectedBlock.explanation,
+          explanationCorrect: selectedBlock.explanationCorrect,
+          explanationPartial: selectedBlock.explanationPartial,
+          hints: selectedBlock.hints,
+          blankWord: selectedBlock.blankWord,
+          matchingPairs: selectedBlock.matchingPairs,
+          orderingItems: selectedBlock.orderingItems,
+          correctOrder: selectedBlock.correctOrder,
+          sliderMin: selectedBlock.sliderMin,
+          sliderMax: selectedBlock.sliderMax,
+          sliderCorrect: selectedBlock.sliderCorrect,
+          sliderStep: selectedBlock.sliderStep,
+        };
+      } else {
+        // Design block - send sub-blocks
+        body.currentSubBlock = {
+          type: selectedBlock.type,
+          content: selectedBlock.content,
+        };
+        body.allSubBlocks = selectedBlock.subBlocks || [];
+      }
+
+      const response = await supabase.functions.invoke('subblock-ai', { body });
 
       if (response.error) throw response.error;
 
       const result = response.data;
-      if (result.newBlocks && Array.isArray(result.newBlocks)) {
+      
+      if (isQuiz && result.blockUpdates) {
+        // Apply quiz field updates
+        onUpdateBlock(result.blockUpdates);
+      } else if (result.newBlocks && Array.isArray(result.newBlocks)) {
+        // Apply design sub-blocks
         onUpdateBlock({ subBlocks: result.newBlocks });
       }
     } catch (error) {
