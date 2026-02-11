@@ -129,7 +129,7 @@ const SortableBlockThumb: React.FC<{
     isDragging,
   } = useSortable({ id: block.id });
 
-  const style = {
+  const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
@@ -140,25 +140,19 @@ const SortableBlockThumb: React.FC<{
     <div
       ref={setNodeRef}
       style={style}
+      {...attributes}
+      {...listeners}
       className={cn(
-        'relative flex-shrink-0 rounded-lg cursor-pointer transition-all duration-200 overflow-hidden group',
+        'relative flex-shrink-0 rounded-lg cursor-grab active:cursor-grabbing transition-all duration-200',
         isSelected
           ? 'ring-2 ring-primary ring-offset-2 ring-offset-card shadow-lg scale-105'
           : 'hover:ring-2 hover:ring-primary/50 hover:scale-105'
       )}
       onClick={() => onSelect(block.id, lessonId)}
     >
-      {/* Drag handle */}
-      <div
-        {...attributes}
-        {...listeners}
-        className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
-      >
-        <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-background/90 shadow-sm">
-          <GripVertical className="w-3 h-3 text-muted-foreground" />
-        </div>
+      <div className="rounded-lg overflow-hidden">
+        <ScaledBlockThumbnail block={block} index={index} designSystem={designSystem} />
       </div>
-      <ScaledBlockThumbnail block={block} index={index} designSystem={designSystem} />
     </div>
   );
 };
