@@ -3,7 +3,7 @@ import {
   Sparkles, MessageSquare, Wand2, Loader2, Check, 
   AlertCircle, Search, Brain, Layers, BookOpen, CheckCircle2, 
   Image, Clock, RotateCcw, PartyPopper, Send, CornerDownLeft,
-  Plus, MousePointerClick, Palette, GraduationCap,
+  Plus, MousePointerClick, Palette, GraduationCap, Pencil,
   ImageOff, ImageIcon,
   icons as lucideIcons
 } from 'lucide-react';
@@ -533,23 +533,25 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                 <button
                   onClick={() => toggleMode('generate')}
                   className={cn(
-                    "px-2.5 py-1 rounded-lg text-xs font-medium transition-all",
+                    "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all",
                     mode === 'generate'
                       ? "bg-primary/15 text-primary"
                       : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
                   )}
                 >
+                  <GraduationCap className="w-3.5 h-3.5" />
                   Создать курс
                 </button>
                 <button
                   onClick={() => toggleMode('edit-block')}
                   className={cn(
-                    "px-2.5 py-1 rounded-lg text-xs font-medium transition-all",
+                    "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all",
                     mode === 'edit-block'
                       ? "bg-primary/15 text-primary"
                       : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
                   )}
                 >
+                  <Pencil className="w-3.5 h-3.5" />
                   Ред. блок
                 </button>
               </div>
