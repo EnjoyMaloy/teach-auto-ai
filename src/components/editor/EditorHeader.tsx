@@ -305,21 +305,23 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
           <div className="w-px h-5 bg-border/50 ml-1" />
 
-          {/* Design & Map buttons */}
+          {/* Design & Map buttons - icon only */}
           <button 
             onClick={() => setShowDesignSystem(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            title="Дизайн"
           >
-            <Palette className="w-3.5 h-3.5" />
-            Дизайн
+            <Palette className="w-4 h-4" />
           </button>
 
           {onUpdateLessonsDisplayType && (
             <Popover open={showMapSettings} onOpenChange={setShowMapSettings}>
               <PopoverTrigger asChild>
-                <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
-                  <Map className="w-3.5 h-3.5" />
-                  Карта
+                <button 
+                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  title="Карта"
+                >
+                  <Map className="w-4 h-4" />
                 </button>
               </PopoverTrigger>
               <PopoverContent 
@@ -358,8 +360,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           )}
         </div>
 
-        {/* Center section - Undo/Redo */}
-        <div className="flex items-center gap-0.5 shrink-0">
+        {/* Center section - Undo/Redo + Sound + Cloud */}
+        <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={onUndo}
             disabled={!canUndo}
@@ -374,29 +376,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           >
             <Redo2 className="w-4 h-4" />
           </button>
-        </div>
 
-        {/* Right section */}
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Cloud save status - icon only */}
-          <div className="relative flex items-center justify-center w-8 h-8">
-            <Cloud className={cn(
-              "w-5 h-5 transition-colors",
-              isSaving ? "text-muted-foreground" : 
-              hasUnsavedChanges ? "text-amber-500" : 
-              lastSavedAt ? "text-emerald-500" : "text-muted-foreground"
-            )} />
-            {/* Status indicator */}
-            <div className="absolute -bottom-0.5 -right-0.5">
-              {isSaving ? (
-                <RefreshCw className="w-3 h-3 text-primary animate-spin" />
-              ) : hasUnsavedChanges ? (
-                <X className="w-3 h-3 text-amber-500" />
-              ) : lastSavedAt ? (
-                <Check className="w-3 h-3 text-emerald-500" />
-              ) : null}
-            </div>
-          </div>
+          <div className="w-px h-5 bg-border/50 mx-1" />
 
           {onToggleMute && (
             <button
@@ -412,7 +393,28 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
             </button>
           )}
 
-          <div className="w-px h-5 bg-border/50" />
+          {/* Cloud save status */}
+          <div className="relative flex items-center justify-center w-8 h-8">
+            <Cloud className={cn(
+              "w-5 h-5 transition-colors",
+              isSaving ? "text-muted-foreground" : 
+              hasUnsavedChanges ? "text-amber-500" : 
+              lastSavedAt ? "text-emerald-500" : "text-muted-foreground"
+            )} />
+            <div className="absolute -bottom-0.5 -right-0.5">
+              {isSaving ? (
+                <RefreshCw className="w-3 h-3 text-primary animate-spin" />
+              ) : hasUnsavedChanges ? (
+                <X className="w-3 h-3 text-amber-500" />
+              ) : lastSavedAt ? (
+                <Check className="w-3 h-3 text-emerald-500" />
+              ) : null}
+            </div>
+          </div>
+        </div>
+
+        {/* Right section */}
+        <div className="flex items-center gap-2 shrink-0">
 
           <button 
             onClick={onPreview}
