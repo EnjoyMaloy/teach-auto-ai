@@ -145,8 +145,8 @@ const SortableBlockThumb: React.FC<{
       className={cn(
         'relative flex-shrink-0 rounded-lg cursor-grab active:cursor-grabbing transition-all duration-200',
         isSelected
-          ? 'ring-[1.5px] ring-primary ring-offset-1 ring-offset-background shadow-lg scale-105'
-          : 'hover:ring-[1.5px] hover:ring-primary/50 hover:scale-105'
+          ? 'ring-[1.5px] ring-blue-400 ring-offset-1 ring-offset-background shadow-lg scale-105'
+          : 'hover:ring-[1.5px] hover:ring-blue-400/50 hover:scale-105'
       )}
       onClick={() => onSelect(block.id, lessonId)}
     >
