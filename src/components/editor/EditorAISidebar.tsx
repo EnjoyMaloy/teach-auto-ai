@@ -143,9 +143,9 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       {/* Header - Logo mark */}
       <div className="flex items-center px-4 py-3">
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[hsl(265,60%,75%)] to-[hsl(265,60%,65%)] flex items-center justify-center">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10.2 1.5H5.2L2 13H4.2L4.95 10.3L5.55 8.2L6.7 3.9H9.7L10.85 8.2L11.45 10.3L12.2 13H14.4L10.2 1.5Z" fill="white"/>
-            <path d="M8.8 7.2H6.6V9.4H8.8V7.2Z" fill="white"/>
+          <svg width="14" height="14" viewBox="0 1.5 15.22 15.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.0069 1.94165H4.21278L0 16.8103H2.95308L3.94432 13.2583L4.74971 10.4911L6.29852 4.70887H8.92119L10.4494 10.4911L11.2754 13.2583L12.2666 16.8103H15.2197L11.0069 1.94165Z" fill="white"/>
+            <path d="M9.06607 9.31335H6.1543V12.2251H9.06607V9.31335Z" fill="white"/>
           </svg>
         </div>
       </div>
