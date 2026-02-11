@@ -561,59 +561,44 @@ const Editor: React.FC = () => {
         />
 
         {/* Content area */}
-        <div className="flex-1 flex overflow-hidden">
-          {/* Preview + Block Editor row */}
-          <div className="flex-1 flex overflow-hidden">
-            {/* Mobile Preview - centered */}
-            <div className="flex-1 flex items-center justify-center overflow-hidden bg-background py-3">
-              <div 
-                className="h-full overflow-hidden"
-                style={{ 
-                  aspectRatio: '9/16',
-                  maxHeight: '100%',
-                }}
-              >
-                <MobilePreviewFrame
-                  block={selectedBlock}
-                  lessonTitle={selectedLesson?.title}
-                  blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
-                  totalBlocks={blocks.length}
-                  onContinue={handleContinueToNextBlock}
-                  onUpdateBlock={handleUpdateBlock}
-                  designSystem={course.designSystem}
-                  isMuted={isPreviewMuted}
-                  selectedSubBlockId={selectedSubBlockId}
-                  onSelectSubBlock={setSelectedSubBlockId}
-                />
-              </div>
-            </div>
-
-            {/* Right: Block Editor - fixed width */}
-            <div className="hidden md:flex w-[380px] shrink-0 flex-col border-l border-border/5 dark:border-transparent bg-secondary/50 dark:bg-white/[0.02] overflow-hidden">
-              {selectedBlock ? (
-                <BlockEditor
-                  block={selectedBlock}
-                  onUpdate={handleUpdateBlock}
-                  onDelete={handleDeleteBlock}
-                  selectedSubBlockId={selectedSubBlockId}
-                  onSelectSubBlock={setSelectedSubBlockId}
-                  themeBackgrounds={(course.designSystem as any)?.themeBackgrounds || []}
-                />
-              ) : (
-                <div className="h-full flex items-center justify-center p-8 text-center">
-                  <div>
-                    <div className="w-20 h-20 rounded-3xl bg-muted mx-auto mb-5 flex items-center justify-center">
-                      <Smartphone className="w-10 h-10 text-muted-foreground" />
-                    </div>
-                    <p className="text-foreground font-medium mb-2">Редактор блока</p>
-                    <p className="text-sm text-muted-foreground">
-                      Выберите блок снизу для редактирования
-                    </p>
-                  </div>
-                </div>
-              )}
+        <div className="flex-1 flex overflow-hidden relative">
+          {/* Preview area - full width */}
+          <div className="flex-1 flex items-center justify-center overflow-hidden bg-background py-3">
+            <div 
+              className="h-full overflow-hidden"
+              style={{ 
+                aspectRatio: '9/16',
+                maxHeight: '100%',
+              }}
+            >
+              <MobilePreviewFrame
+                block={selectedBlock}
+                lessonTitle={selectedLesson?.title}
+                blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
+                totalBlocks={blocks.length}
+                onContinue={handleContinueToNextBlock}
+                onUpdateBlock={handleUpdateBlock}
+                designSystem={course.designSystem}
+                isMuted={isPreviewMuted}
+                selectedSubBlockId={selectedSubBlockId}
+                onSelectSubBlock={setSelectedSubBlockId}
+              />
             </div>
           </div>
+
+          {/* Right: Block Editor - floating overlay */}
+          {selectedBlock && (
+            <div className="hidden md:flex absolute right-3 top-3 bottom-3 w-[380px] flex-col rounded-2xl bg-secondary/80 dark:bg-[#1a1a1f]/95 backdrop-blur-xl shadow-xl dark:shadow-black/30 overflow-hidden z-10 border border-border/10 dark:border-white/[0.06]">
+              <BlockEditor
+                block={selectedBlock}
+                onUpdate={handleUpdateBlock}
+                onDelete={handleDeleteBlock}
+                selectedSubBlockId={selectedSubBlockId}
+                onSelectSubBlock={setSelectedSubBlockId}
+                themeBackgrounds={(course.designSystem as any)?.themeBackgrounds || []}
+              />
+            </div>
+          )}
         </div>
 
         {/* Bottom: Course Timeline */}
