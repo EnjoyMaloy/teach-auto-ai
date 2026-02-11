@@ -136,7 +136,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   return (
     <div 
       className={cn(
-        "h-full flex flex-col border-r border-border/5 dark:border-transparent bg-secondary/50 dark:bg-background/95 backdrop-blur-sm transition-all duration-300 ease-out overflow-hidden",
+        "h-full flex flex-col border-r border-border/5 dark:border-transparent bg-secondary/50 dark:bg-white/[0.02] backdrop-blur-sm transition-all duration-300 ease-out overflow-hidden",
         isOpen ? "w-[380px]" : "w-0"
       )}
     >
