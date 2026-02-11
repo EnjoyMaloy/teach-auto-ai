@@ -566,29 +566,26 @@ const Editor: React.FC = () => {
           {/* Preview + Block Editor row */}
           <div className="flex-1 flex overflow-hidden">
             {/* Mobile Preview - centered */}
-            <div className="flex-1 flex flex-col overflow-hidden bg-muted/30">
-              {/* Mobile frame container */}
-              <div className="flex-1 flex items-center justify-center overflow-hidden p-4">
-                <div 
-                  className="h-full overflow-hidden rounded-2xl shadow-xl"
-                  style={{ 
-                    aspectRatio: '9/16',
-                    maxHeight: '100%',
-                  }}
-                >
-                  <MobilePreviewFrame
-                    block={selectedBlock}
-                    lessonTitle={selectedLesson?.title}
-                    blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
-                    totalBlocks={blocks.length}
-                    onContinue={handleContinueToNextBlock}
-                    onUpdateBlock={handleUpdateBlock}
-                    designSystem={course.designSystem}
-                    isMuted={isPreviewMuted}
-                    selectedSubBlockId={selectedSubBlockId}
-                    onSelectSubBlock={setSelectedSubBlockId}
-                  />
-                </div>
+            <div className="flex-1 flex items-center justify-center overflow-hidden bg-muted/30">
+              <div 
+                className="h-full overflow-hidden"
+                style={{ 
+                  aspectRatio: '9/16',
+                  maxHeight: '100%',
+                }}
+              >
+                <MobilePreviewFrame
+                  block={selectedBlock}
+                  lessonTitle={selectedLesson?.title}
+                  blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
+                  totalBlocks={blocks.length}
+                  onContinue={handleContinueToNextBlock}
+                  onUpdateBlock={handleUpdateBlock}
+                  designSystem={course.designSystem}
+                  isMuted={isPreviewMuted}
+                  selectedSubBlockId={selectedSubBlockId}
+                  onSelectSubBlock={setSelectedSubBlockId}
+                />
               </div>
             </div>
 
