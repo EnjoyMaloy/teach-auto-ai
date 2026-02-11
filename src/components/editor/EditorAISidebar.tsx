@@ -140,13 +140,13 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
         isOpen ? "w-[380px]" : "w-0"
       )}
     >
-      {/* Header */}
+      {/* Header - Logo mark */}
       <div className="flex items-center px-4 py-3">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-ai flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-semibold text-foreground">AI Помощник</span>
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[hsl(265,60%,75%)] to-[hsl(265,60%,65%)] flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10.2 1.5H5.2L2 13H4.2L4.95 10.3L5.55 8.2L6.7 3.9H9.7L10.85 8.2L11.45 10.3L12.2 13H14.4L10.2 1.5Z" fill="white"/>
+            <path d="M8.8 7.2H6.6V9.4H8.8V7.2Z" fill="white"/>
+          </svg>
         </div>
       </div>
 
