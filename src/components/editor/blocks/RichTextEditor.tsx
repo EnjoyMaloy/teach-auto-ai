@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useId } from 'react';
+import React, { useEffect, useState, useId, useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Highlight from '@tiptap/extension-highlight';
@@ -143,7 +143,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     content: content || '',
     editable: isEditing,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      if (!isSettingContentRef.current) {
+        onChange(editor.getHTML());
+      }
     },
     editorProps: {
       attributes: {
@@ -157,10 +159,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     },
   });
 
+  const isSettingContentRef = useRef(false);
+
   // Update content when prop changes externally
   useEffect(() => {
     if (editor && content !== editor.getHTML()) {
+      isSettingContentRef.current = true;
       editor.commands.setContent(content || '');
+      isSettingContentRef.current = false;
     }
   }, [content, editor]);
 
