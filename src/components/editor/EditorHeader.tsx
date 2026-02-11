@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { 
   Undo2, Redo2, Eye, 
   Share2, Check, X, Palette, Map,
-  Cloud, RefreshCw, PanelLeft, Volume2, VolumeX, Home
+  Cloud, RefreshCw, PanelLeft, Volume2, VolumeX, Home, Sun, Moon
 } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { Course, Lesson, LessonsDisplayType } from '@/types/course';
 import { DesignSystemConfig } from '@/types/designSystem';
 import { Button } from '@/components/ui/button';
@@ -74,6 +75,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   onBack,
 }) => {
   const { isAdmin } = useUserRole();
+  const { theme, setTheme } = useTheme();
   const { state: aiState, isDialogOpen, setDialogOpen, showCompletionFlash } = useAIGeneration();
   
   const [isEditing, setIsEditing] = useState(false);
@@ -419,7 +421,20 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                 <Volume2 className="w-4 h-4" />
               )}
             </button>
-          )}
+           )}
+
+          {/* Theme toggle */}
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+          >
+            {theme === 'dark' ? (
+              <Sun className="w-4 h-4" />
+            ) : (
+              <Moon className="w-4 h-4" />
+            )}
+          </button>
 
           {/* Cloud save status */}
           <div className="relative flex items-center justify-center w-8 h-8">
