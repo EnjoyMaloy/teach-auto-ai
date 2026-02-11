@@ -860,7 +860,7 @@ const SubBlockSelector: React.FC<{
   
   if (inline) {
     return (
-      <div className="flex flex-col gap-1 py-2 border-t border-border mt-4">
+      <div className="flex flex-col gap-1 py-2 border-t border-border/10 mt-4">
         <p className="text-xs text-muted-foreground mb-2 px-1">Добавить элемент:</p>
         {types.map((config) => {
           const IconComponent = iconMap[config.icon as keyof typeof iconMap];
@@ -871,10 +871,15 @@ const SubBlockSelector: React.FC<{
                 onSelectType(config.type);
                 onClose();
               }}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-muted transition-colors text-left w-full"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/50 transition-colors text-left w-full"
             >
-              {IconComponent && <IconComponent className="w-4 h-4 text-primary flex-shrink-0" />}
-              <span className="text-sm">{config.labelRu}</span>
+              <div className="w-9 h-9 rounded-lg bg-muted/50 flex items-center justify-center flex-shrink-0">
+                {IconComponent && <IconComponent className="w-4 h-4 text-muted-foreground" />}
+              </div>
+              <div>
+                <span className="text-sm font-medium text-foreground">{config.labelRu}</span>
+                <p className="text-[11px] text-muted-foreground">{config.description || ''}</p>
+              </div>
             </button>
           );
         })}
@@ -883,7 +888,7 @@ const SubBlockSelector: React.FC<{
   }
   
   return (
-    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card border border-border rounded-xl shadow-lg p-3 z-50 min-w-[260px]">
+    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-background border border-border/10 rounded-xl shadow-lg p-3 z-50 min-w-[260px]">
       <div className="grid grid-cols-2 gap-1.5">
         {types.map((config) => {
           const IconComponent = iconMap[config.icon as keyof typeof iconMap];
