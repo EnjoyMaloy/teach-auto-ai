@@ -566,7 +566,7 @@ const Editor: React.FC = () => {
           {/* Preview + Block Editor row */}
           <div className="flex-1 flex overflow-hidden">
             {/* Mobile Preview - centered */}
-            <div className="flex-1 flex items-center justify-center overflow-hidden bg-muted/30 py-3">
+            <div className="flex-1 flex items-center justify-center overflow-hidden bg-background dark:bg-[#0f0f12] py-3">
               <div 
                 className="h-full overflow-hidden"
                 style={{ 
