@@ -28,7 +28,6 @@ import { CoursePlayer } from '@/components/runtime/CoursePlayer';
 
 import { 
   BlockPreview, 
-  BlockTypeSelector, 
   MobilePreviewFrame, 
   BlockEditor 
 } from '@/components/editor/blocks';
@@ -116,7 +115,7 @@ const Editor: React.FC = () => {
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [selectedSubBlockId, setSelectedSubBlockId] = useState<string | null>(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
-  const [showBlockSelector, setShowBlockSelector] = useState(false);
+  const [showBlockSelector, setShowBlockSelector] = useState(false); // kept for potential use
   const [undoStack, setUndoStack] = useState<Course[]>([]);
   const [redoStack, setRedoStack] = useState<Course[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -628,19 +627,11 @@ const Editor: React.FC = () => {
             setSelectedBlockId(blockId);
           }}
           onAddLesson={handleAddLesson}
-          onAddBlock={() => setShowBlockSelector(true)}
+          onAddBlock={handleAddBlock}
           slideToBlock={slideToBlock}
           designSystem={course.designSystem}
         />
       </div>
-
-      {/* Block Type Selector Modal */}
-      {showBlockSelector && (
-        <BlockTypeSelector
-          onSelect={handleAddBlock}
-          onClose={() => setShowBlockSelector(false)}
-        />
-      )}
     </div>
     </TextEditorProvider>
   );
