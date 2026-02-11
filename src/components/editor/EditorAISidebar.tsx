@@ -4,7 +4,8 @@ import {
   AlertCircle, Search, Brain, Layers, BookOpen, CheckCircle2, 
   Image, Clock, RotateCcw, PartyPopper, Send, CornerDownLeft,
   Plus, MousePointerClick, Palette, GraduationCap,
-  ImageOff, ImageIcon
+  ImageOff, ImageIcon,
+  icons as lucideIcons
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -237,11 +238,18 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           {/* Edit block mode - block selected */}
           {mode === 'edit-block' && selectedBlock && !isGenerating && (
             <div className="space-y-3">
-              <div className="p-3 rounded-xl bg-muted/50 border border-border/30">
-                <p className="text-xs text-muted-foreground mb-0.5">Выбранный блок:</p>
-                <p className="font-medium text-foreground text-sm">
-                  {BLOCK_CONFIGS[selectedBlock.type]?.labelRu || selectedBlock.type}
-                </p>
+              <div className="p-3 rounded-xl bg-muted/50 border border-border/10">
+                <p className="text-xs text-muted-foreground mb-1">Выбранный блок:</p>
+                <div className="flex items-center gap-2">
+                  {(() => {
+                    const iconName = BLOCK_CONFIGS[selectedBlock.type]?.icon;
+                    const IconComp = iconName ? lucideIcons[iconName as keyof typeof lucideIcons] : null;
+                    return IconComp ? <IconComp className="w-4 h-4 text-muted-foreground flex-shrink-0" /> : null;
+                  })()}
+                  <p className="font-medium text-foreground text-sm">
+                    {BLOCK_CONFIGS[selectedBlock.type]?.labelRu || selectedBlock.type}
+                  </p>
+                </div>
               </div>
               {isEditingBlock && (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground p-3">
