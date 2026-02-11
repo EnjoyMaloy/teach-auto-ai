@@ -219,24 +219,48 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
                         <PopoverContent 
                           side="top" 
                           align="center" 
-                          className="w-[280px] p-2"
+                          className="w-[280px] p-2 space-y-2"
                           sideOffset={8}
                         >
-                          <div className="grid grid-cols-4 gap-1">
-                            {Object.values(BLOCK_CONFIGS).map((config) => {
-                              const Icon = iconMap[config.icon as string];
-                              return (
-                                <button
-                                  key={config.type}
-                                  onClick={() => onAddBlock(config.type)}
-                                  className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-                                  title={config.labelRu}
-                                >
-                                  {Icon && <Icon className="w-4 h-4" />}
-                                  <span className="text-[10px] leading-tight text-center truncate w-full">{config.labelRu}</span>
-                                </button>
-                              );
-                            })}
+                          {/* Контент */}
+                          <div>
+                            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-1 mb-1">Контент</p>
+                            <div className="grid grid-cols-4 gap-1">
+                              {Object.values(BLOCK_CONFIGS).filter(c => c.category === 'content').map((config) => {
+                                const Icon = iconMap[config.icon as string];
+                                return (
+                                  <button
+                                    key={config.type}
+                                    onClick={() => onAddBlock(config.type)}
+                                    className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                                    title={config.labelRu}
+                                  >
+                                    {Icon && <Icon className="w-4 h-4" />}
+                                    <span className="text-[10px] leading-tight text-center truncate w-full">{config.labelRu}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                          {/* Интерактивные */}
+                          <div className="border-t border-border pt-2">
+                            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-1 mb-1">Интерактивные</p>
+                            <div className="grid grid-cols-4 gap-1">
+                              {Object.values(BLOCK_CONFIGS).filter(c => c.category === 'interactive').map((config) => {
+                                const Icon = iconMap[config.icon as string];
+                                return (
+                                  <button
+                                    key={config.type}
+                                    onClick={() => onAddBlock(config.type)}
+                                    className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                                    title={config.labelRu}
+                                  >
+                                    {Icon && <Icon className="w-4 h-4" />}
+                                    <span className="text-[10px] leading-tight text-center truncate w-full">{config.labelRu}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
                           </div>
                         </PopoverContent>
                       </Popover>
