@@ -1725,13 +1725,10 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
     <div 
       ref={containerRef}
       className="h-full w-full overflow-hidden flex items-center justify-center"
-      style={{ 
-        backgroundColor: `hsl(${ds.mutedColor} / 0.2)`,
-      }}
     >
       {/* Inner container with fixed dimensions, scaled to fit using CSS zoom for crisp rendering */}
       <div 
-        className="flex flex-col overflow-hidden rounded-3xl"
+        className="flex flex-col overflow-hidden"
         style={{ 
           fontFamily: ds.fontFamily,
           // Fixed internal dimensions (mobile screen size)
