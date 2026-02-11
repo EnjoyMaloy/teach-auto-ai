@@ -294,21 +294,10 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                       value={editedTitle}
                       onChange={(e) => setEditedTitle(e.target.value)}
                       onKeyDown={handleKeyDown}
+                      onBlur={handleSaveTitle}
                       className="h-7 w-48 text-sm border-border/50"
                       autoFocus
                     />
-                    <button
-                      onClick={handleSaveTitle}
-                      className="p-1.5 rounded-md text-emerald-600 hover:bg-emerald-500/10"
-                    >
-                      <Check className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={handleCancelEditing}
-                      className="p-1.5 rounded-md text-muted-foreground hover:bg-muted"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
                   </div>
                 ) : (
                   <BreadcrumbPage>
