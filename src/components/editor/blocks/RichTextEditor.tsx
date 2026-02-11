@@ -166,7 +166,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     if (editor && content !== editor.getHTML()) {
       isSettingContentRef.current = true;
       editor.commands.setContent(content || '');
-      isSettingContentRef.current = false;
+      // Use requestAnimationFrame to ensure the flag stays true through async onUpdate
+      requestAnimationFrame(() => {
+        isSettingContentRef.current = false;
+      });
     }
   }, [content, editor]);
 
