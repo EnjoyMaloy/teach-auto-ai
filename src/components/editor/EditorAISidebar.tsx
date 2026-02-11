@@ -3,7 +3,8 @@ import {
   Sparkles, MessageSquare, Wand2, Loader2, Check, 
   AlertCircle, Search, Brain, Layers, BookOpen, CheckCircle2, 
   Image, Clock, RotateCcw, PartyPopper, Send, CornerDownLeft,
-  Plus, MousePointerClick
+  Plus, MousePointerClick, Palette, GraduationCap,
+  ImageOff, ImageIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -14,6 +15,7 @@ import { Block, BLOCK_CONFIGS } from '@/types/blocks';
 import { Lesson, CourseDesignSystem } from '@/types/course';
 import { useAIGeneration, GenerationStep, getGenerationDuration } from '@/hooks/useAIGeneration';
 import { supabase } from '@/integrations/supabase/client';
+import { useBaseDesignSystems } from '@/hooks/useBaseDesignSystems';
 
 interface EditorAISidebarProps {
   isOpen: boolean;
@@ -40,7 +42,12 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   const [chatInput, setChatInput] = useState('');
   const [isEditingBlock, setIsEditingBlock] = useState(false);
   const [localSkipImages, setLocalSkipImages] = useState(false);
+  const [selectedDesignSystemId, setSelectedDesignSystemId] = useState<string | null>(null);
+  const [lessonCount, setLessonCount] = useState(3);
+  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  const { systems: designSystems, isLoading: isLoadingDS } = useBaseDesignSystems();
 
   const {
     state,
@@ -247,16 +254,117 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
 
           {/* Generate mode - pre-generation settings */}
           {mode === 'generate' && !isGenerating && !isCompleted && !isError && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 px-1">
-                <Checkbox
-                  id="skipImages"
-                  checked={localSkipImages}
-                  onCheckedChange={(checked) => setLocalSkipImages(checked === true)}
-                />
-                <Label htmlFor="skipImages" className="text-sm text-muted-foreground cursor-pointer">
-                  Быстрый режим (без иллюстраций)
-                </Label>
+            <div className="space-y-4 px-1">
+              {/* Design System selector */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <Palette className="w-3.5 h-3.5" />
+                  Дизайн-система
+                </div>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {designSystems.map((ds) => (
+                    <button
+                      key={ds.id}
+                      onClick={() => setSelectedDesignSystemId(
+                        selectedDesignSystemId === ds.id ? null : ds.id
+                      )}
+                      className={cn(
+                        "px-3 py-2 rounded-xl text-xs font-medium transition-all text-left truncate border",
+                        selectedDesignSystemId === ds.id
+                          ? "bg-primary/10 border-primary/30 text-primary"
+                          : "bg-muted/30 border-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                      )}
+                    >
+                      {ds.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Illustrations toggle */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <ImageIcon className="w-3.5 h-3.5" />
+                  Иллюстрации
+                </div>
+                <div className="flex gap-1.5">
+                  <button
+                    onClick={() => setLocalSkipImages(false)}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all border",
+                      !localSkipImages
+                        ? "bg-primary/10 border-primary/30 text-primary"
+                        : "bg-muted/30 border-transparent text-muted-foreground hover:bg-muted/50"
+                    )}
+                  >
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    С картинками
+                  </button>
+                  <button
+                    onClick={() => setLocalSkipImages(true)}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all border",
+                      localSkipImages
+                        ? "bg-primary/10 border-primary/30 text-primary"
+                        : "bg-muted/30 border-transparent text-muted-foreground hover:bg-muted/50"
+                    )}
+                  >
+                    <ImageOff className="w-3.5 h-3.5" />
+                    Быстро
+                  </button>
+                </div>
+              </div>
+
+              {/* Lesson count */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <BookOpen className="w-3.5 h-3.5" />
+                  Кол-во уроков
+                </div>
+                <div className="flex gap-1.5">
+                  {[1, 2, 3, 5, 7].map((count) => (
+                    <button
+                      key={count}
+                      onClick={() => setLessonCount(count)}
+                      className={cn(
+                        "flex-1 py-2 rounded-xl text-xs font-medium transition-all border",
+                        lessonCount === count
+                          ? "bg-primary/10 border-primary/30 text-primary"
+                          : "bg-muted/30 border-transparent text-muted-foreground hover:bg-muted/50"
+                      )}
+                    >
+                      {count}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Difficulty */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <GraduationCap className="w-3.5 h-3.5" />
+                  Сложность
+                </div>
+                <div className="flex gap-1.5">
+                  {([
+                    { value: 'easy' as const, label: 'Лёгкая' },
+                    { value: 'medium' as const, label: 'Средняя' },
+                    { value: 'hard' as const, label: 'Сложная' },
+                  ]).map((d) => (
+                    <button
+                      key={d.value}
+                      onClick={() => setDifficulty(d.value)}
+                      className={cn(
+                        "flex-1 py-2 rounded-xl text-xs font-medium transition-all border",
+                        difficulty === d.value
+                          ? "bg-primary/10 border-primary/30 text-primary"
+                          : "bg-muted/30 border-transparent text-muted-foreground hover:bg-muted/50"
+                      )}
+                    >
+                      {d.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           )}
