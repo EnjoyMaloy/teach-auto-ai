@@ -141,7 +141,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border/5">
+      <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-ai flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-white" />
@@ -454,7 +454,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
 
       {/* Bottom input for chat mode */}
       {mode === 'chat' && !isGenerating && !isCompleted && (
-        <div className="p-4 border-t border-border">
+        <div className="p-4">
           <div className="relative">
             <Textarea
               value={chatInput}
