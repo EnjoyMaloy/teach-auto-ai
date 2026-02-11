@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
-import { Plus, Play, Volume2, Heading, Type, Image, LayoutList, CircleDot, CheckSquare, ToggleLeft, PenLine, Link2, ListOrdered, SlidersHorizontal, Layers } from 'lucide-react';
+import { Plus, Play, Volume2, Heading, Type, Image, LayoutList, CircleDot, CheckSquare, ToggleLeft, PenLine, Link2, ListOrdered, SlidersHorizontal, Layers, GripVertical } from 'lucide-react';
 import { Lesson, CourseDesignSystem } from '@/types/course';
 import { Block, BLOCK_CONFIGS, BlockType } from '@/types/blocks';
 import { DesignSystemConfig } from '@/types/designSystem';
@@ -10,6 +10,20 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  horizontalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const iconMap: Record<string, React.FC<{ className?: string }>> = {
   Heading, Type, Image, Play, Volume2, LayoutList,
@@ -25,6 +39,7 @@ interface CourseTimelineProps {
   onSelectBlock: (blockId: string, lessonId: string) => void;
   onAddLesson: () => void;
   onAddBlock: (type: BlockType) => void;
+  onReorderBlocks: (event: DragEndEvent) => void;
   slideToBlock: (slide: any) => Block;
   designSystem?: CourseDesignSystem | DesignSystemConfig;
 }
@@ -96,6 +111,59 @@ const ScaledBlockThumbnail = memo<{
 
 ScaledBlockThumbnail.displayName = 'ScaledBlockThumbnail';
 
+// Sortable wrapper for block thumbnails
+const SortableBlockThumb: React.FC<{
+  block: Block;
+  index: number;
+  isSelected: boolean;
+  lessonId: string;
+  onSelect: (blockId: string, lessonId: string) => void;
+  designSystem?: CourseDesignSystem | DesignSystemConfig;
+}> = ({ block, index, isSelected, lessonId, onSelect, designSystem }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: block.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : undefined,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        'relative flex-shrink-0 rounded-lg cursor-pointer transition-all duration-200 overflow-hidden group',
+        isSelected
+          ? 'ring-2 ring-primary ring-offset-2 ring-offset-card shadow-lg scale-105'
+          : 'hover:ring-2 hover:ring-primary/50 hover:scale-105'
+      )}
+      onClick={() => onSelect(block.id, lessonId)}
+    >
+      {/* Drag handle */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
+      >
+        <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-background/90 shadow-sm">
+          <GripVertical className="w-3 h-3 text-muted-foreground" />
+        </div>
+      </div>
+      <ScaledBlockThumbnail block={block} index={index} designSystem={designSystem} />
+    </div>
+  );
+};
+
+
 export const CourseTimeline: React.FC<CourseTimelineProps> = ({
   lessons,
   selectedLessonId,
@@ -104,9 +172,13 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
   onSelectBlock,
   onAddLesson,
   onAddBlock,
+  onReorderBlocks,
   slideToBlock,
   designSystem,
 }) => {
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  );
   const [expandedLessonId, setExpandedLessonId] = useState<string | null>(selectedLessonId);
   const scrollRef = useRef<HTMLDivElement>(null);
   const selectedBlockRef = useRef<HTMLDivElement>(null);
@@ -174,29 +246,26 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
                   {/* Expanded blocks */}
                   {isExpanded && (
                     <div className="flex items-center gap-1.5 animate-in slide-in-from-left-5 duration-200">
-                      {blocks.map((block, blockIndex) => {
-                        const isSelected = selectedBlockId === block.id;
-
-                        return (
-                          <div
-                            key={block.id}
-                            ref={isSelected ? selectedBlockRef : null}
-                            onClick={() => onSelectBlock(block.id, lesson.id)}
-                            className={cn(
-                              'relative flex-shrink-0 rounded-lg cursor-pointer transition-all duration-200 overflow-hidden',
-                              isSelected
-                                ? 'ring-2 ring-primary ring-offset-2 ring-offset-card shadow-lg scale-105'
-                                : 'hover:ring-2 hover:ring-primary/50 hover:scale-105'
-                            )}
-                          >
-                            <ScaledBlockThumbnail 
-                              block={block} 
-                              index={blockIndex} 
-                              designSystem={designSystem}
-                            />
+                      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(e) => {
+                        onSelectLesson(lesson.id);
+                        onReorderBlocks(e);
+                      }}>
+                        <SortableContext items={blocks.map(b => b.id)} strategy={horizontalListSortingStrategy}>
+                          <div className="flex items-center gap-1.5">
+                            {blocks.map((block, blockIndex) => (
+                              <SortableBlockThumb
+                                key={block.id}
+                                block={block}
+                                index={blockIndex}
+                                isSelected={selectedBlockId === block.id}
+                                lessonId={lesson.id}
+                                onSelect={onSelectBlock}
+                                designSystem={designSystem}
+                              />
+                            ))}
                           </div>
-                        );
-                      })}
+                        </SortableContext>
+                      </DndContext>
 
                       {/* Add block button with popover */}
                       <Popover>
