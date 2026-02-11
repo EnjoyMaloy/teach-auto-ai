@@ -120,7 +120,7 @@ const Editor: React.FC = () => {
   const [undoStack, setUndoStack] = useState<Course[]>([]);
   const [redoStack, setRedoStack] = useState<Course[]>([]);
   const [isSaving, setIsSaving] = useState(false);
-  const [isPreviewMuted, setIsPreviewMuted] = useState(false);
+  const [isPreviewMuted, setIsPreviewMuted] = useState(true);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
@@ -528,6 +528,8 @@ const Editor: React.FC = () => {
           hasUnsavedChanges={hasUnsavedChanges}
           lastSavedAt={lastSavedAt}
           isAISidebarOpen={isAISidebarOpen}
+          isPreviewMuted={isPreviewMuted}
+          onToggleMute={() => setIsPreviewMuted(!isPreviewMuted)}
           onToggleAISidebar={() => setIsAISidebarOpen(!isAISidebarOpen)}
           onUndo={handleUndo}
           onRedo={handleRedo}
@@ -565,29 +567,6 @@ const Editor: React.FC = () => {
           <div className="flex-1 flex overflow-hidden">
             {/* Mobile Preview - centered */}
             <div className="flex-1 flex flex-col overflow-hidden bg-muted/30">
-              {/* Preview header */}
-              <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card shrink-0">
-                <span className="text-sm font-medium text-muted-foreground">Fast View</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsPreviewMuted(!isPreviewMuted)}
-                  className="gap-2"
-                >
-                  {isPreviewMuted ? (
-                    <>
-                      <VolumeX className="w-4 h-4" />
-                      <span className="text-xs">Звук выкл</span>
-                    </>
-                  ) : (
-                    <>
-                      <Volume2 className="w-4 h-4" />
-                      <span className="text-xs">Звук вкл</span>
-                    </>
-                  )}
-                </Button>
-              </div>
-
               {/* Mobile frame container */}
               <div className="flex-1 flex items-center justify-center overflow-hidden p-4">
                 <div 

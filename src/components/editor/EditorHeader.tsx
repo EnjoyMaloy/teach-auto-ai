@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Undo2, Redo2, Eye, 
   Share2, Check, X, Palette, ChevronRight, Map,
-  Cloud, RefreshCw, PanelLeft
+  Cloud, RefreshCw, PanelLeft, Volume2, VolumeX
 } from 'lucide-react';
 import { Course, Lesson, LessonsDisplayType } from '@/types/course';
 import { DesignSystemConfig } from '@/types/designSystem';
@@ -28,6 +28,8 @@ interface EditorHeaderProps {
   hasUnsavedChanges?: boolean;
   lastSavedAt?: Date | null;
   isAISidebarOpen?: boolean;
+  isPreviewMuted?: boolean;
+  onToggleMute?: () => void;
   onToggleAISidebar?: () => void;
   onUndo: () => void;
   onRedo: () => void;
@@ -49,6 +51,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   hasUnsavedChanges = false,
   lastSavedAt,
   isAISidebarOpen = false,
+  isPreviewMuted = false,
+  onToggleMute,
   onToggleAISidebar,
   onUndo,
   onRedo,
@@ -393,6 +397,20 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
               ) : null}
             </div>
           </div>
+
+          {onToggleMute && (
+            <button
+              onClick={onToggleMute}
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              title={isPreviewMuted ? 'Включить звук' : 'Выключить звук'}
+            >
+              {isPreviewMuted ? (
+                <VolumeX className="w-4 h-4" />
+              ) : (
+                <Volume2 className="w-4 h-4" />
+              )}
+            </button>
+          )}
 
           <div className="w-px h-5 bg-border/50" />
 
