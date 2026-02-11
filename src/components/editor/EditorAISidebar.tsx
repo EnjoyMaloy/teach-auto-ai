@@ -91,13 +91,12 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     try {
       const response = await supabase.functions.invoke('subblock-ai', {
         body: {
-          prompt,
-          context: {
-            blockType: selectedBlock.type,
-            currentContent: selectedBlock.content,
-            currentSubBlocks: selectedBlock.subBlocks,
+          message: prompt,
+          currentSubBlock: {
+            type: selectedBlock.type,
+            content: selectedBlock.content,
           },
-          type: 'edit',
+          allSubBlocks: selectedBlock.subBlocks || [],
         },
       });
 
