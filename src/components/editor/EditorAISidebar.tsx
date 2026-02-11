@@ -539,7 +539,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                       : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
                   )}
                 >
-                  <GraduationCap className="w-3.5 h-3.5" />
+                  <Sparkles className="w-3 h-3" />
                   Создать курс
                 </button>
                 <button
@@ -551,7 +551,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                       : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
                   )}
                 >
-                  <Pencil className="w-3.5 h-3.5" />
+                  <Pencil className="w-3 h-3" />
                   Ред. блок
                 </button>
               </div>
