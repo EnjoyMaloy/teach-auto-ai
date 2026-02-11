@@ -250,7 +250,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
   return (
     <>
-      <header className="h-14 border-b border-border/5 bg-background/95 backdrop-blur-sm flex items-center justify-between px-4 gap-4">
+      <header className="h-14 border-b border-border/5 bg-background/95 backdrop-blur-sm flex items-center justify-between px-4 gap-4 relative">
         {/* Left section - Sidebar trigger + Breadcrumbs */}
         <div className="flex items-center gap-2 min-w-0">
           {/* AI Sidebar Toggle - simple icon */}
@@ -389,7 +389,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         </div>
 
         {/* Center section - Undo/Redo + Sound + Cloud */}
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1">
           <button
             onClick={onUndo}
             disabled={!canUndo}
