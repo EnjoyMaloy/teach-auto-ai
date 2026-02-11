@@ -106,7 +106,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
   return (
     <div className="h-full flex flex-col bg-secondary/50 dark:bg-background overflow-hidden">
       {/* Header */}
-      <div className="px-5 py-4 border-b border-border/5 flex items-center justify-between">
+      <div className="px-5 py-4 border-b border-border/5 dark:border-transparent flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', config.bgClass)}>
             {IconComponent && <IconComponent className={cn('w-5 h-5', config.colorClass)} />}

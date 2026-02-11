@@ -589,7 +589,7 @@ const Editor: React.FC = () => {
             </div>
 
             {/* Right: Block Editor - fixed width */}
-            <div className="hidden md:flex w-[380px] shrink-0 flex-col border-l border-border/5 bg-secondary/50 dark:bg-background overflow-hidden">
+            <div className="hidden md:flex w-[380px] shrink-0 flex-col border-l border-border/5 dark:border-transparent bg-secondary/50 dark:bg-background overflow-hidden">
               {selectedBlock ? (
                 <BlockEditor
                   block={selectedBlock}
