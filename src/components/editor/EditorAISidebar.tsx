@@ -3,7 +3,7 @@ import {
   Sparkles, MessageSquare, Wand2, Loader2, Check, 
   AlertCircle, Search, Brain, Layers, BookOpen, CheckCircle2, 
   Image, Clock, RotateCcw, PartyPopper, Send, CornerDownLeft,
-  Plus, MousePointerClick, Palette, GraduationCap, Pencil,
+  Plus, MousePointerClick, Palette, GraduationCap, Pencil, BookPlus,
   ImageOff, ImageIcon,
   icons as lucideIcons
 } from 'lucide-react';
@@ -539,7 +539,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                       : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
                   )}
                 >
-                  <Sparkles className="w-3 h-3" />
+                  <BookPlus className="w-3 h-3" />
                   Создать курс
                 </button>
                 <button
