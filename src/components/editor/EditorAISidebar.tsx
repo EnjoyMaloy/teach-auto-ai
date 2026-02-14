@@ -273,11 +273,10 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                     const dsConfig = ds.config;
                     const isSelected = selectedDesignSystemId === ds.id;
                     const primaryHsl = dsConfig.primaryColor;
-                    const successHsl = dsConfig.successColor || '142 71% 45%';
-                    const destructiveHsl = dsConfig.destructiveColor || '0 84% 60%';
+                    const accentHsl = dsConfig.accentColor || '240 5% 96%';
+                    const mutedHsl = dsConfig.mutedColor || '240 5% 96%';
                     const bgHsl = dsConfig.backgroundColor || '0 0% 100%';
                     const fgHsl = dsConfig.foregroundColor || '0 0% 10%';
-                    const mutedHsl = dsConfig.mutedColor || '240 5% 96%';
                     const btnRadius = dsConfig.buttonStyle === 'pill' ? '9999px' : dsConfig.buttonStyle === 'square' ? '0' : '4px';
 
                     return (
@@ -337,8 +336,8 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                             {/* Color dots */}
                             <div className="flex items-center gap-0.5">
                               <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: `hsl(${primaryHsl})` }} />
-                              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: `hsl(${successHsl})` }} />
-                              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: `hsl(${destructiveHsl})` }} />
+                              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: `hsl(${accentHsl})` }} />
+                              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: `hsl(${mutedHsl})` }} />
                             </div>
                           </div>
                         </div>
