@@ -49,6 +49,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   const [chatInput, setChatInput] = useState('');
   const [isEditingBlock, setIsEditingBlock] = useState(false);
   const [localSkipImages, setLocalSkipImages] = useState(false);
+  const [imageModel, setImageModel] = useState<'gemini-3-pro' | 'gemini-2.5-flash'>('gemini-3-pro');
   const [selectedDesignSystemId, setSelectedDesignSystemId] = useState<string | null>(null);
   const [lessonCount, setLessonCount] = useState(3);
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium'); // kept for API compat
@@ -112,7 +113,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       }
       setLocalPrompt(chatInput);
       const selectedDS = designSystems.find(ds => ds.id === selectedDesignSystemId);
-      runGeneration(chatInput, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id);
+      runGeneration(chatInput, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id, imageModel);
       setChatInput('');
     } else if (mode === 'edit-block' && selectedBlock) {
       handleEditBlock(chatInput);
@@ -422,6 +423,33 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                     Быстро
                   </button>
                 </div>
+                {/* Image model selector - only when images enabled */}
+                {!localSkipImages && (
+                  <div className="flex gap-1.5 mt-1.5">
+                    <button
+                      onClick={() => setImageModel('gemini-3-pro')}
+                      className={cn(
+                        "flex-1 py-1.5 px-2 rounded-lg text-[10px] font-medium transition-all border text-center",
+                        imageModel === 'gemini-3-pro'
+                          ? "bg-primary/10 border-primary/30 text-primary"
+                          : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
+                      )}
+                    >
+                      Pro (качество)
+                    </button>
+                    <button
+                      onClick={() => setImageModel('gemini-2.5-flash')}
+                      className={cn(
+                        "flex-1 py-1.5 px-2 rounded-lg text-[10px] font-medium transition-all border text-center",
+                        imageModel === 'gemini-2.5-flash'
+                          ? "bg-primary/10 border-primary/30 text-primary"
+                          : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
+                      )}
+                    >
+                      Flash (быстро)
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Lesson count */}
