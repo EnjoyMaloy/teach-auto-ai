@@ -271,13 +271,13 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                   {designSystems.map((ds) => {
                     const dsConfig = ds.config;
                     const isSelected = selectedDesignSystemId === ds.id;
-                    const radius = dsConfig.borderRadius || '0.75rem';
                     const primaryHsl = dsConfig.primaryColor;
                     const successHsl = dsConfig.successColor || '142 71% 45%';
                     const destructiveHsl = dsConfig.destructiveColor || '0 84% 60%';
-                    const accentHsl = dsConfig.accentColor || '240 5% 96%';
-                    const mutedHsl = dsConfig.mutedColor || '240 5% 96%';
                     const bgHsl = dsConfig.backgroundColor || '0 0% 100%';
+                    const fgHsl = dsConfig.foregroundColor || '0 0% 10%';
+                    const mutedHsl = dsConfig.mutedColor || '240 5% 96%';
+                    const btnRadius = dsConfig.buttonStyle === 'pill' ? '9999px' : dsConfig.buttonStyle === 'square' ? '0' : '4px';
 
                     return (
                       <button
@@ -286,58 +286,65 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                           selectedDesignSystemId === ds.id ? null : ds.id
                         )}
                         className={cn(
-                          "group relative flex flex-col rounded-xl overflow-hidden transition-all duration-200 border-2 text-left",
+                          "group relative rounded-xl overflow-hidden transition-all duration-200 text-left",
                           isSelected 
-                            ? "border-primary shadow-md scale-[1.02]" 
-                            : "border-border/50 hover:border-border hover:shadow-sm"
+                            ? "ring-2 ring-primary ring-offset-2 ring-offset-background shadow-lg" 
+                            : "ring-1 ring-border/60 hover:ring-border hover:shadow-sm"
                         )}
                         style={{ backgroundColor: `hsl(${bgHsl})` }}
                       >
-                        {/* Color palette strip */}
-                        <div className="flex h-5 w-full">
-                          <div className="flex-1" style={{ backgroundColor: `hsl(${primaryHsl})` }} />
-                          <div className="flex-1" style={{ backgroundColor: `hsl(${successHsl})` }} />
-                          <div className="flex-1" style={{ backgroundColor: `hsl(${destructiveHsl})` }} />
-                          <div className="flex-1" style={{ backgroundColor: `hsl(${accentHsl})` }} />
-                        </div>
-                        
-                        {/* Theme preview content */}
-                        <div className="px-2.5 py-2 space-y-1.5">
-                          {/* Theme name */}
+                        {/* Mini app screen */}
+                        <div className="px-2.5 pt-2.5 pb-2 space-y-2">
+                          {/* Title bar - theme name in its font */}
                           <p 
-                            className="text-[11px] font-semibold truncate"
+                            className="text-[11px] font-bold truncate leading-none"
                             style={{ 
                               fontFamily: dsConfig.headingFontFamily || dsConfig.fontFamily || 'inherit',
-                              color: `hsl(${dsConfig.foregroundColor || '0 0% 10%'})`,
+                              color: `hsl(${fgHsl})`,
                             }}
                           >
                             {ds.name}
                           </p>
                           
-                          {/* Mini UI mockup */}
-                          <div className="flex items-center gap-1">
+                          {/* Body text placeholder */}
+                          <p 
+                            className="text-[7px] leading-tight opacity-50"
+                            style={{ 
+                              fontFamily: dsConfig.fontFamily || 'inherit',
+                              color: `hsl(${fgHsl})`,
+                            }}
+                          >
+                            Пример текста курса
+                          </p>
+
+                          {/* Button + color dots row */}
+                          <div className="flex items-center justify-between">
                             {/* Mini button */}
                             <div 
-                              className="h-3.5 px-2 flex items-center justify-center"
+                              className="h-4 px-2.5 flex items-center justify-center"
                               style={{ 
                                 backgroundColor: `hsl(${primaryHsl})`,
-                                borderRadius: dsConfig.buttonStyle === 'pill' ? '9999px' : dsConfig.buttonStyle === 'square' ? '0' : '4px',
-                                boxShadow: dsConfig.buttonDepth === 'raised' ? `0 1.5px 0 0 hsl(${primaryHsl} / 0.35)` : 'none',
+                                borderRadius: btnRadius,
+                                boxShadow: dsConfig.buttonDepth === 'raised' 
+                                  ? `0 2px 0 0 hsl(${primaryHsl} / 0.35)` 
+                                  : 'none',
                               }}
                             >
-                              <span className="text-[6px] font-medium" style={{ color: `hsl(${dsConfig.primaryForeground || '0 0% 100%'})` }}>OK</span>
+                              <span className="text-[7px] font-semibold" style={{ color: `hsl(${dsConfig.primaryForeground || '0 0% 100%'})` }}>Далее</span>
                             </div>
-                            {/* Mini text lines */}
-                            <div className="flex-1 space-y-0.5">
-                              <div className="h-[3px] rounded-full w-full" style={{ backgroundColor: `hsl(${mutedHsl})` }} />
-                              <div className="h-[3px] rounded-full w-3/5" style={{ backgroundColor: `hsl(${mutedHsl})` }} />
+                            
+                            {/* Color dots */}
+                            <div className="flex items-center gap-0.5">
+                              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: `hsl(${primaryHsl})` }} />
+                              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: `hsl(${successHsl})` }} />
+                              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: `hsl(${destructiveHsl})` }} />
                             </div>
                           </div>
                         </div>
 
-                        {/* Selected check */}
+                        {/* Selected overlay check */}
                         {isSelected && (
-                          <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                          <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-primary flex items-center justify-center shadow-sm">
                             <Check className="w-2.5 h-2.5 text-primary-foreground" />
                           </div>
                         )}
