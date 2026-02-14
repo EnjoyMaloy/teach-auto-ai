@@ -280,10 +280,10 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                     // Dot colors from design system
                     const db = dsConfig.designBlock;
                     const dot1Hsl = db?.buttonBgColor || primaryHsl; // button bg
-                    const thirdBg = dsConfig.themeBackgrounds?.[2];
-                    const dot2Hsl = thirdBg
-                      ? (thirdBg.type === 'solid' ? thirdBg.color || bgHsl : thirdBg.from || bgHsl)
-                      : bgHsl; // 3rd theme background
+                    const fifthBg = dsConfig.themeBackgrounds?.[4];
+                    const dot2Hsl = fifthBg
+                      ? (fifthBg.type === 'solid' ? fifthBg.color || bgHsl : fifthBg.from || bgHsl)
+                      : bgHsl; // 5th theme background
                     const dot3Hsl = db?.backdropDarkColor || '0 0% 0% / 0.9'; // dark backdrop
 
                     return (
