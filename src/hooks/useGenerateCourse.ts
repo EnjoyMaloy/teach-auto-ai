@@ -1,6 +1,7 @@
 import { useRef, useCallback } from 'react';
 import { Lesson, Slide, SlideType, CourseDesignSystem } from '@/types/course';
 import { useAIGeneration, GenerationStep } from '@/hooks/useAIGeneration';
+import { DesignSystemConfig } from '@/types/designSystem';
 import { supabase } from '@/integrations/supabase/client';
 
 interface GeneratedSubBlock {
@@ -178,7 +179,13 @@ export const useGenerateCourse = (courseId: string) => {
 
   const isGeneratingRef = useRef(false);
 
-  const runGeneration = useCallback(async (prompt: string, skipImages: boolean) => {
+  const runGeneration = useCallback(async (
+    prompt: string, 
+    skipImages: boolean, 
+    lessonCount: number = 3,
+    selectedDesignConfig?: DesignSystemConfig,
+    selectedDesignSystemId?: string,
+  ) => {
     if (!prompt.trim() || isGeneratingRef.current) return;
 
     isGeneratingRef.current = true;
@@ -192,6 +199,8 @@ export const useGenerateCourse = (courseId: string) => {
     ];
     setSteps(initialSteps);
 
+    const lessonInstruction = `\n\nВАЖНО: Создай ровно ${lessonCount} уроков.`;
+
     try {
       const checkCancelled = () => {
         if (abortController.current?.signal.aborted) {
@@ -204,7 +213,7 @@ export const useGenerateCourse = (courseId: string) => {
       checkCancelled();
       
       const researchResponse = await supabase.functions.invoke('generate-course', {
-        body: { userMessage: `Исследуй тему: "${prompt}"`, agentRole: 'research' },
+        body: { userMessage: `Исследуй тему: "${prompt}"${lessonInstruction}`, agentRole: 'research' },
       });
       checkCancelled();
       if (researchResponse.error) throw new Error(researchResponse.error.message || 'Ошибка при исследовании');
@@ -227,7 +236,7 @@ export const useGenerateCourse = (courseId: string) => {
       
       const structureResponse = await supabase.functions.invoke('generate-course', {
         body: { 
-          userMessage: `На основе исследования:\n${JSON.stringify(researchData)}\n\nЗапрос пользователя: "${prompt}"\n\nСпланируй структуру курса.`, 
+          userMessage: `На основе исследования:\n${JSON.stringify(researchData)}\n\nЗапрос пользователя: "${prompt}"${lessonInstruction}\n\nСпланируй структуру курса.`, 
           agentRole: 'structure' 
         },
       });
@@ -252,7 +261,7 @@ export const useGenerateCourse = (courseId: string) => {
 
       const generateResponse = await supabase.functions.invoke('generate-course', {
         body: { 
-          userMessage: `Исследование:\n${JSON.stringify(researchData)}\n\nСтруктура:\n${JSON.stringify(structureData)}\n\nСоздай полный контент для всех блоков.`, 
+          userMessage: `Исследование:\n${JSON.stringify(researchData)}\n\nСтруктура:\n${JSON.stringify(structureData)}${lessonInstruction}\n\nСоздай полный контент для всех блоков.`, 
           agentRole: 'content' 
         },
       });
@@ -440,6 +449,21 @@ export const useGenerateCourse = (courseId: string) => {
           updatedAt: new Date(),
         };
       });
+
+      // Apply selected design system to the course
+      if (selectedDesignConfig && selectedDesignSystemId) {
+        try {
+          await supabase
+            .from('courses')
+            .update({ 
+              design_system: JSON.parse(JSON.stringify(selectedDesignConfig)),
+              base_design_system_id: selectedDesignSystemId,
+            })
+            .eq('id', courseId);
+        } catch (e) {
+          console.error('Failed to save design system:', e);
+        }
+      }
 
       completeGeneration(lessons);
       isGeneratingRef.current = false;
