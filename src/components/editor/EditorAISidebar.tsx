@@ -454,11 +454,6 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                   <div className="flex items-center gap-2 animate-pulse">
                     <Sparkles className="w-4 h-4 text-primary" />
                     <span className="font-semibold text-foreground">Создаю курс</span>
-                    <span className="flex items-center gap-0.5">
-                      <span className="w-1 h-1 rounded-full bg-foreground/60 animate-bounce [animation-delay:0s]" />
-                      <span className="w-1 h-1 rounded-full bg-foreground/60 animate-bounce [animation-delay:0.15s]" />
-                      <span className="w-1 h-1 rounded-full bg-foreground/60 animate-bounce [animation-delay:0.3s]" />
-                    </span>
                   </div>
 
                   {/* Steps */}
