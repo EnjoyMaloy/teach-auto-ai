@@ -158,41 +158,55 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           style={{ backgroundColor: `hsl(${mutedColor} / 0.4)` }}
         >
           {type === 'circle_map' ? (
-            <div className="flex flex-col items-center gap-1.5">
-              <div 
-                className="w-9 h-9 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: `hsl(${successColor})` }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
+            <div className="relative w-full h-full">
+              {/* Dark character silhouette - left side */}
+              <svg className="absolute left-1 top-3 opacity-20" width="20" height="28" viewBox="0 0 20 28" fill="hsl(0 0% 20%)">
+                <ellipse cx="10" cy="8" rx="7" ry="8"/>
+                <ellipse cx="10" cy="22" rx="5" ry="6"/>
+                <circle cx="7" cy="7" r="1.5" fill="hsl(0 0% 40%)"/>
+                <circle cx="13" cy="7" r="1.5" fill="hsl(0 0% 40%)"/>
+              </svg>
+              {/* Dark character silhouette - right side */}
+              <svg className="absolute right-1 bottom-3 opacity-15" width="18" height="24" viewBox="0 0 20 28" fill="hsl(0 0% 20%)">
+                <ellipse cx="10" cy="8" rx="7" ry="8"/>
+                <ellipse cx="10" cy="22" rx="5" ry="6"/>
+                <circle cx="7" cy="7" r="1.5" fill="hsl(0 0% 40%)"/>
+                <circle cx="13" cy="7" r="1.5" fill="hsl(0 0% 40%)"/>
+              </svg>
+              {/* Zigzag circles: left, right, left, right */}
+              <div className="flex flex-col items-start gap-1 h-full justify-center pl-4 pr-4">
+                <div className="flex w-full justify-start">
+                  <div 
+                    className="w-6 h-6 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: `hsl(${successColor})` }}
+                  >
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="flex w-full justify-end">
+                  <div 
+                    className="w-6 h-6 rounded-full"
+                    style={{ 
+                      backgroundColor: `hsl(${primaryColor})`,
+                      boxShadow: `0 2px 0 0 hsl(${primaryColor} / 0.4)`
+                    }}
+                  />
+                </div>
+                <div className="flex w-full justify-start">
+                  <div 
+                    className="w-6 h-6 rounded-full opacity-50"
+                    style={{ backgroundColor: `hsl(${mutedColor})` }}
+                  />
+                </div>
+                <div className="flex w-full justify-end">
+                  <div 
+                    className="w-6 h-6 rounded-full opacity-30"
+                    style={{ backgroundColor: `hsl(${mutedColor})` }}
+                  />
+                </div>
               </div>
-              <div 
-                className="w-1 h-3 rounded-full"
-                style={{ backgroundColor: `hsl(${mutedColor})` }}
-              />
-              <div 
-                className="w-9 h-9 rounded-full flex items-center justify-center"
-                style={{ 
-                  backgroundColor: `hsl(${primaryColor})`,
-                  boxShadow: `0 2px 0 0 hsl(${primaryColor} / 0.4)`
-                }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="white" opacity="0.9">
-                  <path d="M12 3C7 3 4 7 4 12c0 4 2 6 4 7.5V21a1 1 0 001 1h6a1 1 0 001-1v-1.5c2-1.5 4-3.5 4-7.5 0-5-3-9-8-9z"/>
-                  <circle cx="9.5" cy="11" r="1.5" fill="hsl(0 0% 30%)"/>
-                  <circle cx="14.5" cy="11" r="1.5" fill="hsl(0 0% 30%)"/>
-                  <path d="M10.5 14.5 L12 16 L13.5 14.5" stroke="hsl(0 0% 30%)" strokeWidth="1.2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-              <div 
-                className="w-1 h-3 rounded-full"
-                style={{ backgroundColor: `hsl(${mutedColor})` }}
-              />
-              <div 
-                className="w-9 h-9 rounded-full opacity-40"
-                style={{ backgroundColor: `hsl(${mutedColor})` }}
-              />
             </div>
           ) : (
             <div className="flex flex-col gap-2 w-full">
