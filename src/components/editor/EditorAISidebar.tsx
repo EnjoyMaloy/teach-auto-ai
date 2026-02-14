@@ -53,6 +53,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   const [lessonCount, setLessonCount] = useState(3);
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium'); // kept for API compat
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const hasAppliedRef = useRef(false);
   
   const { systems: designSystems, isLoading: isLoadingDS } = useBaseDesignSystems();
 
@@ -84,10 +85,14 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   const isError = state.status === 'error';
   const duration = getGenerationDuration(state.startTime, state.endTime);
 
-  // Auto-apply generated lessons when completed
+  // Auto-apply generated lessons when completed (once)
   useEffect(() => {
-    if (isCompleted && state.generatedLessons) {
+    if (isCompleted && state.generatedLessons && !hasAppliedRef.current) {
+      hasAppliedRef.current = true;
       onAIGenerate(state.generatedLessons);
+    }
+    if (!isCompleted) {
+      hasAppliedRef.current = false;
     }
   }, [isCompleted, state.generatedLessons, onAIGenerate]);
 
