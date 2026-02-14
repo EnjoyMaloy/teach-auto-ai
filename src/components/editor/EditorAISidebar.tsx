@@ -84,6 +84,13 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   const isError = state.status === 'error';
   const duration = getGenerationDuration(state.startTime, state.endTime);
 
+  // Auto-apply generated lessons when completed
+  useEffect(() => {
+    if (isCompleted && state.generatedLessons) {
+      onAIGenerate(state.generatedLessons);
+    }
+  }, [isCompleted, state.generatedLessons, onAIGenerate]);
+
   // Auto-scroll to bottom when steps update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -511,7 +518,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
             <div className="space-y-3">
               <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
                 <div className="flex items-center gap-2 mb-2">
-                  <PartyPopper className="w-5 h-5 text-emerald-600" />
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                   <span className="font-medium text-emerald-700 dark:text-emerald-400">
                     Курс создан!
                   </span>
@@ -526,34 +533,6 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                     {duration} сек
                   </span>
                 </div>
-              </div>
-
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => {
-                    setLocalPrompt(state.prompt);
-                    setChatInput(state.prompt);
-                    resetGeneration();
-                  }}
-                  className="flex-1 gap-1"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                  Новый
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    onAIGenerate(state.generatedLessons!);
-                    resetGeneration();
-                    setMode('idle');
-                  }}
-                  className="flex-1 gap-1 bg-emerald-600 hover:bg-emerald-700"
-                >
-                  <Check className="w-4 h-4" />
-                  Применить
-                </Button>
               </div>
             </div>
           )}
