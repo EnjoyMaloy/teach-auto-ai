@@ -71,7 +71,7 @@ const ScaledBlockThumbnail = memo<{
     >
       {/* Badge overlay */}
       <div className="absolute top-1 left-1 right-1 z-10 flex items-center gap-1">
-        <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-background/90 shadow-sm">
+        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-background/90 shadow-sm">
           <span className="text-[9px] font-bold text-foreground">
             {index + 1}
           </span>
