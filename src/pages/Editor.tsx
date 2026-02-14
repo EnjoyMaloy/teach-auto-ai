@@ -710,6 +710,7 @@ const Editor: React.FC = () => {
           onAddLesson={handleAddLesson}
           onAddBlock={handleAddBlock}
           onReorderBlocks={handleReorderBlocks}
+          onDeleteBlock={handleDeleteBlock}
           slideToBlock={slideToBlock}
           designSystem={course.designSystem}
         />
