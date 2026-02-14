@@ -160,28 +160,18 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           {type === 'circle_map' ? (
             <div className="relative w-full h-full">
               {/* Owl silhouette - left side */}
-              <svg className="absolute left-0.5 top-[30%] opacity-20" width="16" height="22" viewBox="0 0 32 44">
-                <ellipse cx="16" cy="14" rx="12" ry="13" fill="hsl(0 0% 55%)"/>
-                <path d="M6 4 L10 10" stroke="hsl(0 0% 55%)" strokeWidth="3" strokeLinecap="round"/>
-                <path d="M26 4 L22 10" stroke="hsl(0 0% 55%)" strokeWidth="3" strokeLinecap="round"/>
-                <ellipse cx="16" cy="34" rx="9" ry="10" fill="hsl(0 0% 55%)"/>
-                <circle cx="11" cy="13" r="3" fill="hsl(0 0% 40%)"/>
-                <circle cx="21" cy="13" r="3" fill="hsl(0 0% 40%)"/>
-                <circle cx="11" cy="12.5" r="1.2" fill="hsl(0 0% 25%)"/>
-                <circle cx="21" cy="12.5" r="1.2" fill="hsl(0 0% 25%)"/>
-                <path d="M14 18 L16 20 L18 18" stroke="hsl(0 0% 40%)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+              <svg className="absolute left-0.5 top-[30%]" style={{ opacity: 0.3 }} width="16" height="22" viewBox="0 0 32 44">
+                <ellipse cx="16" cy="14" rx="12" ry="13" fill="currentColor"/>
+                <path d="M6 4 L10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                <path d="M26 4 L22 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                <ellipse cx="16" cy="34" rx="9" ry="10" fill="currentColor"/>
               </svg>
               {/* Owl silhouette - right side */}
-              <svg className="absolute right-0.5 bottom-[28%] opacity-20" width="14" height="20" viewBox="0 0 32 44">
-                <ellipse cx="16" cy="14" rx="12" ry="13" fill="hsl(0 0% 55%)"/>
-                <path d="M6 4 L10 10" stroke="hsl(0 0% 55%)" strokeWidth="3" strokeLinecap="round"/>
-                <path d="M26 4 L22 10" stroke="hsl(0 0% 55%)" strokeWidth="3" strokeLinecap="round"/>
-                <ellipse cx="16" cy="34" rx="9" ry="10" fill="hsl(0 0% 55%)"/>
-                <circle cx="11" cy="13" r="3" fill="hsl(0 0% 40%)"/>
-                <circle cx="21" cy="13" r="3" fill="hsl(0 0% 40%)"/>
-                <circle cx="11" cy="12.5" r="1.2" fill="hsl(0 0% 25%)"/>
-                <circle cx="21" cy="12.5" r="1.2" fill="hsl(0 0% 25%)"/>
-                <path d="M14 18 L16 20 L18 18" stroke="hsl(0 0% 40%)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+              <svg className="absolute right-0.5 bottom-[28%]" style={{ opacity: 0.25 }} width="14" height="20" viewBox="0 0 32 44">
+                <ellipse cx="16" cy="14" rx="12" ry="13" fill="currentColor"/>
+                <path d="M6 4 L10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                <path d="M26 4 L22 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                <ellipse cx="16" cy="34" rx="9" ry="10" fill="currentColor"/>
               </svg>
               {/* Zigzag circles */}
               <div className="flex flex-col items-start gap-1 h-full justify-center pl-4 pr-4">
@@ -189,7 +179,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                 <div className="flex w-full justify-start">
                   <div 
                     className="w-6 h-6 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: `hsl(${successColor} / 0.5)` }}
+                    style={{ backgroundColor: `hsl(${successColor} / 0.7)` }}
                   >
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="20 6 9 17 4 12" />
@@ -201,8 +191,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                   <div 
                     className="w-6 h-6 rounded-full"
                     style={{ 
-                      backgroundColor: `hsl(${primaryColor} / 0.25)`,
-                      border: `2px solid hsl(${primaryColor} / 0.4)`
+                      backgroundColor: `hsl(${primaryColor} / 0.35)`,
+                      border: `2px solid hsl(${primaryColor} / 0.5)`
                     }}
                   />
                 </div>
@@ -210,14 +200,14 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                 <div className="flex w-full justify-start">
                   <div 
                     className="w-6 h-6 rounded-full"
-                    style={{ backgroundColor: `hsl(0 0% 70% / 0.4)` }}
+                    style={{ backgroundColor: `hsl(0 0% 60% / 0.5)` }}
                   />
                 </div>
                 {/* 4 - locked gray */}
                 <div className="flex w-full justify-end">
                   <div 
                     className="w-6 h-6 rounded-full"
-                    style={{ backgroundColor: `hsl(0 0% 70% / 0.4)` }}
+                    style={{ backgroundColor: `hsl(0 0% 60% / 0.5)` }}
                   />
                 </div>
               </div>
@@ -230,18 +220,18 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                   className="flex items-center gap-2 p-1.5 rounded-md"
                   style={{ 
                     backgroundColor: i === 1 
-                      ? `hsl(${successColor} / 0.12)` 
+                      ? `hsl(${successColor} / 0.2)` 
                       : i === 2 
                         ? 'rgba(255,255,255,0.7)' 
-                        : `hsl(${mutedColor} / 0.3)`,
-                    opacity: i === 3 ? 0.6 : 1,
+                        : `hsl(${mutedColor} / 0.4)`,
+                    opacity: i === 3 ? 0.7 : 1,
                   }}
                 >
                   <div 
                     className="w-5 h-5 rounded flex-shrink-0"
                     style={{ 
                       backgroundColor: i === 1 
-                        ? `hsl(${successColor} / 0.3)` 
+                        ? `hsl(${successColor} / 0.45)` 
                         : `hsl(${mutedColor})`,
                     }}
                   />
