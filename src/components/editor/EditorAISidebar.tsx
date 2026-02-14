@@ -260,7 +260,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
 
           {/* Generate mode - pre-generation settings */}
           {mode === 'generate' && !isGenerating && !isCompleted && !isError && (
-            <div className="space-y-4 px-1">
+            <div className="space-y-6 px-1">
               {/* Design System selector */}
               <div className="space-y-2.5">
                 <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
