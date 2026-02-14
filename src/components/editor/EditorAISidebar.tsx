@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import { Block, BLOCK_CONFIGS } from '@/types/blocks';
 import { Lesson, CourseDesignSystem } from '@/types/course';
+import { DesignSystemConfig } from '@/types/designSystem';
 import { useAIGeneration, GenerationStep, getGenerationDuration } from '@/hooks/useAIGeneration';
 import { useGenerateCourse } from '@/hooks/useGenerateCourse';
 import { supabase } from '@/integrations/supabase/client';
@@ -26,7 +27,7 @@ interface EditorAISidebarProps {
   courseId: string;
   designSystem?: CourseDesignSystem;
   selectedBlock: Block | null;
-  onAIGenerate: (lessons: Lesson[]) => void;
+  onAIGenerate: (lessons: Lesson[], designConfig?: DesignSystemConfig, designSystemId?: string) => void;
   onUpdateBlock: (updates: Partial<Block>) => void;
   initialMode?: 'generate';
   onBeforeGenerate?: () => Promise<boolean>;
@@ -90,12 +91,13 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   useEffect(() => {
     if (isCompleted && state.generatedLessons && !hasAppliedRef.current) {
       hasAppliedRef.current = true;
-      onAIGenerate(state.generatedLessons);
+      const selectedDS = designSystems.find(ds => ds.id === selectedDesignSystemId);
+      onAIGenerate(state.generatedLessons, selectedDS?.config, selectedDS?.id);
     }
     if (!isCompleted) {
       hasAppliedRef.current = false;
     }
-  }, [isCompleted, state.generatedLessons, onAIGenerate]);
+  }, [isCompleted, state.generatedLessons, onAIGenerate, designSystems, selectedDesignSystemId]);
 
   // Auto-scroll to bottom when steps update
   useEffect(() => {
