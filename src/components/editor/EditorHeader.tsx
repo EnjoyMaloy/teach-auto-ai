@@ -186,17 +186,12 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                     </svg>
                   </div>
                 </div>
-                {/* 2 - active (graduation cap icon) */}
+                {/* 2 - active */}
                 <div className="flex w-full justify-end">
                   <div 
-                    className="w-6 h-6 rounded-full flex items-center justify-center"
+                    className="w-6 h-6 rounded-full"
                     style={{ backgroundColor: `hsl(${primaryColor} / 0.6)` }}
-                  >
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="white" opacity="0.9">
-                      <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
-                      <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
-                    </svg>
-                  </div>
+                  />
                 </div>
                 {/* 3 - locked gray */}
                 <div className="flex w-full justify-start">
@@ -222,10 +217,10 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                   className="flex items-center gap-2 p-1.5 rounded-md"
                   style={{ 
                     backgroundColor: i === 1 
-                      ? `hsl(${successColor} / 0.2)` 
+                      ? `hsl(${successColor} / 0.15)` 
                       : i === 2 
-                        ? 'rgba(255,255,255,0.7)' 
-                        : 'rgba(0,0,0,0.1)',
+                        ? 'rgba(255,255,255,0.85)' 
+                        : 'rgba(255,255,255,0.45)',
                     opacity: 1,
                   }}
                 >
@@ -233,8 +228,10 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                     className="w-5 h-5 rounded flex-shrink-0"
                     style={{ 
                       backgroundColor: i === 1 
-                        ? `hsl(${successColor} / 0.45)` 
-                        : 'hsl(0 0% 70%)',
+                        ? `hsl(${successColor} / 0.5)` 
+                        : i === 2
+                          ? 'hsl(0 0% 62%)'
+                          : 'hsl(0 0% 68%)',
                     }}
                   />
                   <div className="flex-1 space-y-1">
