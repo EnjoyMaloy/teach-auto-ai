@@ -262,22 +262,22 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           {mode === 'generate' && !isGenerating && !isCompleted && !isError && (
             <div className="space-y-4 px-1">
               {/* Design System selector */}
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   <Palette className="w-3.5 h-3.5" />
                   Дизайн-система
                 </div>
-                <div className="grid grid-cols-2 gap-1.5">
+                <div className="grid grid-cols-2 gap-2">
                   {designSystems.map((ds) => {
                     const dsConfig = ds.config;
                     const isSelected = selectedDesignSystemId === ds.id;
-                    const radiusMap: Record<string, string> = {
-                      'rounded': dsConfig.borderRadius || '0.75rem',
-                      'pill': '9999px',
-                      'square': '0',
-                    };
-                    const btnRadius = radiusMap[dsConfig.buttonStyle] || dsConfig.borderRadius || '0.75rem';
-                    const isRaised = dsConfig.buttonDepth === 'raised';
+                    const radius = dsConfig.borderRadius || '0.75rem';
+                    const primaryHsl = dsConfig.primaryColor;
+                    const successHsl = dsConfig.successColor || '142 71% 45%';
+                    const destructiveHsl = dsConfig.destructiveColor || '0 84% 60%';
+                    const accentHsl = dsConfig.accentColor || '240 5% 96%';
+                    const mutedHsl = dsConfig.mutedColor || '240 5% 96%';
+                    const bgHsl = dsConfig.backgroundColor || '0 0% 100%';
 
                     return (
                       <button
@@ -286,29 +286,61 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                           selectedDesignSystemId === ds.id ? null : ds.id
                         )}
                         className={cn(
-                          "px-3 py-2 text-xs font-medium transition-all text-left truncate border-2",
-                          isSelected ? "ring-2 ring-offset-1 ring-primary/40" : "hover:opacity-80"
+                          "group relative flex flex-col rounded-xl overflow-hidden transition-all duration-200 border-2 text-left",
+                          isSelected 
+                            ? "border-primary shadow-md scale-[1.02]" 
+                            : "border-border/50 hover:border-border hover:shadow-sm"
                         )}
-                        style={{
-                          borderRadius: btnRadius,
-                          backgroundColor: isSelected 
-                            ? `hsl(${dsConfig.primaryColor})` 
-                            : `hsl(${dsConfig.primaryColor} / 0.12)`,
-                          borderColor: isSelected 
-                            ? `hsl(${dsConfig.primaryColor})` 
-                            : `hsl(${dsConfig.primaryColor} / 0.25)`,
-                          color: isSelected 
-                            ? `hsl(${dsConfig.primaryForeground || '0 0% 100%'})` 
-                            : `hsl(${dsConfig.primaryColor})`,
-                          boxShadow: isRaised 
-                            ? isSelected
-                              ? `0 3px 0 0 hsl(${dsConfig.primaryColor} / 0.4)`
-                              : `0 2px 0 0 hsl(${dsConfig.primaryColor} / 0.15)`
-                            : 'none',
-                          fontFamily: dsConfig.fontFamily || 'inherit',
-                        }}
+                        style={{ backgroundColor: `hsl(${bgHsl})` }}
                       >
-                        {ds.name}
+                        {/* Color palette strip */}
+                        <div className="flex h-5 w-full">
+                          <div className="flex-1" style={{ backgroundColor: `hsl(${primaryHsl})` }} />
+                          <div className="flex-1" style={{ backgroundColor: `hsl(${successHsl})` }} />
+                          <div className="flex-1" style={{ backgroundColor: `hsl(${destructiveHsl})` }} />
+                          <div className="flex-1" style={{ backgroundColor: `hsl(${accentHsl})` }} />
+                        </div>
+                        
+                        {/* Theme preview content */}
+                        <div className="px-2.5 py-2 space-y-1.5">
+                          {/* Theme name */}
+                          <p 
+                            className="text-[11px] font-semibold truncate"
+                            style={{ 
+                              fontFamily: dsConfig.headingFontFamily || dsConfig.fontFamily || 'inherit',
+                              color: `hsl(${dsConfig.foregroundColor || '0 0% 10%'})`,
+                            }}
+                          >
+                            {ds.name}
+                          </p>
+                          
+                          {/* Mini UI mockup */}
+                          <div className="flex items-center gap-1">
+                            {/* Mini button */}
+                            <div 
+                              className="h-3.5 px-2 flex items-center justify-center"
+                              style={{ 
+                                backgroundColor: `hsl(${primaryHsl})`,
+                                borderRadius: dsConfig.buttonStyle === 'pill' ? '9999px' : dsConfig.buttonStyle === 'square' ? '0' : '4px',
+                                boxShadow: dsConfig.buttonDepth === 'raised' ? `0 1.5px 0 0 hsl(${primaryHsl} / 0.35)` : 'none',
+                              }}
+                            >
+                              <span className="text-[6px] font-medium" style={{ color: `hsl(${dsConfig.primaryForeground || '0 0% 100%'})` }}>OK</span>
+                            </div>
+                            {/* Mini text lines */}
+                            <div className="flex-1 space-y-0.5">
+                              <div className="h-[3px] rounded-full w-full" style={{ backgroundColor: `hsl(${mutedHsl})` }} />
+                              <div className="h-[3px] rounded-full w-3/5" style={{ backgroundColor: `hsl(${mutedHsl})` }} />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Selected check */}
+                        {isSelected && (
+                          <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                            <Check className="w-2.5 h-2.5 text-primary-foreground" />
+                          </div>
+                        )}
                       </button>
                     );
                   })}
