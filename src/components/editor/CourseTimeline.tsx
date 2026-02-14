@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
-import { Plus, Play, Volume2, Heading, Type, Image, LayoutList, CircleDot, CheckSquare, ToggleLeft, PenLine, Link2, ListOrdered, SlidersHorizontal, Layers, GripVertical } from 'lucide-react';
+import { Plus, Play, Volume2, Heading, Type, Image, LayoutList, CircleDot, CheckSquare, ToggleLeft, PenLine, Link2, ListOrdered, SlidersHorizontal, Layers, GripVertical, Trash2 } from 'lucide-react';
 import { Lesson, CourseDesignSystem } from '@/types/course';
 import { Block, BLOCK_CONFIGS, BlockType } from '@/types/blocks';
 import { DesignSystemConfig } from '@/types/designSystem';
@@ -40,6 +40,7 @@ interface CourseTimelineProps {
   onAddLesson: () => void;
   onAddBlock: (type: BlockType) => void;
   onReorderBlocks: (event: DragEndEvent) => void;
+  onDeleteBlock?: (blockId: string) => void;
   slideToBlock: (slide: any) => Block;
   designSystem?: CourseDesignSystem | DesignSystemConfig;
 }
@@ -118,8 +119,9 @@ const SortableBlockThumb: React.FC<{
   isSelected: boolean;
   lessonId: string;
   onSelect: (blockId: string, lessonId: string) => void;
+  onDelete?: (blockId: string) => void;
   designSystem?: CourseDesignSystem | DesignSystemConfig;
-}> = ({ block, index, isSelected, lessonId, onSelect, designSystem }) => {
+}> = ({ block, index, isSelected, lessonId, onSelect, onDelete, designSystem }) => {
   const {
     attributes,
     listeners,
@@ -143,7 +145,7 @@ const SortableBlockThumb: React.FC<{
       {...attributes}
       {...listeners}
       className={cn(
-        'relative flex-shrink-0 rounded-lg cursor-grab active:cursor-grabbing transition-all duration-200',
+        'group/thumb relative flex-shrink-0 rounded-lg cursor-grab active:cursor-grabbing transition-all duration-200',
         isSelected
           ? 'ring-[1.5px] ring-blue-400 ring-offset-1 ring-offset-background shadow-lg scale-105'
           : 'hover:ring-[1.5px] hover:ring-blue-400/50 hover:scale-105'
@@ -153,6 +155,18 @@ const SortableBlockThumb: React.FC<{
       <div className="rounded-lg overflow-hidden">
         <ScaledBlockThumbnail block={block} index={index} designSystem={designSystem} />
       </div>
+      {/* Delete button on hover */}
+      {onDelete && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(block.id);
+          }}
+          className="absolute top-1 right-1 z-20 p-1 rounded-md bg-destructive/90 text-white opacity-0 group-hover/thumb:opacity-100 transition-opacity hover:bg-destructive"
+        >
+          <Trash2 className="w-2.5 h-2.5" />
+        </button>
+      )}
     </div>
   );
 };
@@ -167,6 +181,7 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
   onAddLesson,
   onAddBlock,
   onReorderBlocks,
+  onDeleteBlock,
   slideToBlock,
   designSystem,
 }) => {
@@ -254,6 +269,7 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
                                 isSelected={selectedBlockId === block.id}
                                 lessonId={lesson.id}
                                 onSelect={onSelectBlock}
+                                onDelete={onDeleteBlock}
                                 designSystem={designSystem}
                               />
                             ))}
