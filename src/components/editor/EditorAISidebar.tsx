@@ -614,10 +614,10 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
               {isGenerating ? (
                 <button
                   onClick={cancelGeneration}
-                  className="w-7 h-7 flex items-center justify-center rounded-full border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  className="w-7 h-7 flex items-center justify-center rounded-full bg-foreground border border-border dark:bg-transparent dark:text-muted-foreground hover:opacity-80 transition-colors"
                   title="Остановить"
                 >
-                  <Square className="w-3 h-3 fill-current" />
+                  <Square className="w-3 h-3 fill-current text-background dark:text-foreground" />
                 </button>
               ) : (
                 <button
