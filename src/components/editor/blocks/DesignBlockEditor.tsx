@@ -709,10 +709,12 @@ const SortableSubBlockItem: React.FC<{
           return rowIndex % 2 === 0 ? tableStripeBg1 : tableStripeBg2;
         };
         
+        const dsTextColor = designSystem?.foregroundColor || '240 10% 4%';
+        
         return (
           <div 
             className="w-full overflow-hidden"
-            style={tableBorderStyle}
+            style={{ ...tableBorderStyle, color: `hsl(${dsTextColor})` }}
             onClick={(e) => {
               e.stopPropagation();
               if (isEditing && onSelect) onSelect();
@@ -743,10 +745,10 @@ const SortableSubBlockItem: React.FC<{
                             rows={1}
                             className={cn(
                               'w-full bg-transparent border-none outline-none px-1 py-0.5 rounded resize-none',
-                              'focus:bg-muted/50 transition-colors overflow-hidden',
+                              'transition-colors overflow-hidden',
                               tSize, tAlign
                             )}
-                            style={{ minHeight: '1.5em' }}
+                            style={{ minHeight: '1.5em', color: `hsl(${dsTextColor})` }}
                             onInput={(e) => {
                               const target = e.currentTarget;
                               target.style.height = 'auto';
@@ -760,7 +762,7 @@ const SortableSubBlockItem: React.FC<{
                             }}
                           />
                         ) : (
-                          <span className={cn(tSize, tAlign, 'block px-1 py-0.5 whitespace-pre-wrap break-words')}>
+                          <span className={cn(tSize, tAlign, 'block px-1 py-0.5 whitespace-pre-wrap break-words')} style={{ color: `hsl(${dsTextColor})` }}>
                             {cell.content || '—'}
                           </span>
                         )}
