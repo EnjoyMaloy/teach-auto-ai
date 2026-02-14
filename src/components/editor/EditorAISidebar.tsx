@@ -277,14 +277,11 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                     const fgHsl = dsConfig.foregroundColor || '0 0% 10%';
                     const btnRadius = dsConfig.buttonStyle === 'pill' ? '9999px' : dsConfig.buttonStyle === 'square' ? '0' : '4px';
                     
-                    // Derive 3 complementary colors by shifting hue from primary
-                    const hslParts = primaryHsl.split(' ').map(p => parseFloat(p));
-                    const baseH = hslParts[0] || 0;
-                    const baseS = hslParts[1] || 50;
-                    const baseL = hslParts[2] || 50;
-                    const dot2Hsl = `${(baseH + 90) % 360} ${Math.min(baseS, 70)}% ${Math.max(baseL, 45)}%`;
-                    const dot3Hsl = `${(baseH + 180) % 360} ${Math.min(baseS, 65)}% ${Math.max(baseL, 50)}%`;
-                    const dot4Hsl = `${(baseH + 270) % 360} ${Math.min(baseS, 60)}% ${Math.max(baseL, 55)}%`;
+                    // Dot colors from design system
+                    const db = dsConfig.designBlock;
+                    const dot1Hsl = db?.buttonBgColor || primaryHsl; // button bg
+                    const dot2Hsl = bgHsl; // block background
+                    const dot3Hsl = dsConfig.mutedColor || '240 5% 96%'; // text sub-block substrate
 
                     return (
                       <button
@@ -342,10 +339,9 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                             
                             {/* Overlapping color dots */}
                             <div className="flex items-center -space-x-1.5">
-                              <div className="w-4 h-4 rounded-full z-[4]" style={{ backgroundColor: `hsl(${primaryHsl})` }} />
-                              <div className="w-4 h-4 rounded-full z-[3]" style={{ backgroundColor: `hsl(${dot2Hsl})` }} />
-                              <div className="w-4 h-4 rounded-full z-[2]" style={{ backgroundColor: `hsl(${dot3Hsl})` }} />
-                              <div className="w-4 h-4 rounded-full z-[1]" style={{ backgroundColor: `hsl(${dot4Hsl})` }} />
+                              <div className="w-4 h-4 rounded-full border border-black/5 z-[3]" style={{ backgroundColor: `hsl(${dot1Hsl})` }} />
+                              <div className="w-4 h-4 rounded-full border border-black/5 z-[2]" style={{ backgroundColor: `hsl(${dot2Hsl})` }} />
+                              <div className="w-4 h-4 rounded-full border border-black/5 z-[1]" style={{ backgroundColor: `hsl(${dot3Hsl})` }} />
                             </div>
                           </div>
                         </div>
