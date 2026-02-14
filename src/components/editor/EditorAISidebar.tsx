@@ -478,8 +478,8 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
             </div>
           )}
 
-          {/* Generating - chat-style AI messages */}
-          {isGenerating && (
+          {/* Generating or Completed - chat-style AI messages */}
+          {(isGenerating || isCompleted) && (
             <div className="space-y-3">
               {/* User message bubble */}
               <div className="flex justify-end">
@@ -491,16 +491,17 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
               {/* AI response bubble with steps */}
               <div className="flex justify-start">
                 <div className="max-w-[90%] px-3.5 py-3 rounded-2xl rounded-tl-md bg-muted/50 text-foreground text-sm space-y-3">
-                  {/* Pulsing header */}
-                  <div className="flex items-center gap-2 animate-pulse">
-                    <Sparkles className="w-4 h-4 text-primary" />
-                    <span className="font-semibold text-foreground">Создаю курс</span>
-                  </div>
+                  {/* Pulsing header (only while generating) */}
+                  {isGenerating && (
+                    <div className="flex items-center gap-2 animate-pulse">
+                      <Sparkles className="w-4 h-4 text-primary" />
+                      <span className="font-semibold text-foreground">Создаю курс</span>
+                    </div>
+                  )}
 
                   {/* Steps */}
                   <div className="space-y-1.5">
                     {state.steps.map((step) => {
-                      // Parse progress from message like "Создано 3/12 иллюстраций" or "Создано 3 из 12"
                       const progressMatch = step.message?.match(/(\d+)\s*(?:из|\/)\s*(\d+)/);
                       const progressPercent = progressMatch 
                         ? (parseInt(progressMatch[1]) / parseInt(progressMatch[2])) * 100 
@@ -525,7 +526,6 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                               {step.label}
                             </span>
                           </div>
-                          {/* Show message and progress bar for active image step */}
                           {step.status === 'active' && step.id === 'images' && step.message && (
                             <div className="pl-8 pr-2 space-y-1.5">
                               <p className="text-xs text-muted-foreground">{step.message}</p>
@@ -543,30 +543,28 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                   </div>
                 </div>
               </div>
-            </div>
-          )}
 
-          {/* Completed */}
-          {isCompleted && state.generatedLessons && (
-            <div className="space-y-3">
-              <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                  <span className="font-medium text-emerald-700 dark:text-emerald-400">
-                    Курс создан!
-                  </span>
+              {/* Completed status block */}
+              {isCompleted && state.generatedLessons && (
+                <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                    <span className="font-medium text-emerald-700 dark:text-emerald-400">
+                      Курс создан!
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-emerald-600">
+                    <span className="flex items-center gap-1">
+                      <BookOpen className="w-4 h-4" />
+                      {state.generatedLessons.length} уроков
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      {duration} сек
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-4 text-sm text-emerald-600">
-                  <span className="flex items-center gap-1">
-                    <BookOpen className="w-4 h-4" />
-                    {state.generatedLessons.length} уроков
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    {duration} сек
-                  </span>
-                </div>
-              </div>
+              )}
             </div>
           )}
 
@@ -600,7 +598,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       </ScrollArea>
 
       {/* Bottom input area - always visible */}
-      {!isCompleted && (
+      {(
         <div className="p-3">
           <div className="bg-black/[0.06] dark:bg-[#232326] rounded-2xl border border-border/20 dark:border-white/[0.08]">
             <input
@@ -613,41 +611,45 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
             />
             <div className="flex items-center justify-between px-2.5 pb-2.5 pt-1">
               <div className="flex items-center gap-1">
-                <button
-                  className="p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-foreground/5"
-                  title="Ещё"
-                  disabled={isGenerating}
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => toggleMode('generate')}
-                  disabled={isGenerating}
-                  className={cn(
-                    "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all",
-                    mode === 'generate'
-                      ? "bg-[hsl(45,90%,88%)] text-[hsl(45,80%,30%)] dark:bg-[hsl(45,70%,25%)] dark:text-[hsl(45,90%,75%)]"
-                      : "text-muted-foreground hover:text-foreground hover:bg-foreground/5",
-                    isGenerating && "opacity-50 pointer-events-none"
-                  )}
-                >
-                  <BookPlus className="w-3 h-3" />
-                  Создать курс
-                </button>
-                <button
-                  onClick={() => toggleMode('edit-block')}
-                  disabled={isGenerating}
-                  className={cn(
-                    "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all",
-                    mode === 'edit-block'
-                      ? "bg-[hsl(270,60%,90%)] text-[hsl(270,50%,35%)] dark:bg-[hsl(270,40%,25%)] dark:text-[hsl(270,60%,75%)]"
-                      : "text-muted-foreground hover:text-foreground hover:bg-foreground/5",
-                    isGenerating && "opacity-50 pointer-events-none"
-                  )}
-                >
-                  <Pencil className="w-3 h-3" />
-                  Ред. блок
-                </button>
+                {!isCompleted && (
+                  <>
+                    <button
+                      className="p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-foreground/5"
+                      title="Ещё"
+                      disabled={isGenerating}
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => toggleMode('generate')}
+                      disabled={isGenerating}
+                      className={cn(
+                        "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all",
+                        mode === 'generate'
+                          ? "bg-[hsl(45,90%,88%)] text-[hsl(45,80%,30%)] dark:bg-[hsl(45,70%,25%)] dark:text-[hsl(45,90%,75%)]"
+                          : "text-muted-foreground hover:text-foreground hover:bg-foreground/5",
+                        isGenerating && "opacity-50 pointer-events-none"
+                      )}
+                    >
+                      <BookPlus className="w-3 h-3" />
+                      Создать курс
+                    </button>
+                    <button
+                      onClick={() => toggleMode('edit-block')}
+                      disabled={isGenerating}
+                      className={cn(
+                        "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all",
+                        mode === 'edit-block'
+                          ? "bg-[hsl(270,60%,90%)] text-[hsl(270,50%,35%)] dark:bg-[hsl(270,40%,25%)] dark:text-[hsl(270,60%,75%)]"
+                          : "text-muted-foreground hover:text-foreground hover:bg-foreground/5",
+                        isGenerating && "opacity-50 pointer-events-none"
+                      )}
+                    >
+                      <Pencil className="w-3 h-3" />
+                      Ред. блок
+                    </button>
+                  </>
+                )}
               </div>
               {isGenerating ? (
                 <button
