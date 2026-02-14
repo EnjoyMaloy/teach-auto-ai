@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 import { arrayMove } from '@dnd-kit/sortable';
 import {
   DndContext,
@@ -110,6 +111,7 @@ const Editor: React.FC = () => {
   const location = useLocation();
   const { user } = useAuth();
   const { fetchCourse, saveCourse } = useCourses();
+  const queryClient = useQueryClient();
 
   const [course, setCourse] = useState<Course | null>(null);
   const [isLoadingCourse, setIsLoadingCourse] = useState(true);
@@ -233,13 +235,15 @@ const Editor: React.FC = () => {
 
       if (error) throw error;
       setIsNewCourse(false);
+      // Invalidate courses cache so workshop shows the new course
+      queryClient.invalidateQueries({ queryKey: ['courses'] });
       return true;
     } catch (error) {
       console.error('Error creating course in DB:', error);
       toast.error('Ошибка создания курса');
       return false;
     }
-  }, [user]);
+  }, [user, queryClient]);
 
   // Ensure course is persisted to DB (for new courses)
   const ensurePersisted = useCallback(async () => {
