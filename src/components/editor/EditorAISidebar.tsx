@@ -28,6 +28,7 @@ interface EditorAISidebarProps {
   onAIGenerate: (lessons: Lesson[]) => void;
   onUpdateBlock: (updates: Partial<Block>) => void;
   initialMode?: 'generate';
+  onBeforeGenerate?: () => Promise<boolean>;
 }
 
 type SidebarMode = 'idle' | 'generate' | 'edit-block';
@@ -41,6 +42,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   onAIGenerate,
   onUpdateBlock,
   initialMode,
+  onBeforeGenerate,
 }) => {
   const [mode, setMode] = useState<SidebarMode>(initialMode === 'generate' ? 'generate' : 'idle');
   const [chatInput, setChatInput] = useState('');
@@ -86,10 +88,15 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [state.steps, isCompleted, isError]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!chatInput.trim()) return;
     
     if (mode === 'generate') {
+      // Ensure course is persisted to DB before generating
+      if (onBeforeGenerate) {
+        const ok = await onBeforeGenerate();
+        if (!ok) return;
+      }
       setLocalPrompt(chatInput);
       const selectedDS = designSystems.find(ds => ds.id === selectedDesignSystemId);
       runGeneration(chatInput, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id);
