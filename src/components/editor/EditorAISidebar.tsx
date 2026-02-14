@@ -46,7 +46,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   const [localSkipImages, setLocalSkipImages] = useState(false);
   const [selectedDesignSystemId, setSelectedDesignSystemId] = useState<string | null>(null);
   const [lessonCount, setLessonCount] = useState(3);
-  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
+  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium'); // kept for API compat
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const { systems: designSystems, isLoading: isLoadingDS } = useBaseDesignSystems();
@@ -268,22 +268,50 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                   Дизайн-система
                 </div>
                 <div className="grid grid-cols-2 gap-1.5">
-                  {designSystems.map((ds) => (
-                    <button
-                      key={ds.id}
-                      onClick={() => setSelectedDesignSystemId(
-                        selectedDesignSystemId === ds.id ? null : ds.id
-                      )}
-                      className={cn(
-                        "px-3 py-2 rounded-xl text-xs font-medium transition-all text-left truncate border",
-                        selectedDesignSystemId === ds.id
-                          ? "bg-primary/10 border-primary/30 text-primary"
-                          : "bg-muted/30 border-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                      )}
-                    >
-                      {ds.name}
-                    </button>
-                  ))}
+                  {designSystems.map((ds) => {
+                    const dsConfig = ds.config;
+                    const isSelected = selectedDesignSystemId === ds.id;
+                    const radiusMap: Record<string, string> = {
+                      'rounded': dsConfig.borderRadius || '0.75rem',
+                      'pill': '9999px',
+                      'square': '0',
+                    };
+                    const btnRadius = radiusMap[dsConfig.buttonStyle] || dsConfig.borderRadius || '0.75rem';
+                    const isRaised = dsConfig.buttonDepth === 'raised';
+
+                    return (
+                      <button
+                        key={ds.id}
+                        onClick={() => setSelectedDesignSystemId(
+                          selectedDesignSystemId === ds.id ? null : ds.id
+                        )}
+                        className={cn(
+                          "px-3 py-2 text-xs font-medium transition-all text-left truncate border-2",
+                          isSelected ? "ring-2 ring-offset-1 ring-primary/40" : "hover:opacity-80"
+                        )}
+                        style={{
+                          borderRadius: btnRadius,
+                          backgroundColor: isSelected 
+                            ? `hsl(${dsConfig.primaryColor})` 
+                            : `hsl(${dsConfig.primaryColor} / 0.12)`,
+                          borderColor: isSelected 
+                            ? `hsl(${dsConfig.primaryColor})` 
+                            : `hsl(${dsConfig.primaryColor} / 0.25)`,
+                          color: isSelected 
+                            ? `hsl(${dsConfig.primaryForeground || '0 0% 100%'})` 
+                            : `hsl(${dsConfig.primaryColor})`,
+                          boxShadow: isRaised 
+                            ? isSelected
+                              ? `0 3px 0 0 hsl(${dsConfig.primaryColor} / 0.4)`
+                              : `0 2px 0 0 hsl(${dsConfig.primaryColor} / 0.15)`
+                            : 'none',
+                          fontFamily: dsConfig.fontFamily || 'inherit',
+                        }}
+                      >
+                        {ds.name}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -340,34 +368,6 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                       )}
                     >
                       {count}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Difficulty */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  <GraduationCap className="w-3.5 h-3.5" />
-                  Сложность
-                </div>
-                <div className="flex gap-1.5">
-                  {([
-                    { value: 'easy' as const, label: 'Лёгкая' },
-                    { value: 'medium' as const, label: 'Средняя' },
-                    { value: 'hard' as const, label: 'Сложная' },
-                  ]).map((d) => (
-                    <button
-                      key={d.value}
-                      onClick={() => setDifficulty(d.value)}
-                      className={cn(
-                        "flex-1 py-2 rounded-xl text-xs font-medium transition-all border",
-                        difficulty === d.value
-                          ? "bg-primary/10 border-primary/30 text-primary"
-                          : "bg-muted/30 border-transparent text-muted-foreground hover:bg-muted/50"
-                      )}
-                    >
-                      {d.label}
                     </button>
                   ))}
                 </div>
