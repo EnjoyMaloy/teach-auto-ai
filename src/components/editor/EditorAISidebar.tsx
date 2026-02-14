@@ -273,12 +273,17 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                     const dsConfig = ds.config;
                     const isSelected = selectedDesignSystemId === ds.id;
                     const primaryHsl = dsConfig.primaryColor;
-                    const db = dsConfig.designBlock;
-                    const dot2Hsl = db?.accentElementColor || db?.badgeColor || dsConfig.accentColor || primaryHsl;
-                    const dot3Hsl = db?.buttonBgColor || dsConfig.foregroundColor || '0 0% 10%';
                     const bgHsl = dsConfig.backgroundColor || '0 0% 100%';
                     const fgHsl = dsConfig.foregroundColor || '0 0% 10%';
                     const btnRadius = dsConfig.buttonStyle === 'pill' ? '9999px' : dsConfig.buttonStyle === 'square' ? '0' : '4px';
+                    
+                    // Derive 2 complementary dot colors by shifting hue from primary
+                    const hslParts = primaryHsl.split(' ').map(p => parseFloat(p));
+                    const baseH = hslParts[0] || 0;
+                    const baseS = hslParts[1] || 50;
+                    const baseL = hslParts[2] || 50;
+                    const dot2Hsl = `${(baseH + 120) % 360} ${Math.min(baseS, 70)}% ${Math.max(baseL, 45)}%`;
+                    const dot3Hsl = `${(baseH + 240) % 360} ${Math.min(baseS, 65)}% ${Math.max(baseL, 50)}%`;
 
                     return (
                       <button
