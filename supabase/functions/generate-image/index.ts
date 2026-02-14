@@ -139,6 +139,8 @@ Style requirements:
     const data = await response.json();
     const parts = data.candidates?.[0]?.content?.parts || [];
     const imagePart = parts.find((part: any) => part.inlineData?.mimeType?.startsWith('image/'));
+    let imageMimeType = '';
+    let imageBase64 = '';
     if (imagePart?.inlineData) {
       imageMimeType = imagePart.inlineData.mimeType;
       imageBase64 = imagePart.inlineData.data;
