@@ -1021,7 +1021,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             {/* Mascot top */}
             {mascotSettings?.rivePosition === 'top' && renderMascot()}
             <div className="w-full flex-1 flex flex-col justify-center">
-              <p className="text-lg font-semibold mb-4 text-center text-foreground">
+              <p className="text-lg font-semibold mb-4 text-center" style={{ color: `hsl(${ds.foregroundColor})` }}>
                 {block.content || 'Расположите в порядке'}
               </p>
               <div className="space-y-2">
@@ -1047,7 +1047,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
                       )}>
                         {idx + 1}
                       </span>
-                      <span className="text-sm text-foreground flex-1">{item}</span>
+                      <span className="text-sm flex-1" style={{ color: `hsl(${ds.foregroundColor})` }}>{item}</span>
                       {!showOrderResult && (
                         <div className="flex gap-1">
                           <button
