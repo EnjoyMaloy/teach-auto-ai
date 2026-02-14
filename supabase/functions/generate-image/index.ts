@@ -68,7 +68,7 @@ serve(async (req) => {
       return authError;
     }
 
-    const { prompt, slideContext, colorPalette } = await req.json();
+    const { prompt, slideContext, colorPalette, imageModel } = await req.json();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     
     if (!GEMINI_API_KEY) {
@@ -101,11 +101,25 @@ Style requirements:
 - Modern, professional look suitable for educational content
 - Simple backgrounds, no complex textures${colorGuidance}`;
 
-    console.log(`Generating image via Gemini 3 Pro Image for: ${(slideContext || prompt).substring(0, 60)}...`);
-
-    // Use gemini-3-pro-image-preview model
-    const MODEL = "gemini-3-pro-image-preview";
+    // Select model based on user choice
+    const MODEL = imageModel === 'gemini-2.5-flash' 
+      ? "gemini-2.5-flash-preview-image-generation" 
+      : "gemini-3-pro-image-preview";
     
+    console.log(`Generating image via ${MODEL} for: ${(slideContext || prompt).substring(0, 60)}...`);
+    
+    const generationConfig: any = {
+      responseModalities: ["TEXT", "IMAGE"],
+    };
+    
+    // gemini-3-pro uses imageConfig, flash uses responseModalities
+    if (MODEL === "gemini-3-pro-image-preview") {
+      generationConfig.imageConfig = {
+        aspectRatio: "1:1",
+        imageSize: "1K"
+      };
+    }
+
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
@@ -117,12 +131,7 @@ Style requirements:
             parts: [{ text: imagePrompt }]
           }
         ],
-        generationConfig: {
-          imageConfig: {
-            aspectRatio: "1:1",
-            imageSize: "1K"
-          }
-        }
+        generationConfig,
       }),
     });
 

@@ -143,7 +143,8 @@ const getColorPalette = (designSystem?: CourseDesignSystem) => {
 const generateImageForSlide = async (
   slideContent: string,
   coursePrompt: string,
-  designSystem?: CourseDesignSystem
+  designSystem?: CourseDesignSystem,
+  imageModel?: string
 ): Promise<string | null> => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 20000);
@@ -154,6 +155,7 @@ const generateImageForSlide = async (
         prompt: coursePrompt,
         slideContext: slideContent,
         colorPalette: getColorPalette(designSystem),
+        imageModel: imageModel || 'gemini-3-pro',
       },
     });
     clearTimeout(timeoutId);
@@ -185,6 +187,7 @@ export const useGenerateCourse = (courseId: string) => {
     lessonCount: number = 3,
     selectedDesignConfig?: DesignSystemConfig,
     selectedDesignSystemId?: string,
+    imageModel?: string,
   ) => {
     if (!prompt.trim() || isGeneratingRef.current) return;
 
@@ -328,7 +331,7 @@ export const useGenerateCourse = (courseId: string) => {
               try {
                 await Promise.all(batch.map(async ({ lessonIdx, slideIdx, subBlockIdx, description }) => {
                   try {
-                    const imageUrl = await generateImageForSlide(description, prompt, designSystem);
+                    const imageUrl = await generateImageForSlide(description, prompt, designSystem, imageModel);
                     if (imageUrl) {
                       if (subBlockIdx !== undefined) {
                         const subBlocks = courseData.lessons[lessonIdx].slides[slideIdx].subBlocks as any[];
