@@ -526,7 +526,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                   className={cn(
                     "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all",
                     mode === 'generate'
-                      ? "bg-primary/15 text-primary"
+                      ? "bg-[hsl(45,90%,88%)] text-[hsl(45,80%,30%)] dark:bg-[hsl(45,70%,25%)] dark:text-[hsl(45,90%,75%)]"
                       : "text-muted-foreground hover:text-foreground hover:bg-foreground/5",
                     isGenerating && "opacity-50 pointer-events-none"
                   )}
@@ -540,7 +540,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                   className={cn(
                     "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all",
                     mode === 'edit-block'
-                      ? "bg-primary/15 text-primary"
+                      ? "bg-[hsl(270,60%,90%)] text-[hsl(270,50%,35%)] dark:bg-[hsl(270,40%,25%)] dark:text-[hsl(270,60%,75%)]"
                       : "text-muted-foreground hover:text-foreground hover:bg-foreground/5",
                     isGenerating && "opacity-50 pointer-events-none"
                   )}
