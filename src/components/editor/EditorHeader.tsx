@@ -152,110 +152,100 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           isSelected ? "border-primary bg-primary/5" : "border-border bg-card"
         )}
       >
-        {/* Preview — Figma-style abstract illustration */}
+        {/* Preview */}
         <div 
-          className="h-32 rounded-lg mb-2 overflow-hidden flex items-center justify-center relative"
-          style={{ 
-            background: isSelected 
-              ? `linear-gradient(145deg, hsl(${primaryColor} / 0.08), hsl(${primaryColor} / 0.03))` 
-              : 'hsl(var(--muted))',
-          }}
+          className="h-32 rounded-lg mb-2 p-3 overflow-hidden flex items-center justify-center"
+          style={{ backgroundColor: 'hsl(0 0% 78%)' }}
         >
           {type === 'circle_map' ? (
-            /* Winding path with nodes */
-            <svg width="80" height="100" viewBox="0 0 80 100" fill="none" className="drop-shadow-sm">
-              {/* Curved path */}
-              <path 
-                d="M40 12 C55 12, 58 30, 40 35 C22 40, 20 55, 40 58 C60 61, 58 78, 40 82" 
-                stroke={`hsl(${isSelected ? primaryColor : '0 0% 65%'} / 0.3)`}
-                strokeWidth="2" 
-                strokeDasharray="4 3"
-                strokeLinecap="round"
-              />
-              {/* Node 1 — completed */}
-              <circle cx="40" cy="12" r="8" fill={`hsl(${successColor})`} opacity="0.85" />
-              <path d="M36 12.5 L39 15.5 L45 9.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              {/* Node 2 — active with pulse ring */}
-              <circle cx="40" cy="38" r="10" fill={`hsl(${primaryColor} / 0.15)`} />
-              <circle cx="40" cy="38" r="7" fill={`hsl(${primaryColor})`} opacity="0.9" />
-              <circle cx="40" cy="38" r="3" fill="white" opacity="0.9" />
-              {/* Node 3 — locked */}
-              <circle cx="40" cy="60" r="6.5" fill={`hsl(0 0% ${isSelected ? '75' : '70'}%)`} opacity="0.5" />
-              <rect x="37.5" y="57" width="5" height="6" rx="1" fill="white" opacity="0.5" />
-              {/* Node 4 — locked */}
-              <circle cx="40" cy="82" r="6" fill={`hsl(0 0% ${isSelected ? '80' : '75'}%)`} opacity="0.4" />
-              <rect x="37.5" y="79.5" width="5" height="5" rx="1" fill="white" opacity="0.4" />
-            </svg>
-          ) : (
-            /* Stacked cards with progress */
-            <div className="flex flex-col gap-1.5 w-[85%]">
-              {[0, 1, 2].map((i) => {
-                const isCompleted = i === 0;
-                const isActive = i === 1;
-                return (
+            <div className="relative w-full h-full">
+              {/* Owl silhouette - left side */}
+              <svg className="absolute left-0.5 top-[30%]" style={{ opacity: 0.3 }} width="16" height="22" viewBox="0 0 32 44">
+                <ellipse cx="16" cy="14" rx="12" ry="13" fill="hsl(0 0% 45%)"/>
+                <path d="M6 4 L10 10" stroke="hsl(0 0% 45%)" strokeWidth="3" strokeLinecap="round"/>
+                <path d="M26 4 L22 10" stroke="hsl(0 0% 45%)" strokeWidth="3" strokeLinecap="round"/>
+                <ellipse cx="16" cy="34" rx="9" ry="10" fill="hsl(0 0% 45%)"/>
+              </svg>
+              {/* Owl silhouette - right side */}
+              <svg className="absolute right-0.5 bottom-[20%]" style={{ opacity: 0.3 }} width="16" height="22" viewBox="0 0 32 44">
+                <ellipse cx="16" cy="14" rx="12" ry="13" fill="hsl(0 0% 45%)"/>
+                <path d="M6 4 L10 10" stroke="hsl(0 0% 45%)" strokeWidth="3" strokeLinecap="round"/>
+                <path d="M26 4 L22 10" stroke="hsl(0 0% 45%)" strokeWidth="3" strokeLinecap="round"/>
+                <ellipse cx="16" cy="34" rx="9" ry="10" fill="hsl(0 0% 45%)"/>
+              </svg>
+              {/* Zigzag circles */}
+              <div className="flex flex-col items-start gap-1 h-full justify-center pl-4 pr-4">
+                {/* 1 - completed (pastel green, bold check) */}
+                <div className="flex w-full justify-start">
                   <div 
-                    key={i}
-                    className="flex items-center gap-2 rounded-md transition-all"
-                    style={{ 
-                      padding: '5px 8px',
-                      backgroundColor: isCompleted 
-                        ? `hsl(${successColor} / 0.12)` 
-                        : isActive
-                          ? `hsl(${isSelected ? primaryColor : '0 0% 50%'} / 0.1)`
-                          : `hsl(0 0% ${isSelected ? '50' : '45'}% / 0.08)`,
-                      border: isActive 
-                        ? `1.5px solid hsl(${isSelected ? primaryColor : '0 0% 60%'} / 0.3)` 
-                        : '1.5px solid transparent',
-                    }}
+                    className="w-6 h-6 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: `hsl(${successColor} / 0.7)` }}
                   >
-                    {/* Icon placeholder */}
-                    <div 
-                      className="w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center"
-                      style={{ 
-                        backgroundColor: isCompleted 
-                          ? `hsl(${successColor} / 0.7)` 
-                          : isActive 
-                            ? `hsl(${isSelected ? primaryColor : '0 0% 55%'} / 0.5)`
-                            : `hsl(0 0% ${isSelected ? '65' : '60'}% / 0.35)`,
-                      }}
-                    >
-                      {isCompleted && (
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                      )}
-                    </div>
-                    {/* Text skeleton */}
-                    <div className="flex-1 space-y-1">
-                      <div 
-                        className="h-1.5 rounded-full"
-                        style={{ 
-                          width: i === 1 ? '70%' : i === 0 ? '80%' : '55%',
-                          backgroundColor: isCompleted 
-                            ? `hsl(${successColor} / 0.35)` 
-                            : `hsl(0 0% ${isSelected ? '55' : '50'}% / ${isActive ? '0.4' : '0.25'})`,
-                        }}
-                      />
-                      <div 
-                        className="h-1 rounded-full"
-                        style={{ 
-                          width: '45%',
-                          backgroundColor: isCompleted 
-                            ? `hsl(${successColor} / 0.2)` 
-                            : `hsl(0 0% ${isSelected ? '60' : '55'}% / ${isActive ? '0.3' : '0.18'})`,
-                        }}
-                      />
-                    </div>
-                    {/* Progress indicator for active */}
-                    {isActive && (
-                      <div className="w-4 h-4 rounded-full flex-shrink-0" style={{
-                        border: `2px solid hsl(${isSelected ? primaryColor : '0 0% 60%'} / 0.4)`,
-                        borderTopColor: `hsl(${isSelected ? primaryColor : '0 0% 60%'} / 0.9)`,
-                      }} />
-                    )}
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
                   </div>
-                );
-              })}
+                </div>
+                {/* 2 - active */}
+                <div className="flex w-full justify-end">
+                  <div 
+                    className="w-6 h-6 rounded-full"
+                    style={{ backgroundColor: `hsl(${primaryColor} / 0.6)` }}
+                  />
+                </div>
+                {/* 3 - locked gray */}
+                <div className="flex w-full justify-start">
+                  <div 
+                    className="w-6 h-6 rounded-full"
+                    style={{ backgroundColor: `hsl(0 0% 60% / 0.5)` }}
+                  />
+                </div>
+                {/* 4 - locked gray */}
+                <div className="flex w-full justify-end">
+                  <div 
+                    className="w-6 h-6 rounded-full"
+                    style={{ backgroundColor: `hsl(0 0% 60% / 0.5)` }}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2 w-full">
+              {[1, 2, 3].map((i) => (
+                <div 
+                  key={i}
+                  className="flex items-center gap-2 p-1.5 rounded-md"
+                  style={{ 
+                    backgroundColor: i === 1 
+                      ? `hsl(${successColor} / 0.15)` 
+                      : i === 2 
+                        ? 'rgba(255,255,255,0.85)' 
+                        : 'rgba(255,255,255,0.45)',
+                    opacity: 1,
+                  }}
+                >
+                  <div 
+                    className="w-5 h-5 rounded flex-shrink-0"
+                    style={{ 
+                      backgroundColor: i === 1 
+                        ? `hsl(${successColor} / 0.5)` 
+                        : i === 2
+                          ? 'hsl(0 0% 62%)'
+                          : 'hsl(0 0% 68%)',
+                    }}
+                  />
+                  <div className="flex-1 space-y-1">
+                    <div 
+                      className="h-1.5 rounded-full w-3/4"
+                      style={{ backgroundColor: i === 1 ? 'hsl(0 0% 45%)' : 'hsl(0 0% 65%)' }}
+                    />
+                    <div 
+                      className="h-1 rounded-full w-1/2"
+                      style={{ backgroundColor: i === 1 ? 'hsl(0 0% 50%)' : 'hsl(0 0% 70%)' }}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
