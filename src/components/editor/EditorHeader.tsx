@@ -223,8 +223,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                       ? `hsl(${successColor} / 0.2)` 
                       : i === 2 
                         ? 'rgba(255,255,255,0.7)' 
-                        : `hsl(${mutedColor} / 0.4)`,
-                    opacity: i === 3 ? 0.7 : 1,
+                        : 'rgba(0,0,0,0.06)',
+                    opacity: i === 3 ? 0.8 : 1,
                   }}
                 >
                   <div 
