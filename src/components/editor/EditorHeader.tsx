@@ -159,51 +159,65 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         >
           {type === 'circle_map' ? (
             <div className="relative w-full h-full">
-              {/* Dark character silhouette - left side */}
-              <svg className="absolute left-1 top-3 opacity-20" width="20" height="28" viewBox="0 0 20 28" fill="hsl(0 0% 20%)">
-                <ellipse cx="10" cy="8" rx="7" ry="8"/>
-                <ellipse cx="10" cy="22" rx="5" ry="6"/>
-                <circle cx="7" cy="7" r="1.5" fill="hsl(0 0% 40%)"/>
-                <circle cx="13" cy="7" r="1.5" fill="hsl(0 0% 40%)"/>
+              {/* Owl silhouette - left side, between rows 1-2 */}
+              <svg className="absolute left-0.5 top-[30%] opacity-15" width="16" height="22" viewBox="0 0 32 44">
+                <ellipse cx="16" cy="14" rx="12" ry="13" fill="hsl(0 0% 15%)"/>
+                <path d="M6 4 L10 10" stroke="hsl(0 0% 15%)" strokeWidth="3" strokeLinecap="round"/>
+                <path d="M26 4 L22 10" stroke="hsl(0 0% 15%)" strokeWidth="3" strokeLinecap="round"/>
+                <ellipse cx="16" cy="34" rx="9" ry="10" fill="hsl(0 0% 15%)"/>
+                <circle cx="11" cy="13" r="3" fill="hsl(0 0% 30%)"/>
+                <circle cx="21" cy="13" r="3" fill="hsl(0 0% 30%)"/>
+                <circle cx="11" cy="12.5" r="1.2" fill="hsl(0 0% 10%)"/>
+                <circle cx="21" cy="12.5" r="1.2" fill="hsl(0 0% 10%)"/>
+                <path d="M14 18 L16 20 L18 18" stroke="hsl(0 0% 30%)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
               </svg>
-              {/* Dark character silhouette - right side */}
-              <svg className="absolute right-1 bottom-3 opacity-15" width="18" height="24" viewBox="0 0 20 28" fill="hsl(0 0% 20%)">
-                <ellipse cx="10" cy="8" rx="7" ry="8"/>
-                <ellipse cx="10" cy="22" rx="5" ry="6"/>
-                <circle cx="7" cy="7" r="1.5" fill="hsl(0 0% 40%)"/>
-                <circle cx="13" cy="7" r="1.5" fill="hsl(0 0% 40%)"/>
+              {/* Owl silhouette - right side, between rows 3-4 */}
+              <svg className="absolute right-0.5 bottom-[28%] opacity-12" width="14" height="20" viewBox="0 0 32 44">
+                <ellipse cx="16" cy="14" rx="12" ry="13" fill="hsl(0 0% 15%)"/>
+                <path d="M6 4 L10 10" stroke="hsl(0 0% 15%)" strokeWidth="3" strokeLinecap="round"/>
+                <path d="M26 4 L22 10" stroke="hsl(0 0% 15%)" strokeWidth="3" strokeLinecap="round"/>
+                <ellipse cx="16" cy="34" rx="9" ry="10" fill="hsl(0 0% 15%)"/>
+                <circle cx="11" cy="13" r="3" fill="hsl(0 0% 30%)"/>
+                <circle cx="21" cy="13" r="3" fill="hsl(0 0% 30%)"/>
+                <circle cx="11" cy="12.5" r="1.2" fill="hsl(0 0% 10%)"/>
+                <circle cx="21" cy="12.5" r="1.2" fill="hsl(0 0% 10%)"/>
+                <path d="M14 18 L16 20 L18 18" stroke="hsl(0 0% 30%)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
               </svg>
-              {/* Zigzag circles: left, right, left, right */}
+              {/* Zigzag circles */}
               <div className="flex flex-col items-start gap-1 h-full justify-center pl-4 pr-4">
+                {/* 1 - completed (pastel green, bold check) */}
                 <div className="flex w-full justify-start">
                   <div 
                     className="w-6 h-6 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: `hsl(${successColor})` }}
+                    style={{ backgroundColor: `hsl(${successColor} / 0.5)` }}
                   >
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   </div>
                 </div>
+                {/* 2 - active (light/highlighted) */}
                 <div className="flex w-full justify-end">
                   <div 
                     className="w-6 h-6 rounded-full"
                     style={{ 
-                      backgroundColor: `hsl(${primaryColor})`,
-                      boxShadow: `0 2px 0 0 hsl(${primaryColor} / 0.4)`
+                      backgroundColor: `hsl(${primaryColor} / 0.25)`,
+                      border: `2px solid hsl(${primaryColor} / 0.4)`
                     }}
                   />
                 </div>
+                {/* 3 - locked gray */}
                 <div className="flex w-full justify-start">
                   <div 
-                    className="w-6 h-6 rounded-full opacity-50"
-                    style={{ backgroundColor: `hsl(${mutedColor})` }}
+                    className="w-6 h-6 rounded-full"
+                    style={{ backgroundColor: `hsl(0 0% 70% / 0.4)` }}
                   />
                 </div>
+                {/* 4 - locked gray */}
                 <div className="flex w-full justify-end">
                   <div 
-                    className="w-6 h-6 rounded-full opacity-30"
-                    style={{ backgroundColor: `hsl(${mutedColor})` }}
+                    className="w-6 h-6 rounded-full"
+                    style={{ backgroundColor: `hsl(0 0% 70% / 0.4)` }}
                   />
                 </div>
               </div>
