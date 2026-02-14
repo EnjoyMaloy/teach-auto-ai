@@ -154,82 +154,76 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
       >
         {/* Preview */}
         <div 
-          className="h-32 rounded-lg mb-2 p-3 overflow-hidden"
-          style={{ backgroundColor: `hsl(${mutedColor} / 0.5)` }}
+          className="h-32 rounded-lg mb-2 p-3 overflow-hidden flex items-center justify-center"
+          style={{ backgroundColor: `hsl(${mutedColor} / 0.4)` }}
         >
           {type === 'circle_map' ? (
-            // Duolingo circles preview
-            <div className="flex flex-col items-center gap-2">
-              <div className="relative">
-                <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs"
-                  style={{ backgroundColor: `hsl(${successColor})`, color: 'white' }}
-                >
-                  ✓
-                </div>
+            <div className="flex flex-col items-center gap-1.5">
+              <div 
+                className="w-9 h-9 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: `hsl(${successColor})` }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
               </div>
               <div 
                 className="w-1 h-3 rounded-full"
                 style={{ backgroundColor: `hsl(${mutedColor})` }}
               />
-              <div className="relative" style={{ marginLeft: '20px' }}>
-                <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs"
-                  style={{ 
-                    backgroundColor: `hsl(${primaryColor})`, 
-                    color: 'white',
-                    boxShadow: `0 2px 0 0 hsl(${primaryColor} / 0.4)`
-                  }}
-                >
-                  2
-                </div>
+              <div 
+                className="w-9 h-9 rounded-full flex items-center justify-center"
+                style={{ 
+                  backgroundColor: `hsl(${primaryColor})`,
+                  boxShadow: `0 2px 0 0 hsl(${primaryColor} / 0.4)`
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="white" opacity="0.9">
+                  <path d="M12 3C7 3 4 7 4 12c0 4 2 6 4 7.5V21a1 1 0 001 1h6a1 1 0 001-1v-1.5c2-1.5 4-3.5 4-7.5 0-5-3-9-8-9z"/>
+                  <circle cx="9.5" cy="11" r="1.5" fill="hsl(0 0% 30%)"/>
+                  <circle cx="14.5" cy="11" r="1.5" fill="hsl(0 0% 30%)"/>
+                  <path d="M10.5 14.5 L12 16 L13.5 14.5" stroke="hsl(0 0% 30%)" strokeWidth="1.2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
               <div 
                 className="w-1 h-3 rounded-full"
                 style={{ backgroundColor: `hsl(${mutedColor})` }}
               />
-              <div className="relative" style={{ marginRight: '20px' }}>
-                <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs opacity-50"
-                  style={{ backgroundColor: `hsl(${mutedColor})`, color: '#888' }}
-                >
-                  🔒
-                </div>
-              </div>
+              <div 
+                className="w-9 h-9 rounded-full opacity-40"
+                style={{ backgroundColor: `hsl(${mutedColor})` }}
+              />
             </div>
           ) : (
-            // List preview
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2 w-full">
               {[1, 2, 3].map((i) => (
                 <div 
                   key={i}
                   className="flex items-center gap-2 p-1.5 rounded-md"
                   style={{ 
                     backgroundColor: i === 1 
-                      ? `hsl(${successColor} / 0.15)` 
+                      ? `hsl(${successColor} / 0.12)` 
                       : i === 2 
-                        ? 'white' 
-                        : `hsl(${mutedColor} / 0.5)`,
-                    opacity: i === 3 ? 0.5 : 1,
+                        ? 'rgba(255,255,255,0.7)' 
+                        : 'transparent',
+                    opacity: i === 3 ? 0.4 : 1,
                   }}
                 >
                   <div 
-                    className="w-5 h-5 rounded flex items-center justify-center text-[8px]"
+                    className="w-5 h-5 rounded flex-shrink-0"
                     style={{ 
                       backgroundColor: i === 1 
                         ? `hsl(${successColor} / 0.3)` 
                         : `hsl(${mutedColor})`,
                     }}
-                  >
-                    {i === 1 ? '✓' : i === 3 ? '🔒' : '📚'}
-                  </div>
-                  <div className="flex-1">
+                  />
+                  <div className="flex-1 space-y-1">
                     <div 
                       className="h-1.5 rounded-full w-3/4"
                       style={{ backgroundColor: `hsl(${mutedColor})` }}
                     />
                     <div 
-                      className="h-1 rounded-full w-1/2 mt-1"
+                      className="h-1 rounded-full w-1/2"
                       style={{ backgroundColor: `hsl(${mutedColor} / 0.5)` }}
                     />
                   </div>
