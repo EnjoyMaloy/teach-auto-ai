@@ -21,12 +21,18 @@ import { useGenerateCourse } from '@/hooks/useGenerateCourse';
 import { supabase } from '@/integrations/supabase/client';
 import { useBaseDesignSystems } from '@/hooks/useBaseDesignSystems';
 
+interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 interface EditorAISidebarProps {
   isOpen: boolean;
   onClose: () => void;
   courseId: string;
   designSystem?: CourseDesignSystem;
   selectedBlock: Block | null;
+  allBlocks?: Block[];
   onAIGenerate: (lessons: Lesson[], designConfig?: DesignSystemConfig, designSystemId?: string) => void;
   onUpdateBlock: (updates: Partial<Block>) => void;
   initialMode?: 'generate';
@@ -41,6 +47,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   courseId,
   designSystem,
   selectedBlock,
+  allBlocks,
   onAIGenerate,
   onUpdateBlock,
   initialMode,
@@ -53,7 +60,8 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   const [imageModel, setImageModel] = useState<'gemini-3-pro' | 'gemini-2.5-flash'>('gemini-3-pro');
   const [selectedDesignSystemId, setSelectedDesignSystemId] = useState<string | null>(null);
   const [lessonCount, setLessonCount] = useState(3);
-  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium'); // kept for API compat
+  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasAppliedRef = useRef(false);
   
@@ -99,16 +107,19 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     }
   }, [isCompleted, state.generatedLessons, onAIGenerate, designSystems, selectedDesignSystemId]);
 
-  // Auto-scroll to bottom when steps update
+  // Auto-scroll to bottom when steps update or chat messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [state.steps, isCompleted, isError]);
+  }, [state.steps, isCompleted, isError, chatMessages]);
 
   const handleSubmit = async () => {
     if (!chatInput.trim()) return;
     
     if (mode === 'generate') {
-      // Ensure course is persisted to DB before generating
+      if (isCompleted) {
+        // Reset and start new generation
+        resetGeneration();
+      }
       if (onBeforeGenerate) {
         const ok = await onBeforeGenerate();
         if (!ok) return;
@@ -119,6 +130,10 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       setChatInput('');
     } else if (mode === 'edit-block' && selectedBlock) {
       handleEditBlock(chatInput);
+      setChatInput('');
+    } else if (mode === 'idle') {
+      // Free-chat mode: send to AI with whatever context we have
+      handleFreeChat(chatInput);
       setChatInput('');
     }
   };
@@ -185,6 +200,81 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     }
   };
 
+  const handleFreeChat = async (prompt: string) => {
+    if (!prompt.trim()) return;
+    
+    // Add user message to chat
+    const userMsg: ChatMessage = { role: 'user', content: prompt };
+    setChatMessages(prev => [...prev, userMsg]);
+    setIsEditingBlock(true);
+    
+    try {
+      // Build context: use selected block if available, otherwise send all blocks
+      const body: Record<string, unknown> = { 
+        message: prompt,
+        conversationHistory: chatMessages.slice(-10),
+      };
+      
+      if (selectedBlock) {
+        const isQuiz = isQuizBlock(selectedBlock.type);
+        if (isQuiz) {
+          body.blockData = {
+            type: selectedBlock.type,
+            content: selectedBlock.content,
+            options: selectedBlock.options,
+            correctAnswer: selectedBlock.correctAnswer,
+            explanation: selectedBlock.explanation,
+            explanationCorrect: selectedBlock.explanationCorrect,
+            explanationPartial: selectedBlock.explanationPartial,
+            hints: selectedBlock.hints,
+            blankWord: selectedBlock.blankWord,
+            matchingPairs: selectedBlock.matchingPairs,
+            orderingItems: selectedBlock.orderingItems,
+            correctOrder: selectedBlock.correctOrder,
+            sliderMin: selectedBlock.sliderMin,
+            sliderMax: selectedBlock.sliderMax,
+            sliderCorrect: selectedBlock.sliderCorrect,
+            sliderStep: selectedBlock.sliderStep,
+          };
+        } else {
+          body.currentSubBlock = { type: selectedBlock.type, content: selectedBlock.content };
+          body.allSubBlocks = selectedBlock.subBlocks || [];
+        }
+      } else if (allBlocks && allBlocks.length > 0) {
+        // Send first block's sub-blocks as context
+        const firstDesignBlock = allBlocks.find(b => b.type === 'design');
+        if (firstDesignBlock) {
+          body.allSubBlocks = firstDesignBlock.subBlocks || [];
+        }
+      }
+
+      const response = await supabase.functions.invoke('subblock-ai', { body });
+      if (response.error) throw response.error;
+
+      const result = response.data;
+      const aiMessage = result.message || 'Готово!';
+      setChatMessages(prev => [...prev, { role: 'assistant', content: aiMessage }]);
+      
+      // Apply changes if any
+      if (selectedBlock) {
+        const isQuiz = isQuizBlock(selectedBlock.type);
+        if (isQuiz && result.blockUpdates) {
+          onUpdateBlock(result.blockUpdates);
+        } else if (result.newBlocks && Array.isArray(result.newBlocks)) {
+          onUpdateBlock({ subBlocks: result.newBlocks });
+        }
+      } else if (result.newBlocks && Array.isArray(result.newBlocks)) {
+        // If no block selected but AI returned blocks, try to apply to first design block
+        onUpdateBlock({ subBlocks: result.newBlocks });
+      }
+    } catch (error) {
+      console.error('Free chat error:', error);
+      setChatMessages(prev => [...prev, { role: 'assistant', content: 'Ошибка. Попробуйте снова.' }]);
+    } finally {
+      setIsEditingBlock(false);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -193,6 +283,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   };
 
   const toggleMode = (newMode: SidebarMode) => {
+    if (isCompleted) resetGeneration();
     setMode(prev => prev === newMode ? 'idle' : newMode);
   };
 
@@ -220,7 +311,9 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       if (!selectedBlock) return 'Сначала выберите блок справа...';
       return 'Опишите что изменить...';
     }
-    return 'Design anything...';
+    return selectedBlock 
+      ? 'Опишите что хотите изменить...' 
+      : 'Напишите что хотите поправить...';
   };
 
   const isInputDisabled = mode === 'edit-block' && !selectedBlock;
@@ -245,13 +338,40 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       {/* Chat / Messages area */}
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-3 h-full">
-          {/* Idle state - nothing selected */}
+          {/* Idle state - free chat */}
           {mode === 'idle' && !isGenerating && !isCompleted && !isError && (
-            <div className="flex items-center justify-center min-h-[60vh]">
-              <p className="text-sm text-muted-foreground text-center px-8">
-                Выберите действие внизу, чтобы начать
-              </p>
-            </div>
+            chatMessages.length === 0 ? (
+              <div className="flex items-center justify-center min-h-[60vh]">
+                <p className="text-sm text-muted-foreground text-center px-8">
+                  Напишите что хотите изменить или выберите действие внизу
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {chatMessages.map((msg, i) => (
+                  <div key={i} className={cn("flex", msg.role === 'user' ? "justify-end" : "justify-start")}>
+                    <div className={cn(
+                      "max-w-[85%] px-3.5 py-2.5 rounded-2xl text-sm",
+                      msg.role === 'user' 
+                        ? "rounded-tr-md bg-primary text-primary-foreground" 
+                        : "rounded-tl-md bg-muted/50 text-foreground"
+                    )}>
+                      {msg.content}
+                    </div>
+                  </div>
+                ))}
+                {isEditingBlock && (
+                  <div className="flex justify-start">
+                    <div className="max-w-[85%] px-3.5 py-2.5 rounded-2xl rounded-tl-md bg-muted/50 text-foreground text-sm">
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Думаю...
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
           )}
 
           {/* Edit block mode - waiting for selection */}
@@ -613,7 +733,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
             />
             <div className="flex items-center justify-between px-2.5 pb-2.5 pt-1">
               <div className="flex items-center gap-1">
-                {!isCompleted && (
+                {(
                   <>
                     <button
                       className="p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-foreground/5"

@@ -589,6 +589,7 @@ const Editor: React.FC = () => {
         courseId={course.id}
         designSystem={course.designSystem}
         selectedBlock={selectedBlock}
+        allBlocks={blocks}
         onAIGenerate={async (generatedLessons, designConfig, designSystemId) => {
           await ensurePersisted();
           pushToUndo();
