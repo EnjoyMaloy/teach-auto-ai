@@ -159,29 +159,29 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         >
           {type === 'circle_map' ? (
             <div className="relative w-full h-full">
-              {/* Owl silhouette - left side, between rows 1-2 */}
-              <svg className="absolute left-0.5 top-[30%] opacity-15" width="16" height="22" viewBox="0 0 32 44">
-                <ellipse cx="16" cy="14" rx="12" ry="13" fill="hsl(0 0% 15%)"/>
-                <path d="M6 4 L10 10" stroke="hsl(0 0% 15%)" strokeWidth="3" strokeLinecap="round"/>
-                <path d="M26 4 L22 10" stroke="hsl(0 0% 15%)" strokeWidth="3" strokeLinecap="round"/>
-                <ellipse cx="16" cy="34" rx="9" ry="10" fill="hsl(0 0% 15%)"/>
-                <circle cx="11" cy="13" r="3" fill="hsl(0 0% 30%)"/>
-                <circle cx="21" cy="13" r="3" fill="hsl(0 0% 30%)"/>
-                <circle cx="11" cy="12.5" r="1.2" fill="hsl(0 0% 10%)"/>
-                <circle cx="21" cy="12.5" r="1.2" fill="hsl(0 0% 10%)"/>
-                <path d="M14 18 L16 20 L18 18" stroke="hsl(0 0% 30%)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+              {/* Owl silhouette - left side */}
+              <svg className="absolute left-0.5 top-[30%] opacity-20" width="16" height="22" viewBox="0 0 32 44">
+                <ellipse cx="16" cy="14" rx="12" ry="13" fill="hsl(0 0% 55%)"/>
+                <path d="M6 4 L10 10" stroke="hsl(0 0% 55%)" strokeWidth="3" strokeLinecap="round"/>
+                <path d="M26 4 L22 10" stroke="hsl(0 0% 55%)" strokeWidth="3" strokeLinecap="round"/>
+                <ellipse cx="16" cy="34" rx="9" ry="10" fill="hsl(0 0% 55%)"/>
+                <circle cx="11" cy="13" r="3" fill="hsl(0 0% 40%)"/>
+                <circle cx="21" cy="13" r="3" fill="hsl(0 0% 40%)"/>
+                <circle cx="11" cy="12.5" r="1.2" fill="hsl(0 0% 25%)"/>
+                <circle cx="21" cy="12.5" r="1.2" fill="hsl(0 0% 25%)"/>
+                <path d="M14 18 L16 20 L18 18" stroke="hsl(0 0% 40%)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
               </svg>
-              {/* Owl silhouette - right side, between rows 3-4 */}
-              <svg className="absolute right-0.5 bottom-[28%] opacity-12" width="14" height="20" viewBox="0 0 32 44">
-                <ellipse cx="16" cy="14" rx="12" ry="13" fill="hsl(0 0% 15%)"/>
-                <path d="M6 4 L10 10" stroke="hsl(0 0% 15%)" strokeWidth="3" strokeLinecap="round"/>
-                <path d="M26 4 L22 10" stroke="hsl(0 0% 15%)" strokeWidth="3" strokeLinecap="round"/>
-                <ellipse cx="16" cy="34" rx="9" ry="10" fill="hsl(0 0% 15%)"/>
-                <circle cx="11" cy="13" r="3" fill="hsl(0 0% 30%)"/>
-                <circle cx="21" cy="13" r="3" fill="hsl(0 0% 30%)"/>
-                <circle cx="11" cy="12.5" r="1.2" fill="hsl(0 0% 10%)"/>
-                <circle cx="21" cy="12.5" r="1.2" fill="hsl(0 0% 10%)"/>
-                <path d="M14 18 L16 20 L18 18" stroke="hsl(0 0% 30%)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+              {/* Owl silhouette - right side */}
+              <svg className="absolute right-0.5 bottom-[28%] opacity-20" width="14" height="20" viewBox="0 0 32 44">
+                <ellipse cx="16" cy="14" rx="12" ry="13" fill="hsl(0 0% 55%)"/>
+                <path d="M6 4 L10 10" stroke="hsl(0 0% 55%)" strokeWidth="3" strokeLinecap="round"/>
+                <path d="M26 4 L22 10" stroke="hsl(0 0% 55%)" strokeWidth="3" strokeLinecap="round"/>
+                <ellipse cx="16" cy="34" rx="9" ry="10" fill="hsl(0 0% 55%)"/>
+                <circle cx="11" cy="13" r="3" fill="hsl(0 0% 40%)"/>
+                <circle cx="21" cy="13" r="3" fill="hsl(0 0% 40%)"/>
+                <circle cx="11" cy="12.5" r="1.2" fill="hsl(0 0% 25%)"/>
+                <circle cx="21" cy="12.5" r="1.2" fill="hsl(0 0% 25%)"/>
+                <path d="M14 18 L16 20 L18 18" stroke="hsl(0 0% 40%)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
               </svg>
               {/* Zigzag circles */}
               <div className="flex flex-col items-start gap-1 h-full justify-center pl-4 pr-4">
@@ -233,8 +233,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                       ? `hsl(${successColor} / 0.12)` 
                       : i === 2 
                         ? 'rgba(255,255,255,0.7)' 
-                        : 'transparent',
-                    opacity: i === 3 ? 0.4 : 1,
+                        : `hsl(${mutedColor} / 0.3)`,
+                    opacity: i === 3 ? 0.6 : 1,
                   }}
                 >
                   <div 
