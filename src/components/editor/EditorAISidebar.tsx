@@ -337,7 +337,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                                   : 'none',
                               }}
                             >
-                              <span className="text-[7px] font-semibold" style={{ color: `hsl(${dsConfig.primaryForeground || '0 0% 100%'})` }}>Далее</span>
+                              <span className="text-[7px] font-semibold uppercase" style={{ color: `hsl(${dsConfig.primaryForeground || '0 0% 100%'})` }}>Далее</span>
                             </div>
                             
                             {/* Overlapping color dots */}
