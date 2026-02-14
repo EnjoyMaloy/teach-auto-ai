@@ -319,7 +319,7 @@ export const useGenerateCourse = (courseId: string) => {
           } else {
             let imagesGenerated = 0;
             let imageErrors = 0;
-            const batchSize = 2;
+            const batchSize = 4;
             
             for (let i = 0; i < slidesToIllustrate.length; i += batchSize) {
               checkCancelled();
@@ -347,6 +347,11 @@ export const useGenerateCourse = (courseId: string) => {
               }
               
               updateStep('images', { status: 'active', message: `Создано ${imagesGenerated}/${totalImages} иллюстраций` });
+              
+              // Small delay between batches for API stability
+              if (i + batchSize < slidesToIllustrate.length) {
+                await new Promise(resolve => setTimeout(resolve, 300));
+              }
             }
             
             updateStep('images', { 

@@ -12,6 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { Progress } from '@/components/ui/progress';
 import { Block, BLOCK_CONFIGS } from '@/types/blocks';
 import { Lesson, CourseDesignSystem } from '@/types/course';
 import { useAIGeneration, GenerationStep, getGenerationDuration } from '@/hooks/useAIGeneration';
@@ -458,26 +459,47 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
 
                   {/* Steps */}
                   <div className="space-y-1.5">
-                    {state.steps.map((step) => (
-                      <div 
-                        key={step.id}
-                        className={cn(
-                          "flex items-center gap-2 py-1 px-2 rounded-lg transition-all",
-                          step.status === 'pending' && "opacity-30",
-                          step.status === 'completed' && "bg-emerald-500/10",
-                        )}
-                      >
-                        <div className="flex-shrink-0">{getStepIcon(step)}</div>
-                        <span className={cn(
-                          "text-sm",
-                          step.status === 'completed' && "text-emerald-600 dark:text-emerald-400 font-medium",
-                          step.status === 'active' && "text-foreground font-medium",
-                          step.status === 'error' && "text-destructive"
-                        )}>
-                          {step.label}
-                        </span>
-                      </div>
-                    ))}
+                    {state.steps.map((step) => {
+                      // Parse progress from message like "Создано 3/12 иллюстраций" or "Создано 3 из 12"
+                      const progressMatch = step.message?.match(/(\d+)\s*(?:из|\/)\s*(\d+)/);
+                      const progressPercent = progressMatch 
+                        ? (parseInt(progressMatch[1]) / parseInt(progressMatch[2])) * 100 
+                        : 0;
+
+                      return (
+                        <div key={step.id} className="space-y-1">
+                          <div 
+                            className={cn(
+                              "flex items-center gap-2 py-1 px-2 rounded-lg transition-all",
+                              step.status === 'pending' && "opacity-30",
+                              step.status === 'completed' && "bg-emerald-500/10",
+                            )}
+                          >
+                            <div className="flex-shrink-0">{getStepIcon(step)}</div>
+                            <span className={cn(
+                              "text-sm",
+                              step.status === 'completed' && "text-emerald-600 dark:text-emerald-400 font-medium",
+                              step.status === 'active' && "text-foreground font-medium",
+                              step.status === 'error' && "text-destructive"
+                            )}>
+                              {step.label}
+                            </span>
+                          </div>
+                          {/* Show message and progress bar for active image step */}
+                          {step.status === 'active' && step.id === 'images' && step.message && (
+                            <div className="pl-8 pr-2 space-y-1.5">
+                              <p className="text-xs text-muted-foreground">{step.message}</p>
+                              <div className="progress-striped h-2 rounded-full overflow-hidden bg-[hsl(220,70%,95%)] dark:bg-[hsl(220,40%,20%)]">
+                                <div 
+                                  className="h-full rounded-full transition-all duration-500 ease-out"
+                                  style={{ width: `${progressPercent}%` }}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
