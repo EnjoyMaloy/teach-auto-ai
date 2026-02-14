@@ -237,11 +237,11 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                   <div className="flex-1 space-y-1">
                     <div 
                       className="h-1.5 rounded-full w-3/4"
-                      style={{ backgroundColor: 'hsl(0 0% 65%)' }}
+                      style={{ backgroundColor: i === 1 ? 'hsl(0 0% 45%)' : 'hsl(0 0% 65%)' }}
                     />
                     <div 
                       className="h-1 rounded-full w-1/2"
-                      style={{ backgroundColor: 'hsl(0 0% 70%)' }}
+                      style={{ backgroundColor: i === 1 ? 'hsl(0 0% 50%)' : 'hsl(0 0% 70%)' }}
                     />
                   </div>
                 </div>
