@@ -167,7 +167,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                 <ellipse cx="16" cy="34" rx="9" ry="10" fill="hsl(0 0% 45%)"/>
               </svg>
               {/* Owl silhouette - right side */}
-              <svg className="absolute right-0.5 bottom-[28%]" style={{ opacity: 0.25 }} width="14" height="20" viewBox="0 0 32 44">
+              <svg className="absolute right-0.5 bottom-[20%]" style={{ opacity: 0.3 }} width="16" height="22" viewBox="0 0 32 44">
                 <ellipse cx="16" cy="14" rx="12" ry="13" fill="hsl(0 0% 45%)"/>
                 <path d="M6 4 L10 10" stroke="hsl(0 0% 45%)" strokeWidth="3" strokeLinecap="round"/>
                 <path d="M26 4 L22 10" stroke="hsl(0 0% 45%)" strokeWidth="3" strokeLinecap="round"/>
@@ -186,15 +186,17 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                     </svg>
                   </div>
                 </div>
-                {/* 2 - active (light/highlighted) */}
+                {/* 2 - active (graduation cap icon) */}
                 <div className="flex w-full justify-end">
                   <div 
-                    className="w-6 h-6 rounded-full"
-                    style={{ 
-                      backgroundColor: `hsl(${primaryColor} / 0.35)`,
-                      border: `2px solid hsl(${primaryColor} / 0.5)`
-                    }}
-                  />
+                    className="w-6 h-6 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: `hsl(${primaryColor} / 0.6)` }}
+                  >
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="white" opacity="0.9">
+                      <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
+                      <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+                    </svg>
+                  </div>
                 </div>
                 {/* 3 - locked gray */}
                 <div className="flex w-full justify-start">
@@ -223,8 +225,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                       ? `hsl(${successColor} / 0.2)` 
                       : i === 2 
                         ? 'rgba(255,255,255,0.7)' 
-                        : 'rgba(0,0,0,0.06)',
-                    opacity: i === 3 ? 0.8 : 1,
+                        : 'rgba(0,0,0,0.1)',
+                    opacity: 1,
                   }}
                 >
                   <div 
