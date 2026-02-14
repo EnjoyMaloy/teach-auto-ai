@@ -284,7 +284,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                     const dot2Hsl = thirdBg
                       ? (thirdBg.type === 'solid' ? thirdBg.color || bgHsl : thirdBg.from || bgHsl)
                       : bgHsl; // 3rd theme background
-                    const dot3Hsl = dsConfig.mutedColor || '240 5% 96%'; // text sub-block substrate
+                    const dot3Hsl = db?.backdropDarkColor || '0 0% 0% / 0.9'; // dark backdrop
 
                     return (
                       <button
