@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -23,7 +23,7 @@ type FilterType = 'all' | 'drafts' | 'published';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { courses, isLoading, createCourse, deleteCourse, isCreating } = useUserCourses();
+  const { courses, isLoading, deleteCourse } = useUserCourses();
   const { isFavorite, toggleFavorite } = useCachedFavorites();
   const [courseToDelete, setCourseToDelete] = useState<CourseListItem | null>(null);
   const [filter, setFilter] = useState<FilterType>('all');
@@ -40,13 +40,8 @@ const Dashboard: React.FC = () => {
     published: courses.filter(c => c.isPublished).length,
   };
 
-  const handleCreate = async () => {
-    try {
-      const course = await createCourse('Новый курс');
-      if (course) navigate(`/editor/${course.id}`, { state: { openAIGenerate: true } });
-    } catch {
-      // Error handled by mutation
-    }
+  const handleCreate = () => {
+    navigate('/editor/new', { state: { openAIGenerate: true } });
   };
 
   const handleDelete = async () => {
@@ -73,18 +68,11 @@ const Dashboard: React.FC = () => {
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 z-20 flex items-center justify-end px-4">
         <Button 
           onClick={handleCreate} 
-          disabled={isCreating}
           size="sm"
           className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px]"
         >
-          {isCreating ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          ) : (
-            <>
-              <Plus className="w-3.5 h-3.5 mr-1.5" />
-              Создать
-            </>
-          )}
+          <Plus className="w-3.5 h-3.5 mr-1.5" />
+          Создать
         </Button>
       </div>
       
@@ -99,18 +87,11 @@ const Dashboard: React.FC = () => {
       <div className="hidden md:block fixed top-4 right-6 z-20">
         <Button 
           onClick={handleCreate} 
-          disabled={isCreating}
           size="sm"
           className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px]"
         >
-          {isCreating ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          ) : (
-            <>
-              <Plus className="w-3.5 h-3.5 mr-1.5" />
-              Новый курс
-            </>
-          )}
+          <Plus className="w-3.5 h-3.5 mr-1.5" />
+          Новый курс
         </Button>
       </div>
 
@@ -153,7 +134,6 @@ const Dashboard: React.FC = () => {
           {filter === 'all' && (
             <Button 
               onClick={handleCreate} 
-              disabled={isCreating}
               variant="outline"
               size="sm"
               className="border-border text-muted-foreground hover:text-foreground hover:bg-muted dark:border-white/10 dark:text-white/60 dark:hover:text-white dark:hover:bg-white/5"

@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { arrayMove } from '@dnd-kit/sortable';
 import {
   DndContext,
@@ -108,7 +109,7 @@ const Editor: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
-  const { fetchCourse, createCourse, saveCourse } = useCourses();
+  const { fetchCourse, saveCourse } = useCourses();
 
   const [course, setCourse] = useState<Course | null>(null);
   const [isLoadingCourse, setIsLoadingCourse] = useState(true);
@@ -116,7 +117,7 @@ const Editor: React.FC = () => {
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [selectedSubBlockId, setSelectedSubBlockId] = useState<string | null>(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
-  const [showBlockSelector, setShowBlockSelector] = useState(false); // kept for potential use
+  const [showBlockSelector, setShowBlockSelector] = useState(false);
   const [undoStack, setUndoStack] = useState<Course[]>([]);
   const [redoStack, setRedoStack] = useState<Course[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -124,6 +125,7 @@ const Editor: React.FC = () => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
+  const [isNewCourse, setIsNewCourse] = useState(false); // Track if course is not yet in DB
   const [initialAIMode, setInitialAIMode] = useState<'generate' | null>(
     (location.state as any)?.openAIGenerate ? 'generate' : null
   );
@@ -145,12 +147,27 @@ const Editor: React.FC = () => {
       setIsLoadingCourse(true);
       
       if (courseId === 'new') {
-        const newCourse = await createCourse('Новый курс');
-        if (newCourse) {
-          navigate(`/editor/${newCourse.id}`, { replace: true });
-        } else {
-          navigate('/');
-        }
+        // Create in-memory course without saving to DB
+        const tempId = crypto.randomUUID();
+        const tempCourse: Course = {
+          id: tempId,
+          title: 'Новый курс',
+          description: '',
+          authorId: user.id,
+          targetAudience: '',
+          lessons: [],
+          currentVersion: 1,
+          versions: [],
+          isPublished: false,
+          estimatedMinutes: 0,
+          tags: [],
+          lessonsDisplayType: 'circle_map',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        setCourse(tempCourse);
+        setIsNewCourse(true);
+        navigate(`/editor/${tempId}`, { replace: true, state: location.state });
       } else if (courseId) {
         const loadedCourse = await fetchCourse(courseId);
         if (loadedCourse) {
@@ -161,7 +178,8 @@ const Editor: React.FC = () => {
               setSelectedBlockId(loadedCourse.lessons[0].slides[0].id);
             }
           }
-        } else {
+        } else if (!isNewCourse) {
+          // Only show error if this isn't a new in-memory course
           toast.error('Курс не найден');
           navigate('/');
         }
@@ -196,12 +214,56 @@ const Editor: React.FC = () => {
     setHasUnsavedChanges(true);
   }, [course]);
 
+  // Persist a new in-memory course to DB for the first time
+  const persistNewCourseToDb = useCallback(async (courseToSave: Course): Promise<boolean> => {
+    if (!user) return false;
+    try {
+      const { data, error } = await supabase
+        .from('courses')
+        .insert({
+          id: courseToSave.id,
+          author_id: user.id,
+          title: courseToSave.title,
+          description: courseToSave.description || '',
+          design_system: courseToSave.designSystem as any,
+          lessons_display_type: courseToSave.lessonsDisplayType || 'circle_map',
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      setIsNewCourse(false);
+      return true;
+    } catch (error) {
+      console.error('Error creating course in DB:', error);
+      toast.error('Ошибка создания курса');
+      return false;
+    }
+  }, [user]);
+
+  // Ensure course is persisted to DB (for new courses)
+  const ensurePersisted = useCallback(async () => {
+    if (!isNewCourse || !course) return true;
+    const created = await persistNewCourseToDb(course);
+    return created;
+  }, [isNewCourse, course, persistNewCourseToDb]);
+
   // Autosave effect - saves 2 seconds after last change
   useEffect(() => {
     if (!hasUnsavedChanges || !course || isSaving) return;
 
     const timeoutId = setTimeout(async () => {
       setIsSaving(true);
+      
+      // If this is a new course, create it in DB first
+      if (isNewCourse) {
+        const created = await persistNewCourseToDb(course);
+        if (!created) {
+          setIsSaving(false);
+          return;
+        }
+      }
+      
       const success = await saveCourse(course);
       setIsSaving(false);
       if (success) {
@@ -211,7 +273,7 @@ const Editor: React.FC = () => {
     }, 2000);
 
     return () => clearTimeout(timeoutId);
-  }, [course, hasUnsavedChanges, isSaving, saveCourse]);
+  }, [course, hasUnsavedChanges, isSaving, saveCourse, isNewCourse, persistNewCourseToDb]);
 
   const handleUndo = useCallback(() => {
     if (undoStack.length === 0 || !course) return;
@@ -456,6 +518,15 @@ const Editor: React.FC = () => {
   const handleSave = async () => {
     if (!course) return;
     setIsSaving(true);
+    
+    if (isNewCourse) {
+      const created = await persistNewCourseToDb(course);
+      if (!created) {
+        setIsSaving(false);
+        return;
+      }
+    }
+    
     const success = await saveCourse(course);
     setIsSaving(false);
     if (success) {
@@ -514,7 +585,8 @@ const Editor: React.FC = () => {
         courseId={course.id}
         designSystem={course.designSystem}
         selectedBlock={selectedBlock}
-        onAIGenerate={(generatedLessons) => {
+        onAIGenerate={async (generatedLessons) => {
+          await ensurePersisted();
           pushToUndo();
           setCourse(prev => prev ? ({
             ...prev,
@@ -530,6 +602,7 @@ const Editor: React.FC = () => {
           toast.success(`Курс сгенерирован: ${generatedLessons.length} уроков`);
         }}
         onUpdateBlock={handleUpdateBlock}
+        onBeforeGenerate={ensurePersisted}
       />
 
       {/* Main content area - header + content */}
@@ -556,8 +629,9 @@ const Editor: React.FC = () => {
             pushToUndo();
             setCourse(prev => prev ? ({ ...prev, lessonsDisplayType: type, updatedAt: new Date() }) : null);
           }}
-          onAIGenerate={(generatedLessons) => {
+          onAIGenerate={async (generatedLessons) => {
             if (!course) return;
+            await ensurePersisted();
             pushToUndo();
             setCourse(prev => prev ? ({
               ...prev,
