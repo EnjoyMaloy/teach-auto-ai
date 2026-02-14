@@ -155,23 +155,23 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         {/* Preview */}
         <div 
           className="h-32 rounded-lg mb-2 p-3 overflow-hidden flex items-center justify-center"
-          style={{ backgroundColor: `hsl(${mutedColor} / 0.4)` }}
+          style={{ backgroundColor: 'hsl(0 0% 78%)' }}
         >
           {type === 'circle_map' ? (
             <div className="relative w-full h-full">
               {/* Owl silhouette - left side */}
               <svg className="absolute left-0.5 top-[30%]" style={{ opacity: 0.3 }} width="16" height="22" viewBox="0 0 32 44">
-                <ellipse cx="16" cy="14" rx="12" ry="13" fill="currentColor"/>
-                <path d="M6 4 L10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
-                <path d="M26 4 L22 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
-                <ellipse cx="16" cy="34" rx="9" ry="10" fill="currentColor"/>
+                <ellipse cx="16" cy="14" rx="12" ry="13" fill="hsl(0 0% 45%)"/>
+                <path d="M6 4 L10 10" stroke="hsl(0 0% 45%)" strokeWidth="3" strokeLinecap="round"/>
+                <path d="M26 4 L22 10" stroke="hsl(0 0% 45%)" strokeWidth="3" strokeLinecap="round"/>
+                <ellipse cx="16" cy="34" rx="9" ry="10" fill="hsl(0 0% 45%)"/>
               </svg>
               {/* Owl silhouette - right side */}
               <svg className="absolute right-0.5 bottom-[28%]" style={{ opacity: 0.25 }} width="14" height="20" viewBox="0 0 32 44">
-                <ellipse cx="16" cy="14" rx="12" ry="13" fill="currentColor"/>
-                <path d="M6 4 L10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
-                <path d="M26 4 L22 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
-                <ellipse cx="16" cy="34" rx="9" ry="10" fill="currentColor"/>
+                <ellipse cx="16" cy="14" rx="12" ry="13" fill="hsl(0 0% 45%)"/>
+                <path d="M6 4 L10 10" stroke="hsl(0 0% 45%)" strokeWidth="3" strokeLinecap="round"/>
+                <path d="M26 4 L22 10" stroke="hsl(0 0% 45%)" strokeWidth="3" strokeLinecap="round"/>
+                <ellipse cx="16" cy="34" rx="9" ry="10" fill="hsl(0 0% 45%)"/>
               </svg>
               {/* Zigzag circles */}
               <div className="flex flex-col items-start gap-1 h-full justify-center pl-4 pr-4">
@@ -232,17 +232,17 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                     style={{ 
                       backgroundColor: i === 1 
                         ? `hsl(${successColor} / 0.45)` 
-                        : `hsl(${mutedColor})`,
+                        : 'hsl(0 0% 70%)',
                     }}
                   />
                   <div className="flex-1 space-y-1">
                     <div 
                       className="h-1.5 rounded-full w-3/4"
-                      style={{ backgroundColor: `hsl(${mutedColor})` }}
+                      style={{ backgroundColor: 'hsl(0 0% 65%)' }}
                     />
                     <div 
                       className="h-1 rounded-full w-1/2"
-                      style={{ backgroundColor: `hsl(${mutedColor} / 0.5)` }}
+                      style={{ backgroundColor: 'hsl(0 0% 70%)' }}
                     />
                   </div>
                 </div>
