@@ -43,7 +43,7 @@ const Dashboard: React.FC = () => {
   const handleCreate = async () => {
     try {
       const course = await createCourse('Новый курс');
-      if (course) navigate(`/editor/${course.id}`);
+      if (course) navigate(`/editor/${course.id}`, { state: { openAIGenerate: true } });
     } catch {
       // Error handled by mutation
     }

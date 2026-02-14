@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { arrayMove } from '@dnd-kit/sortable';
 import {
   DndContext,
@@ -106,6 +106,7 @@ const blockToSlide = (block: Block): Slide => ({
 const Editor: React.FC = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const { fetchCourse, createCourse, saveCourse } = useCourses();
 
@@ -123,6 +124,9 @@ const Editor: React.FC = () => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
+  const [initialAIMode, setInitialAIMode] = useState<'generate' | null>(
+    (location.state as any)?.openAIGenerate ? 'generate' : null
+  );
 
 
   const sensors = useSensors(
@@ -169,6 +173,16 @@ const Editor: React.FC = () => {
     loadCourse();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId, user?.id]);
+
+  // Auto-open AI sidebar in generate mode when coming from "New Course"
+  useEffect(() => {
+    if (initialAIMode === 'generate' && course && !isLoadingCourse) {
+      setIsAISidebarOpen(true);
+      setInitialAIMode(null);
+      // Clear navigation state to prevent re-triggering
+      window.history.replaceState({}, '');
+    }
+  }, [initialAIMode, course, isLoadingCourse]);
 
   const selectedLesson = course?.lessons.find(l => l.id === selectedLessonId);
   const blocks: Block[] = selectedLesson?.slides.map(slideToBlock) || [];
@@ -496,6 +510,7 @@ const Editor: React.FC = () => {
       <EditorAISidebar
         isOpen={isAISidebarOpen}
         onClose={() => setIsAISidebarOpen(false)}
+        initialMode={(location.state as any)?.openAIGenerate ? 'generate' : undefined}
         courseId={course.id}
         designSystem={course.designSystem}
         selectedBlock={selectedBlock}

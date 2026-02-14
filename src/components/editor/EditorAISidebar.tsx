@@ -27,6 +27,7 @@ interface EditorAISidebarProps {
   selectedBlock: Block | null;
   onAIGenerate: (lessons: Lesson[]) => void;
   onUpdateBlock: (updates: Partial<Block>) => void;
+  initialMode?: 'generate';
 }
 
 type SidebarMode = 'idle' | 'generate' | 'edit-block';
@@ -39,8 +40,9 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   selectedBlock,
   onAIGenerate,
   onUpdateBlock,
+  initialMode,
 }) => {
-  const [mode, setMode] = useState<SidebarMode>('idle');
+  const [mode, setMode] = useState<SidebarMode>(initialMode === 'generate' ? 'generate' : 'idle');
   const [chatInput, setChatInput] = useState('');
   const [isEditingBlock, setIsEditingBlock] = useState(false);
   const [localSkipImages, setLocalSkipImages] = useState(false);
@@ -66,6 +68,13 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   useEffect(() => {
     setDesignSystem(designSystem);
   }, [designSystem, setDesignSystem]);
+
+  // Set mode to generate when initialMode is passed and sidebar opens
+  useEffect(() => {
+    if (initialMode === 'generate' && isOpen) {
+      setMode('generate');
+    }
+  }, [initialMode, isOpen]);
 
   const isGenerating = state.status === 'generating';
   const isCompleted = state.status === 'completed';
