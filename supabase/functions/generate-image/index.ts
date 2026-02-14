@@ -102,103 +102,46 @@ Style requirements:
 - Simple backgrounds, no complex textures${colorGuidance}`;
 
     const useFlash = imageModel === 'gemini-2.5-flash';
+    const MODEL = useFlash ? "gemini-2.5-flash-image" : "gemini-3-pro-image-preview";
     
-    console.log(`Generating image via ${useFlash ? 'gemini-2.5-flash (Lovable AI)' : 'gemini-3-pro-image-preview (Direct)'} for: ${(slideContext || prompt).substring(0, 60)}...`);
+    console.log(`Generating image via ${MODEL} for: ${(slideContext || prompt).substring(0, 60)}...`);
 
-    let imageBase64: string | null = null;
-    let imageMimeType = 'image/png';
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: imagePrompt }] }],
+        generationConfig: {
+          responseModalities: ["TEXT", "IMAGE"],
+          ...(useFlash ? {} : { imageConfig: { aspectRatio: "1:1", imageSize: "1K" } }),
+        },
+      }),
+    });
 
-    if (useFlash) {
-      // Use Lovable AI Gateway for flash image model
-      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-      if (!LOVABLE_API_KEY) {
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Gemini Image API error:", response.status, errorText);
+      if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: "LOVABLE_API_KEY не настроен" }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: "Превышен лимит запросов Gemini API. Попробуйте позже." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-
-      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash-image",
-          messages: [{ role: "user", content: imagePrompt }],
-          modalities: ["image", "text"],
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Lovable AI Gateway error:", response.status, errorText);
-        if (response.status === 429) {
-          return new Response(
-            JSON.stringify({ error: "Превышен лимит запросов. Попробуйте позже." }),
-            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-        if (response.status === 402) {
-          return new Response(
-            JSON.stringify({ error: "Недостаточно кредитов Lovable AI." }),
-            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-        throw new Error(`Lovable AI error: ${response.status}`);
+      if (response.status === 403 || response.status === 400) {
+        return new Response(
+          JSON.stringify({ error: "Ошибка Gemini API. Проверьте ключ и биллинг.", details: errorText }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
+      throw new Error(`Gemini API error: ${response.status}`);
+    }
 
-      const data = await response.json();
-      const imgUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-      if (imgUrl && imgUrl.startsWith('data:')) {
-        const match = imgUrl.match(/^data:(image\/\w+);base64,(.+)$/);
-        if (match) {
-          imageMimeType = match[1];
-          imageBase64 = match[2];
-        }
-      }
-    } else {
-      // Use direct Gemini API for pro model
-      const MODEL = "gemini-3-pro-image-preview";
-
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: imagePrompt }] }],
-          generationConfig: {
-            responseModalities: ["TEXT", "IMAGE"],
-            imageConfig: { aspectRatio: "1:1", imageSize: "1K" }
-          },
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Gemini Image API error:", response.status, errorText);
-        if (response.status === 429) {
-          return new Response(
-            JSON.stringify({ error: "Превышен лимит запросов Gemini API. Попробуйте позже." }),
-            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-        if (response.status === 403 || response.status === 400) {
-          return new Response(
-            JSON.stringify({ error: "Ошибка Gemini API. Проверьте ключ и биллинг.", details: errorText }),
-            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-        throw new Error(`Gemini API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const parts = data.candidates?.[0]?.content?.parts || [];
-      const imagePart = parts.find((part: any) => part.inlineData?.mimeType?.startsWith('image/'));
-      if (imagePart?.inlineData) {
-        imageMimeType = imagePart.inlineData.mimeType;
-        imageBase64 = imagePart.inlineData.data;
-      }
+    const data = await response.json();
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    const imagePart = parts.find((part: any) => part.inlineData?.mimeType?.startsWith('image/'));
+    if (imagePart?.inlineData) {
+      imageMimeType = imagePart.inlineData.mimeType;
+      imageBase64 = imagePart.inlineData.data;
     }
 
     if (!imageBase64) {
