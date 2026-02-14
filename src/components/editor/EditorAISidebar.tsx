@@ -82,7 +82,8 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     
     if (mode === 'generate') {
       setLocalPrompt(chatInput);
-      runGeneration(chatInput, localSkipImages);
+      const selectedDS = designSystems.find(ds => ds.id === selectedDesignSystemId);
+      runGeneration(chatInput, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id);
       setChatInput('');
     } else if (mode === 'edit-block' && selectedBlock) {
       handleEditBlock(chatInput);
@@ -395,7 +396,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                   Кол-во уроков
                 </div>
                 <div className="flex gap-1.5">
-                  {[1, 2, 3, 5, 7].map((count) => (
+                  {[3, 5, 10].map((count) => (
                     <button
                       key={count}
                       onClick={() => setLessonCount(count)}
