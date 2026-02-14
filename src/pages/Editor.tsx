@@ -589,12 +589,13 @@ const Editor: React.FC = () => {
         courseId={course.id}
         designSystem={course.designSystem}
         selectedBlock={selectedBlock}
-        onAIGenerate={async (generatedLessons) => {
+        onAIGenerate={async (generatedLessons, designConfig, designSystemId) => {
           await ensurePersisted();
           pushToUndo();
           setCourse(prev => prev ? ({
             ...prev,
             lessons: generatedLessons.map((l, i) => ({ ...l, courseId: prev.id, order: i + 1 })),
+            ...(designConfig ? { designSystem: designConfig as any } : {}),
             updatedAt: new Date(),
           }) : null);
           if (generatedLessons.length > 0) {
@@ -633,13 +634,14 @@ const Editor: React.FC = () => {
             pushToUndo();
             setCourse(prev => prev ? ({ ...prev, lessonsDisplayType: type, updatedAt: new Date() }) : null);
           }}
-          onAIGenerate={async (generatedLessons) => {
+          onAIGenerate={async (generatedLessons, designConfig, designSystemId) => {
             if (!course) return;
             await ensurePersisted();
             pushToUndo();
             setCourse(prev => prev ? ({
               ...prev,
               lessons: generatedLessons.map((l, i) => ({ ...l, courseId: prev.id, order: i + 1 })),
+              ...(designConfig ? { designSystem: designConfig as any } : {}),
               updatedAt: new Date(),
             }) : null);
             if (generatedLessons.length > 0) {

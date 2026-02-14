@@ -48,7 +48,7 @@ interface EditorHeaderProps {
   onUpdateTitle: (title: string) => void;
   onUpdateDesignSystem: (config: DesignSystemConfig) => void;
   onUpdateLessonsDisplayType?: (type: LessonsDisplayType) => void;
-  onAIGenerate?: (lessons: Lesson[]) => void;
+  onAIGenerate?: (lessons: Lesson[], designConfig?: DesignSystemConfig, designSystemId?: string) => void;
   onBack?: () => void;
 }
 
