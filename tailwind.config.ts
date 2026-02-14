@@ -15,13 +15,17 @@ export default {
   	extend: {
   		fontFamily: {
   			sans: [
+  				'Montserrat',
   				'ui-sans-serif',
   				'system-ui',
-  				'sans-serif',
-  				'Apple Color Emoji',
-  				'Segoe UI Emoji',
-  				'Segoe UI Symbol',
-  				'Noto Color Emoji'
+  				'-apple-system',
+  				'BlinkMacSystemFont',
+  				'Segoe UI',
+  				'Roboto',
+  				'Helvetica Neue',
+  				'Arial',
+  				'Noto Sans',
+  				'sans-serif'
   			],
   			display: [
   				'Inter',
@@ -29,6 +33,7 @@ export default {
   				'sans-serif'
   			],
   			serif: [
+  				'Cormorant Garamond',
   				'ui-serif',
   				'Georgia',
   				'Cambria',
@@ -37,6 +42,7 @@ export default {
   				'serif'
   			],
   			mono: [
+  				'IBM Plex Mono',
   				'ui-monospace',
   				'SFMono-Regular',
   				'Menlo',
