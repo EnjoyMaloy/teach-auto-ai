@@ -315,13 +315,13 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                           
                           {/* Body text placeholder */}
                           <p 
-                            className="text-[7px] leading-tight opacity-50"
+                            className="text-[8px] leading-tight opacity-50"
                             style={{ 
                               fontFamily: dsConfig.fontFamily || 'inherit',
                               color: `hsl(${fgHsl})`,
                             }}
                           >
-                            Пример текста курса
+                            Пример текста курса в этой теме
                           </p>
 
                           {/* Button + color dots row */}
