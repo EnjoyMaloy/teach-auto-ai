@@ -1342,7 +1342,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
 
   const bottomNavigation = (
     <div 
-      className="h-20 flex items-center justify-center gap-3 px-4 shrink-0 relative z-10"
+      className="h-20 flex items-center justify-center gap-3 px-4 pb-2 shrink-0 relative z-10"
       style={{ 
         backgroundColor: answerState === 'correct' 
           ? correctBgTint 
