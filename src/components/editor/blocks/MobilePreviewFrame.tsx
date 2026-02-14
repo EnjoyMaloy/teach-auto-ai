@@ -487,7 +487,7 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             {block.imageUrl && (
               <img src={block.imageUrl} alt="" className="w-full rounded-2xl object-contain max-h-[60%]" />
             )}
-            <p className="text-lg text-foreground text-center">{block.content || 'Описание к картинке...'}</p>
+            <p className="text-lg text-center" style={{ color: `hsl(${ds.foregroundColor})` }}>{block.content || 'Описание к картинке...'}</p>
           </div>
         );
 
