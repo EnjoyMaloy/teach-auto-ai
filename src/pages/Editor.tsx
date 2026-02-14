@@ -342,7 +342,7 @@ const Editor: React.FC = () => {
     }) : null);
     setSelectedLessonId(newLesson.id);
     setSelectedBlockId(null);
-    toast.success('Урок добавлен');
+    // toast removed intentionally
   };
 
   const handleDeleteLesson = (lessonId: string) => {
@@ -361,7 +361,7 @@ const Editor: React.FC = () => {
       const remaining = course.lessons.filter(l => l.id !== lessonId);
       setSelectedLessonId(remaining[0]?.id || null);
     }
-    toast.success('Урок удалён');
+    // toast removed intentionally
   };
 
   const handleDuplicateLesson = (lessonId: string) => {
@@ -412,7 +412,7 @@ const Editor: React.FC = () => {
     }) : null);
     setSelectedBlockId(newBlock.id);
     setShowBlockSelector(false);
-    toast.success('Блок добавлен');
+    // toast removed intentionally
   };
 
   const handleUpdateBlock = (updates: Partial<Block>) => {
@@ -447,7 +447,7 @@ const Editor: React.FC = () => {
     if (idToDelete === selectedBlockId) {
       setSelectedBlockId(null);
     }
-    toast.success('Блок удалён');
+    // toast removed intentionally
   };
 
   const handleDuplicateBlock = (blockId: string) => {
@@ -709,6 +709,7 @@ const Editor: React.FC = () => {
             setSelectedBlockId(blockId);
           }}
           onAddLesson={handleAddLesson}
+          onDeleteLesson={handleDeleteLesson}
           onAddBlock={handleAddBlock}
           onReorderBlocks={handleReorderBlocks}
           onDeleteBlock={handleDeleteBlock}

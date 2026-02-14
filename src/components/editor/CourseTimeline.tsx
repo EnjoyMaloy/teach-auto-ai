@@ -41,6 +41,7 @@ interface CourseTimelineProps {
   onAddBlock: (type: BlockType) => void;
   onReorderBlocks: (event: DragEndEvent) => void;
   onDeleteBlock?: (blockId: string) => void;
+  onDeleteLesson?: (lessonId: string) => void;
   slideToBlock: (slide: any) => Block;
   designSystem?: CourseDesignSystem | DesignSystemConfig;
 }
@@ -182,6 +183,7 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
   onAddBlock,
   onReorderBlocks,
   onDeleteBlock,
+  onDeleteLesson,
   slideToBlock,
   designSystem,
 }) => {
@@ -234,22 +236,36 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
               return (
                 <div key={lesson.id} className="flex items-center gap-2 flex-shrink-0">
                   {/* Lesson indicator */}
-                  <div
-                    onClick={() => handleLessonClick(lesson.id)}
-                    className={cn(
-                      'relative flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-200',
-                      'text-sm font-bold',
-                      isSelectedLesson
-                        ? 'bg-primary text-primary-foreground shadow-lg scale-105'
-                        : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:scale-105'
+                  <div className="relative group/lesson flex-shrink-0">
+                    <div
+                      onClick={() => handleLessonClick(lesson.id)}
+                      className={cn(
+                        'w-12 h-12 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-200',
+                        'text-sm font-bold',
+                        isSelectedLesson
+                          ? 'bg-primary text-primary-foreground shadow-lg scale-105'
+                          : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:scale-105'
+                      )}
+                      title={lesson.title}
+                    >
+                      {lessonIndex + 1}
+                      {/* Block count badge */}
+                      <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-background border border-border text-[10px] font-medium flex items-center justify-center text-foreground">
+                        {blocks.length}
+                      </span>
+                    </div>
+                    {/* Delete lesson button */}
+                    {onDeleteLesson && lessons.length > 1 && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteLesson(lesson.id);
+                        }}
+                        className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[hsl(0,60%,85%)] text-[hsl(0,50%,40%)] hover:bg-[hsl(0,60%,78%)] flex items-center justify-center opacity-0 group-hover/lesson:opacity-100 transition-opacity z-10"
+                      >
+                        <Trash2 className="w-2.5 h-2.5" />
+                      </button>
                     )}
-                    title={lesson.title}
-                  >
-                    {lessonIndex + 1}
-                    {/* Block count badge */}
-                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-background border border-border text-[10px] font-medium flex items-center justify-center text-foreground">
-                      {blocks.length}
-                    </span>
                   </div>
 
                   {/* Expanded blocks */}
