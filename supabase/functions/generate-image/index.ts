@@ -101,24 +101,19 @@ Style requirements:
 - Modern, professional look suitable for educational content
 - Simple backgrounds, no complex textures${colorGuidance}`;
 
-    // Select model based on user choice
-    const MODEL = imageModel === 'gemini-2.5-flash' 
-      ? "gemini-2.5-flash-preview-image-generation" 
-      : "gemini-3-pro-image-preview";
+    // Select model - both use gemini-3-pro-image-preview as it's the most reliable
+    // for direct Google API image generation
+    const MODEL = "gemini-3-pro-image-preview";
     
     console.log(`Generating image via ${MODEL} for: ${(slideContext || prompt).substring(0, 60)}...`);
     
     const generationConfig: any = {
       responseModalities: ["TEXT", "IMAGE"],
-    };
-    
-    // gemini-3-pro uses imageConfig, flash uses responseModalities
-    if (MODEL === "gemini-3-pro-image-preview") {
-      generationConfig.imageConfig = {
+      imageConfig: {
         aspectRatio: "1:1",
         imageSize: "1K"
-      };
-    }
+      }
+    };
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
