@@ -449,31 +449,40 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
 
               {/* AI response bubble with steps */}
               <div className="flex justify-start">
-                <div className="max-w-[90%] px-3.5 py-3 rounded-2xl rounded-tl-md bg-muted/50 text-foreground text-sm space-y-2">
-                  {state.steps.map((step) => (
-                    <div 
-                      key={step.id}
-                      className={cn(
-                        "flex items-center gap-2 transition-opacity",
-                        step.status === 'pending' && "opacity-30"
-                      )}
-                    >
-                      <div className="flex-shrink-0">{getStepIcon(step)}</div>
-                      <span className={cn(
-                        "text-sm",
-                        step.status === 'completed' && "text-emerald-600 dark:text-emerald-400",
-                        step.status === 'active' && "text-foreground font-medium",
-                        step.status === 'error' && "text-destructive"
-                      )}>
-                        {step.label}
-                      </span>
-                    </div>
-                  ))}
-                  {/* Typing indicator */}
-                  <div className="flex items-center gap-1 pt-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 animate-pulse" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 animate-pulse [animation-delay:0.2s]" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 animate-pulse [animation-delay:0.4s]" />
+                <div className="max-w-[90%] px-3.5 py-3 rounded-2xl rounded-tl-md bg-muted/50 text-foreground text-sm space-y-3">
+                  {/* Pulsing header */}
+                  <div className="flex items-center gap-2 animate-pulse">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    <span className="font-semibold text-foreground">Создаю курс</span>
+                    <span className="flex items-center gap-0.5">
+                      <span className="w-1 h-1 rounded-full bg-foreground/60 animate-bounce [animation-delay:0s]" />
+                      <span className="w-1 h-1 rounded-full bg-foreground/60 animate-bounce [animation-delay:0.15s]" />
+                      <span className="w-1 h-1 rounded-full bg-foreground/60 animate-bounce [animation-delay:0.3s]" />
+                    </span>
+                  </div>
+
+                  {/* Steps */}
+                  <div className="space-y-1.5">
+                    {state.steps.map((step) => (
+                      <div 
+                        key={step.id}
+                        className={cn(
+                          "flex items-center gap-2 py-1 px-2 rounded-lg transition-all",
+                          step.status === 'pending' && "opacity-30",
+                          step.status === 'completed' && "bg-emerald-500/10",
+                        )}
+                      >
+                        <div className="flex-shrink-0">{getStepIcon(step)}</div>
+                        <span className={cn(
+                          "text-sm",
+                          step.status === 'completed' && "text-emerald-600 dark:text-emerald-400 font-medium",
+                          step.status === 'active' && "text-foreground font-medium",
+                          step.status === 'error' && "text-destructive"
+                        )}>
+                          {step.label}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
