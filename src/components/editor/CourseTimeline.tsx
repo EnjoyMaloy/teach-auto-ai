@@ -162,7 +162,7 @@ const SortableBlockThumb: React.FC<{
             e.stopPropagation();
             onDelete(block.id);
           }}
-          className="absolute top-1 right-1 z-20 p-1 rounded-md bg-destructive/90 text-white opacity-0 group-hover/thumb:opacity-100 transition-opacity hover:bg-destructive"
+          className="absolute top-1 right-1 z-20 p-1 rounded-md bg-[hsl(0,60%,85%)] text-[hsl(0,50%,40%)] opacity-0 group-hover/thumb:opacity-100 transition-opacity hover:bg-[hsl(0,60%,78%)]"
         >
           <Trash2 className="w-2.5 h-2.5" />
         </button>
