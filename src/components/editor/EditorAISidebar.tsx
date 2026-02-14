@@ -367,7 +367,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                       "flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all border",
                       !localSkipImages
                         ? "bg-primary/10 border-primary/30 text-primary"
-                        : "bg-muted/30 border-transparent text-muted-foreground hover:bg-muted/50"
+                        : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
                     )}
                   >
                     <ImageIcon className="w-3.5 h-3.5" />
@@ -379,7 +379,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                       "flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all border",
                       localSkipImages
                         ? "bg-primary/10 border-primary/30 text-primary"
-                        : "bg-muted/30 border-transparent text-muted-foreground hover:bg-muted/50"
+                        : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
                     )}
                   >
                     <ImageOff className="w-3.5 h-3.5" />
@@ -403,7 +403,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                         "flex-1 py-2 rounded-xl text-xs font-medium transition-all border",
                         lessonCount === count
                           ? "bg-primary/10 border-primary/30 text-primary"
-                          : "bg-muted/30 border-transparent text-muted-foreground hover:bg-muted/50"
+                          : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
                       )}
                     >
                       {count}
