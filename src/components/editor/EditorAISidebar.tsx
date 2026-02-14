@@ -437,7 +437,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                           : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
                       )}
                     >
-                      Pro (качество)
+                      Gemini 3 Pro
                     </button>
                     <button
                       onClick={() => setImageModel('gemini-2.5-flash')}
@@ -448,7 +448,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                           : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
                       )}
                     >
-                      Flash (быстро)
+                      Gemini 2.5 Flash
                     </button>
                   </div>
                 )}
