@@ -264,7 +264,8 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           sliderCorrect: selectedBlock.sliderCorrect, sliderStep: selectedBlock.sliderStep,
         };
       } else {
-        body.currentSubBlock = { type: selectedBlock.type, content: selectedBlock.content };
+        // For design blocks: send ALL sub-blocks as the full context
+        // Do NOT send currentSubBlock with type "design" — it's meaningless to the AI
         body.allSubBlocks = selectedBlock.subBlocks || [];
       }
 
