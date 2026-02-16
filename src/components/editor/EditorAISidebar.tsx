@@ -337,12 +337,12 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       </div>
 
       {/* Chat / Messages area */}
-      <ScrollArea className="flex-1">
-        <div className="p-4 space-y-3 h-full">
+      <ScrollArea className="flex-1 h-full">
+        <div className="p-4 space-y-3 min-h-full flex flex-col">
           {/* Idle state - free chat */}
           {mode === 'idle' && !isGenerating && !isCompleted && !isError && (
             chatMessages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full">
+              <div className="flex flex-col items-center justify-center flex-1">
                 <img src={aiMascot} alt="" className="w-32 h-32 object-contain mb-3" />
                 <p className="text-sm text-muted-foreground text-center px-8">
                   Напишите что хотите изменить или выберите действие внизу
