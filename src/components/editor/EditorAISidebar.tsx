@@ -341,7 +341,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           {/* Idle state - free chat */}
           {mode === 'idle' && !isGenerating && !isCompleted && !isError && (
             chatMessages.length === 0 ? (
-              <div className="flex items-end justify-center min-h-[60vh]">
+              <div className="flex items-center justify-center min-h-[60vh]">
                 <p className="text-sm text-muted-foreground text-center px-8">
                   Напишите что хотите изменить или выберите действие внизу
                 </p>
