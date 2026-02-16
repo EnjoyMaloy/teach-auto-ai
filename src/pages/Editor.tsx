@@ -599,6 +599,8 @@ const Editor: React.FC = () => {
         courseId={course.id}
         designSystem={course.designSystem}
         selectedBlock={selectedBlock}
+        selectedLessonOrder={selectedLesson ? (course.lessons.indexOf(selectedLesson) + 1) : undefined}
+        selectedBlockOrder={selectedBlock ? (blocks.indexOf(selectedBlock) + 1) : undefined}
         allBlocks={blocks}
         onAIGenerate={async (generatedLessons, designConfig, designSystemId) => {
           await ensurePersisted();

@@ -34,6 +34,8 @@ interface EditorAISidebarProps {
   courseId: string;
   designSystem?: CourseDesignSystem;
   selectedBlock: Block | null;
+  selectedLessonOrder?: number;
+  selectedBlockOrder?: number;
   allBlocks?: Block[];
   onAIGenerate: (lessons: Lesson[], designConfig?: DesignSystemConfig, designSystemId?: string) => void;
   onUpdateBlock: (updates: Partial<Block>) => void;
@@ -49,6 +51,8 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   courseId,
   designSystem,
   selectedBlock,
+  selectedLessonOrder,
+  selectedBlockOrder,
   allBlocks,
   onAIGenerate,
   onUpdateBlock,
@@ -697,7 +701,10 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
               return IconComp ? <IconComp className="w-3.5 h-3.5 text-[hsl(270,50%,50%)] dark:text-[hsl(270,60%,75%)] flex-shrink-0" /> : null;
             })()}
             <span className="text-xs font-medium text-[hsl(270,50%,35%)] dark:text-[hsl(270,60%,75%)] truncate">
-              {BLOCK_CONFIGS[selectedBlock.type]?.labelRu || selectedBlock.type}
+              {selectedLessonOrder && selectedBlockOrder
+                ? `Урок ${selectedLessonOrder}, блок ${selectedBlockOrder} · `
+                : ''
+              }{BLOCK_CONFIGS[selectedBlock.type]?.labelRu || selectedBlock.type}
             </span>
           </div>
         </div>
