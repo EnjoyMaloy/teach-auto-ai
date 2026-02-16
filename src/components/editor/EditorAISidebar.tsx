@@ -298,8 +298,9 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   const handleFreeChat = async (prompt: string) => {
     if (!prompt.trim()) return;
     
-    // If no block is selected AND we have lessons → use refine-course for global edits
-    if (!selectedBlock && allLessons && allLessons.length > 0 && onRefineCourse) {
+    // In idle mode (no active tool) → use refine-course for global course edits
+    // The key check is mode === 'idle', NOT selectedBlock, because Editor always selects a block
+    if (mode === 'idle' && allLessons && allLessons.length > 0 && onRefineCourse) {
       setIsEditingBlock(true);
       const loadingId = crypto.randomUUID();
       setMessages(prev => [...prev, { id: loadingId, type: 'assistant', content: '...', timestamp: Date.now() }]);
