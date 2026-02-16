@@ -343,7 +343,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           {mode === 'idle' && !isGenerating && !isCompleted && !isError && (
             chatMessages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full">
-                <img src={aiMascot} alt="" className="w-32 h-32 object-contain mb-3" />
+                <img src={aiMascot} alt="" className="w-32 h-32 object-contain mb-3 dark:brightness-125 dark:contrast-90" />
                 <p className="text-sm text-muted-foreground text-center px-8">
                   Напишите что хотите изменить или выберите действие внизу
                 </p>
