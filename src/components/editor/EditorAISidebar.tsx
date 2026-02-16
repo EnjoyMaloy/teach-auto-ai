@@ -20,7 +20,7 @@ import { useAIGeneration, GenerationStep, getGenerationDuration } from '@/hooks/
 import { useGenerateCourse } from '@/hooks/useGenerateCourse';
 import { supabase } from '@/integrations/supabase/client';
 import { useBaseDesignSystems } from '@/hooks/useBaseDesignSystems';
-import aiMascot from '@/assets/ai-mascot.png';
+import aiMascot from '@/assets/ai-mascot.svg';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
