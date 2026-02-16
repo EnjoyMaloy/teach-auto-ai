@@ -20,6 +20,7 @@ import { useAIGeneration, GenerationStep, getGenerationDuration } from '@/hooks/
 import { useGenerateCourse } from '@/hooks/useGenerateCourse';
 import { supabase } from '@/integrations/supabase/client';
 import { useBaseDesignSystems } from '@/hooks/useBaseDesignSystems';
+import aiMascot from '@/assets/ai-mascot.png';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -341,7 +342,8 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           {/* Idle state - free chat */}
           {mode === 'idle' && !isGenerating && !isCompleted && !isError && (
             chatMessages.length === 0 ? (
-              <div className="flex items-center justify-center min-h-[60vh]">
+              <div className="flex flex-col items-center justify-center h-full">
+                <img src={aiMascot} alt="" className="w-32 h-32 object-contain mb-3 opacity-80" />
                 <p className="text-sm text-muted-foreground text-center px-8">
                   Напишите что хотите изменить или выберите действие внизу
                 </p>
