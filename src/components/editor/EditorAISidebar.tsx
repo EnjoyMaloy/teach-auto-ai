@@ -523,38 +523,53 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                   <button
                     onClick={() => { setLocalSkipImages(false); setImageModel('gemini-3-pro'); }}
                     className={cn(
-                      "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
+                      "flex-1 flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
                       !localSkipImages && imageModel === 'gemini-3-pro'
                         ? "bg-primary/10 border-primary/30 text-primary"
                         : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
                     )}
                   >
-                    <Star className="w-3.5 h-3.5" />
-                    Качество
+                    <span className="flex items-center gap-1">
+                      <Star className="w-3.5 h-3.5" />
+                      Высокое
+                    </span>
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-medium bg-amber-500/15 text-amber-600 dark:text-amber-400">
+                      ~8 мин
+                    </span>
                   </button>
                   <button
                     onClick={() => { setLocalSkipImages(false); setImageModel('gemini-2.5-flash'); }}
                     className={cn(
-                      "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
+                      "flex-1 flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
                       !localSkipImages && imageModel === 'gemini-2.5-flash'
                         ? "bg-primary/10 border-primary/30 text-primary"
                         : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
                     )}
                   >
-                    <Zap className="w-3.5 h-3.5" />
-                    Быстро
+                    <span className="flex items-center gap-1">
+                      <Zap className="w-3.5 h-3.5" />
+                      Среднее
+                    </span>
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-medium bg-sky-500/15 text-sky-600 dark:text-sky-400">
+                      ~5 мин
+                    </span>
                   </button>
                   <button
                     onClick={() => setLocalSkipImages(true)}
                     className={cn(
-                      "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
+                      "flex-1 flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
                       localSkipImages
                         ? "bg-primary/10 border-primary/30 text-primary"
                         : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
                     )}
                   >
-                    <ImageOff className="w-3.5 h-3.5" />
-                    Без картинок
+                    <span className="flex items-center gap-1">
+                      <ImageOff className="w-3.5 h-3.5" />
+                      Без картинок
+                    </span>
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-medium bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                      ~2 мин
+                    </span>
                   </button>
                 </div>
               </div>
