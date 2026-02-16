@@ -537,13 +537,12 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       )}
     >
       {/* Spacer for header alignment */}
-      <div className="h-3" />
+      <div className="h-14 shrink-0" />
 
       {/* Generation settings panel - above chat when in generate mode */}
       {showGenerationSettings && (
-        <>
-        <ScrollArea className="min-h-0 overflow-auto">
-        <div className="px-4 pb-4">
+        <ScrollArea className="flex-1 min-h-0">
+        <div className="px-4 pt-2 pb-4">
           <div className="space-y-6 px-1">
             {/* Design System selector */}
             <div className="space-y-2.5">
@@ -704,8 +703,6 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           </div>
         </div>
         </ScrollArea>
-        <div className="flex-1" />
-        </>
       )}
 
       {/* Empty state - mascot (only when no messages at all) */}
