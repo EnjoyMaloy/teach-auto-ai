@@ -327,15 +327,8 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
         isOpen ? "w-[380px]" : "w-0"
       )}
     >
-      {/* Header - Logo mark */}
-      <div className="flex items-center px-4 py-3">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[hsl(265,60%,75%)] to-[hsl(265,60%,65%)] flex items-center justify-center">
-          <svg width="14" height="14" viewBox="0 1.5 15.22 15.5" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M11.0069 1.94165H4.21278L0 16.8103H2.95308L3.94432 13.2583L4.74971 10.4911L6.29852 4.70887H8.92119L10.4494 10.4911L11.2754 13.2583L12.2666 16.8103H15.2197L11.0069 1.94165Z" fill="white"/>
-            <path d="M9.06607 9.31335H6.1543V12.2251H9.06607V9.31335Z" fill="white"/>
-          </svg>
-        </div>
-      </div>
+      {/* Spacer for header alignment (logo now in EditorHeader) */}
+      <div className="h-3" />
 
       {/* Idle empty state - centered mascot (outside ScrollArea for proper centering) */}
       {mode === 'idle' && !isGenerating && !isCompleted && !isError && chatMessages.length === 0 && (
