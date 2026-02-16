@@ -144,13 +144,15 @@ const convertToLessons = (generated: GeneratedLesson[], courseId: string): Lesso
   });
 };
 
-/** Compress Lesson[] to a lighter format for sending to the edge function */
+/** Compress Lesson[] to a lighter format for sending to the edge function.
+ *  IMPORTANT: We include imageUrl so the AI can preserve existing images. */
 const compressLessons = (lessons: Lesson[]) => {
   return lessons.map(lesson => ({
     title: lesson.title,
     description: lesson.description,
     slides: lesson.slides.map(slide => {
       const s: any = { type: slide.type, content: slide.content };
+      if (slide.imageUrl) s.imageUrl = slide.imageUrl;
       if (slide.options) s.options = slide.options.map((o: any) => typeof o === 'string' ? o : o.text);
       if (slide.correctAnswer !== undefined) s.correctAnswer = slide.correctAnswer;
       if (slide.explanation) s.explanation = slide.explanation;
@@ -177,6 +179,7 @@ const compressLessons = (lessons: Lesson[]) => {
           if (sb.badgeVariant) block.badgeVariant = sb.badgeVariant;
           if (sb.badgeSize) block.badgeSize = sb.badgeSize;
           if (sb.badgeLayout) block.badgeLayout = sb.badgeLayout;
+          if (sb.imageUrl) block.imageUrl = sb.imageUrl;
           if (sb.imageDescription) block.imageDescription = sb.imageDescription;
           if (sb.imageSize) block.imageSize = sb.imageSize;
           if (sb.backdrop && sb.backdrop !== 'none') block.backdrop = sb.backdrop;
@@ -195,6 +198,46 @@ const compressLessons = (lessons: Lesson[]) => {
       return s;
     }),
   }));
+};
+
+/** Merge imageUrl from original lessons into AI-generated ones.
+ *  The AI often drops imageUrl fields — this restores them by matching lesson/slide order. */
+const mergeImageUrls = (refined: Lesson[], originals: Lesson[]): Lesson[] => {
+  return refined.map((lesson, li) => {
+    const origLesson = originals[li];
+    if (!origLesson) return lesson; // New lesson, no originals to merge
+
+    return {
+      ...lesson,
+      slides: lesson.slides.map((slide, si) => {
+        const origSlide = origLesson.slides[si];
+        if (!origSlide) return slide; // New slide
+
+        // Restore top-level imageUrl if AI dropped it
+        const mergedSlide = { ...slide };
+        if (!mergedSlide.imageUrl && origSlide.imageUrl) {
+          mergedSlide.imageUrl = origSlide.imageUrl;
+        }
+
+        // Restore imageUrl in subBlocks
+        if (mergedSlide.subBlocks && origSlide.subBlocks) {
+          const origSubs = origSlide.subBlocks as any[];
+          mergedSlide.subBlocks = (mergedSlide.subBlocks as any[]).map((sb: any) => {
+            if (sb.type === 'image' && !sb.imageUrl) {
+              // Find matching original image sub-block by order
+              const origSb = origSubs.find((o: any) => o.type === 'image' && o.order === sb.order);
+              if (origSb?.imageUrl) {
+                return { ...sb, imageUrl: origSb.imageUrl };
+              }
+            }
+            return sb;
+          });
+        }
+
+        return mergedSlide;
+      }),
+    };
+  });
 };
 
 export const useRefineCourse = (courseId: string) => {
@@ -225,7 +268,9 @@ export const useRefineCourse = (courseId: string) => {
       }
 
       const lessons = convertToLessons(data.lessons, courseId);
-      return { lessons, message: data.message || 'Курс обновлён' };
+      // Merge back imageUrls that AI may have dropped
+      const merged = mergeImageUrls(lessons, currentLessons);
+      return { lessons: merged, message: data.message || 'Курс обновлён' };
     } catch (error) {
       console.error('Refine course error:', error);
       throw error;
