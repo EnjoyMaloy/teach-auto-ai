@@ -702,7 +702,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
             })()}
             <span className="text-xs font-medium text-[hsl(270,50%,35%)] dark:text-[hsl(270,60%,75%)] truncate">
               {selectedLessonOrder && selectedBlockOrder
-                ? `Урок ${selectedLessonOrder}, блок ${selectedBlockOrder} · `
+                ? `Урок ${selectedLessonOrder} · Блок ${selectedBlockOrder} · `
                 : ''
               }{BLOCK_CONFIGS[selectedBlock.type]?.labelRu || selectedBlock.type}
             </span>
