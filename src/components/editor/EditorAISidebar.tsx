@@ -220,6 +220,8 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       const selectedDS = designSystems.find(ds => ds.id === selectedDesignSystemId);
       runGeneration(chatInput, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id, imageModel);
       setChatInput('');
+      // Switch to idle so chat history is shown instead of settings
+      setMode('idle');
     } else if (mode === 'edit-block' && selectedBlock) {
       setChatInput('');
       await handleEditBlock(chatInput);
