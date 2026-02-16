@@ -657,7 +657,7 @@ const Editor: React.FC = () => {
         />
 
         {/* Content area */}
-        <div className="flex-1 flex overflow-hidden relative bg-secondary/50 dark:bg-white/[0.02]">
+        <div className="flex-1 flex overflow-hidden relative bg-secondary/50 dark:bg-black/10">
           {/* Preview area - full width */}
           <div className="flex-1 flex items-center justify-center overflow-hidden bg-background rounded-2xl">
             <div 
@@ -685,7 +685,7 @@ const Editor: React.FC = () => {
 
           {/* Right: Block Editor - floating overlay */}
           {selectedBlock && (
-            <div className="hidden md:flex absolute right-3 top-3 bottom-3 w-[380px] flex-col rounded-2xl bg-secondary/50 dark:bg-white/[0.02] backdrop-blur-xl shadow-sm dark:shadow-black/10 overflow-hidden z-10 border border-border/10 dark:border-white/[0.06]">
+            <div className="hidden md:flex absolute right-3 top-3 bottom-3 w-[380px] flex-col rounded-2xl bg-secondary/50 dark:bg-black/10 backdrop-blur-xl shadow-sm dark:shadow-black/10 overflow-hidden z-10 border border-border/10 dark:border-white/[0.06]">
               <BlockEditor
                 block={selectedBlock}
                 onUpdate={handleUpdateBlock}

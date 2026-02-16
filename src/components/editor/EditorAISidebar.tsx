@@ -321,7 +321,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   return (
     <div 
       className={cn(
-        "h-full flex flex-col bg-secondary/50 dark:bg-white/[0.02] backdrop-blur-sm transition-all duration-300 ease-out overflow-hidden",
+        "h-full flex flex-col bg-secondary/50 dark:bg-black/10 backdrop-blur-sm transition-all duration-300 ease-out overflow-hidden",
         isOpen ? "w-[380px]" : "w-0"
       )}
     >

@@ -222,7 +222,7 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
   };
 
   return (
-    <div className="h-[160px] border-t border-border/5 dark:border-transparent bg-secondary/50 dark:bg-white/[0.02] backdrop-blur-sm flex flex-col">
+    <div className="h-[160px] border-t border-border/5 dark:border-transparent bg-secondary/50 dark:bg-black/10 backdrop-blur-sm flex flex-col">
       {/* Timeline content */}
       <div className="flex-1 flex items-center px-2 pt-2 gap-2 overflow-hidden">
         {/* Lessons and blocks scroll area */}
