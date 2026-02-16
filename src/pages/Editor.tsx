@@ -602,6 +602,7 @@ const Editor: React.FC = () => {
         selectedLessonOrder={selectedLesson ? (course.lessons.indexOf(selectedLesson) + 1) : undefined}
         selectedBlockOrder={selectedBlock ? (blocks.indexOf(selectedBlock) + 1) : undefined}
         allBlocks={blocks}
+        allLessons={course.lessons}
         onAIGenerate={async (generatedLessons, designConfig, designSystemId) => {
           await ensurePersisted();
           pushToUndo();
@@ -620,6 +621,22 @@ const Editor: React.FC = () => {
           toast.success(`Курс сгенерирован: ${generatedLessons.length} уроков`);
         }}
         onUpdateBlock={handleUpdateBlock}
+        onRefineCourse={async (refinedLessons) => {
+          await ensurePersisted();
+          pushToUndo();
+          setCourse(prev => prev ? ({
+            ...prev,
+            lessons: refinedLessons.map((l, i) => ({ ...l, courseId: prev.id, order: i + 1 })),
+            updatedAt: new Date(),
+          }) : null);
+          if (refinedLessons.length > 0) {
+            setSelectedLessonId(refinedLessons[0].id);
+            if (refinedLessons[0].slides.length > 0) {
+              setSelectedBlockId(refinedLessons[0].slides[0].id);
+            }
+          }
+          toast.success(`Курс обновлён: ${refinedLessons.length} уроков`);
+        }}
         onBeforeGenerate={ensurePersisted}
       />
 

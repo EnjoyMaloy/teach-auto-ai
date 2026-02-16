@@ -20,6 +20,7 @@ import { useAIGeneration, GenerationStep, getGenerationDuration } from '@/hooks/
 import { useGenerateCourse } from '@/hooks/useGenerateCourse';
 import { supabase } from '@/integrations/supabase/client';
 import { useBaseDesignSystems } from '@/hooks/useBaseDesignSystems';
+import { useRefineCourse } from '@/hooks/useRefineCourse';
 import aiMascot from '@/assets/ai-mascot.svg';
 import aiMascotDark from '@/assets/ai-mascot-dark.svg';
 
@@ -47,8 +48,10 @@ interface EditorAISidebarProps {
   selectedLessonOrder?: number;
   selectedBlockOrder?: number;
   allBlocks?: Block[];
+  allLessons?: Lesson[];
   onAIGenerate: (lessons: Lesson[], designConfig?: DesignSystemConfig, designSystemId?: string) => void;
   onUpdateBlock: (updates: Partial<Block>) => void;
+  onRefineCourse?: (lessons: Lesson[]) => void;
   initialMode?: 'generate';
   onBeforeGenerate?: () => Promise<boolean>;
 }
@@ -64,8 +67,10 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   selectedLessonOrder,
   selectedBlockOrder,
   allBlocks,
+  allLessons,
   onAIGenerate,
   onUpdateBlock,
+  onRefineCourse,
   initialMode,
   onBeforeGenerate,
 }) => {
@@ -94,6 +99,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   } = useAIGeneration();
   
   const { runGeneration } = useGenerateCourse(courseId);
+  const { refineCourse, isRefining } = useRefineCourse(courseId);
 
   useEffect(() => {
     setDesignSystem(designSystem);
@@ -292,6 +298,34 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   const handleFreeChat = async (prompt: string) => {
     if (!prompt.trim()) return;
     
+    // If no block is selected AND we have lessons → use refine-course for global edits
+    if (!selectedBlock && allLessons && allLessons.length > 0 && onRefineCourse) {
+      setIsEditingBlock(true);
+      const loadingId = crypto.randomUUID();
+      setMessages(prev => [...prev, { id: loadingId, type: 'assistant', content: '...', timestamp: Date.now() }]);
+      
+      try {
+        const history = messages.filter(m => m.type === 'user' || m.type === 'assistant').slice(-10).map(m => ({
+          role: m.type as string, content: m.content,
+        }));
+        
+        const result = await refineCourse(prompt, allLessons, history);
+        if (result) {
+          setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: result.message } : m));
+          onRefineCourse(result.lessons);
+        } else {
+          setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: 'Не удалось обработать запрос.' } : m));
+        }
+      } catch (error) {
+        console.error('Refine course error:', error);
+        setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: 'Ошибка. Попробуйте снова.' } : m));
+      } finally {
+        setIsEditingBlock(false);
+      }
+      return;
+    }
+
+    // Otherwise: block-level editing via subblock-ai (when a block is selected)
     setIsEditingBlock(true);
     const loadingId = crypto.randomUUID();
     setMessages(prev => [...prev, { id: loadingId, type: 'assistant', content: '...', timestamp: Date.now() }]);
@@ -381,7 +415,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     }
     return selectedBlock 
       ? 'Опишите что хотите изменить...' 
-      : 'Напишите что хотите поправить...';
+      : 'Доработайте курс: добавить урок, убрать квизы...';
   };
 
   const isInputDisabled = mode === 'edit-block' && !selectedBlock;
