@@ -311,7 +311,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           role: m.type as string, content: m.content,
         }));
         
-        const result = await refineCourse(prompt, allLessons, history);
+        const result = await refineCourse(prompt, allLessons, history, undefined, designSystem);
         if (result) {
           setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: result.message } : m));
           onRefineCourse(result.lessons);
