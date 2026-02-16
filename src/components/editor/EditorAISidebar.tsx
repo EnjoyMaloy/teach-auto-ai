@@ -337,20 +337,23 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
         </div>
       </div>
 
+      {/* Idle empty state - centered mascot (outside ScrollArea for proper centering) */}
+      {mode === 'idle' && !isGenerating && !isCompleted && !isError && chatMessages.length === 0 && (
+        <div className="flex-1 flex flex-col items-center justify-center p-4">
+          <img src={aiMascot} alt="" className="w-32 h-32 object-contain mb-3 dark:hidden" />
+          <img src={aiMascotDark} alt="" className="w-32 h-32 object-contain mb-3 hidden dark:block" />
+          <p className="text-sm text-muted-foreground text-center px-8">
+            Напишите что хотите изменить или выберите действие внизу
+          </p>
+        </div>
+      )}
+
       {/* Chat / Messages area */}
-      <ScrollArea className="flex-1 min-h-0 [&_[data-radix-scroll-area-viewport]>div]:!min-h-full [&_[data-radix-scroll-area-viewport]>div]:flex [&_[data-radix-scroll-area-viewport]>div]:flex-col">
-        <div className="p-4 flex-1 flex flex-col">
-          {/* Idle state - free chat */}
-          {mode === 'idle' && !isGenerating && !isCompleted && !isError && (
-            chatMessages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center flex-1">
-                <img src={aiMascot} alt="" className="w-32 h-32 object-contain mb-3 dark:hidden" />
-                <img src={aiMascotDark} alt="" className="w-32 h-32 object-contain mb-3 hidden dark:block" />
-                <p className="text-sm text-muted-foreground text-center px-8">
-                  Напишите что хотите изменить или выберите действие внизу
-                </p>
-              </div>
-            ) : (
+      {!(mode === 'idle' && !isGenerating && !isCompleted && !isError && chatMessages.length === 0) && (
+      <ScrollArea className="flex-1 min-h-0">
+        <div className="p-4 flex flex-col">
+          {/* Idle state - has messages */}
+          {mode === 'idle' && !isGenerating && !isCompleted && !isError && chatMessages.length > 0 && (
               <div className="space-y-3">
                 {chatMessages.map((msg, i) => (
                   <div key={i} className={cn("flex", msg.role === 'user' ? "justify-end" : "justify-start")}>
@@ -375,7 +378,6 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                   </div>
                 )}
               </div>
-            )
           )}
 
           {/* Edit block mode - waiting for selection */}
@@ -707,6 +709,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
+      )}
 
       {/* Bottom input area - always visible */}
       {(
