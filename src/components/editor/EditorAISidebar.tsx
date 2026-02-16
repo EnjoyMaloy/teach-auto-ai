@@ -21,6 +21,7 @@ import { useGenerateCourse } from '@/hooks/useGenerateCourse';
 import { supabase } from '@/integrations/supabase/client';
 import { useBaseDesignSystems } from '@/hooks/useBaseDesignSystems';
 import aiMascot from '@/assets/ai-mascot.svg';
+import aiMascotDark from '@/assets/ai-mascot-dark.svg';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -343,7 +344,8 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           {mode === 'idle' && !isGenerating && !isCompleted && !isError && (
             chatMessages.length === 0 ? (
               <div className="flex flex-col items-center justify-center flex-1">
-                <img src={aiMascot} alt="" className="w-32 h-32 object-contain mb-3" />
+                <img src={aiMascot} alt="" className="w-32 h-32 object-contain mb-3 dark:hidden" />
+                <img src={aiMascotDark} alt="" className="w-32 h-32 object-contain mb-3 hidden dark:block" />
                 <p className="text-sm text-muted-foreground text-center px-8">
                   Напишите что хотите изменить или выберите действие внизу
                 </p>
