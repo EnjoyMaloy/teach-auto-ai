@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Lesson, Slide } from '@/types/course';
+import { Lesson, Slide, CourseDesignSystem } from '@/types/course';
 import { supabase } from '@/integrations/supabase/client';
 
 interface GeneratedSubBlock {
@@ -275,6 +275,48 @@ const mergeImageUrls = (refined: Lesson[], originals: Lesson[]): Lesson[] => {
   });
 };
 
+/** Generate image for a single sub-block description */
+const generateImageForDescription = async (
+  description: string,
+  courseTitle: string,
+  designSystem?: CourseDesignSystem,
+): Promise<string | null> => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20000);
+  try {
+    const response = await supabase.functions.invoke('generate-image', {
+      body: {
+        prompt: courseTitle,
+        slideContext: description,
+        colorPalette: designSystem ? undefined : null,
+        imageModel: 'gemini-3-pro',
+      },
+    });
+    clearTimeout(timeoutId);
+    if (response.error) return null;
+    return response.data?.imageUrl || null;
+  } catch {
+    clearTimeout(timeoutId);
+    return null;
+  }
+};
+
+/** Collect all image sub-blocks that need generation (have description but no url) */
+const collectMissingImages = (lessons: Lesson[]) => {
+  const items: { lessonIdx: number; slideIdx: number; subBlockIdx: number; description: string }[] = [];
+  lessons.forEach((lesson, li) => {
+    lesson.slides.forEach((slide, si) => {
+      if (slide.type !== 'design' || !slide.subBlocks) return;
+      (slide.subBlocks as any[]).forEach((sb: any, sbi: number) => {
+        if (sb.type === 'image' && sb.imageDescription && !sb.imageUrl) {
+          items.push({ lessonIdx: li, slideIdx: si, subBlockIdx: sbi, description: sb.imageDescription });
+        }
+      });
+    });
+  });
+  return items;
+};
+
 export const useRefineCourse = (courseId: string) => {
   const [isRefining, setIsRefining] = useState(false);
 
@@ -282,6 +324,8 @@ export const useRefineCourse = (courseId: string) => {
     prompt: string,
     currentLessons: Lesson[],
     conversationHistory?: { role: string; content: string }[],
+    courseTitle?: string,
+    designSystem?: CourseDesignSystem,
   ): Promise<{ lessons: Lesson[]; message: string } | null> => {
     if (!prompt.trim() || isRefining) return null;
 
@@ -303,10 +347,28 @@ export const useRefineCourse = (courseId: string) => {
       }
 
       const lessons = convertToLessons(data.lessons, courseId);
-      // Merge back imageUrls that AI may have dropped
       const merged = mergeImageUrls(lessons, currentLessons);
-      // Ensure all design blocks have image sub-blocks (AI sometimes forgets)
       const withImages = ensureImageSubBlocks(merged);
+
+      // Generate images for new sub-blocks that have imageDescription but no imageUrl
+      const missing = collectMissingImages(withImages);
+      if (missing.length > 0) {
+        const title = courseTitle || prompt;
+        const batchSize = 4;
+        for (let i = 0; i < missing.length; i += batchSize) {
+          const batch = missing.slice(i, i + batchSize);
+          await Promise.all(batch.map(async ({ lessonIdx, slideIdx, subBlockIdx, description }) => {
+            try {
+              const imageUrl = await generateImageForDescription(description, title, designSystem);
+              if (imageUrl) {
+                const subs = withImages[lessonIdx].slides[slideIdx].subBlocks as any[];
+                if (subs?.[subBlockIdx]) subs[subBlockIdx].imageUrl = imageUrl;
+              }
+            } catch { /* skip failed image */ }
+          }));
+        }
+      }
+
       return { lessons: withImages, message: data.message || 'Курс обновлён' };
     } catch (error) {
       console.error('Refine course error:', error);
