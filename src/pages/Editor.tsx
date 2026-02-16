@@ -580,7 +580,17 @@ const Editor: React.FC = () => {
 
   return (
     <TextEditorProvider>
-    <div className="h-screen flex bg-background">
+    <div className="h-screen flex bg-background relative">
+      {/* Academy logo - fixed top-left corner, always visible */}
+      <button
+        onClick={() => setIsAISidebarOpen(prev => !prev)}
+        className="absolute top-3 left-3 z-50 w-8 h-8 rounded-lg bg-gradient-to-br from-[hsl(265,60%,75%)] to-[hsl(265,60%,65%)] flex items-center justify-center flex-shrink-0 transition-transform duration-300 hover:scale-105"
+      >
+        <svg width="14" height="14" viewBox="0 1.5 15.22 15.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11.0069 1.94165H4.21278L0 16.8103H2.95308L3.94432 13.2583L4.74971 10.4911L6.29852 4.70887H8.92119L10.4494 10.4911L11.2754 13.2583L12.2666 16.8103H15.2197L11.0069 1.94165Z" fill="white"/>
+          <path d="M9.06607 9.31335H6.1543V12.2251H9.06607V9.31335Z" fill="white"/>
+        </svg>
+      </button>
       {/* AI Sidebar - Left, full height */}
       <EditorAISidebar
         isOpen={isAISidebarOpen}
