@@ -4,7 +4,7 @@ import {
   AlertCircle, Search, Brain, Layers, BookOpen, CheckCircle2, 
   Image, Clock, RotateCcw, PartyPopper, Send, CornerDownLeft, Square,
   Plus, MousePointerClick, Palette, GraduationCap, Pencil, BookPlus,
-  ImageOff, ImageIcon,
+  ImageOff, ImageIcon, Star, Zap,
   icons as lucideIcons
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -521,57 +521,42 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                 </div>
                 <div className="flex gap-1.5">
                   <button
-                    onClick={() => setLocalSkipImages(false)}
+                    onClick={() => { setLocalSkipImages(false); setImageModel('gemini-3-pro'); }}
                     className={cn(
-                      "flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all border",
-                      !localSkipImages
+                      "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
+                      !localSkipImages && imageModel === 'gemini-3-pro'
                         ? "bg-primary/10 border-primary/30 text-primary"
                         : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
                     )}
                   >
-                    <ImageIcon className="w-3.5 h-3.5" />
-                    С картинками
+                    <Star className="w-3.5 h-3.5" />
+                    Качество
+                  </button>
+                  <button
+                    onClick={() => { setLocalSkipImages(false); setImageModel('gemini-2.5-flash'); }}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
+                      !localSkipImages && imageModel === 'gemini-2.5-flash'
+                        ? "bg-primary/10 border-primary/30 text-primary"
+                        : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
+                    )}
+                  >
+                    <Zap className="w-3.5 h-3.5" />
+                    Быстро
                   </button>
                   <button
                     onClick={() => setLocalSkipImages(true)}
                     className={cn(
-                      "flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all border",
+                      "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
                       localSkipImages
                         ? "bg-primary/10 border-primary/30 text-primary"
                         : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
                     )}
                   >
                     <ImageOff className="w-3.5 h-3.5" />
-                    Быстро
+                    Без картинок
                   </button>
                 </div>
-                {/* Image model selector - only when images enabled */}
-                {!localSkipImages && (
-                  <div className="flex gap-1.5 mt-1.5">
-                    <button
-                      onClick={() => setImageModel('gemini-3-pro')}
-                      className={cn(
-                        "flex-1 py-1.5 px-2 rounded-lg text-[10px] font-medium transition-all border text-center",
-                        imageModel === 'gemini-3-pro'
-                          ? "bg-primary/10 border-primary/30 text-primary"
-                          : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
-                      )}
-                    >
-                      Gemini 3 Pro
-                    </button>
-                    <button
-                      onClick={() => setImageModel('gemini-2.5-flash')}
-                      className={cn(
-                        "flex-1 py-1.5 px-2 rounded-lg text-[10px] font-medium transition-all border text-center",
-                        imageModel === 'gemini-2.5-flash'
-                          ? "bg-primary/10 border-primary/30 text-primary"
-                          : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
-                      )}
-                    >
-                      Gemini 2.5 Flash
-                    </button>
-                  </div>
-                )}
               </div>
 
               {/* Lesson count */}
