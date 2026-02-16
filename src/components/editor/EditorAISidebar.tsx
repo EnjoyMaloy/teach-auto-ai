@@ -385,28 +385,11 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
             </div>
           )}
 
-          {/* Edit block mode - block selected */}
-          {mode === 'edit-block' && selectedBlock && !isGenerating && (
-            <div className="space-y-3">
-              <div className="p-3 rounded-xl bg-muted/50 border border-border/10">
-                <p className="text-xs text-muted-foreground mb-1">Выбранный блок:</p>
-                <div className="flex items-center gap-2">
-                  {(() => {
-                    const iconName = BLOCK_CONFIGS[selectedBlock.type]?.icon;
-                    const IconComp = iconName ? lucideIcons[iconName as keyof typeof lucideIcons] : null;
-                    return IconComp ? <IconComp className="w-4 h-4 text-muted-foreground flex-shrink-0" /> : null;
-                  })()}
-                  <p className="font-medium text-foreground text-sm">
-                    {BLOCK_CONFIGS[selectedBlock.type]?.labelRu || selectedBlock.type}
-                  </p>
-                </div>
-              </div>
-              {isEditingBlock && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground p-3">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Редактирую блок...
-                </div>
-              )}
+          {/* Edit block mode - block selected - messages shown here */}
+          {mode === 'edit-block' && selectedBlock && !isGenerating && isEditingBlock && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground p-3">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Редактирую блок...
             </div>
           )}
 
@@ -704,9 +687,25 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       </ScrollArea>
       )}
 
+      {/* Selected block chip - above input in edit mode */}
+      {mode === 'edit-block' && selectedBlock && (
+        <div className="px-3 pb-1">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[hsl(270,60%,90%)]/60 dark:bg-[hsl(270,40%,25%)]/60 border border-[hsl(270,40%,80%)]/30 dark:border-[hsl(270,40%,40%)]/30">
+            {(() => {
+              const iconName = BLOCK_CONFIGS[selectedBlock.type]?.icon;
+              const IconComp = iconName ? lucideIcons[iconName as keyof typeof lucideIcons] : null;
+              return IconComp ? <IconComp className="w-3.5 h-3.5 text-[hsl(270,50%,50%)] dark:text-[hsl(270,60%,75%)] flex-shrink-0" /> : null;
+            })()}
+            <span className="text-xs font-medium text-[hsl(270,50%,35%)] dark:text-[hsl(270,60%,75%)] truncate">
+              {BLOCK_CONFIGS[selectedBlock.type]?.labelRu || selectedBlock.type}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Bottom input area - always visible */}
       {(
-        <div className="p-3">
+        <div className="p-3 pt-1.5">
           <div className="bg-black/[0.06] dark:bg-[#232326] rounded-2xl border border-border/20 dark:border-white/[0.08]">
             <input
               value={chatInput}
