@@ -338,7 +338,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
 
       {/* Chat / Messages area */}
       <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]]:h-full">
-        <div className="p-4 space-y-3 min-h-full flex flex-col">
+        <div className="p-4 min-h-full flex flex-col">
           {/* Idle state - free chat */}
           {mode === 'idle' && !isGenerating && !isCompleted && !isError && (
             chatMessages.length === 0 ? (
