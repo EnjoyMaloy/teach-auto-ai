@@ -51,6 +51,12 @@ const SYSTEM_PROMPT = `Ты — ИИ-редактор образовательн
 - Для backdrop ВСЕГДА backdropRounded: true
 - Чередуй текст и визуальные элементы
 
+## КРИТИЧЕСКИ ВАЖНО — ИЗОБРАЖЕНИЯ:
+- НЕ ТРОГАЙ существующие изображения! Если у блока уже есть imageUrl — СОХРАНИ его как есть.
+- Для НОВЫХ design блоков добавляй image sub-block с imageDescription (на АНГЛИЙСКОМ) — картинки будут сгенерированы отдельно.
+- Если пользователь просит "добавить картинки" к блокам без картинок — добавь image sub-block с imageDescription, но НЕ удаляй существующие imageUrl.
+- Поле imageUrl передаётся для существующих блоков — ВСЕГДА копируй его обратно без изменений.
+
 ## ФОРМАТ ОТВЕТА:
 Верни JSON:
 {
@@ -68,7 +74,7 @@ const SYSTEM_PROMPT = `Ты — ИИ-редактор образовательн
 
 КРИТИЧЕСКИ ВАЖНО:
 - Верни ВСЕ уроки курса, не только измененные!
-- Сохраняй неизмененные уроки как есть
+- Сохраняй неизмененные уроки как есть, включая ВСЕ поля (imageUrl, imageDescription и т.д.)
 - Для новых уроков генерируй полный контент по эталону (10 блоков)
 - Верни ТОЛЬКО валидный JSON без markdown-обертки`;
 
@@ -101,7 +107,8 @@ Deno.serve(async (req) => {
       title: lesson.title,
       description: lesson.description,
       slides: (lesson.slides || []).map((slide: any) => {
-        const s: any = { type: slide.type, content: slide.content };
+      const s: any = { type: slide.type, content: slide.content };
+        if (slide.imageUrl) s.imageUrl = slide.imageUrl;
         if (slide.options) s.options = slide.options;
         if (slide.correctAnswer !== undefined) s.correctAnswer = slide.correctAnswer;
         if (slide.explanation) s.explanation = slide.explanation;
@@ -128,6 +135,7 @@ Deno.serve(async (req) => {
             if (sb.badgeVariant) block.badgeVariant = sb.badgeVariant;
             if (sb.badgeSize) block.badgeSize = sb.badgeSize;
             if (sb.badgeLayout) block.badgeLayout = sb.badgeLayout;
+            if (sb.imageUrl) block.imageUrl = sb.imageUrl;
             if (sb.imageDescription) block.imageDescription = sb.imageDescription;
             if (sb.imageSize) block.imageSize = sb.imageSize;
             if (sb.backdrop && sb.backdrop !== 'none') block.backdrop = sb.backdrop;
