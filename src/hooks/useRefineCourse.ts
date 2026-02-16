@@ -200,6 +200,41 @@ const compressLessons = (lessons: Lesson[]) => {
   }));
 };
 
+/** Ensure every design block (without table) ends with an image sub-block */
+const ensureImageSubBlocks = (lessons: Lesson[]): Lesson[] => {
+  return lessons.map(lesson => ({
+    ...lesson,
+    slides: lesson.slides.map(slide => {
+      if (slide.type !== 'design' || !slide.subBlocks) return slide;
+      const subs = slide.subBlocks as any[];
+      const hasTable = subs.some((sb: any) => sb.type === 'table');
+      if (hasTable) return slide;
+      const hasImage = subs.some((sb: any) => sb.type === 'image');
+      if (hasImage) return slide;
+      // Add a placeholder image sub-block with a generic description
+      const maxOrder = Math.max(...subs.map((sb: any) => sb.order || 0), 0);
+      const headingSb = subs.find((sb: any) => sb.type === 'heading');
+      const textSb = subs.find((sb: any) => sb.type === 'text');
+      const context = headingSb?.content || textSb?.content || lesson.title || 'educational illustration';
+      return {
+        ...slide,
+        subBlocks: [
+          ...subs,
+          {
+            id: crypto.randomUUID(),
+            type: 'image',
+            order: maxOrder + 1,
+            textAlign: 'center',
+            imageDescription: `Illustration for: ${context}`,
+            imageSize: 'medium',
+            padding: 'small',
+          },
+        ],
+      };
+    }),
+  }));
+};
+
 /** Merge imageUrl from original lessons into AI-generated ones.
  *  The AI often drops imageUrl fields — this restores them by matching lesson/slide order. */
 const mergeImageUrls = (refined: Lesson[], originals: Lesson[]): Lesson[] => {
@@ -270,7 +305,9 @@ export const useRefineCourse = (courseId: string) => {
       const lessons = convertToLessons(data.lessons, courseId);
       // Merge back imageUrls that AI may have dropped
       const merged = mergeImageUrls(lessons, currentLessons);
-      return { lessons: merged, message: data.message || 'Курс обновлён' };
+      // Ensure all design blocks have image sub-blocks (AI sometimes forgets)
+      const withImages = ensureImageSubBlocks(merged);
+      return { lessons: withImages, message: data.message || 'Курс обновлён' };
     } catch (error) {
       console.error('Refine course error:', error);
       throw error;
