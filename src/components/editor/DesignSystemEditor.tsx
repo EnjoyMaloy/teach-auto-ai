@@ -676,11 +676,19 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   // Handler for base system selection
   const handleBaseSystemSelect = (system: BaseDesignSystem, isPersonalTheme: boolean) => {
     // Apply the theme's config with defaults for any missing fields
-    // This ensures fields like partialColor have values even if not in the stored config
+    // Preserve course-specific themeBackgrounds and defaultBackgroundId if the theme doesn't have its own
+    const themeConfig = system.config as Partial<DesignSystemConfig>;
     const newConfig: DesignSystemConfig = {
       ...DEFAULT_DESIGN_SYSTEM,
-      ...system.config,
+      ...themeConfig,
       themeId: system.id,
+      // If the theme has its own backgrounds, use them; otherwise preserve course-specific ones
+      themeBackgrounds: (themeConfig.themeBackgrounds && themeConfig.themeBackgrounds.length > 0)
+        ? themeConfig.themeBackgrounds
+        : config.themeBackgrounds || [],
+      defaultBackgroundId: (themeConfig.themeBackgrounds && themeConfig.themeBackgrounds.length > 0)
+        ? themeConfig.defaultBackgroundId
+        : config.defaultBackgroundId,
     };
     
     // Update refs to prevent auto-save of the loaded config
