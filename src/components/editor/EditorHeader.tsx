@@ -489,6 +489,9 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
       {showDesignSystem && (
         <FullscreenDesignEditor
           config={{
+            // Spread all existing fields first to preserve any that aren't explicitly listed
+            ...course.designSystem,
+            // Then apply defaults for required fields
             primaryColor: course.designSystem?.primaryColor || '262 83% 58%',
             primaryForeground: course.designSystem?.primaryForeground || '0 0% 100%',
             backgroundColor: course.designSystem?.backgroundColor || '0 0% 100%',

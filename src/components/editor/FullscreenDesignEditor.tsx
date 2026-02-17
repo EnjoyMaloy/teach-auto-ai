@@ -54,8 +54,8 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
   // Track config changes for save status
   useEffect(() => {
     const currentConfig = JSON.stringify(config);
-    if (currentConfig !== lastConfigRef.current && selectedBaseSystemId) {
-      // Config changed, show saving status
+    if (currentConfig !== lastConfigRef.current) {
+      // Config changed, show saving status (autosave in Editor.tsx handles persistence)
       setSaveStatus('saving');
       lastConfigRef.current = currentConfig;
       
