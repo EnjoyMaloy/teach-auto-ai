@@ -127,10 +127,6 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Settings */}
         <div className="w-[420px] min-w-[380px] border-r border-border bg-card flex flex-col">
-          <div className="px-4 py-3 border-b border-border">
-            <h2 className="font-semibold text-foreground">Настройки</h2>
-            <p className="text-xs text-muted-foreground">Настройте внешний вид курса</p>
-          </div>
           <ScrollArea className="flex-1">
             <div className="p-4">
               <DesignSystemEditor
