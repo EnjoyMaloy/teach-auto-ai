@@ -216,7 +216,7 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
                 title={`${bg.name}${isDefault ? ' (по умолчанию)' : ''}`}
               >
                 <span className={cn(
-                  "text-xs font-medium text-foreground/80 bg-white/90 px-2 py-0.5 rounded truncate max-w-[90%] transition-transform",
+                  "text-xs font-medium bg-white/90 dark:bg-black/60 text-foreground/80 dark:text-white/90 px-2 py-0.5 rounded truncate max-w-[90%] transition-transform",
                   !isDefault && "group-hover:-translate-y-3"
                 )}>
                   {bg.name}
