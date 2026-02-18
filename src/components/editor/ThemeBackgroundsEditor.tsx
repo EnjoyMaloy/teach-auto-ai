@@ -222,7 +222,7 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
                   {bg.name}
                 </span>
                 {isDefault && (
-                  <span className="text-[9px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                  <span className="text-[9px] font-medium text-primary bg-white/90 dark:bg-black/60 dark:text-primary px-1.5 py-0.5 rounded">
                     по умолчанию
                   </span>
                 )}
