@@ -749,27 +749,27 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
         <h3 className="font-semibold text-foreground">Детальные настройки</h3>
         <Tabs defaultValue="ui" className="w-full">
           <TabsList className="w-full grid grid-cols-3 grid-rows-2 h-auto p-1 bg-background dark:bg-muted/50 border border-border/50 dark:border-transparent gap-1">
-            <TabsTrigger value="ui" className="text-xs py-2 px-1 data-[state=active]:bg-background">
+            <TabsTrigger value="ui" className="text-xs py-2 px-1 data-[state=active]:bg-background data-[state=active]:border data-[state=active]:border-border/80 dark:data-[state=active]:border-transparent">
               <Palette className="w-3.5 h-3.5 mr-1" />
               Тема
             </TabsTrigger>
-            <TabsTrigger value="interactive" className="text-xs py-2 px-1 data-[state=active]:bg-background">
+            <TabsTrigger value="interactive" className="text-xs py-2 px-1 data-[state=active]:bg-background data-[state=active]:border data-[state=active]:border-border/80 dark:data-[state=active]:border-transparent">
               <Sparkles className="w-3.5 h-3.5 mr-1" />
               Квизы
             </TabsTrigger>
-            <TabsTrigger value="quizblocks" className="text-xs py-2 px-1 data-[state=active]:bg-background">
+            <TabsTrigger value="quizblocks" className="text-xs py-2 px-1 data-[state=active]:bg-background data-[state=active]:border data-[state=active]:border-border/80 dark:data-[state=active]:border-transparent">
               <MousePointerClick className="w-3.5 h-3.5 mr-1" />
               Блоки
             </TabsTrigger>
-            <TabsTrigger value="blocks" className="text-xs py-2 px-1 data-[state=active]:bg-background">
+            <TabsTrigger value="blocks" className="text-xs py-2 px-1 data-[state=active]:bg-background data-[state=active]:border data-[state=active]:border-border/80 dark:data-[state=active]:border-transparent">
               <Layers className="w-3.5 h-3.5 mr-1" />
               Дизайн-блок
             </TabsTrigger>
-            <TabsTrigger value="typography" className="text-xs py-2 px-1 data-[state=active]:bg-background">
+            <TabsTrigger value="typography" className="text-xs py-2 px-1 data-[state=active]:bg-background data-[state=active]:border data-[state=active]:border-border/80 dark:data-[state=active]:border-transparent">
               <Type className="w-3.5 h-3.5 mr-1" />
               Шрифты
             </TabsTrigger>
-            <TabsTrigger value="sound" className="text-xs py-2 px-1 data-[state=active]:bg-background">
+            <TabsTrigger value="sound" className="text-xs py-2 px-1 data-[state=active]:bg-background data-[state=active]:border data-[state=active]:border-border/80 dark:data-[state=active]:border-transparent">
               <Volume2 className="w-3.5 h-3.5 mr-1" />
               Звуки
             </TabsTrigger>
