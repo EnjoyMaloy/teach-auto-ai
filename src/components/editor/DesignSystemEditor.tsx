@@ -748,7 +748,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
     <div className="space-y-4">
         <h3 className="font-semibold text-foreground">Детальные настройки</h3>
         <Tabs defaultValue="ui" className="w-full">
-          <TabsList className="w-full grid grid-cols-3 grid-rows-2 h-auto p-1 bg-muted/50 gap-1">
+          <TabsList className="w-full grid grid-cols-3 grid-rows-2 h-auto p-1 bg-background border border-border/50 gap-1">
             <TabsTrigger value="ui" className="text-xs py-2 px-1 data-[state=active]:bg-background">
               <Palette className="w-3.5 h-3.5 mr-1" />
               Тема
