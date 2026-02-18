@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { 
   Heading, Type, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
-  Link2, ListOrdered, SlidersHorizontal, Layers
+  Link2, ListOrdered, Layers
 } from 'lucide-react';
 
 const iconMap: Record<string, React.ElementType> = {
@@ -21,7 +21,6 @@ const iconMap: Record<string, React.ElementType> = {
   fill_blank: PenLine,
   matching: Link2,
   ordering: ListOrdered,
-  slider: SlidersHorizontal,
   design: Layers,
 };
 
@@ -36,7 +35,6 @@ const blockLabels: Record<string, string> = {
   fill_blank: 'Заполни пропуск',
   matching: 'Соответствие',
   ordering: 'Порядок',
-  slider: 'Ползунок',
 };
 
 // Convert Slide to Block for MobilePreviewFrame
@@ -351,22 +349,6 @@ const createSampleSlides = (): Slide[] => {
       content: 'Расположите теги в правильном порядке вложенности:',
       orderingItems: ['<body>', '<html>', '<head>', '<!DOCTYPE html>'],
       correctOrder: ['<!DOCTYPE html>', '<html>', '<head>', '<body>'],
-      createdAt: now,
-      updatedAt: now,
-    },
-    // Slider
-    {
-      id: 'sample-slider',
-      lessonId: 'sample',
-      type: 'slider',
-      order: 11,
-      content: 'Сколько уровней заголовков в HTML?',
-      sliderMin: 1,
-      sliderMax: 10,
-      sliderCorrect: 6,
-      sliderStep: 1,
-      explanation: 'В HTML есть заголовки от h1 до h6.',
-      explanationCorrect: 'Отлично! В HTML 6 уровней заголовков.',
       createdAt: now,
       updatedAt: now,
     },
