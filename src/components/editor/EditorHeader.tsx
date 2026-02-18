@@ -161,9 +161,9 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           {type === 'circle_map' ? (
             <div className="relative w-full h-full">
               {/* Mascot - left side */}
-              <img src={lessonMapMascot} alt="" className="absolute left-0 top-[25%] w-5 h-auto" style={{ opacity: 0.55 }} />
+              <img src={lessonMapMascot} alt="" className="absolute left-0 top-[25%] w-5 h-auto" style={{ opacity: 0.5, filter: 'brightness(0.6)' }} />
               {/* Mascot - right side */}
-              <img src={lessonMapMascot} alt="" className="absolute right-0 bottom-[25%] w-5 h-auto" style={{ opacity: 0.55, transform: 'scaleX(-1)' }} />
+              <img src={lessonMapMascot} alt="" className="absolute right-0 bottom-[20%] w-5 h-auto" style={{ opacity: 0.5, filter: 'brightness(0.6)', transform: 'scaleX(-1)' }} />
               {/* Zigzag circles */}
               <div className="flex flex-col items-start gap-1 h-full justify-center pl-4 pr-4">
                 {/* 1 - completed (pastel green, bold check) */}
