@@ -1,6 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Shield, User, Home } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { ArrowLeft, Shield, User } from 'lucide-react';
 import { DesignSystemConfig } from '@/types/designSystem';
 import { DesignSystemEditor } from './DesignSystemEditor';
 import { DesignPreviewBlocks } from './DesignPreviewBlocks';
@@ -9,14 +8,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { SaveStatusIndicator, SaveStatus } from './design-system/SaveStatusIndicator';
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
-  BreadcrumbPage,
-} from '@/components/ui/breadcrumb';
 
 interface FullscreenDesignEditorProps {
   config: DesignSystemConfig;
@@ -37,7 +28,7 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
   selectedBaseSystemId,
   onBaseSystemSelect,
 }) => {
-  const navigate = useNavigate();
+  
   
   // Test mode toggle - allows switching between admin and regular user view
   const [isTestModeAdmin, setIsTestModeAdmin] = useState(realIsAdmin);
@@ -84,9 +75,6 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
     };
   }, [config, selectedBaseSystemId]);
 
-  const handleGoToWorkshop = () => {
-    navigate('/workshop');
-  };
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col">
@@ -103,29 +91,9 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
             Назад
           </Button>
           <div className="h-5 w-px bg-border/20" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <button onClick={handleGoToWorkshop} className="flex items-center">
-                    <Home className="w-4 h-4" />
-                  </button>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <button onClick={onClose} className="truncate max-w-[200px]">
-                    {courseTitle}
-                  </button>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Дизайн</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+          <h2 className="text-sm font-medium text-foreground truncate max-w-[300px]">
+            {courseTitle} — Дизайн
+          </h2>
           
           {/* Save status indicator */}
           <SaveStatusIndicator status={saveStatus} className="ml-2" />
