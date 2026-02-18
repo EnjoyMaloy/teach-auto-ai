@@ -32,7 +32,7 @@ export const SettingsCard: React.FC<SettingsCardProps> = ({
     return (
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <div className={cn(
-          "rounded-xl border border-border bg-card/50 overflow-hidden transition-all",
+          "rounded-xl bg-card/50 overflow-hidden transition-all",
           isOpen && "ring-1 ring-primary/10",
           className
         )}>
@@ -54,7 +54,7 @@ export const SettingsCard: React.FC<SettingsCardProps> = ({
             </button>
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <div className="px-4 pb-4 pt-0 space-y-4 border-t border-border/50">
+            <div className="px-4 pb-4 pt-0 space-y-4">
               <div className="pt-4">
                 {children}
               </div>
@@ -67,11 +67,11 @@ export const SettingsCard: React.FC<SettingsCardProps> = ({
 
   return (
     <div className={cn(
-      "rounded-xl border border-border bg-card/50 overflow-hidden",
+      "rounded-xl bg-card/50 overflow-hidden",
       className
     )}>
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b border-border/50">
+      <div className="flex items-center gap-3 p-4">
         <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
           {icon}
         </div>
