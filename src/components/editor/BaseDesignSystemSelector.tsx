@@ -79,6 +79,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
   const [newName, setNewName] = useState('');
   const [editName, setEditName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [themeFilter, setThemeFilter] = useState<'all' | 'base' | 'user'>('all');
 
   const isLoading = isLoadingBaseSystems || isLoadingUserSystems;
 
@@ -192,17 +193,44 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
     );
   }
 
+  const showBase = themeFilter === 'all' || themeFilter === 'base';
+  const showUser = themeFilter === 'all' || themeFilter === 'user';
+
   return (
     <div className="space-y-4">
+      {/* Filter tabs */}
+      <div className="flex gap-1 p-1 rounded-lg bg-muted/50">
+        {[
+          { key: 'all' as const, label: 'Все' },
+          { key: 'base' as const, label: 'Общие', icon: <Users className="w-3 h-3" /> },
+          { key: 'user' as const, label: 'Мои', icon: <User className="w-3 h-3" /> },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setThemeFilter(tab.key)}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md text-xs font-medium transition-all",
+              themeFilter === tab.key
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {tab.icon}
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       {/* Base systems (admin-managed, visible to all) */}
-      {hasBaseSystems && (
+      {showBase && hasBaseSystems && (
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Users className="w-3.5 h-3.5" />
-            <span>Общие темы</span>
-          </div>
+          {themeFilter === 'all' && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Users className="w-3.5 h-3.5" />
+              <span>Общие темы</span>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-2">
-            {/* Database-stored base systems */}
             {baseSystems.map((system) => (
               <ThemeCard
                 key={system.id}
@@ -223,12 +251,14 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
       )}
 
       {/* User systems (personal themes) */}
-      {hasUserSystems && (
+      {showUser && hasUserSystems && (
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <User className="w-3.5 h-3.5" />
-            <span>Мои темы</span>
-          </div>
+          {themeFilter === 'all' && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <User className="w-3.5 h-3.5" />
+              <span>Мои темы</span>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-2">
             {userSystems.map((system) => (
               <ThemeCard
