@@ -178,12 +178,6 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
 
         {/* Right: Preview */}
         <div className="flex-1 flex flex-col bg-muted/30 overflow-hidden">
-          <div className="px-4 py-3 border-b border-border bg-card">
-            <h2 className="font-semibold text-foreground">Предпросмотр</h2>
-            <p className="text-xs text-muted-foreground">
-              Так будет выглядеть ваш курс на всех типах блоков
-            </p>
-          </div>
           <div className="flex-1 overflow-hidden">
             <DesignPreviewBlocks config={config} />
           </div>
