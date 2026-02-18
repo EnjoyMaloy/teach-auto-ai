@@ -139,7 +139,7 @@ const Auth: React.FC = () => {
             {isSignUp ? 'Зарегистрироваться через Google' : 'Войти через Google'}
           </Button>
 
-          <Button type="button" variant="outline" className="w-full h-11 bg-black hover:bg-gray-900 text-white hover:text-white font-semibold border-black" onClick={handleAppleSignIn} disabled={isAppleLoading || isLoading}>
+          <Button type="button" variant="outline" className="w-full h-11 bg-black hover:bg-gray-900 text-white hover:text-white font-semibold border-black mt-3" onClick={handleAppleSignIn} disabled={isAppleLoading || isLoading}>
             {isAppleLoading ? <Loader2 className="w-4 h-4 mr-3 animate-spin" /> : <span className="mr-3"><AppleIcon /></span>}
             {isSignUp ? 'Зарегистрироваться через Apple' : 'Войти через Apple'}
           </Button>
@@ -147,7 +147,7 @@ const Auth: React.FC = () => {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <Separator className="w-full" />
+              <Separator className="w-full bg-gray-200" />
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="bg-white px-4 text-gray-400">Или</span>
@@ -183,7 +183,7 @@ const Auth: React.FC = () => {
           {/* Switch mode */}
           <p className="text-center text-sm text-gray-500 mt-6">
             {isSignUp ? 'Уже есть аккаунт?' : 'Нет аккаунта?'}{' '}
-            <button type="button" onClick={() => setIsSignUp(!isSignUp)} className="text-primary hover:underline font-medium">
+            <button type="button" onClick={() => setIsSignUp(!isSignUp)} className="text-foreground hover:underline font-semibold">
               {isSignUp ? 'Войти' : 'Зарегистрироваться'}
             </button>
           </p>
