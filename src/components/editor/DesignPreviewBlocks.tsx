@@ -376,7 +376,7 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
       {/* Center group: icon strip + phone preview */}
       <div className="flex h-full max-h-full items-center">
         {/* Left: Icons strip, rounded on left side */}
-        <div className="w-12 bg-secondary/50 dark:bg-black/10 rounded-l-2xl flex flex-col shrink-0 overflow-hidden h-full">
+        <div className="w-12 bg-secondary dark:bg-black/10 rounded-l-2xl flex flex-col shrink-0 overflow-hidden h-full">
           <div className="flex-1 overflow-y-auto py-2 space-y-1 flex flex-col items-center">
             {sampleSlides.map((slide, index) => {
               const Icon = iconMap[slide.type] || Layers;
