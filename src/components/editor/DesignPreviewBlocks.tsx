@@ -392,7 +392,7 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
   return (
     <div className="h-full flex">
       {/* Left: Compact blocks list - icons only */}
-      <div className="w-14 border-r border-border bg-card flex flex-col shrink-0">
+      <div className="w-14 border-r border-border bg-secondary/50 dark:bg-black/10 flex flex-col shrink-0">
         <div className="flex-1 overflow-y-auto py-2 space-y-1 flex flex-col items-center">
           {sampleSlides.map((slide, index) => {
             const Icon = iconMap[slide.type] || Layers;
