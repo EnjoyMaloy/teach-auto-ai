@@ -791,7 +791,13 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
               >
                 <ThemeBackgroundsEditor 
                   backgrounds={config.themeBackgrounds || []}
-                  onChange={(backgrounds) => updateConfig({ themeBackgrounds: backgrounds })}
+                  onChange={(backgrounds, newDefaultId) => {
+                    if (newDefaultId !== undefined) {
+                      updateConfig({ themeBackgrounds: backgrounds, defaultBackgroundId: newDefaultId });
+                    } else {
+                      updateConfig({ themeBackgrounds: backgrounds });
+                    }
+                  }}
                   defaultBackgroundId={config.defaultBackgroundId}
                   onDefaultChange={(id) => updateConfig({ defaultBackgroundId: id })}
                   selectedBackgroundId={config.defaultBackgroundId}
