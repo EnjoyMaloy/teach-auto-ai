@@ -390,36 +390,37 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
   };
 
   return (
-    <div className="h-full flex">
-      {/* Left: Compact blocks list - icons only */}
-      <div className="w-14 border-r border-border bg-secondary/50 dark:bg-black/10 flex flex-col shrink-0">
-        <div className="flex-1 overflow-y-auto py-2 space-y-1 flex flex-col items-center">
-          {sampleSlides.map((slide, index) => {
-            const Icon = iconMap[slide.type] || Layers;
-            const isSelected = selectedIndex === index;
-            
-            return (
-              <button
-                key={slide.id}
-                onClick={() => setSelectedIndex(index)}
-                title={blockLabels[slide.type] || slide.type}
-                className={cn(
-                  "w-10 h-10 rounded-lg flex items-center justify-center transition-all",
-                  isSelected 
-                    ? "bg-primary text-primary-foreground" 
-                    : "hover:bg-muted/70 active:bg-muted text-muted-foreground"
-                )}
-              >
-                <Icon className="w-4 h-4" />
-              </button>
-            );
-          })}
+    <div className="h-full flex items-center justify-center">
+      {/* Center group: icon strip + phone preview */}
+      <div className="flex h-full items-center">
+        {/* Left: Icons strip, rounded on left side */}
+        <div className="w-12 bg-card rounded-l-2xl flex flex-col shrink-0 self-stretch my-3 overflow-hidden">
+          <div className="flex-1 overflow-y-auto py-2 space-y-1 flex flex-col items-center">
+            {sampleSlides.map((slide, index) => {
+              const Icon = iconMap[slide.type] || Layers;
+              const isSelected = selectedIndex === index;
+              
+              return (
+                <button
+                  key={slide.id}
+                  onClick={() => setSelectedIndex(index)}
+                  title={blockLabels[slide.type] || slide.type}
+                  className={cn(
+                    "w-9 h-9 rounded-lg flex items-center justify-center transition-all",
+                    isSelected 
+                      ? "bg-primary text-primary-foreground" 
+                      : "hover:bg-muted/70 active:bg-muted text-muted-foreground"
+                  )}
+                >
+                  <Icon className="w-4 h-4" />
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
 
-      {/* Right: Preview using MobilePreviewFrame */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex-1 overflow-hidden py-3 px-3">
+        {/* Right: Phone preview, flush against icon strip */}
+        <div className="flex flex-col overflow-hidden h-full py-3">
           <MobilePreviewFrame
             block={selectedBlock}
             lessonTitle="Демо-урок"
