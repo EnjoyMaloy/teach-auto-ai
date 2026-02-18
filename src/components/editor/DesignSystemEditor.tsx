@@ -731,16 +731,16 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
 
   // Details section
   const detailsSection = isEditingRestricted ? (
-    <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+    <div className="p-3 rounded-xl bg-muted border border-border text-foreground text-sm">
       <p className="font-medium">Общая тема выбрана</p>
-      <p className="text-xs mt-1 text-amber-600">
+      <p className="text-xs mt-1 text-muted-foreground">
         Вы не можете редактировать параметры общих тем. Создайте свою тему, чтобы настроить дизайн.
       </p>
     </div>
   ) : !selectedBaseSystemId ? (
-    <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-sm">
+    <div className="p-3 rounded-xl bg-muted border border-border text-foreground text-sm">
       <p className="font-medium">Тема не выбрана</p>
-      <p className="text-xs mt-1 text-blue-600">
+      <p className="text-xs mt-1 text-muted-foreground">
         Выберите готовую тему выше или создайте свою для настройки дизайна курса.
       </p>
     </div>
