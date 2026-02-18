@@ -119,29 +119,39 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
         )}
       </header>
 
-      {/* Main content */}
+      {/* Main content - 3 columns */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left: Settings */}
-        <div className="w-[420px] min-w-[380px] border-r border-border bg-card flex flex-col">
-          <ScrollArea className="flex-1">
-            <div className="p-4">
-              <DesignSystemEditor
-                config={config}
-                onChange={onChange}
-                isAdmin={effectiveIsAdmin}
-                selectedBaseSystemId={selectedBaseSystemId}
-                onBaseSystemSelect={onBaseSystemSelect}
-              />
-            </div>
-          </ScrollArea>
-        </div>
+        <DesignSystemEditor
+          config={config}
+          onChange={onChange}
+          isAdmin={effectiveIsAdmin}
+          selectedBaseSystemId={selectedBaseSystemId}
+          onBaseSystemSelect={onBaseSystemSelect}
+          onRenderSplit={(themes, details) => (
+            <>
+              {/* Left: Theme selector */}
+              <div className="w-[300px] min-w-[280px] border-r border-border bg-card flex flex-col">
+                <ScrollArea className="flex-1">
+                  <div className="p-4">{themes}</div>
+                </ScrollArea>
+              </div>
 
-        {/* Right: Preview */}
-        <div className="flex-1 flex flex-col bg-muted/30 overflow-hidden">
-          <div className="flex-1 overflow-hidden">
-            <DesignPreviewBlocks config={config} />
-          </div>
-        </div>
+              {/* Middle: Detailed settings */}
+              <div className="w-[380px] min-w-[340px] border-r border-border bg-card flex flex-col">
+                <ScrollArea className="flex-1">
+                  <div className="p-4">{details}</div>
+                </ScrollArea>
+              </div>
+
+              {/* Right: Preview */}
+              <div className="flex-1 flex flex-col bg-muted/30 overflow-hidden">
+                <div className="flex-1 overflow-hidden py-3 pr-3">
+                  <DesignPreviewBlocks config={config} />
+                </div>
+              </div>
+            </>
+          )}
+        />
       </div>
     </div>
   );

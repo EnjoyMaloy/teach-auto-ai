@@ -74,6 +74,8 @@ interface DesignSystemEditorProps {
   isAdmin?: boolean;
   selectedBaseSystemId?: string | null;
   onBaseSystemSelect?: (id: string | null) => void;
+  /** Render themes and details as separate scrollable columns via render props */
+  onRenderSplit?: (themes: React.ReactNode, details: React.ReactNode) => React.ReactNode;
 }
 
 const ColorInput: React.FC<{
@@ -512,6 +514,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   isAdmin = false,
   selectedBaseSystemId,
   onBaseSystemSelect,
+  onRenderSplit,
 }) => {
   // Initialize activePreset from config.themeId if available
   const [activePreset, setActivePreset] = useState<string | null>(config.themeId || null);
@@ -701,55 +704,49 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
     setActivePreset(null);
   };
 
-  return (
-    <div className="space-y-6">
-      {/* Unified Themes Block - Base systems from DB + Preset themes */}
-      <div className="space-y-3">
-        <h3 className="font-semibold text-foreground flex items-center gap-2">
-          <Palette className="w-4 h-4 text-primary" />
-          Темы
-        </h3>
+  // Themes section
+  const themesSection = (
+    <div className="space-y-3">
+      <h3 className="font-semibold text-foreground flex items-center gap-2">
+        <Palette className="w-4 h-4 text-primary" />
+        Темы
+      </h3>
+      <BaseDesignSystemSelector
+        selectedId={selectedBaseSystemId || null}
+        onSelect={handleBaseSystemSelect}
+        isAdmin={isAdmin}
+        currentConfig={config}
+        baseSystems={baseSystems}
+        isLoadingBaseSystems={isLoadingBaseSystems}
+        onCreateBaseSystem={createBaseSystem}
+        onUpdateBaseSystem={updateBaseSystem}
+        onDeleteBaseSystem={deleteBaseSystem}
+        userSystems={userSystems}
+        isLoadingUserSystems={isLoadingUserSystems}
+        onCreateUserSystem={createUserSystem}
+        onUpdateUserSystem={updateUserSystem}
+        onDeleteUserSystem={deleteUserSystem}
+      />
+    </div>
+  );
 
-        {/* Base design systems from database */}
-        <BaseDesignSystemSelector
-          selectedId={selectedBaseSystemId || null}
-          onSelect={handleBaseSystemSelect}
-          isAdmin={isAdmin}
-          currentConfig={config}
-          baseSystems={baseSystems}
-          isLoadingBaseSystems={isLoadingBaseSystems}
-          onCreateBaseSystem={createBaseSystem}
-          onUpdateBaseSystem={updateBaseSystem}
-          onDeleteBaseSystem={deleteBaseSystem}
-          userSystems={userSystems}
-          isLoadingUserSystems={isLoadingUserSystems}
-          onCreateUserSystem={createUserSystem}
-          onUpdateUserSystem={updateUserSystem}
-          onDeleteUserSystem={deleteUserSystem}
-        />
-      </div>
-
-      {/* Show restriction message for non-admins with base system or built-in theme selected */}
-      {isEditingRestricted && (
-        <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
-          <p className="font-medium">Общая тема выбрана</p>
-          <p className="text-xs mt-1 text-amber-600">
-            Вы не можете редактировать параметры общих тем. Создайте свою тему, чтобы настроить дизайн.
-          </p>
-        </div>
-      )}
-
-      {/* Show hint when no theme is selected - hide all content below */}
-      {!selectedBaseSystemId && !isEditingRestricted ? (
-        <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-sm">
-          <p className="font-medium">Тема не выбрана</p>
-          <p className="text-xs mt-1 text-blue-600">
-            Выберите готовую тему выше или создайте свою для настройки дизайна курса.
-          </p>
-        </div>
-      ) : isEditingRestricted ? null : (
-      /* Detailed Settings - only shown for personal themes or admin */
-      <div className="space-y-4">
+  // Details section
+  const detailsSection = isEditingRestricted ? (
+    <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+      <p className="font-medium">Общая тема выбрана</p>
+      <p className="text-xs mt-1 text-amber-600">
+        Вы не можете редактировать параметры общих тем. Создайте свою тему, чтобы настроить дизайн.
+      </p>
+    </div>
+  ) : !selectedBaseSystemId ? (
+    <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-sm">
+      <p className="font-medium">Тема не выбрана</p>
+      <p className="text-xs mt-1 text-blue-600">
+        Выберите готовую тему выше или создайте свою для настройки дизайна курса.
+      </p>
+    </div>
+  ) : (
+    <div className="space-y-4">
         <h3 className="font-semibold text-foreground">Детальные настройки</h3>
         <Tabs defaultValue="ui" className="w-full">
           <TabsList className="w-full grid grid-cols-3 grid-rows-2 h-auto p-1 bg-muted/50 gap-1">
@@ -1877,8 +1874,19 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
 
           </div>
         </Tabs>
-      </div>
-      )}
+    </div>
+  );
+
+  // If onRenderSplit is provided, let parent control layout
+  if (onRenderSplit) {
+    return <>{onRenderSplit(themesSection, detailsSection)}</>;
+  }
+
+  // Default: render everything together
+  return (
+    <div className="space-y-6">
+      {themesSection}
+      {detailsSection}
     </div>
   );
 };
