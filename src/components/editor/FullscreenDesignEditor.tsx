@@ -165,14 +165,14 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
             <>
               {/* Left: Theme selector */}
               <div className="w-[320px] max-w-[320px] shrink-0 grow-0 bg-secondary dark:bg-black/10 flex flex-col overflow-hidden">
-                <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]]:!overflow-x-hidden [&>[data-radix-scroll-area-viewport]]:!max-w-[320px]">
+                <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]]:!overflow-x-hidden [&>[data-radix-scroll-area-viewport]]:!max-w-[320px] [&_[data-radix-scroll-area-scrollbar]]:hidden">
                   <div className="p-5 overflow-hidden max-w-[320px]">{themes}</div>
                 </ScrollArea>
               </div>
 
               {/* Middle: Detailed settings */}
               <div className="w-[440px] max-w-[440px] shrink-0 grow-0 bg-secondary dark:bg-black/10 flex flex-col overflow-hidden">
-                <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]]:!overflow-x-hidden">
+                <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]]:!overflow-x-hidden [&_[data-radix-scroll-area-scrollbar]]:hidden">
                   <div className="p-5 overflow-hidden">{details}</div>
                 </ScrollArea>
               </div>
