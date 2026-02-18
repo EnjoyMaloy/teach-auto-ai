@@ -268,41 +268,34 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
 
       {/* Empty state for "Мои" tab */}
       {showUser && !hasUserSystems && (
-        <div className="flex flex-col items-center justify-center py-8 text-center space-y-3">
+        <div className="flex flex-col items-center justify-center py-6 text-center space-y-2">
           <Wand2 className="w-8 h-8 text-muted-foreground/50" />
           <div className="space-y-1">
             <p className="text-sm font-medium text-foreground">У вас пока нет своих тем</p>
             <p className="text-xs text-muted-foreground">Создайте свою тему, чтобы настроить оформление курсов</p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2"
-            onClick={() => setIsCreateUserDialogOpen(true)}
-          >
-            <Plus className="w-4 h-4" />
-            Создать тему
-          </Button>
         </div>
       )}
 
-      <div className="flex flex-col gap-2 pt-2">
+      <div className="flex flex-col gap-1.5 pt-1">
         <Button
           variant="outline"
-          className="w-full justify-start gap-2 text-sm"
+          size="sm"
+          className="w-full justify-start gap-2 text-xs"
           onClick={() => setIsCreateUserDialogOpen(true)}
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-3.5 h-3.5" />
           Создать свою тему
         </Button>
         {isAdmin && (
           <Button
             variant="outline"
-            className="w-full justify-between text-sm overflow-hidden"
+            size="sm"
+            className="w-full justify-between text-xs overflow-hidden"
             onClick={() => setIsCreateBaseDialogOpen(true)}
           >
             <span className="flex items-center gap-2 truncate">
-              <Plus className="w-4 h-4 shrink-0" />
+              <Plus className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">Создать общую тему</span>
             </span>
             <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0 ml-1">
