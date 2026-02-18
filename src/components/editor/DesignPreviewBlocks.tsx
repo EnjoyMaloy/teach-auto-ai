@@ -390,11 +390,11 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
   };
 
   return (
-    <div className="h-full flex items-center justify-center">
+    <div className="h-full flex items-center justify-center py-1">
       {/* Center group: icon strip + phone preview */}
-      <div className="flex h-full items-center">
+      <div className="flex h-full max-h-full items-center">
         {/* Left: Icons strip, rounded on left side */}
-        <div className="w-12 bg-card rounded-l-2xl flex flex-col shrink-0 overflow-hidden my-0.5">
+        <div className="w-12 bg-card rounded-l-2xl flex flex-col shrink-0 overflow-hidden h-full">
           <div className="flex-1 overflow-y-auto py-2 space-y-1 flex flex-col items-center">
             {sampleSlides.map((slide, index) => {
               const Icon = iconMap[slide.type] || Layers;
@@ -419,8 +419,8 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
           </div>
         </div>
 
-        {/* Right: Phone preview, flush against icon strip */}
-        <div className="flex flex-col overflow-hidden h-full py-0.5">
+        {/* Right: Phone preview - use aspect ratio to fill height */}
+        <div className="h-full overflow-hidden" style={{ aspectRatio: '390 / 760' }}>
           <MobilePreviewFrame
             block={selectedBlock}
             lessonTitle="Демо-урок"
