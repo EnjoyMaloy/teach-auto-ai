@@ -79,7 +79,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
   const [newName, setNewName] = useState('');
   const [editName, setEditName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [themeFilter, setThemeFilter] = useState<'all' | 'base' | 'user'>('all');
+  const [themeFilter, setThemeFilter] = useState<'base' | 'user'>('base');
 
   const isLoading = isLoadingBaseSystems || isLoadingUserSystems;
 
@@ -193,17 +193,16 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
     );
   }
 
-  const showBase = themeFilter === 'all' || themeFilter === 'base';
-  const showUser = themeFilter === 'all' || themeFilter === 'user';
+  const showBase = themeFilter === 'base';
+  const showUser = themeFilter === 'user';
 
   return (
     <div className="space-y-4">
       {/* Filter tabs */}
       <div className="flex gap-1 p-1 rounded-lg bg-muted/50">
         {[
-          { key: 'all' as const, label: 'Все' },
-          { key: 'base' as const, label: 'Общие', icon: <Users className="w-3 h-3" /> },
-          { key: 'user' as const, label: 'Мои', icon: <User className="w-3 h-3" /> },
+          { key: 'base' as const, label: 'Общие' },
+          { key: 'user' as const, label: 'Мои' },
         ].map((tab) => (
           <button
             key={tab.key}
@@ -215,7 +214,6 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
-            {tab.icon}
             {tab.label}
           </button>
         ))}
@@ -224,12 +222,6 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
       {/* Base systems (admin-managed, visible to all) */}
       {showBase && hasBaseSystems && (
         <div className="space-y-2">
-          {themeFilter === 'all' && (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Users className="w-3.5 h-3.5" />
-              <span>Общие темы</span>
-            </div>
-          )}
           <div className="grid grid-cols-2 gap-2">
             {baseSystems.map((system) => (
               <ThemeCard
@@ -253,12 +245,6 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
       {/* User systems (personal themes) */}
       {showUser && hasUserSystems && (
         <div className="space-y-2">
-          {themeFilter === 'all' && (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <User className="w-3.5 h-3.5" />
-              <span>Мои темы</span>
-            </div>
-          )}
           <div className="grid grid-cols-2 gap-2">
             {userSystems.map((system) => (
               <ThemeCard
@@ -280,7 +266,26 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
         </div>
       )}
 
-      {/* Create buttons at the bottom */}
+      {/* Empty state for "Мои" tab */}
+      {showUser && !hasUserSystems && (
+        <div className="flex flex-col items-center justify-center py-8 text-center space-y-3">
+          <Wand2 className="w-8 h-8 text-muted-foreground/50" />
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-foreground">У вас пока нет своих тем</p>
+            <p className="text-xs text-muted-foreground">Создайте свою тему, чтобы настроить оформление курсов</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => setIsCreateUserDialogOpen(true)}
+          >
+            <Plus className="w-4 h-4" />
+            Создать тему
+          </Button>
+        </div>
+      )}
+
       <div className="flex flex-col gap-2 pt-2">
         {isAdmin && (
           <Button
