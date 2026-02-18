@@ -79,7 +79,7 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col">
       {/* Header with breadcrumbs */}
-      <header className="h-14 border-b border-border/5 bg-background/95 backdrop-blur-sm flex items-center justify-between px-4 flex-shrink-0">
+      <header className="h-14 bg-secondary/50 dark:bg-black/10 flex items-center justify-between px-4 flex-shrink-0">
         <div className="flex items-center gap-3">
           <Button 
             variant="ghost" 
@@ -90,10 +90,6 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
             <ArrowLeft className="w-4 h-4" />
             Назад
           </Button>
-          <div className="h-5 w-px bg-border/20" />
-          <h2 className="text-sm font-medium text-foreground truncate max-w-[300px]">
-            {courseTitle} — Дизайн
-          </h2>
           
           {/* Save status indicator */}
           <SaveStatusIndicator status={saveStatus} className="ml-2" />
