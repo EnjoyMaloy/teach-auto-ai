@@ -287,31 +287,29 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
       )}
 
       <div className="flex flex-col gap-2 pt-2">
+        <Button
+          variant="outline"
+          className="w-full justify-start gap-2 text-sm"
+          onClick={() => setIsCreateUserDialogOpen(true)}
+        >
+          <Plus className="w-4 h-4" />
+          Создать свою тему
+        </Button>
         {isAdmin && (
           <Button
             variant="outline"
-            className="w-full justify-between text-sm border-2 border-pink-400 text-pink-600 hover:bg-pink-50 hover:text-pink-700 overflow-hidden"
+            className="w-full justify-between text-sm overflow-hidden"
             onClick={() => setIsCreateBaseDialogOpen(true)}
           >
             <span className="flex items-center gap-2 truncate">
               <Plus className="w-4 h-4 shrink-0" />
-              <Users className="w-4 h-4 shrink-0" />
-              <span className="truncate">Добавить общую тему</span>
+              <span className="truncate">Создать общую тему</span>
             </span>
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-pink-100 text-pink-600 border-0 shrink-0 ml-1">
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0 ml-1">
               Admin
             </Badge>
           </Button>
         )}
-        <Button
-          variant="outline"
-          className="w-full justify-start gap-2 text-sm border-2 border-blue-400 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
-          onClick={() => setIsCreateUserDialogOpen(true)}
-        >
-          <Plus className="w-4 h-4" />
-          <Wand2 className="w-4 h-4" />
-          Создать свою тему
-        </Button>
       </div>
 
       {/* Base Create Dialog */}
