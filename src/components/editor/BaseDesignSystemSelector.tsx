@@ -199,7 +199,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
   return (
     <div className="space-y-4">
       {/* Filter tabs */}
-      <div className="flex gap-1 p-1 rounded-lg bg-background border border-border/50">
+      <div className="flex gap-1 p-1 rounded-lg bg-background dark:bg-muted/50 border border-border/50 dark:border-transparent">
         {[
           { key: 'base' as const, label: 'Общие' },
           { key: 'user' as const, label: 'Мои' },
