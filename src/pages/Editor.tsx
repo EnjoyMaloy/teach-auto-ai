@@ -688,7 +688,7 @@ const Editor: React.FC = () => {
         {/* Content area */}
         <div className="flex-1 flex overflow-hidden relative bg-background">
           {/* Preview area - full width */}
-          <div className="flex-1 flex items-center justify-center overflow-hidden">
+          <div className="flex-1 flex items-center justify-center overflow-hidden rounded-2xl">
             <div 
               className="overflow-hidden py-3"
               style={{ 
