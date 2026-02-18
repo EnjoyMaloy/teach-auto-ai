@@ -129,7 +129,7 @@ const Auth: React.FC = () => {
       <div className="flex-1 flex flex-col justify-center px-4 sm:px-8 lg:px-16 xl:px-24 pt-16 pb-8 lg:py-0">
         <div className="w-full max-w-[400px] mx-auto">
           {/* Title */}
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-foreground mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900 mb-6 sm:mb-8">
             {isSignUp ? 'Создайте аккаунт' : 'Войдите в аккаунт'}
           </h1>
 
@@ -183,7 +183,7 @@ const Auth: React.FC = () => {
           {/* Switch mode */}
           <p className="text-center text-sm text-gray-500 mt-6">
             {isSignUp ? 'Уже есть аккаунт?' : 'Нет аккаунта?'}{' '}
-            <button type="button" onClick={() => setIsSignUp(!isSignUp)} className="text-foreground hover:underline font-semibold">
+            <button type="button" onClick={() => setIsSignUp(!isSignUp)} className="text-gray-900 hover:underline font-semibold">
               {isSignUp ? 'Войти' : 'Зарегистрироваться'}
             </button>
           </p>
