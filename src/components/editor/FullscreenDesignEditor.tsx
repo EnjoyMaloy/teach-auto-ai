@@ -154,7 +154,7 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
       </header>
 
       {/* Main content - 3 columns */}
-      <div className="flex-1 flex overflow-hidden isolate">
+      <div className="flex-1 flex overflow-hidden isolate design-editor-no-scrollbar">
         <DesignSystemEditor
           config={config}
           onChange={onChange}

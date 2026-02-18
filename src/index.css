@@ -529,3 +529,12 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Hide all scrollbars inside design editor */
+.design-editor-no-scrollbar *::-webkit-scrollbar {
+  display: none;
+}
+.design-editor-no-scrollbar * {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
