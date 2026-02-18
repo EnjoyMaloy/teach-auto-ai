@@ -130,16 +130,16 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
           onRenderSplit={(themes, details) => (
             <>
               {/* Left: Theme selector */}
-              <div className="w-[280px] max-w-[280px] shrink-0 grow-0 border-r border-border bg-card flex flex-col overflow-hidden">
-                <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]]:!overflow-x-hidden [&>[data-radix-scroll-area-viewport]]:!max-w-[280px]">
-                  <div className="p-4 overflow-hidden max-w-[280px]">{themes}</div>
+              <div className="w-[320px] max-w-[320px] shrink-0 grow-0 border-r border-border bg-card flex flex-col overflow-hidden">
+                <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]]:!overflow-x-hidden [&>[data-radix-scroll-area-viewport]]:!max-w-[320px]">
+                  <div className="p-5 overflow-hidden max-w-[320px]">{themes}</div>
                 </ScrollArea>
               </div>
 
               {/* Middle: Detailed settings */}
-              <div className="basis-[340px] shrink-0 grow-0 border-r border-border bg-card flex flex-col overflow-hidden">
+              <div className="w-[380px] max-w-[380px] shrink-0 grow-0 border-r border-border bg-card flex flex-col overflow-hidden">
                 <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]]:!overflow-x-hidden">
-                  <div className="p-4 overflow-hidden">{details}</div>
+                  <div className="p-5 overflow-hidden">{details}</div>
                 </ScrollArea>
               </div>
 
