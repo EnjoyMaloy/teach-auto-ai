@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Shield, User } from 'lucide-react';
+import { ArrowLeft, Shield, User, Cloud, RefreshCw, Check, Sun, Moon } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { DesignSystemConfig } from '@/types/designSystem';
 import { DesignSystemEditor } from './DesignSystemEditor';
 import { DesignPreviewBlocks } from './DesignPreviewBlocks';
@@ -7,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
-import { SaveStatusIndicator, SaveStatus } from './design-system/SaveStatusIndicator';
+import { SaveStatus } from './design-system/SaveStatusIndicator';
 
 interface FullscreenDesignEditorProps {
   config: DesignSystemConfig;
@@ -31,6 +32,7 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
   
   
   // Test mode toggle - allows switching between admin and regular user view
+  const { theme, setTheme } = useTheme();
   const [isTestModeAdmin, setIsTestModeAdmin] = useState(realIsAdmin);
   
   // Save status indicator
@@ -91,32 +93,58 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
             Назад
           </Button>
           
-          {/* Save status indicator */}
-          <SaveStatusIndicator status={saveStatus} className="ml-2" />
+          {/* Cloud save status - same as editor header */}
+          <div className="relative flex items-center justify-center w-8 h-8">
+            <Cloud className={cn(
+              "w-5 h-5 transition-colors",
+              saveStatus === 'saving' ? "text-muted-foreground" : 
+              saveStatus === 'saved' ? "text-emerald-500" : "text-muted-foreground"
+            )} />
+            {saveStatus === 'saving' ? (
+              <RefreshCw className="w-3 h-3 text-primary animate-spin absolute bottom-0.5 right-0.5" />
+            ) : saveStatus === 'saved' ? (
+              <Check className="w-3 h-3 text-emerald-500 absolute bottom-0.5 right-0.5" />
+            ) : null}
+          </div>
         </div>
 
-        {/* Role toggle for testing (only visible to real admins) */}
-        {realIsAdmin && (
-          <div className="flex items-center gap-3 px-3 py-1.5 rounded-lg bg-muted/50 border border-border">
-            <div className="flex items-center gap-2">
-              <User className={cn("w-4 h-4", !isTestModeAdmin && "text-blue-500")} />
-              <span className={cn("text-xs font-medium", !isTestModeAdmin && "text-blue-600")}>
-                Юзер
-              </span>
+        <div className="flex items-center gap-2">
+          {/* Role toggle for testing (only visible to real admins) */}
+          {realIsAdmin && (
+            <div className="flex items-center gap-3 px-3 py-1.5 rounded-lg bg-muted/50 border border-border">
+              <div className="flex items-center gap-2">
+                <User className={cn("w-4 h-4", !isTestModeAdmin && "text-blue-500")} />
+                <span className={cn("text-xs font-medium", !isTestModeAdmin && "text-blue-600")}>
+                  Юзер
+                </span>
+              </div>
+              <Switch
+                checked={isTestModeAdmin}
+                onCheckedChange={setIsTestModeAdmin}
+                className="data-[state=checked]:bg-pink-500"
+              />
+              <div className="flex items-center gap-2">
+                <Shield className={cn("w-4 h-4", isTestModeAdmin && "text-pink-500")} />
+                <span className={cn("text-xs font-medium", isTestModeAdmin && "text-pink-600")}>
+                  Админ
+                </span>
+              </div>
             </div>
-            <Switch
-              checked={isTestModeAdmin}
-              onCheckedChange={setIsTestModeAdmin}
-              className="data-[state=checked]:bg-pink-500"
-            />
-            <div className="flex items-center gap-2">
-              <Shield className={cn("w-4 h-4", isTestModeAdmin && "text-pink-500")} />
-              <span className={cn("text-xs font-medium", isTestModeAdmin && "text-pink-600")}>
-                Админ
-              </span>
-            </div>
-          </div>
-        )}
+          )}
+
+          {/* Theme toggle */}
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+          >
+            {theme === 'dark' ? (
+              <Sun className="w-4 h-4" />
+            ) : (
+              <Moon className="w-4 h-4" />
+            )}
+          </button>
+        </div>
       </header>
 
       {/* Main content - 3 columns */}
