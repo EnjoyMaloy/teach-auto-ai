@@ -418,7 +418,7 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
       </div>
 
       {/* Right: Preview using MobilePreviewFrame */}
-      <div className="flex-1 flex flex-col bg-muted/30 overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 overflow-hidden py-3 px-3">
           <MobilePreviewFrame
             block={selectedBlock}
