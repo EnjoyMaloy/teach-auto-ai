@@ -130,14 +130,14 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
           onRenderSplit={(themes, details) => (
             <>
               {/* Left: Theme selector */}
-              <div className="w-[300px] min-w-[280px] border-r border-border bg-card flex flex-col" style={{ flexShrink: 0 }}>
+              <div className="w-[280px] border-r border-border bg-card flex flex-col shrink-0">
                 <ScrollArea className="flex-1">
                   <div className="p-4">{themes}</div>
                 </ScrollArea>
               </div>
 
               {/* Middle: Detailed settings */}
-              <div className="w-[380px] min-w-[340px] border-r border-border bg-card flex flex-col" style={{ flexShrink: 0 }}>
+              <div className="w-[340px] border-r border-border bg-card flex flex-col shrink-0">
                 <ScrollArea className="flex-1">
                   <div className="p-4">{details}</div>
                 </ScrollArea>

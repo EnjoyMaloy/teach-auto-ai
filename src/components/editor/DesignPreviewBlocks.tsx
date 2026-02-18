@@ -391,12 +391,9 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
 
   return (
     <div className="h-full flex">
-      {/* Left: Blocks list */}
-      <div className="w-72 border-r border-border bg-card flex flex-col">
-        <div className="px-4 py-3 border-b border-border">
-          <h3 className="font-semibold text-sm text-foreground">Демо-блоки</h3>
-        </div>
-        <div className="flex-1 overflow-y-auto p-2 space-y-1">
+      {/* Left: Compact blocks list - icons only */}
+      <div className="w-14 border-r border-border bg-card flex flex-col shrink-0">
+        <div className="flex-1 overflow-y-auto py-2 space-y-1 flex flex-col items-center">
           {sampleSlides.map((slide, index) => {
             const Icon = iconMap[slide.type] || Layers;
             const isSelected = selectedIndex === index;
@@ -405,36 +402,24 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
               <button
                 key={slide.id}
                 onClick={() => setSelectedIndex(index)}
+                title={blockLabels[slide.type] || slide.type}
                 className={cn(
-                  "w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all",
-                  isSelected 
-                    ? "bg-primary/10 ring-2 ring-primary ring-inset" 
-                    : "hover:bg-muted/70 active:bg-muted"
-                )}
-              >
-                <div className={cn(
-                  "w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors",
+                  "w-10 h-10 rounded-lg flex items-center justify-center transition-all",
                   isSelected 
                     ? "bg-primary text-primary-foreground" 
-                    : "bg-muted-foreground/15 text-muted-foreground"
-                )}>
-                  <Icon className="w-4 h-4" />
-                </div>
-                <p className={cn(
-                  "text-sm font-medium truncate flex-1 transition-colors",
-                  isSelected ? "text-primary" : "text-foreground"
-                )}>
-                  {blockLabels[slide.type] || slide.type}
-                </p>
+                    : "hover:bg-muted/70 active:bg-muted text-muted-foreground"
+                )}
+              >
+                <Icon className="w-4 h-4" />
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Right: Fast View using MobilePreviewFrame */}
+      {/* Right: Preview using MobilePreviewFrame */}
       <div className="flex-1 flex flex-col bg-muted/30 overflow-hidden">
-        <div className="flex-1 overflow-hidden py-3 pr-3">
+        <div className="flex-1 overflow-hidden py-3 px-3">
           <MobilePreviewFrame
             block={selectedBlock}
             lessonTitle="Демо-урок"
