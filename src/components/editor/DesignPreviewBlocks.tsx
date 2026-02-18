@@ -434,13 +434,6 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
 
       {/* Right: Fast View using MobilePreviewFrame */}
       <div className="flex-1 flex flex-col bg-muted/30 overflow-hidden">
-        <div className="px-4 py-2 border-b border-border bg-card flex items-center justify-between">
-          <span className="text-sm font-medium text-muted-foreground">Fast View</span>
-          <span className="text-xs text-muted-foreground">
-            {selectedIndex + 1} / {sampleSlides.length}
-          </span>
-        </div>
-        
         <div className="flex-1 overflow-hidden">
           <MobilePreviewFrame
             block={selectedBlock}
