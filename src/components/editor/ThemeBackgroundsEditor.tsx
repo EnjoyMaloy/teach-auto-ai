@@ -16,7 +16,7 @@ import { AnglePicker } from './AnglePicker';
 
 interface ThemeBackgroundsEditorProps {
   backgrounds: BackgroundPreset[];
-  onChange: (backgrounds: BackgroundPreset[]) => void;
+  onChange: (backgrounds: BackgroundPreset[], newDefaultId?: string) => void;
   defaultBackgroundId?: string;
   onDefaultChange: (id: string | undefined) => void;
   selectedBackgroundId?: string;
@@ -158,10 +158,12 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
     if (editingBackground) {
       onChange(backgrounds.map(bg => bg.id === editingBackground.id ? newBg : bg));
     } else {
-      onChange([...backgrounds, newBg]);
-      // Set as default if it's the first background
+      const newBackgrounds = [...backgrounds, newBg];
+      // Set as default if it's the first background — pass in same call to avoid stale closure
       if (backgrounds.length === 0) {
-        onDefaultChange(newBg.id);
+        onChange(newBackgrounds, newBg.id);
+      } else {
+        onChange(newBackgrounds);
       }
     }
 
