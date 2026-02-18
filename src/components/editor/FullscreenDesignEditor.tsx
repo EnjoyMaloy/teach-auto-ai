@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Shield, User, Cloud, RefreshCw, Check, Sun, Moon } from 'lucide-react';
+import { ArrowLeft, Shield, User, Cloud, RefreshCw, Check, Sun, Moon, Palette } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { DesignSystemConfig } from '@/types/designSystem';
 import { DesignSystemEditor } from './DesignSystemEditor';
@@ -81,7 +81,7 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col">
       {/* Header with breadcrumbs */}
-      <header className="h-14 bg-secondary/50 dark:bg-black/10 flex items-center justify-between px-4 flex-shrink-0">
+      <header className="h-14 bg-secondary/50 dark:bg-black/10 flex items-center justify-between px-4 flex-shrink-0 relative">
         <div className="flex items-center gap-3">
           <Button 
             variant="ghost" 
@@ -93,11 +93,17 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
             Назад
           </Button>
           
-          {/* Cloud save status - same as editor header */}
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Palette className="w-4 h-4" />
+            <span className="text-sm font-medium">Дизайн</span>
+          </div>
+        </div>
+
+        {/* Cloud save status - centered */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center">
           <div className="relative flex items-center justify-center w-8 h-8">
             <Cloud className={cn(
               "w-5 h-5 transition-colors",
-              saveStatus === 'saving' ? "text-muted-foreground" : 
               saveStatus === 'saved' ? "text-emerald-500" : "text-muted-foreground"
             )} />
             {saveStatus === 'saving' ? (
