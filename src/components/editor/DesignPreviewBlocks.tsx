@@ -394,7 +394,7 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
       {/* Center group: icon strip + phone preview */}
       <div className="flex h-full items-center">
         {/* Left: Icons strip, rounded on left side */}
-        <div className="w-12 bg-card rounded-l-2xl flex flex-col shrink-0 overflow-hidden my-1">
+        <div className="w-12 bg-card rounded-l-2xl flex flex-col shrink-0 overflow-hidden my-0.5">
           <div className="flex-1 overflow-y-auto py-2 space-y-1 flex flex-col items-center">
             {sampleSlides.map((slide, index) => {
               const Icon = iconMap[slide.type] || Layers;
@@ -420,7 +420,7 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
         </div>
 
         {/* Right: Phone preview, flush against icon strip */}
-        <div className="flex flex-col overflow-hidden h-full py-1">
+        <div className="flex flex-col overflow-hidden h-full py-0.5">
           <MobilePreviewFrame
             block={selectedBlock}
             lessonTitle="Демо-урок"
