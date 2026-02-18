@@ -1765,7 +1765,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     title="Тема звуков"
                     description="Стиль звукового оформления"
                   >
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="flex flex-wrap gap-2">
                       {SOUND_THEME_OPTIONS.map((theme) => {
                         const currentTheme = config.sound?.theme ?? 'duolingo';
                         
