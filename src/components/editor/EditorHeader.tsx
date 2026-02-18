@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import lessonMapMascot from '@/assets/lesson-map-mascot.svg';
 import { 
   Undo2, Redo2, Eye, 
   Share2, Check, X, Palette, Map,
@@ -159,20 +160,10 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         >
           {type === 'circle_map' ? (
             <div className="relative w-full h-full">
-              {/* Owl silhouette - left side */}
-              <svg className="absolute left-0.5 top-[30%]" style={{ opacity: 0.3 }} width="16" height="22" viewBox="0 0 32 44">
-                <ellipse cx="16" cy="14" rx="12" ry="13" fill="hsl(0 0% 45%)"/>
-                <path d="M6 4 L10 10" stroke="hsl(0 0% 45%)" strokeWidth="3" strokeLinecap="round"/>
-                <path d="M26 4 L22 10" stroke="hsl(0 0% 45%)" strokeWidth="3" strokeLinecap="round"/>
-                <ellipse cx="16" cy="34" rx="9" ry="10" fill="hsl(0 0% 45%)"/>
-              </svg>
-              {/* Owl silhouette - right side */}
-              <svg className="absolute right-0.5 bottom-[20%]" style={{ opacity: 0.3 }} width="16" height="22" viewBox="0 0 32 44">
-                <ellipse cx="16" cy="14" rx="12" ry="13" fill="hsl(0 0% 45%)"/>
-                <path d="M6 4 L10 10" stroke="hsl(0 0% 45%)" strokeWidth="3" strokeLinecap="round"/>
-                <path d="M26 4 L22 10" stroke="hsl(0 0% 45%)" strokeWidth="3" strokeLinecap="round"/>
-                <ellipse cx="16" cy="34" rx="9" ry="10" fill="hsl(0 0% 45%)"/>
-              </svg>
+              {/* Mascot - left side */}
+              <img src={lessonMapMascot} alt="" className="absolute left-0 top-[25%] w-5 h-auto" style={{ opacity: 0.35 }} />
+              {/* Mascot - right side */}
+              <img src={lessonMapMascot} alt="" className="absolute right-0 bottom-[15%] w-5 h-auto" style={{ opacity: 0.35, transform: 'scaleX(-1)' }} />
               {/* Zigzag circles */}
               <div className="flex flex-col items-start gap-1 h-full justify-center pl-4 pr-4">
                 {/* 1 - completed (pastel green, bold check) */}
