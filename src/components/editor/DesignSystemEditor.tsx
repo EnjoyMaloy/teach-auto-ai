@@ -1338,7 +1338,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                         })}
                       />
                     </div>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       <ColorInput
                         label="Маркер"
                         value={config.designBlock?.backdropLightMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropLightMarkerColor}
@@ -1382,7 +1382,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                         })}
                       />
                     </div>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       <ColorInput
                         label="Маркер"
                         value={config.designBlock?.backdropDarkMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropDarkMarkerColor}
@@ -1426,7 +1426,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                         })}
                       />
                     </div>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       <ColorInput
                         label="Маркер"
                         value={config.designBlock?.backdropPrimaryMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropPrimaryMarkerColor}
@@ -1470,7 +1470,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                         })}
                       />
                     </div>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       <ColorInput
                         label="Маркер"
                         value={config.designBlock?.backdropBlurMarkerColor || DEFAULT_DESIGN_BLOCK_SETTINGS.backdropBlurMarkerColor}
