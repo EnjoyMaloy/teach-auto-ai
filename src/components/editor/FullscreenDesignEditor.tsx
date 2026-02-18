@@ -120,7 +120,7 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
       </header>
 
       {/* Main content - 3 columns */}
-      <div className="flex-1 flex overflow-hidden" style={{ display: 'flex' }}>
+      <div className="flex-1 flex overflow-hidden isolate">
         <DesignSystemEditor
           config={config}
           onChange={onChange}
@@ -130,22 +130,22 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
           onRenderSplit={(themes, details) => (
             <>
               {/* Left: Theme selector */}
-              <div className="w-[280px] border-r border-border bg-card flex flex-col shrink-0 overflow-hidden">
-                <ScrollArea className="flex-1">
-                  <div className="p-4">{themes}</div>
+              <div className="basis-[280px] shrink-0 grow-0 border-r border-border bg-card flex flex-col overflow-hidden">
+                <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]]:!overflow-x-hidden">
+                  <div className="p-4 overflow-hidden">{themes}</div>
                 </ScrollArea>
               </div>
 
               {/* Middle: Detailed settings */}
-              <div className="w-[340px] border-r border-border bg-card flex flex-col shrink-0">
-                <ScrollArea className="flex-1">
-                  <div className="p-4">{details}</div>
+              <div className="basis-[340px] shrink-0 grow-0 border-r border-border bg-card flex flex-col overflow-hidden">
+                <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]]:!overflow-x-hidden">
+                  <div className="p-4 overflow-hidden">{details}</div>
                 </ScrollArea>
               </div>
 
               {/* Right: Preview */}
-              <div className="flex-1 flex flex-col bg-muted/30 overflow-hidden">
-                <div className="flex-1 overflow-hidden py-3 pr-3">
+              <div className="flex-1 min-w-0 flex flex-col bg-muted/30 overflow-hidden">
+                <div className="flex-1 overflow-hidden py-3 px-3">
                   <DesignPreviewBlocks config={config} />
                 </div>
               </div>

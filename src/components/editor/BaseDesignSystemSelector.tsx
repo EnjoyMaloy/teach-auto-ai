@@ -255,16 +255,16 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
         {isAdmin && (
           <Button
             variant="outline"
-            className="w-full justify-between text-sm border-2 border-pink-400 text-pink-600 hover:bg-pink-50 hover:text-pink-700"
+            className="w-full justify-between text-sm border-2 border-pink-400 text-pink-600 hover:bg-pink-50 hover:text-pink-700 overflow-hidden"
             onClick={() => setIsCreateBaseDialogOpen(true)}
           >
-            <span className="flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              <Users className="w-4 h-4" />
-              Добавить общую тему
+            <span className="flex items-center gap-2 truncate">
+              <Plus className="w-4 h-4 shrink-0" />
+              <Users className="w-4 h-4 shrink-0" />
+              <span className="truncate">Добавить общую тему</span>
             </span>
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-pink-100 text-pink-600 border-0">
-              Admin Mode
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-pink-100 text-pink-600 border-0 shrink-0 ml-1">
+              Admin
             </Badge>
           </Button>
         )}
