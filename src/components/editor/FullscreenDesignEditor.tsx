@@ -179,7 +179,7 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
 
               {/* Right: Preview */}
               <div className="flex-1 min-w-0 flex flex-col bg-secondary/50 dark:bg-black/10 overflow-hidden">
-                <div className="flex-1 overflow-hidden py-3 px-3">
+                <div className="flex-1 overflow-hidden m-2 rounded-2xl bg-background">
                   <DesignPreviewBlocks config={config} />
                 </div>
               </div>
