@@ -254,7 +254,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
   return (
     <>
-      <header className="h-14 border-b border-border/5 dark:border-transparent bg-secondary/50 dark:bg-black/10 backdrop-blur-sm flex items-center justify-between px-4 gap-4 relative">
+      <header className="h-14 border-b border-border/5 dark:border-transparent bg-secondary dark:bg-black/10 backdrop-blur-sm flex items-center justify-between px-4 gap-4 relative">
         {/* Left section - Sidebar trigger + Breadcrumbs */}
         <div className={cn("flex items-center gap-2 min-w-0", !isAISidebarOpen && "ml-11")}>
           {/* AI Sidebar Toggle */}
