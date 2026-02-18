@@ -707,8 +707,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
   // Themes section
   const themesSection = (
     <div className="space-y-3">
-      <h3 className="font-semibold text-foreground flex items-center gap-2">
-        <Palette className="w-4 h-4 text-primary" />
+      <h3 className="font-semibold text-foreground">
         Темы
       </h3>
       <BaseDesignSystemSelector
