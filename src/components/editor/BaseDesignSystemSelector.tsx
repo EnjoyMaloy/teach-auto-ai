@@ -210,7 +210,7 @@ export const BaseDesignSystemSelector: React.FC<BaseDesignSystemSelectorProps> =
             className={cn(
               "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md text-xs font-medium transition-all",
               themeFilter === tab.key
-                ? "bg-background text-foreground shadow-sm"
+                ? "bg-background text-foreground shadow-sm border border-border/80 dark:border-transparent"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
