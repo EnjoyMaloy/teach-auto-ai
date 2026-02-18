@@ -572,6 +572,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
         isOpen ? "w-[380px]" : "w-0"
       )}
     >
+      <div className="w-[380px] h-full flex flex-col min-w-[380px]">
       {/* Spacer for header alignment */}
       <div className="h-14 shrink-0" />
 
@@ -862,6 +863,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
             )}
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
