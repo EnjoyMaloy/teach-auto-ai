@@ -130,7 +130,7 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
           onRenderSplit={(themes, details) => (
             <>
               {/* Left: Theme selector */}
-              <div className="w-[280px] border-r border-border bg-card flex flex-col shrink-0">
+              <div className="w-[280px] border-r border-border bg-card flex flex-col shrink-0 overflow-hidden">
                 <ScrollArea className="flex-1">
                   <div className="p-4">{themes}</div>
                 </ScrollArea>
