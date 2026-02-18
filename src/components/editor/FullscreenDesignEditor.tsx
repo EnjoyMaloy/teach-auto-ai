@@ -171,7 +171,7 @@ export const FullscreenDesignEditor: React.FC<FullscreenDesignEditorProps> = ({
               </div>
 
               {/* Middle: Detailed settings */}
-              <div className="w-[380px] max-w-[380px] shrink-0 grow-0 bg-secondary dark:bg-black/10 flex flex-col overflow-hidden">
+              <div className="w-[440px] max-w-[440px] shrink-0 grow-0 bg-secondary dark:bg-black/10 flex flex-col overflow-hidden">
                 <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]]:!overflow-x-hidden">
                   <div className="p-5 overflow-hidden">{details}</div>
                 </ScrollArea>
