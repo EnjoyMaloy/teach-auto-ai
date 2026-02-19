@@ -416,7 +416,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     setMessages(prev => [...prev, userMsg]);
 
     if (mode === 'generate') {
-      if (isCompleted) resetGeneration();
+      if (isCompleted || state.status === 'cancelled' || state.status === 'error') resetGeneration();
       if (onBeforeGenerate) {
         const ok = await onBeforeGenerate();
         if (!ok) return;
