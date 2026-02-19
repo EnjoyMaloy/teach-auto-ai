@@ -82,8 +82,6 @@ const extractFirstImageFromCourse = (lessons: Lesson[]): string | undefined => {
 const dbCourseToCourse = (row: any, lessons: Lesson[]): Course & { 
   category?: string; 
   isLinkAccessible?: boolean;
-  moderationStatus?: string;
-  moderationComment?: string;
 } => {
   const courseLessons = lessons.filter(l => l.courseId === row.id).sort((a, b) => a.order - b.order);
   
@@ -110,8 +108,6 @@ const dbCourseToCourse = (row: any, lessons: Lesson[]): Course & {
     lessonsDisplayType: row.lessons_display_type || 'circle_map',
     category: row.category || undefined,
     isLinkAccessible: row.is_link_accessible || false,
-    moderationStatus: row.moderation_status || undefined,
-    moderationComment: row.moderation_comment || undefined,
   };
 };
 
@@ -423,7 +419,6 @@ export const useCourses = () => {
       const { data: coursesData, error: coursesError } = await supabase
         .from('courses')
         .select('*')
-        .eq('is_published', true)
         .eq('is_published', true)
         .order('published_at', { ascending: false });
 
