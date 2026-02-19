@@ -237,6 +237,30 @@ const CONTENT_PROMPT = `Ты — контент-мейкер для мобиль
 - ❌ ПЛОХО: "<b>Ошибки:</b> <u>мелкий помол</u>, <u>быстрое опускание</u>"
 - ✅ ХОРОШО: "Слишком <b>мелкий помол</b> — кофе просочится через фильтр"
 
+### 🎨 ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА ВИЗУАЛЬНОГО ОФОРМЛЕНИЯ TEXT:
+
+#### Подложки (backdrop):
+- Используй backdrop в 40-60% текстовых блоков! Это делает контент визуально интереснее
+- "light" — для обычных определений и фактов
+- "primary" — для ключевых тезисов и важных выводов
+- "dark" — для контрастных акцентов и предупреждений
+- "blur" — для дополнительной информации и примечаний
+- Всегда ставь "backdropRounded": true при использовании backdrop
+- ❌ НЕ ставь backdrop: "none" на ВСЕ текстовые блоки — это скучно!
+
+#### Маркеры (highlight):
+- Используй highlight в 30-50% текстовых блоков для выделения ключевой мысли!
+- "marker" — как жёлтый маркер, для самых важных определений и терминов
+- "underline" — для акцента на действиях или процессах
+- "wavy" — для интересных фактов и необычных утверждений
+- ❌ НЕ ставь highlight: "none" на ВСЕ текстовые блоки!
+- Комбинируй: backdrop + highlight вместе создают мощный визуальный акцент
+
+#### Примеры правильного оформления:
+✅ { "type": "text", "content": "<b>Фотосинтез</b> — процесс превращения света в энергию", "backdrop": "primary", "backdropRounded": true, "highlight": "none" }
+✅ { "type": "text", "content": "Растения поглощают <mark>углекислый газ</mark> из воздуха", "backdrop": "none", "highlight": "marker" }
+✅ { "type": "text", "content": "Без света этот процесс невозможен!", "backdrop": "light", "backdropRounded": true, "highlight": "wavy" }
+
 #### image (картинка)
 {
   "type": "image",
@@ -303,7 +327,7 @@ const CONTENT_PROMPT = `Ты — контент-мейкер для мобиль
   "subBlocks": [
     { "type": "badge", "order": 1, "badges": [{"id": "1", "text": "Урок 1", "iconType": "lucide", "iconValue": "BookOpen"}], "badgeVariant": "oval", "textAlign": "center", "padding": "small" },
     { "type": "heading", "order": 2, "content": "Добро пожаловать!", "textAlign": "center", "textSize": "xlarge", "fontWeight": "bold" },
-    { "type": "text", "order": 3, "content": "В этом уроке вы узнаете основы", "textAlign": "center", "textSize": "medium" },
+    { "type": "text", "order": 3, "content": "В этом уроке вы узнаете основы", "textAlign": "center", "textSize": "medium", "backdrop": "light", "backdropRounded": true, "highlight": "none" },
     { "type": "image", "order": 4, "imageDescription": "A welcoming illustration of a person starting a new learning journey", "imageSize": "medium", "textAlign": "center", "padding": "small" }
   ]
 }
@@ -313,7 +337,7 @@ const CONTENT_PROMPT = `Ты — контент-мейкер для мобиль
   "type": "design",
   "subBlocks": [
     { "type": "heading", "order": 1, "content": "Отлично!", "textAlign": "center", "textSize": "xlarge", "fontWeight": "bold" },
-    { "type": "text", "order": 2, "content": "Вы освоили ключевые навыки этого урока!", "textAlign": "center", "textSize": "medium" },
+    { "type": "text", "order": 2, "content": "Вы освоили ключевые навыки этого урока!", "textAlign": "center", "textSize": "medium", "backdrop": "primary", "backdropRounded": true, "highlight": "marker" },
     { "type": "badge", "order": 3, "badges": [{"id": "1", "text": "Навык 1", "iconType": "lucide", "iconValue": "CheckCircle"}, {"id": "2", "text": "Навык 2", "iconType": "lucide", "iconValue": "Star"}], "badgeVariant": "contrast", "badgeLayout": "horizontal", "textAlign": "center", "padding": "small" },
     { "type": "image", "order": 4, "imageDescription": "A celebratory illustration with a trophy and confetti", "imageSize": "medium", "textAlign": "center", "padding": "small" }
   ]
