@@ -129,7 +129,6 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   };
 
   const handlePublishClick = () => {
-    onPublish();
     setShowPublishDialog(true);
   };
 
