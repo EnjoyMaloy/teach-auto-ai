@@ -285,20 +285,20 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           )}
 
           {/* Breadcrumb navigation */}
-          <Breadcrumb className="min-w-0">
-            <BreadcrumbList className="flex-nowrap">
-              <BreadcrumbItem>
+          <Breadcrumb className="min-w-0 flex-1">
+            <BreadcrumbList className="flex-nowrap min-w-0">
+              <BreadcrumbItem className="shrink-0">
                 <BreadcrumbLink asChild>
                   <button onClick={onBack} className="flex items-center p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
                     <Home className="w-4 h-4" />
                   </button>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
+              <BreadcrumbSeparator className="shrink-0" />
+              <BreadcrumbItem className="min-w-0">
                 {showDesignSystem ? (
                   <BreadcrumbLink asChild>
-                    <button onClick={() => setShowDesignSystem(false)} className="transition-colors truncate max-w-[100px] sm:max-w-[150px] md:max-w-[200px] lg:max-w-[280px]">
+                    <button onClick={() => setShowDesignSystem(false)} className="block truncate transition-colors">
                       {course.title}
                     </button>
                   </BreadcrumbLink>
@@ -314,9 +314,9 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                     />
                   </div>
                 ) : (
-                  <BreadcrumbPage>
+                  <BreadcrumbPage className="min-w-0">
                     <span 
-                      className="block truncate max-w-[100px] sm:max-w-[150px] md:max-w-[200px] lg:max-w-[280px] xl:max-w-[360px] cursor-pointer hover:text-primary transition-colors"
+                      className="block truncate cursor-pointer hover:text-primary transition-colors"
                       onDoubleClick={handleStartEditing}
                       title="Двойной клик для редактирования"
                     >
@@ -327,8 +327,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
               </BreadcrumbItem>
               {showDesignSystem && (
                 <>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
+                  <BreadcrumbSeparator className="shrink-0" />
+                  <BreadcrumbItem className="shrink-0">
                     <BreadcrumbPage>Дизайн</BreadcrumbPage>
                   </BreadcrumbItem>
                 </>
