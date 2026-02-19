@@ -39,6 +39,13 @@ interface UnifiedMessage {
 
 // ── Props ─────────────────────────────────────────────────
 
+interface GenerationSettings {
+  designSystemId?: string | null;
+  lessonCount?: number;
+  skipImages?: boolean;
+  imageModel?: 'gemini-3-pro' | 'gemini-2.5-flash';
+}
+
 interface EditorAISidebarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -54,6 +61,8 @@ interface EditorAISidebarProps {
   onRefineCourse?: (lessons: Lesson[]) => void;
   initialMode?: 'generate';
   onBeforeGenerate?: () => Promise<boolean>;
+  autoPrompt?: string;
+  autoSettings?: GenerationSettings;
 }
 
 type SidebarMode = 'idle' | 'generate' | 'edit-block';
@@ -73,14 +82,16 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   onRefineCourse,
   initialMode,
   onBeforeGenerate,
+  autoPrompt,
+  autoSettings,
 }) => {
   const [mode, setMode] = useState<SidebarMode>(initialMode === 'generate' ? 'generate' : 'idle');
   const [chatInput, setChatInput] = useState('');
   const [isEditingBlock, setIsEditingBlock] = useState(false);
-  const [localSkipImages, setLocalSkipImages] = useState(false);
-  const [imageModel, setImageModel] = useState<'gemini-3-pro' | 'gemini-2.5-flash'>('gemini-3-pro');
-  const [selectedDesignSystemId, setSelectedDesignSystemId] = useState<string | null>(null);
-  const [lessonCount, setLessonCount] = useState(3);
+  const [localSkipImages, setLocalSkipImages] = useState(autoSettings?.skipImages ?? false);
+  const [imageModel, setImageModel] = useState<'gemini-3-pro' | 'gemini-2.5-flash'>(autoSettings?.imageModel ?? 'gemini-3-pro');
+  const [selectedDesignSystemId, setSelectedDesignSystemId] = useState<string | null>(autoSettings?.designSystemId ?? null);
+  const [lessonCount, setLessonCount] = useState(autoSettings?.lessonCount ?? 3);
 
   // ── Unified messages state ──────────────────────────────
   const [messages, setMessages] = useState<UnifiedMessage[]>([]);
@@ -110,6 +121,44 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       setMode('generate');
     }
   }, [initialMode, isOpen]);
+
+  // ── Auto-start generation from Home page ────────────────
+  const autoStartedRef = useRef(false);
+  useEffect(() => {
+    if (autoPrompt && isOpen && !autoStartedRef.current && designSystems.length > 0 && state.status === 'idle') {
+      autoStartedRef.current = true;
+      // Trigger generation with pre-configured settings
+      const doAutoGenerate = async () => {
+        if (onBeforeGenerate) {
+          const ok = await onBeforeGenerate();
+          if (!ok) return;
+        }
+        // Add user message
+        const userMsg: UnifiedMessage = {
+          id: crypto.randomUUID(),
+          type: 'user',
+          content: autoPrompt,
+          timestamp: Date.now(),
+        };
+        setMessages(prev => [...prev, userMsg]);
+        // Add generation placeholder
+        const genMsgId = crypto.randomUUID();
+        generationMsgIdRef.current = genMsgId;
+        setMessages(prev => [...prev, {
+          id: genMsgId,
+          type: 'generation',
+          content: '',
+          timestamp: Date.now(),
+          steps: [],
+          isGenerating: true,
+        }]);
+        const selectedDS = designSystems.find(ds => ds.id === selectedDesignSystemId);
+        runGeneration(autoPrompt, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id, imageModel);
+        setMode('idle');
+      };
+      doAutoGenerate();
+    }
+  }, [autoPrompt, isOpen, designSystems, state.status]);
 
   const isGenerating = state.status === 'generating';
   const isCompleted = state.status === 'completed';
