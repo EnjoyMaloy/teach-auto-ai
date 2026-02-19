@@ -25,6 +25,32 @@ import { useRefineCourse } from '@/hooks/useRefineCourse';
 import aiMascot from '@/assets/ai-mascot.svg';
 import aiMascotDark from '@/assets/ai-mascot-dark.svg';
 
+// ── Helpers ────────────────────────────────────────────────
+
+/** Strip base64 data and raw JSON from AI messages to keep chat clean */
+const sanitizeAIMessage = (raw: string): string => {
+  if (!raw || raw === '...') return raw;
+  // If content looks like raw JSON object, try to extract message field
+  const trimmed = raw.trim();
+  if (trimmed.startsWith('{') && trimmed.includes('"message"')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (parsed.message && typeof parsed.message === 'string') {
+        return sanitizeAIMessage(parsed.message);
+      }
+    } catch { /* not valid JSON, continue */ }
+  }
+  // Remove any base64 data URIs or long base64 strings
+  let cleaned = raw.replace(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]{100,}/g, '[изображение]');
+  // Remove any remaining very long base64-like strings (>200 chars of alphanumeric)
+  cleaned = cleaned.replace(/[A-Za-z0-9+/=]{200,}/g, '...');
+  // Trim to reasonable length
+  if (cleaned.length > 2000) {
+    cleaned = cleaned.substring(0, 2000) + '...';
+  }
+  return cleaned;
+};
+
 // ── Unified message type ──────────────────────────────────
 
 interface UnifiedMessage {
@@ -134,7 +160,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           const msg: UnifiedMessage = {
             id: row.id,
             type: row.type,
-            content: row.content,
+            content: row.type === 'assistant' ? sanitizeAIMessage(row.content) : row.content,
             timestamp: new Date(row.created_at).getTime(),
           };
           if (meta.lessonCount) msg.lessonCount = meta.lessonCount;
@@ -497,7 +523,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       if (response.error) throw response.error;
 
       const result = response.data;
-      const aiMessage = result.message || 'Готово!';
+      const aiMessage = sanitizeAIMessage(typeof result === 'string' ? result : (result.message || 'Готово!'));
       
       setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: aiMessage } : m));
       
@@ -545,7 +571,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
         }
         
         if (result) {
-          setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: result.message } : m));
+          setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: sanitizeAIMessage(result.message) } : m));
           onRefineCourse(result.lessons);
         } else {
           setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: 'Не удалось обработать запрос.' } : m));
@@ -611,7 +637,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       if (response.error) throw response.error;
 
       const result = response.data;
-      const aiMessage = result.message || 'Готово!';
+      const aiMessage = sanitizeAIMessage(typeof result === 'string' ? result : (result.message || 'Готово!'));
       setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: aiMessage } : m));
       
       if (selectedBlock) {
