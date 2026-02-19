@@ -471,7 +471,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         course={course}
         isPublished={course.isPublished}
         category={(course as any).category || null}
-        onUpdate={() => window.location.reload()}
+        onUpdate={() => {/* no-op: dialog handles state internally */}}
       />
 
       {/* Fullscreen Design Editor */}
