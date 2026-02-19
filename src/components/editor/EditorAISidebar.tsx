@@ -734,7 +734,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                   <span className="text-muted-foreground">Запускаю генерацию...</span>
                 </div>
               )}
-              {msg.steps && msg.steps.length > 0 && (
+              {msg.steps && msg.steps.length > 0 && (msg.isGenerating || !msg.steps.some(s => s.status === 'error')) && (
                 <div className="space-y-1.5">
                   {msg.steps.map((step) => {
                     const progressMatch = step.message?.match(/(\d+)\s*(?:из|\/)\s*(\d+)/);
