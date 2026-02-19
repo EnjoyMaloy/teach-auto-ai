@@ -6,6 +6,11 @@ import {
   Cloud, RefreshCw, PanelLeft, Volume2, VolumeX, Home, Sun, Moon, Globe
 } from 'lucide-react';
 import { useCourseLanguages, getLanguageInfo } from '@/hooks/useCourseLanguages';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { LanguageSettings } from './LanguageSettings';
 import { useTheme } from 'next-themes';
 import { Course, Lesson, LessonsDisplayType } from '@/types/course';
@@ -529,13 +534,30 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
             Предпросмотр
           </button>
 
-          <button 
-            onClick={handlePublishClick}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-          >
-            <Share2 className="w-3.5 h-3.5" />
-            Опубликовать
-          </button>
+          {course.lessons.length === 0 ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <button 
+                    disabled
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-primary text-primary-foreground opacity-50 cursor-not-allowed transition-colors"
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                    Опубликовать
+                  </button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>Добавьте хотя бы 1 урок</TooltipContent>
+            </Tooltip>
+          ) : (
+            <button 
+              onClick={handlePublishClick}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              Опубликовать
+            </button>
+          )}
         </div>
       </header>
 
