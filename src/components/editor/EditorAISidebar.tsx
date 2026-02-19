@@ -986,9 +986,9 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           <div className="flex items-center justify-between px-2.5 pb-2.5 pt-1">
             <div className="flex items-center gap-1">
               <button
-                className="p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-foreground/5"
-                title="Ещё"
-                disabled={isGenerating}
+                className="p-1.5 text-muted-foreground/40 cursor-not-allowed rounded-lg"
+                title="Добавление файлов — скоро"
+                disabled
               >
                 <Plus className="w-4 h-4" />
               </button>
