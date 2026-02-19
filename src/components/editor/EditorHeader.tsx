@@ -6,6 +6,7 @@ import {
   Cloud, RefreshCw, PanelLeft, Volume2, VolumeX, Home, Sun, Moon, Globe
 } from 'lucide-react';
 import { useCourseLanguages, getLanguageInfo } from '@/hooks/useCourseLanguages';
+import { LanguageSettings } from './LanguageSettings';
 import { useTheme } from 'next-themes';
 import { Course, Lesson, LessonsDisplayType } from '@/types/course';
 import { DesignSystemConfig } from '@/types/designSystem';
@@ -86,6 +87,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [showDesignSystem, setShowDesignSystem] = useState(false);
   const [showMapSettings, setShowMapSettings] = useState(false);
+  const [showLangSettings, setShowLangSettings] = useState(false);
   const [currentEditLanguage, setCurrentEditLanguage] = useState<string | null>(null);
   const [selectedBaseSystemId, setSelectedBaseSystemId] = useState<string | null>(
     course.designSystem?.themeId || null
@@ -381,6 +383,34 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
               </PopoverContent>
             </Popover>
           )}
+
+          {/* Language settings popover */}
+          <Popover open={showLangSettings} onOpenChange={setShowLangSettings}>
+            <PopoverTrigger asChild>
+              <button 
+                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                title="Языки"
+              >
+                <Globe className="w-4 h-4" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent 
+              className="w-[320px] p-4" 
+              align="start"
+              side="bottom"
+              sideOffset={8}
+            >
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-semibold text-sm mb-1">Языки курса</h4>
+                  <p className="text-xs text-muted-foreground">
+                    AI переведёт весь текстовый контент
+                  </p>
+                </div>
+                <LanguageSettings courseId={course.id} />
+              </div>
+            </PopoverContent>
+          </Popover>
 
           {/* Language switcher - only show when languages are configured */}
           {languages.length > 1 && (
