@@ -3,8 +3,9 @@ import lessonMapMascot from '@/assets/lesson-map-mascot.svg';
 import { 
   Undo2, Redo2, Eye, 
   Share2, Check, X, Palette, Map,
-  Cloud, RefreshCw, PanelLeft, Volume2, VolumeX, Home, Sun, Moon
+  Cloud, RefreshCw, PanelLeft, Volume2, VolumeX, Home, Sun, Moon, Globe
 } from 'lucide-react';
+import { useCourseLanguages, getLanguageInfo } from '@/hooks/useCourseLanguages';
 import { useTheme } from 'next-themes';
 import { Course, Lesson, LessonsDisplayType } from '@/types/course';
 import { DesignSystemConfig } from '@/types/designSystem';
@@ -78,12 +79,14 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   const { isAdmin } = useUserRole();
   const { theme, setTheme } = useTheme();
   const { state: aiState, isDialogOpen, setDialogOpen, showCompletionFlash } = useAIGeneration();
+  const { languages, primaryLanguage, translationLanguages } = useCourseLanguages(course.id);
   
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(course.title);
   const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [showDesignSystem, setShowDesignSystem] = useState(false);
   const [showMapSettings, setShowMapSettings] = useState(false);
+  const [currentEditLanguage, setCurrentEditLanguage] = useState<string | null>(null);
   const [selectedBaseSystemId, setSelectedBaseSystemId] = useState<string | null>(
     course.designSystem?.themeId || null
   );
@@ -377,6 +380,47 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                 </div>
               </PopoverContent>
             </Popover>
+          )}
+
+          {/* Language switcher - only show when languages are configured */}
+          {languages.length > 1 && (
+            <>
+              <div className="w-px h-5 bg-border/50 mx-1" />
+              <div className="flex items-center gap-0.5">
+                {/* Primary language */}
+                <button
+                  onClick={() => setCurrentEditLanguage(null)}
+                  className={cn(
+                    "px-1.5 py-1 rounded text-xs font-medium transition-colors",
+                    currentEditLanguage === null
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  )}
+                  title={primaryLanguage ? getLanguageInfo(primaryLanguage).name : ''}
+                >
+                  {primaryLanguage ? getLanguageInfo(primaryLanguage).flag : <Globe className="w-3.5 h-3.5" />}
+                </button>
+                {/* Translation languages */}
+                {translationLanguages.map(code => {
+                  const info = getLanguageInfo(code);
+                  return (
+                    <button
+                      key={code}
+                      onClick={() => setCurrentEditLanguage(code)}
+                      className={cn(
+                        "px-1.5 py-1 rounded text-xs font-medium transition-colors",
+                        currentEditLanguage === code
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      )}
+                      title={info.name}
+                    >
+                      {info.flag}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
 
