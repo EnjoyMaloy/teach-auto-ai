@@ -843,12 +843,12 @@ export const AIGeneratorDialog: React.FC<AIGeneratorDialogProps> = ({
           {/* Error state */}
           {isError && (
             <div className="space-y-3">
-              <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <div className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/40 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
-                  <AlertCircle className="w-5 h-5 text-destructive" />
-                  <span className="font-medium text-destructive">Ошибка генерации</span>
+                  <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400" />
+                  <span className="font-medium text-red-700 dark:text-red-300">Ошибка</span>
                 </div>
-                <p className="text-sm text-destructive/80">{state.error}</p>
+                <p className="text-sm text-red-600/80 dark:text-red-400/80">{state.error}</p>
               </div>
 
               <div className="p-3 bg-muted/50 rounded-lg">
