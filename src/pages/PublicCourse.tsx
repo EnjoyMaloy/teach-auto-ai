@@ -66,7 +66,7 @@ const PublicCourse: React.FC = () => {
       <CoursePlayerV2 
         courseId={courseId} 
         mode="published" 
-        skipMap={true}
+        skipMap={false}
       />
     </div>
   );
