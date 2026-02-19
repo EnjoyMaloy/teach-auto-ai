@@ -270,9 +270,30 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
             {actualIsPublished ? (
               <div className="space-y-4">
                 <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
-                  <div className="flex items-center gap-2 text-green-700 dark:text-green-400 mb-2">
-                    <Check className="w-5 h-5" />
-                    <span className="font-semibold">Курс опубликован в комьюнити</span>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                      <Check className="w-5 h-5" />
+                      <span className="font-semibold">Курс опубликован в комьюнити</span>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        const { error } = await supabase
+                          .from('courses')
+                          .update({ is_published: false, category: null })
+                          .eq('id', courseId);
+                        if (error) {
+                          toast.error('Ошибка снятия с публикации');
+                          return;
+                        }
+                        setActualIsPublished(false);
+                        setSelectedCategory(null);
+                        toast.success('Курс убран из комьюнити');
+                        onUpdate?.();
+                      }}
+                      className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+                    >
+                      Снять
+                    </button>
                   </div>
                   <p className="text-sm text-green-600 dark:text-green-500">
                     Раздел: {COURSE_CATEGORIES.find(c => c.id === (selectedCategory || category))?.name || 'Не указан'}
@@ -308,29 +329,6 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
                     ))}
                   </div>
                 </div>
-
-                {/* Unpublish */}
-                <Button
-                  variant="outline"
-                  className="w-full text-destructive hover:text-destructive"
-                  onClick={async () => {
-                    const { error } = await supabase
-                      .from('courses')
-                      .update({ is_published: false, category: null })
-                      .eq('id', courseId);
-                    if (error) {
-                      toast.error('Ошибка снятия с публикации');
-                      return;
-                    }
-                    setActualIsPublished(false);
-                    setSelectedCategory(null);
-                    toast.success('Курс убран из комьюнити');
-                    onUpdate?.();
-                  }}
-                >
-                  <X className="w-4 h-4 mr-2" />
-                  Убрать из комьюнити
-                </Button>
               </div>
             ) : (
               <div className="space-y-4">
