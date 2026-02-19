@@ -200,12 +200,11 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
 
       setCourse(fullCourse);
 
-      // Initialize lesson if specified
+      // Pre-select lesson if specified, but always start on map
       if (initialLessonId) {
         const lessonIdx = fullCourse.lessons.findIndex(l => l.id === initialLessonId);
         if (lessonIdx >= 0) {
           setCurrentLessonIndex(lessonIdx);
-          setViewMode('lesson');
         }
       }
       
