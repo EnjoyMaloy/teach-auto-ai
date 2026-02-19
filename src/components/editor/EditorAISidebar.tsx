@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Block, BLOCK_CONFIGS } from '@/types/blocks';
 import { Lesson, CourseDesignSystem } from '@/types/course';
 import { DesignSystemConfig } from '@/types/designSystem';
@@ -985,13 +986,18 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           />
           <div className="flex items-center justify-between px-2.5 pb-2.5 pt-1">
             <div className="flex items-center gap-1">
-              <button
-                className="p-1.5 text-muted-foreground/40 cursor-not-allowed rounded-lg"
-                title="Добавление файлов — скоро"
-                disabled
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+              <TooltipProvider delayDuration={200}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="inline-flex p-1.5 text-muted-foreground/40 cursor-not-allowed rounded-lg">
+                      <Plus className="w-4 h-4" />
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <p>Добавление файлов — скоро</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <button
                 onClick={() => toggleMode('generate')}
                 disabled={isGenerating}
