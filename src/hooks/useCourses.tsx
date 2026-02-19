@@ -424,7 +424,7 @@ export const useCourses = () => {
         .from('courses')
         .select('*')
         .eq('is_published', true)
-        .eq('moderation_status', 'approved')
+        .eq('is_published', true)
         .order('published_at', { ascending: false });
 
       if (coursesError) throw coursesError;

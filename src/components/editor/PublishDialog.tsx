@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, Check, Globe, Bot, ExternalLink, Loader2, MessageCircle, BookOpen, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
+import { Copy, Check, Bot, ExternalLink, Loader2, MessageCircle, BookOpen, RefreshCw, Compass } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -13,9 +13,10 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Course } from '@/types/course';
 import { usePublishing } from '@/hooks/usePublishing';
+import { COURSE_CATEGORIES } from '@/lib/categories';
+import { cn } from '@/lib/utils';
 
 interface PublishDialogProps {
   open: boolean;
@@ -23,10 +24,8 @@ interface PublishDialogProps {
   courseId: string;
   courseTitle: string;
   course?: Course;
-  isLinkAccessible?: boolean;
   isPublished?: boolean;
-  moderationStatus?: string | null;
-  moderationComment?: string | null;
+  category?: string | null;
   onUpdate?: () => void;
 }
 
@@ -36,45 +35,31 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
   courseId,
   courseTitle,
   course,
-  isLinkAccessible = false,
   isPublished = false,
-  moderationStatus = null,
-  moderationComment = null,
+  category = null,
   onUpdate,
 }) => {
-  const [copied, setCopied] = useState(false);
   const [copiedTelegram, setCopiedTelegram] = useState(false);
   const [telegramToken, setTelegramToken] = useState('');
   const [isDeploying, setIsDeploying] = useState(false);
   const [telegramDeployed, setTelegramDeployed] = useState(false);
   const [botUsername, setBotUsername] = useState<string | null>(null);
   const [botLink, setBotLink] = useState<string | null>(null);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [hasPublished, setHasPublished] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(category);
+  const [isUpdatingCatalog, setIsUpdatingCatalog] = useState(false);
   
   const { isPublishing, publishCourse, hasPublishedVersion } = usePublishing();
 
-  // Check if course has published version
+  const publishedUrl = 'https://teach-auto-ai.lovable.app';
+  const webUrl = `${publishedUrl}/course/${courseId}`;
+
   useEffect(() => {
     if (open && courseId) {
       hasPublishedVersion(courseId).then(setHasPublished);
+      setSelectedCategory(category);
     }
-  }, [open, courseId]);
-
-  const publishedUrl = 'https://teach-auto-ai.lovable.app';
-  const webUrl = `${publishedUrl}/course/${courseId}`;
-  const previewUrl = `${window.location.origin}/course/${courseId}`;
-
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(webUrl);
-      setCopied(true);
-      toast.success('Ссылка скопирована!');
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      toast.error('Не удалось скопировать ссылку');
-    }
-  };
+  }, [open, courseId, category]);
 
   const handleCopyTelegramLink = async () => {
     try {
@@ -97,47 +82,60 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
     }
   };
 
-  const handleToggleLinkAccess = async () => {
-    setIsUpdating(true);
-    try {
-      const { error } = await supabase
-        .from('courses')
-        .update({ is_link_accessible: !isLinkAccessible })
-        .eq('id', courseId);
-
-      if (error) throw error;
-
-      toast.success(isLinkAccessible ? 'Доступ по ссылке закрыт' : 'Курс доступен по ссылке');
-      onUpdate?.();
-    } catch (error) {
-      console.error('Error updating link access:', error);
-      toast.error('Ошибка обновления');
-    } finally {
-      setIsUpdating(false);
+  // Publish or update course to Explore catalog
+  const handlePublishToExplore = async () => {
+    if (!selectedCategory) {
+      toast.error('Выберите раздел для публикации');
+      return;
     }
-  };
+    if (!course) return;
 
-  const handleSubmitForModeration = async () => {
-    setIsUpdating(true);
+    setIsUpdatingCatalog(true);
     try {
+      // Publish content to published_lessons/slides
+      const success = await publishCourse(course);
+      if (!success) throw new Error('Failed to publish content');
+
+      // Update course metadata
       const { error } = await supabase
         .from('courses')
-        .update({ 
-          moderation_status: 'pending',
-          submitted_for_moderation_at: new Date().toISOString(),
-          moderation_comment: null,
+        .update({
+          is_published: true,
+          category: selectedCategory,
+          published_at: new Date().toISOString(),
+          is_link_accessible: true,
         })
         .eq('id', courseId);
 
       if (error) throw error;
 
-      toast.success('Курс отправлен на модерацию');
+      setHasPublished(true);
+      toast.success(isPublished ? 'Курс обновлён в каталоге' : 'Курс опубликован в каталоге!');
       onUpdate?.();
     } catch (error) {
-      console.error('Error submitting for moderation:', error);
-      toast.error('Ошибка отправки на модерацию');
+      console.error('Error publishing to explore:', error);
+      toast.error('Ошибка публикации');
     } finally {
-      setIsUpdating(false);
+      setIsUpdatingCatalog(false);
+    }
+  };
+
+  // Unified update for both Explore and Telegram
+  const handleUnifiedUpdate = async () => {
+    if (!course) return;
+    setIsUpdatingCatalog(true);
+    try {
+      const success = await publishCourse(course);
+      if (success) {
+        setHasPublished(true);
+        toast.success('Публичная версия обновлена');
+        onUpdate?.();
+      }
+    } catch (error) {
+      console.error('Error updating:', error);
+      toast.error('Ошибка обновления');
+    } finally {
+      setIsUpdatingCatalog(false);
     }
   };
 
@@ -150,6 +148,19 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
     setIsDeploying(true);
     
     try {
+      // Ensure published version exists
+      if (!hasPublished && course) {
+        const success = await publishCourse(course);
+        if (!success) throw new Error('Failed to publish');
+        setHasPublished(true);
+      }
+
+      // Also make link accessible for TG
+      await supabase
+        .from('courses')
+        .update({ is_link_accessible: true })
+        .eq('id', courseId);
+
       const { data, error } = await supabase.functions.invoke('deploy-telegram-bot', {
         body: {
           botToken: telegramToken.trim(),
@@ -162,9 +173,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
       if (error) throw error;
 
       if (data.error) {
-        toast.error('Ошибка развёртывания', {
-          description: data.details || data.error,
-        });
+        toast.error('Ошибка развёртывания', { description: data.details || data.error });
         return;
       }
 
@@ -176,9 +185,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
       });
     } catch (error) {
       console.error('Deploy error:', error);
-      toast.error('Ошибка развёртывания', {
-        description: 'Проверьте правильность токена',
-      });
+      toast.error('Ошибка развёртывания', { description: 'Проверьте правильность токена' });
     } finally {
       setIsDeploying(false);
     }
@@ -191,6 +198,8 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
     setBotLink(null);
   };
 
+  const showUpdateButton = isPublished && hasPublished;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
@@ -201,15 +210,39 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="link" className="mt-4">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="link" className="flex items-center gap-2">
-              <Globe className="w-4 h-4" />
-              По ссылке
-            </TabsTrigger>
-            <TabsTrigger value="catalog" className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4" />
-              В каталог
+        {/* Unified Update Button - shown when course is already published */}
+        {showUpdateButton && (
+          <div className="p-3 rounded-lg border bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-sm">Обновить публичную версию</p>
+                <p className="text-xs text-muted-foreground">
+                  Применить изменения из редактора для каталога и Telegram
+                </p>
+              </div>
+              <Button
+                size="sm"
+                onClick={handleUnifiedUpdate}
+                disabled={isUpdatingCatalog || isPublishing}
+              >
+                {isUpdatingCatalog || isPublishing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-1" />
+                    Обновить
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        <Tabs defaultValue="explore" className="mt-2">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="explore" className="flex items-center gap-2">
+              <Compass className="w-4 h-4" />
+              Исследовать
             </TabsTrigger>
             <TabsTrigger value="telegram" className="flex items-center gap-2">
               <Bot className="w-4 h-4" />
@@ -217,187 +250,59 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
             </TabsTrigger>
           </TabsList>
 
-          {/* Link Access Tab */}
-          <TabsContent value="link" className="space-y-4 mt-4">
-            <div className="p-4 rounded-lg bg-muted/50">
-              <p className="text-sm text-muted-foreground mb-3">
-                Курс будет доступен всем, у кого есть ссылка. Модерация не требуется.
-              </p>
-              
-              <div className={`p-3 rounded-lg border ${isLinkAccessible ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {isLinkAccessible ? (
-                      <CheckCircle className="w-5 h-5 text-green-600" />
-                    ) : (
-                      <Globe className="w-5 h-5 text-gray-400" />
-                    )}
-                    <span className="font-medium">
-                      {isLinkAccessible ? 'Доступ открыт' : 'Доступ закрыт'}
-                    </span>
-                  </div>
-                  <Button
-                    variant={isLinkAccessible ? "outline" : "default"}
-                    size="sm"
-                    onClick={handleToggleLinkAccess}
-                    disabled={isUpdating}
-                  >
-                    {isUpdating ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : isLinkAccessible ? (
-                      'Закрыть доступ'
-                    ) : (
-                      'Открыть доступ'
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {isLinkAccessible && (
-              <div className="space-y-3">
-                {/* Update button */}
-                <div className="p-3 rounded-lg border bg-blue-50 border-blue-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-sm">
-                        {hasPublished ? 'Обновить публичную версию' : 'Опубликовать курс'}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {hasPublished 
-                          ? 'Применить изменения из редактора' 
-                          : 'Сделать курс доступным по ссылке'}
-                      </p>
-                    </div>
-                    <Button
-                      size="sm"
-                      onClick={async () => {
-                        if (course) {
-                          const success = await publishCourse(course);
-                          if (success) {
-                            setHasPublished(true);
-                            onUpdate?.();
-                          }
-                        }
-                      }}
-                      disabled={isPublishing || !course}
-                    >
-                      {isPublishing ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <>
-                          <RefreshCw className="w-4 h-4 mr-1" />
-                          {hasPublished ? 'Обновить' : 'Опубликовать'}
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Ссылка на курс</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      value={webUrl}
-                      readOnly
-                      className="bg-muted font-mono text-sm"
-                    />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={handleCopyLink}
-                      className="shrink-0"
-                    >
-                      {copied ? (
-                        <Check className="w-4 h-4 text-emerald-600" />
-                      ) : (
-                        <Copy className="w-4 h-4" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-                
-                <Button className="w-full" onClick={() => window.open(previewUrl, '_blank')}>
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  Открыть в новой вкладке
-                </Button>
-
-                {!hasPublished && (
-                  <p className="text-xs text-amber-600 text-center">
-                    ⚠️ Курс ещё не опубликован. Нажмите "Опубликовать" чтобы сделать его видимым.
-                  </p>
-                )}
-              </div>
-            )}
-          </TabsContent>
-
-          {/* Catalog Tab */}
-          <TabsContent value="catalog" className="space-y-4 mt-4">
-            {moderationStatus === 'pending' ? (
-              <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-200">
-                <div className="flex items-center gap-2 text-yellow-700 mb-2">
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span className="font-semibold">На модерации</span>
-                </div>
-                <p className="text-sm text-yellow-600">
-                  Курс проверяется модератором. Это может занять некоторое время.
-                </p>
-              </div>
-            ) : moderationStatus === 'approved' && isPublished ? (
-              <div className="p-4 rounded-lg bg-green-50 border border-green-200">
-                <div className="flex items-center gap-2 text-green-700 mb-2">
-                  <CheckCircle className="w-5 h-5" />
+          {/* Explore / Catalog Tab */}
+          <TabsContent value="explore" className="space-y-4 mt-4">
+            {isPublished ? (
+              <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-400 mb-2">
+                  <Check className="w-5 h-5" />
                   <span className="font-semibold">Курс опубликован в каталоге</span>
                 </div>
-                <p className="text-sm text-green-600">
-                  Курс доступен всем пользователям платформы
+                <p className="text-sm text-green-600 dark:text-green-500">
+                  Раздел: {COURSE_CATEGORIES.find(c => c.id === (selectedCategory || category))?.name || 'Не указан'}
                 </p>
-              </div>
-            ) : moderationStatus === 'rejected' ? (
-              <div className="space-y-4">
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    <strong>Требуются исправления</strong>
-                    <p className="mt-1">{moderationComment || 'Комментарий модератора отсутствует'}</p>
-                  </AlertDescription>
-                </Alert>
-                <Button 
-                  className="w-full" 
-                  onClick={handleSubmitForModeration}
-                  disabled={isUpdating}
-                >
-                  {isUpdating ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <BookOpen className="w-4 h-4 mr-2" />
-                  )}
-                  Отправить на повторную модерацию
-                </Button>
               </div>
             ) : (
               <div className="space-y-4">
                 <div className="p-4 rounded-lg bg-muted/50">
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Курс будет проверен модератором перед публикацией в каталоге.
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Курс будет доступен всем в разделе «Исследовать». Выберите категорию:
                   </p>
-                  <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-                    <li>Модератор проверит качество контента</li>
-                    <li>После одобрения курс появится в каталоге</li>
-                    <li>Вы получите уведомление о решении</li>
-                  </ul>
                 </div>
-                <Button 
-                  className="w-full" 
-                  onClick={handleSubmitForModeration}
-                  disabled={isUpdating}
+
+                {/* Category selector */}
+                <div className="space-y-2">
+                  <Label>Раздел каталога</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {COURSE_CATEGORIES.map(cat => (
+                      <button
+                        key={cat.id}
+                        onClick={() => setSelectedCategory(cat.id)}
+                        className={cn(
+                          "flex items-center gap-2 p-2.5 rounded-lg border text-sm font-medium transition-all text-left",
+                          selectedCategory === cat.id
+                            ? "border-primary bg-primary/5 text-foreground"
+                            : "border-border bg-card text-muted-foreground hover:border-primary/30"
+                        )}
+                      >
+                        <cat.icon className="w-4 h-4 flex-shrink-0" />
+                        {cat.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <Button
+                  className="w-full"
+                  onClick={handlePublishToExplore}
+                  disabled={isUpdatingCatalog || isPublishing || !selectedCategory}
                 >
-                  {isUpdating ? (
+                  {isUpdatingCatalog || isPublishing ? (
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   ) : (
                     <BookOpen className="w-4 h-4 mr-2" />
                   )}
-                  Отправить на модерацию
+                  Опубликовать в каталог
                 </Button>
               </div>
             )}
