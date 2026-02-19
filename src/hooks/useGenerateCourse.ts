@@ -74,6 +74,38 @@ interface GeneratedCourse {
   lessons: GeneratedLesson[];
 }
 
+const invokeWithRetry = async (
+  functionName: string,
+  body: Record<string, any>,
+  maxRetries = 3,
+): Promise<any> => {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const response = await supabase.functions.invoke(functionName, { body });
+      if (response.error) {
+        // Don't retry on client-side validation errors
+        const msg = response.error.message || '';
+        if (msg.includes('Invalid') || msg.includes('Некорректные')) throw response.error;
+        if (attempt < maxRetries - 1) {
+          const delay = Math.min(2000 * Math.pow(2, attempt), 10000);
+          await new Promise(r => setTimeout(r, delay));
+          continue;
+        }
+        throw response.error;
+      }
+      return response;
+    } catch (err: any) {
+      if (err?.message === 'CANCELLED') throw err;
+      if (attempt < maxRetries - 1) {
+        const delay = Math.min(2000 * Math.pow(2, attempt), 10000);
+        await new Promise(r => setTimeout(r, delay));
+        continue;
+      }
+      throw new Error(err?.message || 'Ошибка при вызове функции');
+    }
+  }
+};
+
 const extractAndFixJson = (content: string): any => {
   const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
   let jsonStr = jsonMatch ? jsonMatch[1].trim() : content.trim();
@@ -215,11 +247,10 @@ export const useGenerateCourse = (courseId: string) => {
       updateStep('research', { status: 'active', message: 'Изучаю тему...' });
       checkCancelled();
       
-      const researchResponse = await supabase.functions.invoke('generate-course', {
-        body: { userMessage: `Исследуй тему: "${prompt}"\n\nВАЖНО: Раздели тему ровно на ${lessonCount} концепций (каждая концепция = 1 урок). Определи логическую последовательность изучения.`, agentRole: 'research' },
+      const researchResponse = await invokeWithRetry('generate-course', {
+        userMessage: `Исследуй тему: "${prompt}"\n\nВАЖНО: Раздели тему ровно на ${lessonCount} концепций (каждая концепция = 1 урок). Определи логическую последовательность изучения.`, agentRole: 'research',
       });
       checkCancelled();
-      if (researchResponse.error) throw new Error(researchResponse.error.message || 'Ошибка при исследовании');
 
       let researchData: any = {};
       try {
@@ -237,14 +268,11 @@ export const useGenerateCourse = (courseId: string) => {
       updateStep('structure', { status: 'active', message: 'Планирую структуру...' });
       checkCancelled();
       
-      const structureResponse = await supabase.functions.invoke('generate-course', {
-        body: { 
-          userMessage: `На основе исследования:\n${JSON.stringify(researchData)}\n\nЗапрос пользователя: "${prompt}"\n\nВАЖНО: Создай ровно ${lessonCount} уроков. Каждый урок = 1 концепция из исследования. В "contentOutline" для каждого блока напиши КОНКРЕТНО что будет в этом блоке. В "quizSource" для квизов укажи какой тезис из теории проверяется.\n\nСпланируй структуру курса.`, 
-          agentRole: 'structure' 
-        },
+      const structureResponse = await invokeWithRetry('generate-course', { 
+        userMessage: `На основе исследования:\n${JSON.stringify(researchData)}\n\nЗапрос пользователя: "${prompt}"\n\nВАЖНО: Создай ровно ${lessonCount} уроков. Каждый урок = 1 концепция из исследования. В "contentOutline" для каждого блока напиши КОНКРЕТНО что будет в этом блоке. В "quizSource" для квизов укажи какой тезис из теории проверяется.\n\nСпланируй структуру курса.`, 
+        agentRole: 'structure',
       });
       checkCancelled();
-      if (structureResponse.error) throw new Error(structureResponse.error.message || 'Ошибка при планировании');
 
       let structureData: any = {};
       try {
@@ -267,14 +295,11 @@ export const useGenerateCourse = (courseId: string) => {
 
       if (lessonCount <= BATCH_SIZE) {
         // Small course - single request
-        const generateResponse = await supabase.functions.invoke('generate-course', {
-          body: { 
-            userMessage: `Исследование:\n${JSON.stringify(researchData)}\n\nСтруктура:\n${JSON.stringify(structureData)}\n\nВАЖНО: Создай ровно ${lessonCount} уроков по 10 блоков каждый.\n\n## КРИТИЧЕСКИЕ ПРАВИЛА СВЯЗНОСТИ:\n1. Квиз в блоке 4 проверяет ТОЛЬКО материал из блоков 2-3 этого урока\n2. Квиз в блоке 7 проверяет ТОЛЬКО материал из блоков 5-6 этого урока\n3. Блок 1 каждого урока говорит "чему научимся"\n4. Блок 10 каждого урока подводит итоги + тизер следующего урока\n5. Следуй "contentOutline" из структуры для каждого блока!\n\nСоздай полный контент для всех блоков.`, 
-            agentRole: 'content' 
-          },
+        const generateResponse = await invokeWithRetry('generate-course', { 
+          userMessage: `Исследование:\n${JSON.stringify(researchData)}\n\nСтруктура:\n${JSON.stringify(structureData)}\n\nВАЖНО: Создай ровно ${lessonCount} уроков по 10 блоков каждый.\n\n## КРИТИЧЕСКИЕ ПРАВИЛА СВЯЗНОСТИ:\n1. Квиз в блоке 4 проверяет ТОЛЬКО материал из блоков 2-3 этого урока\n2. Квиз в блоке 7 проверяет ТОЛЬКО материал из блоков 5-6 этого урока\n3. Блок 1 каждого урока говорит "чему научимся"\n4. Блок 10 каждого урока подводит итоги + тизер следующего урока\n5. Следуй "contentOutline" из структуры для каждого блока!\n\nСоздай полный контент для всех блоков.`, 
+          agentRole: 'content',
         });
         checkCancelled();
-        if (generateResponse.error) throw new Error(generateResponse.error.message || 'Ошибка при генерации');
         
         try {
           courseData = extractAndFixJson(generateResponse.data?.content || '');
@@ -302,14 +327,11 @@ export const useGenerateCourse = (courseId: string) => {
           const batchStructure = { ...structureData, lessons: batchLessons };
           const batchResearch = { ...researchData, concepts: batchConcepts };
 
-          const batchResponse = await supabase.functions.invoke('generate-course', {
-            body: { 
-              userMessage: `Исследование:\n${JSON.stringify(batchResearch)}\n\nСтруктура:\n${JSON.stringify(batchStructure)}\n\nВАЖНО: Создай ровно ${batchLessons.length} уроков по 10 блоков каждый. Это уроки ${startIdx + 1}-${endIdx} из ${structureLessons.length} в курсе.\n\n## КРИТИЧЕСКИЕ ПРАВИЛА СВЯЗНОСТИ:\n1. Квиз в блоке 4 проверяет ТОЛЬКО материал из блоков 2-3 этого урока\n2. Квиз в блоке 7 проверяет ТОЛЬКО материал из блоков 5-6 этого урока\n3. Блок 1 каждого урока говорит "чему научимся"\n4. Блок 10 каждого урока подводит итоги + тизер следующего урока\n5. Следуй "contentOutline" из структуры для каждого блока!\n\nСоздай полный контент для всех блоков.`, 
-              agentRole: 'content' 
-            },
+          const batchResponse = await invokeWithRetry('generate-course', { 
+            userMessage: `Исследование:\n${JSON.stringify(batchResearch)}\n\nСтруктура:\n${JSON.stringify(batchStructure)}\n\nВАЖНО: Создай ровно ${batchLessons.length} уроков по 10 блоков каждый. Это уроки ${startIdx + 1}-${endIdx} из ${structureLessons.length} в курсе.\n\n## КРИТИЧЕСКИЕ ПРАВИЛА СВЯЗНОСТИ:\n1. Квиз в блоке 4 проверяет ТОЛЬКО материал из блоков 2-3 этого урока\n2. Квиз в блоке 7 проверяет ТОЛЬКО материал из блоков 5-6 этого урока\n3. Блок 1 каждого урока говорит "чему научимся"\n4. Блок 10 каждого урока подводит итоги + тизер следующего урока\n5. Следуй "contentOutline" из структуры для каждого блока!\n\nСоздай полный контент для всех блоков.`, 
+            agentRole: 'content',
           });
           checkCancelled();
-          if (batchResponse.error) throw new Error(batchResponse.error.message || `Ошибка при генерации уроков ${startIdx + 1}-${endIdx}`);
 
           let batchData: GeneratedCourse;
           try {
