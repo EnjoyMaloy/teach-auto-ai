@@ -266,9 +266,9 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
   return (
     <>
-      <header className="h-14 border-b border-border/5 dark:border-transparent bg-secondary dark:bg-black/10 backdrop-blur-sm flex items-center justify-between px-2 sm:px-4 gap-1 sm:gap-2 relative">
+      <header className="h-14 border-b border-border/5 dark:border-transparent bg-secondary dark:bg-black/10 backdrop-blur-sm flex items-center px-2 sm:px-4 gap-1 sm:gap-2 overflow-hidden">
         {/* Left section - Sidebar trigger + Breadcrumbs */}
-        <div className={cn("flex items-center gap-2 min-w-0", !isAISidebarOpen && "ml-11")}>
+        <div className={cn("flex items-center gap-2 min-w-0 flex-1 overflow-hidden", !isAISidebarOpen && "ml-11")}>
           {/* AI Sidebar Toggle */}
           {onToggleAISidebar && (
             <button
@@ -285,8 +285,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           )}
 
           {/* Breadcrumb navigation */}
-          <Breadcrumb>
-            <BreadcrumbList>
+          <Breadcrumb className="min-w-0">
+            <BreadcrumbList className="flex-nowrap">
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
                   <button onClick={onBack} className="flex items-center p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
@@ -298,7 +298,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
               <BreadcrumbItem>
                 {showDesignSystem ? (
                   <BreadcrumbLink asChild>
-                    <button onClick={() => setShowDesignSystem(false)} className="transition-colors">
+                    <button onClick={() => setShowDesignSystem(false)} className="transition-colors truncate max-w-[100px] sm:max-w-[150px] md:max-w-[200px] lg:max-w-[280px]">
                       {course.title}
                     </button>
                   </BreadcrumbLink>
@@ -316,7 +316,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                 ) : (
                   <BreadcrumbPage>
                     <span 
-                      className="truncate max-w-[80px] sm:max-w-[120px] md:max-w-[160px] lg:max-w-[200px] cursor-pointer hover:text-primary transition-colors"
+                      className="block truncate max-w-[100px] sm:max-w-[150px] md:max-w-[200px] lg:max-w-[280px] xl:max-w-[360px] cursor-pointer hover:text-primary transition-colors"
                       onDoubleClick={handleStartEditing}
                       title="Двойной клик для редактирования"
                     >
