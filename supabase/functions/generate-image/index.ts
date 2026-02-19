@@ -105,25 +105,39 @@ Style requirements:
     
     console.log(`Generating image via ${MODEL} for: ${(slideContext || prompt).substring(0, 60)}...`);
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: imagePrompt }] }],
-        generationConfig: {
-          responseModalities: ["TEXT", "IMAGE"],
-          ...(useFlash ? {} : { imageConfig: { aspectRatio: "1:1", imageSize: "1K" } }),
-        },
-      }),
-    });
+    const MAX_RETRIES = 3;
+    let response: Response | null = null;
+    
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: imagePrompt }] }],
+          generationConfig: {
+            responseModalities: ["TEXT", "IMAGE"],
+            ...(useFlash ? {} : { imageConfig: { aspectRatio: "1:1", imageSize: "1K" } }),
+          },
+        }),
+      });
 
-    if (!response.ok) {
+      if (response.ok) break;
+
       const errorText = await response.text();
-      console.error("Gemini Image API error:", response.status, errorText);
-      if (response.status === 429) {
+      console.error(`Gemini Image API error (attempt ${attempt + 1}):`, response.status, errorText);
+
+      if (response.status === 503 || response.status === 429) {
+        if (attempt < MAX_RETRIES - 1) {
+          const delay = Math.pow(2, attempt) * 2000;
+          console.log(`Retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
         return new Response(
-          JSON.stringify({ error: "Превышен лимит запросов Gemini API. Попробуйте позже." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: response.status === 429 
+            ? "Превышен лимит запросов Gemini API. Попробуйте позже." 
+            : "Сервис генерации изображений временно перегружен. Попробуйте через минуту." }),
+          { status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       if (response.status === 403 || response.status === 400) {
