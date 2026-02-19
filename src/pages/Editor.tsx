@@ -39,7 +39,7 @@ import { SortableBlockItem } from '@/components/editor/SortableBlockItem'; // Ke
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Loader2, Plus, Smartphone, Volume2, VolumeX } from 'lucide-react';
-import { AIGenerationProvider, useAIGeneration } from '@/hooks/useAIGeneration';
+import { useAIGeneration } from '@/hooks/useAIGeneration';
 
 // Adapter: Convert Slide to Block for the new editor
 const slideToBlock = (slide: Slide): Block => ({
@@ -845,11 +845,4 @@ const Editor: React.FC = () => {
   );
 };
 
-// Wrap Editor with AIGenerationProvider
-const EditorWithProviders: React.FC = () => (
-  <AIGenerationProvider>
-    <Editor />
-  </AIGenerationProvider>
-);
-
-export default EditorWithProviders;
+export default Editor;
