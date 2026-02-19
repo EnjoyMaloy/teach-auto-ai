@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, Check, Bot, ExternalLink, Loader2, MessageCircle, BookOpen, RefreshCw, Compass } from 'lucide-react';
+import { Copy, Check, Bot, ExternalLink, Loader2, MessageCircle, BookOpen, RefreshCw, Compass, X } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -268,14 +268,69 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
           {/* Explore / Catalog Tab */}
           <TabsContent value="explore" className="space-y-4 mt-4">
             {actualIsPublished ? (
-              <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-400 mb-2">
-                  <Check className="w-5 h-5" />
-                  <span className="font-semibold">Курс опубликован в комьюнити</span>
+              <div className="space-y-4">
+                <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
+                  <div className="flex items-center gap-2 text-green-700 dark:text-green-400 mb-2">
+                    <Check className="w-5 h-5" />
+                    <span className="font-semibold">Курс опубликован в комьюнити</span>
+                  </div>
+                  <p className="text-sm text-green-600 dark:text-green-500">
+                    Раздел: {COURSE_CATEGORIES.find(c => c.id === (selectedCategory || category))?.name || 'Не указан'}
+                  </p>
                 </div>
-                <p className="text-sm text-green-600 dark:text-green-500">
-                  Раздел: {COURSE_CATEGORIES.find(c => c.id === (selectedCategory || category))?.name || 'Не указан'}
-                </p>
+
+                {/* Change category */}
+                <div className="space-y-2">
+                  <Label>Изменить раздел</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {COURSE_CATEGORIES.map(cat => (
+                      <button
+                        key={cat.id}
+                        onClick={async () => {
+                          setSelectedCategory(cat.id);
+                          await supabase
+                            .from('courses')
+                            .update({ category: cat.id })
+                            .eq('id', courseId);
+                          toast.success(`Раздел изменён на «${cat.name}»`);
+                          onUpdate?.();
+                        }}
+                        className={cn(
+                          "flex items-center gap-2 p-2.5 rounded-lg border text-sm font-medium transition-all text-left",
+                          (selectedCategory || category) === cat.id
+                            ? "border-primary bg-primary/5 text-foreground"
+                            : "border-border bg-card text-muted-foreground hover:border-primary/30"
+                        )}
+                      >
+                        <cat.icon className="w-4 h-4 flex-shrink-0" />
+                        {cat.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Unpublish */}
+                <Button
+                  variant="outline"
+                  className="w-full text-destructive hover:text-destructive"
+                  onClick={async () => {
+                    const { error } = await supabase
+                      .from('courses')
+                      .update({ is_published: false, category: null })
+                      .eq('id', courseId);
+                    if (error) {
+                      toast.error('Ошибка снятия с публикации');
+                      return;
+                    }
+                    setActualIsPublished(false);
+                    setSelectedCategory(null);
+                    toast.success('Курс убран из комьюнити');
+                    onUpdate?.();
+                  }}
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Убрать из комьюнити
+                </Button>
               </div>
             ) : (
               <div className="space-y-4">
