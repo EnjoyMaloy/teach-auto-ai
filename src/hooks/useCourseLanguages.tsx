@@ -106,22 +106,41 @@ export const useCourseLanguages = (courseId: string | undefined) => {
 
     setIsTranslating(true);
     try {
-      const { data, error } = await supabase.functions.invoke('translate-course', {
-        body: {
-          course_id: courseId,
-          source_language: primaryLanguage,
-          target_languages: translationLanguages,
-        },
-      });
+      // Translate one language at a time to avoid edge function timeouts
+      const results: Record<string, any> = {};
+      
+      for (const targetLang of translationLanguages) {
+        try {
+          const { data, error } = await supabase.functions.invoke('translate-course', {
+            body: {
+              course_id: courseId,
+              source_language: primaryLanguage,
+              target_languages: [targetLang],
+            },
+          });
 
-      if (error) throw error;
+          if (error) {
+            console.error(`Translation error for ${targetLang}:`, error);
+            continue;
+          }
 
-      const results = data?.results || {};
+          if (data?.results) {
+            Object.assign(results, data.results);
+          }
+        } catch (e) {
+          console.error(`Translation failed for ${targetLang}:`, e);
+        }
+      }
+
       const summary = Object.entries(results)
         .map(([lang, r]: [string, any]) => `${getLanguageInfo(lang).flag} ${r.lessons}/${r.slides}`)
         .join(', ');
 
-      toast.success(`Перевод завершён: ${summary}`);
+      if (summary) {
+        toast.success(`Перевод завершён: ${summary}`);
+      } else {
+        toast.error('Не удалось перевести ни на один язык');
+      }
     } catch (e) {
       console.error('Translation error:', e);
       toast.error('Ошибка перевода');
