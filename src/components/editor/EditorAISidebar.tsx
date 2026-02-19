@@ -305,7 +305,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   // ── Sync generation progress into unified messages ──────
   useEffect(() => {
     if (!generationMsgIdRef.current) return;
-    if (state.status === 'generating' && state.steps.length > 0) {
+    if (state.status === 'generating') {
       const msgId = generationMsgIdRef.current;
       setMessages(prev => prev.map(m => 
         m.id === msgId ? { ...m, steps: [...state.steps], isGenerating: true } : m
@@ -416,7 +416,10 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     setMessages(prev => [...prev, userMsg]);
 
     if (mode === 'generate') {
-      if (isCompleted || state.status === 'cancelled' || state.status === 'error') resetGeneration();
+      if (isCompleted || state.status === 'cancelled' || state.status === 'error') {
+        resetGeneration();
+        prevStepsLenRef.current = 0;
+      }
       if (onBeforeGenerate) {
         const ok = await onBeforeGenerate();
         if (!ok) return;
