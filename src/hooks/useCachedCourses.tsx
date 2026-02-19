@@ -77,7 +77,6 @@ const fetchPublishedCourses = async (): Promise<CourseListItem[]> => {
       lessons:published_lessons(id)
     `)
     .eq('is_published', true)
-    .eq('moderation_status', 'approved')
     .order('published_at', { ascending: false });
 
   if (error) throw error;

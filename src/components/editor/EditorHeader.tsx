@@ -469,10 +469,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         courseId={course.id}
         courseTitle={course.title}
         course={course}
-        isLinkAccessible={(course as any).isLinkAccessible || false}
         isPublished={course.isPublished}
-        moderationStatus={(course as any).moderationStatus || null}
-        moderationComment={(course as any).moderationComment || null}
+        category={(course as any).category || null}
         onUpdate={() => window.location.reload()}
       />
 

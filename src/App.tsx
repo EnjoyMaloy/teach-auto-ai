@@ -20,7 +20,7 @@ const CourseSettings = lazy(() => import("./pages/CourseSettings"));
 const CourseStats = lazy(() => import("./pages/CourseStats"));
 const PublicCourse = lazy(() => import("./pages/PublicCourse"));
 const ShortCourse = lazy(() => import("./pages/ShortCourse"));
-const Moderation = lazy(() => import("./pages/Moderation"));
+
 
 const Favorites = lazy(() => import("./pages/Favorites"));
 const Pricing = lazy(() => import("./pages/Pricing"));
@@ -82,7 +82,7 @@ const AppRoutes = () => (
       <Route path="/" element={<Suspense fallback={<PageLoader />}><Home /></Suspense>} />
       <Route path="/catalog" element={<Suspense fallback={<PageLoader />}><Catalog /></Suspense>} />
       <Route path="/workshop" element={<Suspense fallback={<PageLoader />}><Dashboard /></Suspense>} />
-      <Route path="/moderation" element={<Suspense fallback={<PageLoader />}><Moderation /></Suspense>} />
+      
       
       <Route path="/favorites" element={<Suspense fallback={<PageLoader />}><Favorites /></Suspense>} />
       <Route path="/pricing" element={<Suspense fallback={<PageLoader />}><Pricing /></Suspense>} />
