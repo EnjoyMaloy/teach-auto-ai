@@ -258,27 +258,76 @@ export const useGenerateCourse = (courseId: string) => {
         message: `Создано ${structureData.lessons?.length || 0} уроков` 
       });
 
-      // Step 3: Content
+      // Step 3: Content (batched for large courses)
       updateStep('content', { status: 'active', message: 'Генерирую контент...' });
       checkCancelled();
 
-      const generateResponse = await supabase.functions.invoke('generate-course', {
-        body: { 
-          userMessage: `Исследование:\n${JSON.stringify(researchData)}\n\nСтруктура:\n${JSON.stringify(structureData)}\n\nВАЖНО: Создай ровно ${lessonCount} уроков по 10 блоков каждый.\n\n## КРИТИЧЕСКИЕ ПРАВИЛА СВЯЗНОСТИ:\n1. Квиз в блоке 4 проверяет ТОЛЬКО материал из блоков 2-3 этого урока\n2. Квиз в блоке 7 проверяет ТОЛЬКО материал из блоков 5-6 этого урока\n3. Блок 1 каждого урока говорит "чему научимся"\n4. Блок 10 каждого урока подводит итоги + тизер следующего урока\n5. Следуй "contentOutline" из структуры для каждого блока!\n\nСоздай полный контент для всех блоков.`, 
-          agentRole: 'content' 
-        },
-      });
-      checkCancelled();
-      if (generateResponse.error) throw new Error(generateResponse.error.message || 'Ошибка при генерации');
+      const BATCH_SIZE = 4; // Max lessons per API call
+      let courseData: GeneratedCourse = { title: '', description: '', lessons: [] };
 
-      updateStep('content', { status: 'completed', message: 'Контент создан' });
+      if (lessonCount <= BATCH_SIZE) {
+        // Small course - single request
+        const generateResponse = await supabase.functions.invoke('generate-course', {
+          body: { 
+            userMessage: `Исследование:\n${JSON.stringify(researchData)}\n\nСтруктура:\n${JSON.stringify(structureData)}\n\nВАЖНО: Создай ровно ${lessonCount} уроков по 10 блоков каждый.\n\n## КРИТИЧЕСКИЕ ПРАВИЛА СВЯЗНОСТИ:\n1. Квиз в блоке 4 проверяет ТОЛЬКО материал из блоков 2-3 этого урока\n2. Квиз в блоке 7 проверяет ТОЛЬКО материал из блоков 5-6 этого урока\n3. Блок 1 каждого урока говорит "чему научимся"\n4. Блок 10 каждого урока подводит итоги + тизер следующего урока\n5. Следуй "contentOutline" из структуры для каждого блока!\n\nСоздай полный контент для всех блоков.`, 
+            agentRole: 'content' 
+          },
+        });
+        checkCancelled();
+        if (generateResponse.error) throw new Error(generateResponse.error.message || 'Ошибка при генерации');
+        
+        try {
+          courseData = extractAndFixJson(generateResponse.data?.content || '');
+        } catch (parseError) {
+          throw new Error('Не удалось распознать структуру курса');
+        }
+      } else {
+        // Large course - batch generation
+        const structureLessons = structureData.lessons || [];
+        const researchConcepts = researchData.concepts || [];
+        const totalBatches = Math.ceil(structureLessons.length / BATCH_SIZE);
 
-      let courseData: GeneratedCourse;
-      try {
-        courseData = extractAndFixJson(generateResponse.data?.content || '');
-      } catch (parseError) {
-        throw new Error('Не удалось распознать структуру курса');
+        for (let batchIdx = 0; batchIdx < totalBatches; batchIdx++) {
+          checkCancelled();
+          const startIdx = batchIdx * BATCH_SIZE;
+          const endIdx = Math.min(startIdx + BATCH_SIZE, structureLessons.length);
+          const batchLessons = structureLessons.slice(startIdx, endIdx);
+          const batchConcepts = researchConcepts.slice(startIdx, endIdx);
+
+          updateStep('content', { 
+            status: 'active', 
+            message: `Генерирую уроки ${startIdx + 1}-${endIdx} из ${structureLessons.length}...` 
+          });
+
+          const batchStructure = { ...structureData, lessons: batchLessons };
+          const batchResearch = { ...researchData, concepts: batchConcepts };
+
+          const batchResponse = await supabase.functions.invoke('generate-course', {
+            body: { 
+              userMessage: `Исследование:\n${JSON.stringify(batchResearch)}\n\nСтруктура:\n${JSON.stringify(batchStructure)}\n\nВАЖНО: Создай ровно ${batchLessons.length} уроков по 10 блоков каждый. Это уроки ${startIdx + 1}-${endIdx} из ${structureLessons.length} в курсе.\n\n## КРИТИЧЕСКИЕ ПРАВИЛА СВЯЗНОСТИ:\n1. Квиз в блоке 4 проверяет ТОЛЬКО материал из блоков 2-3 этого урока\n2. Квиз в блоке 7 проверяет ТОЛЬКО материал из блоков 5-6 этого урока\n3. Блок 1 каждого урока говорит "чему научимся"\n4. Блок 10 каждого урока подводит итоги + тизер следующего урока\n5. Следуй "contentOutline" из структуры для каждого блока!\n\nСоздай полный контент для всех блоков.`, 
+              agentRole: 'content' 
+            },
+          });
+          checkCancelled();
+          if (batchResponse.error) throw new Error(batchResponse.error.message || `Ошибка при генерации уроков ${startIdx + 1}-${endIdx}`);
+
+          let batchData: GeneratedCourse;
+          try {
+            batchData = extractAndFixJson(batchResponse.data?.content || '');
+          } catch {
+            throw new Error(`Не удалось распознать контент уроков ${startIdx + 1}-${endIdx}`);
+          }
+
+          // Merge: take title/description from first batch
+          if (batchIdx === 0) {
+            courseData.title = batchData.title || '';
+            courseData.description = batchData.description || '';
+          }
+          courseData.lessons.push(...(batchData.lessons || []));
+        }
       }
+
+      updateStep('content', { status: 'completed', message: `Создано ${courseData.lessons?.length || 0} уроков` });
 
       if (!courseData.lessons || courseData.lessons.length === 0) {
         throw new Error('Курс не содержит уроков');
