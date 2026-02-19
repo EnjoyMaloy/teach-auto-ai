@@ -650,7 +650,7 @@ const Editor: React.FC = () => {
 
   return (
     <TextEditorProvider>
-    <div className="h-screen flex bg-background relative">
+      <div className="h-screen flex bg-background relative">
       {/* Academy logo - fixed top-left corner, always visible */}
       <button
         onClick={() => setIsAISidebarOpen(prev => !prev)}
@@ -675,6 +675,67 @@ const Editor: React.FC = () => {
         selectedBlockOrder={selectedBlock ? (blocks.indexOf(selectedBlock) + 1) : undefined}
         allBlocks={blocks}
         allLessons={course.lessons}
+        onAIGenerate={async (generatedLessons, designConfig, designSystemId) => {
+          await ensurePersisted();
+          pushToUndo();
+          setCourse(prev => prev ? ({
+            ...prev,
+            lessons: generatedLessons.map((l, i) => ({ ...l, courseId: prev.id, order: i + 1 })),
+            ...(designConfig ? { designSystem: designConfig as any } : {}),
+            updatedAt: new Date(),
+          }) : null);
+          if (generatedLessons.length > 0) {
+            setSelectedLessonId(generatedLessons[0].id);
+            if (generatedLessons[0].slides.length > 0) {
+              setSelectedBlockId(generatedLessons[0].slides[0].id);
+            }
+          }
+          toast.success(`Курс сгенерирован: ${generatedLessons.length} уроков`);
+        }}
+        onUpdateBlock={handleUpdateBlock}
+        onRefineCourse={async (refinedLessons) => {
+          await ensurePersisted();
+          pushToUndo();
+          setCourse(prev => prev ? ({
+            ...prev,
+            lessons: refinedLessons.map((l, i) => ({ ...l, courseId: prev.id, order: i + 1 })),
+            updatedAt: new Date(),
+          }) : null);
+          if (refinedLessons.length > 0) {
+            setSelectedLessonId(refinedLessons[0].id);
+            if (refinedLessons[0].slides.length > 0) {
+              setSelectedBlockId(refinedLessons[0].slides[0].id);
+            }
+          }
+          toast.success(`Курс обновлён: ${refinedLessons.length} уроков`);
+        }}
+        onBeforeGenerate={ensurePersisted}
+      />
+
+      {/* Main content area - header + content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <EditorHeader
+          course={course}
+          canUndo={undoStack.length > 0}
+          canRedo={redoStack.length > 0}
+          isSaving={isSaving}
+          hasUnsavedChanges={hasUnsavedChanges}
+          lastSavedAt={lastSavedAt}
+          isAISidebarOpen={isAISidebarOpen}
+          isPreviewMuted={isPreviewMuted}
+          onToggleMute={() => setIsPreviewMuted(!isPreviewMuted)}
+          onToggleAISidebar={() => setIsAISidebarOpen(!isAISidebarOpen)}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          onPreview={() => setIsPreviewMode(true)}
+          onPublish={handlePublish}
+          onSave={handleSave}
+          onUpdateTitle={handleUpdateTitle}
+          onUpdateDesignSystem={handleUpdateDesignSystem}
+          onUpdateLessonsDisplayType={(type) => {
+            pushToUndo();
+            setCourse(prev => prev ? ({ ...prev, lessonsDisplayType: type, updatedAt: new Date() }) : null);
+          }}
           onAIGenerate={async (generatedLessons, designConfig, designSystemId) => {
             if (!course) return;
             await ensurePersisted();
@@ -698,7 +759,6 @@ const Editor: React.FC = () => {
           onLanguageChange={setCurrentEditLanguage}
         />
 
-        {/* Content area */}
         <div className="flex-1 flex overflow-hidden relative bg-secondary dark:bg-black/10">
           {/* Preview area - full width */}
           <div className="flex-1 flex items-center justify-center overflow-hidden m-2 rounded-2xl bg-background">
@@ -759,7 +819,7 @@ const Editor: React.FC = () => {
           designSystem={course.designSystem}
         />
       </div>
-    </div>
+      </div>
     </TextEditorProvider>
   );
 };
