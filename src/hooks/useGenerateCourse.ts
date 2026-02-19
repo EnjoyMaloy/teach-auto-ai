@@ -458,18 +458,26 @@ export const useGenerateCourse = (courseId: string) => {
         };
       });
 
-      // Apply selected design system to the course
+      // Apply selected design system and generated title to the course
+      const courseUpdate: Record<string, any> = {};
+      if (courseData.title) {
+        courseUpdate.title = courseData.title;
+      }
+      if (courseData.description) {
+        courseUpdate.description = courseData.description;
+      }
       if (selectedDesignConfig && selectedDesignSystemId) {
+        courseUpdate.design_system = JSON.parse(JSON.stringify(selectedDesignConfig));
+        courseUpdate.base_design_system_id = selectedDesignSystemId;
+      }
+      if (Object.keys(courseUpdate).length > 0) {
         try {
           await supabase
             .from('courses')
-            .update({ 
-              design_system: JSON.parse(JSON.stringify(selectedDesignConfig)),
-              base_design_system_id: selectedDesignSystemId,
-            })
+            .update(courseUpdate)
             .eq('id', courseId);
         } catch (e) {
-          console.error('Failed to save design system:', e);
+          console.error('Failed to update course:', e);
         }
       }
 
