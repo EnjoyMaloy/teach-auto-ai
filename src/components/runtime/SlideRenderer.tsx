@@ -1112,8 +1112,11 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
       {/* Прогресс бар */}
       {showProgress && renderProgressBar()}
 
-      {/* Контент */}
-      <div className="flex-1 min-h-0 overflow-auto">
+      {/* Контент с анимацией появления */}
+      <div 
+        key={slide.id} 
+        className="flex-1 min-h-0 overflow-auto animate-slide-fade-in"
+      >
         {renderContent()}
       </div>
 
