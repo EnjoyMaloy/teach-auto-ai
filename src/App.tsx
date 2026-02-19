@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import { AIGenerationProvider } from "@/hooks/useAIGeneration";
 import { LanguageProvider } from "@/hooks/useLanguage";
 import { Loader2 } from "lucide-react";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
@@ -108,9 +109,11 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
-            <LanguageProvider>
-              <AppRoutes />
-            </LanguageProvider>
+            <AIGenerationProvider>
+              <LanguageProvider>
+                <AppRoutes />
+              </LanguageProvider>
+            </AIGenerationProvider>
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
