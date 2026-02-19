@@ -107,6 +107,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   const completionAddedRef = useRef(false);
   const generationMsgIdRef = useRef<string | null>(null);
   const savedMessageIdsRef = useRef<Set<string>>(new Set());
+  const editAbortRef = useRef<AbortController | null>(null);
 
   // ── Load messages from DB on mount ─────────────────────
   useEffect(() => {
@@ -407,8 +408,9 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   const handleEditBlock = async (prompt: string) => {
     if (!selectedBlock || !prompt.trim()) return;
     
+    const controller = new AbortController();
+    editAbortRef.current = controller;
     setIsEditingBlock(true);
-    // Add loading indicator as assistant message
     const loadingId = crypto.randomUUID();
     setMessages(prev => [...prev, { id: loadingId, type: 'assistant', content: '...', timestamp: Date.now() }]);
 
@@ -427,23 +429,26 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           sliderCorrect: selectedBlock.sliderCorrect, sliderStep: selectedBlock.sliderStep,
         };
       } else {
-        // For design blocks: send ALL sub-blocks as the full context
-        // Do NOT send currentSubBlock with type "design" — it's meaningless to the AI
         body.allSubBlocks = selectedBlock.subBlocks || [];
       }
 
-      // Include conversation history
       body.conversationHistory = messages.filter(m => m.type === 'user' || m.type === 'assistant').slice(-10).map(m => ({
         role: m.type as 'user' | 'assistant', content: m.content,
       }));
 
       const response = await supabase.functions.invoke('subblock-ai', { body });
+      
+      // Check if cancelled before applying
+      if (controller.signal.aborted) {
+        setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: 'Остановлено.' } : m));
+        return;
+      }
+      
       if (response.error) throw response.error;
 
       const result = response.data;
       const aiMessage = result.message || 'Готово!';
       
-      // Replace loading message with actual response
       setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: aiMessage } : m));
       
       if (isQuiz && result.blockUpdates) {
@@ -452,9 +457,14 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
         onUpdateBlock({ subBlocks: result.newBlocks });
       }
     } catch (error) {
+      if (controller.signal.aborted) {
+        setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: 'Остановлено.' } : m));
+        return;
+      }
       console.error('Block edit error:', error);
       setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: 'Ошибка. Попробуйте снова.' } : m));
     } finally {
+      editAbortRef.current = null;
       setIsEditingBlock(false);
     }
   };
@@ -462,8 +472,10 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   const handleFreeChat = async (prompt: string) => {
     if (!prompt.trim()) return;
     
+    const controller = new AbortController();
+    editAbortRef.current = controller;
+    
     // In idle mode (no active tool) → use refine-course for global course edits
-    // The key check is mode === 'idle', NOT selectedBlock, because Editor always selects a block
     if (mode === 'idle' && allLessons && allLessons.length > 0 && onRefineCourse) {
       setIsEditingBlock(true);
       const loadingId = crypto.randomUUID();
@@ -475,6 +487,12 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
         }));
         
         const result = await refineCourse(prompt, allLessons, history, undefined, designSystem);
+        
+        if (controller.signal.aborted) {
+          setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: 'Остановлено.' } : m));
+          return;
+        }
+        
         if (result) {
           setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: result.message } : m));
           onRefineCourse(result.lessons);
@@ -482,15 +500,20 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: 'Не удалось обработать запрос.' } : m));
         }
       } catch (error) {
+        if (controller.signal.aborted) {
+          setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: 'Остановлено.' } : m));
+          return;
+        }
         console.error('Refine course error:', error);
         setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: 'Ошибка. Попробуйте снова.' } : m));
       } finally {
+        editAbortRef.current = null;
         setIsEditingBlock(false);
       }
       return;
     }
 
-    // Otherwise: block-level editing via subblock-ai (when a block is selected)
+    // Otherwise: block-level editing via subblock-ai
     setIsEditingBlock(true);
     const loadingId = crypto.randomUUID();
     setMessages(prev => [...prev, { id: loadingId, type: 'assistant', content: '...', timestamp: Date.now() }]);
@@ -527,6 +550,12 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       }
 
       const response = await supabase.functions.invoke('subblock-ai', { body });
+      
+      if (controller.signal.aborted) {
+        setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: 'Остановлено.' } : m));
+        return;
+      }
+      
       if (response.error) throw response.error;
 
       const result = response.data;
@@ -544,9 +573,14 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
         onUpdateBlock({ subBlocks: result.newBlocks });
       }
     } catch (error) {
+      if (controller.signal.aborted) {
+        setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: 'Остановлено.' } : m));
+        return;
+      }
       console.error('Free chat error:', error);
       setMessages(prev => prev.map(m => m.id === loadingId ? { ...m, content: 'Ошибка. Попробуйте снова.' } : m));
     } finally {
+      editAbortRef.current = null;
       setIsEditingBlock(false);
     }
   };
@@ -979,9 +1013,9 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           <input
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
-            onKeyDown={isGenerating ? undefined : handleKeyDown}
-            placeholder={isGenerating ? 'Генерация...' : getPlaceholder()}
-            disabled={isInputDisabled || isGenerating}
+            onKeyDown={isGenerating || isEditingBlock ? undefined : handleKeyDown}
+            placeholder={isGenerating ? 'Генерация...' : isEditingBlock ? 'Обработка...' : getPlaceholder()}
+            disabled={isInputDisabled || isGenerating || isEditingBlock}
             className="w-full bg-transparent px-4 pt-3 pb-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none disabled:opacity-50"
           />
           <div className="flex items-center justify-between px-2.5 pb-2.5 pt-1">
@@ -1027,9 +1061,17 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                 Ред. блок
               </button>
             </div>
-            {isGenerating ? (
+            {isGenerating || isEditingBlock ? (
               <button
-                onClick={cancelGeneration}
+                onClick={() => {
+                  if (isGenerating) {
+                    cancelGeneration();
+                  } else if (editAbortRef.current) {
+                    editAbortRef.current.abort();
+                    editAbortRef.current = null;
+                    setIsEditingBlock(false);
+                  }
+                }}
                 className="w-7 h-7 flex items-center justify-center rounded-full bg-foreground border border-border dark:bg-transparent dark:text-muted-foreground hover:opacity-80 transition-colors"
                 title="Остановить"
               >
