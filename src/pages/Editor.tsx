@@ -23,6 +23,7 @@ import { DesignSystemConfig } from '@/types/designSystem';
 import { useAuth } from '@/hooks/useAuth';
 import { useCourses } from '@/hooks/useCourses';
 import { EditorHeader } from '@/components/editor/EditorHeader';
+import { useCourseLanguages } from '@/hooks/useCourseLanguages';
 import { CourseTimeline } from '@/components/editor/CourseTimeline';
 import { EditorAISidebar } from '@/components/editor/EditorAISidebar';
 
@@ -127,10 +128,13 @@ const Editor: React.FC = () => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
-  const [isNewCourse, setIsNewCourse] = useState(false); // Track if course is not yet in DB
+  const [isNewCourse, setIsNewCourse] = useState(false);
   const [initialAIMode, setInitialAIMode] = useState<'generate' | null>(
     (location.state as any)?.openAIGenerate ? 'generate' : null
   );
+  const [currentEditLanguage, setCurrentEditLanguage] = useState<string | null>(null);
+  const [translatedSlides, setTranslatedSlides] = useState<Record<string, any>>({});
+  const [translatedLessons, setTranslatedLessons] = useState<Record<string, any>>({});
 
 
   const sensors = useSensors(
@@ -204,8 +208,74 @@ const Editor: React.FC = () => {
     }
   }, [initialAIMode, course, isLoadingCourse]);
 
+  // Load translations when edit language changes
+  useEffect(() => {
+    if (!currentEditLanguage || !course) {
+      setTranslatedSlides({});
+      setTranslatedLessons({});
+      return;
+    }
+    const loadTranslations = async () => {
+      const lessonIds = course.lessons.map(l => l.id);
+      if (lessonIds.length === 0) return;
+
+      // Load lesson translations
+      const { data: lessonTrans } = await supabase
+        .from('lesson_translations')
+        .select('*')
+        .in('lesson_id', lessonIds)
+        .eq('language_code', currentEditLanguage);
+
+      const lessonMap: Record<string, any> = {};
+      lessonTrans?.forEach(lt => { lessonMap[lt.lesson_id] = lt; });
+      setTranslatedLessons(lessonMap);
+
+      // Load slide translations
+      const allSlideIds = course.lessons.flatMap(l => l.slides.map(s => s.id));
+      if (allSlideIds.length === 0) { setTranslatedSlides({}); return; }
+
+      const { data: slideTrans } = await supabase
+        .from('slide_translations')
+        .select('*')
+        .in('slide_id', allSlideIds)
+        .eq('language_code', currentEditLanguage);
+
+      const slideMap: Record<string, any> = {};
+      slideTrans?.forEach(st => { slideMap[st.slide_id] = st; });
+      setTranslatedSlides(slideMap);
+    };
+    loadTranslations();
+  }, [currentEditLanguage, course?.id, course?.lessons.length]);
+
   const selectedLesson = course?.lessons.find(l => l.id === selectedLessonId);
-  const blocks: Block[] = selectedLesson?.slides.map(slideToBlock) || [];
+  
+  // Apply translations to blocks if viewing a translation language
+  const rawBlocks: Block[] = selectedLesson?.slides.map(slideToBlock) || [];
+  const blocks: Block[] = currentEditLanguage
+    ? rawBlocks.map(block => {
+        const trans = translatedSlides[block.id];
+        if (!trans) return block;
+        return {
+          ...block,
+          content: trans.content ?? block.content,
+          options: trans.options ?? block.options,
+          explanation: trans.explanation ?? block.explanation,
+          explanationCorrect: trans.explanation_correct ?? block.explanationCorrect,
+          explanationPartial: trans.explanation_partial ?? block.explanationPartial,
+          blankWord: trans.blank_word ?? block.blankWord,
+          matchingPairs: trans.matching_pairs ?? block.matchingPairs,
+          orderingItems: trans.ordering_items ?? block.orderingItems,
+          subBlocks: trans.sub_blocks ?? block.subBlocks,
+          hints: trans.hints ?? (block as any).hints,
+        };
+      })
+    : rawBlocks;
+  
+  // Apply lesson title translation  
+  const displayLessonTitle = currentEditLanguage && selectedLesson
+    ? translatedLessons[selectedLesson.id]?.title || selectedLesson.title
+    : selectedLesson?.title;
+
   const selectedBlock = blocks.find(b => b.id === selectedBlockId) || null;
 
   // History management
@@ -605,67 +675,6 @@ const Editor: React.FC = () => {
         selectedBlockOrder={selectedBlock ? (blocks.indexOf(selectedBlock) + 1) : undefined}
         allBlocks={blocks}
         allLessons={course.lessons}
-        onAIGenerate={async (generatedLessons, designConfig, designSystemId) => {
-          await ensurePersisted();
-          pushToUndo();
-          setCourse(prev => prev ? ({
-            ...prev,
-            lessons: generatedLessons.map((l, i) => ({ ...l, courseId: prev.id, order: i + 1 })),
-            ...(designConfig ? { designSystem: designConfig as any } : {}),
-            updatedAt: new Date(),
-          }) : null);
-          if (generatedLessons.length > 0) {
-            setSelectedLessonId(generatedLessons[0].id);
-            if (generatedLessons[0].slides.length > 0) {
-              setSelectedBlockId(generatedLessons[0].slides[0].id);
-            }
-          }
-          toast.success(`Курс сгенерирован: ${generatedLessons.length} уроков`);
-        }}
-        onUpdateBlock={handleUpdateBlock}
-        onRefineCourse={async (refinedLessons) => {
-          await ensurePersisted();
-          pushToUndo();
-          setCourse(prev => prev ? ({
-            ...prev,
-            lessons: refinedLessons.map((l, i) => ({ ...l, courseId: prev.id, order: i + 1 })),
-            updatedAt: new Date(),
-          }) : null);
-          if (refinedLessons.length > 0) {
-            setSelectedLessonId(refinedLessons[0].id);
-            if (refinedLessons[0].slides.length > 0) {
-              setSelectedBlockId(refinedLessons[0].slides[0].id);
-            }
-          }
-          toast.success(`Курс обновлён: ${refinedLessons.length} уроков`);
-        }}
-        onBeforeGenerate={ensurePersisted}
-      />
-
-      {/* Main content area - header + content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <EditorHeader
-          course={course}
-          canUndo={undoStack.length > 0}
-          canRedo={redoStack.length > 0}
-          isSaving={isSaving}
-          hasUnsavedChanges={hasUnsavedChanges}
-          lastSavedAt={lastSavedAt}
-          isAISidebarOpen={isAISidebarOpen}
-          isPreviewMuted={isPreviewMuted}
-          onToggleMute={() => setIsPreviewMuted(!isPreviewMuted)}
-          onToggleAISidebar={() => setIsAISidebarOpen(!isAISidebarOpen)}
-          onUndo={handleUndo}
-          onRedo={handleRedo}
-          onPreview={() => setIsPreviewMode(true)}
-          onPublish={handlePublish}
-          onSave={handleSave}
-          onUpdateTitle={handleUpdateTitle}
-          onUpdateDesignSystem={handleUpdateDesignSystem}
-          onUpdateLessonsDisplayType={(type) => {
-            pushToUndo();
-            setCourse(prev => prev ? ({ ...prev, lessonsDisplayType: type, updatedAt: new Date() }) : null);
-          }}
           onAIGenerate={async (generatedLessons, designConfig, designSystemId) => {
             if (!course) return;
             await ensurePersisted();
@@ -685,6 +694,8 @@ const Editor: React.FC = () => {
             toast.success(`Курс сгенерирован: ${generatedLessons.length} уроков`);
           }}
           onBack={() => navigate('/')}
+          currentEditLanguage={currentEditLanguage}
+          onLanguageChange={setCurrentEditLanguage}
         />
 
         {/* Content area */}
@@ -701,7 +712,7 @@ const Editor: React.FC = () => {
             >
               <MobilePreviewFrame
                 block={selectedBlock}
-                lessonTitle={selectedLesson?.title}
+                lessonTitle={displayLessonTitle}
                 blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
                 totalBlocks={blocks.length}
                 onContinue={handleContinueToNextBlock}
