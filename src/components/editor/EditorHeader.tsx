@@ -266,7 +266,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
   return (
     <>
-      <header className="h-14 border-b border-border/5 dark:border-transparent bg-secondary dark:bg-black/10 backdrop-blur-sm flex items-center justify-between px-4 gap-4 relative">
+      <header className="h-14 border-b border-border/5 dark:border-transparent bg-secondary dark:bg-black/10 backdrop-blur-sm flex items-center justify-between px-2 sm:px-4 gap-1 sm:gap-2 relative">
         {/* Left section - Sidebar trigger + Breadcrumbs */}
         <div className={cn("flex items-center gap-2 min-w-0", !isAISidebarOpen && "ml-11")}>
           {/* AI Sidebar Toggle */}
@@ -316,7 +316,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                 ) : (
                   <BreadcrumbPage>
                     <span 
-                      className="truncate max-w-[200px] cursor-pointer hover:text-primary transition-colors"
+                      className="truncate max-w-[80px] sm:max-w-[120px] md:max-w-[160px] lg:max-w-[200px] cursor-pointer hover:text-primary transition-colors"
                       onDoubleClick={handleStartEditing}
                       title="Двойной клик для редактирования"
                     >
@@ -336,18 +336,19 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
             </BreadcrumbList>
           </Breadcrumb>
 
-          <div className="w-px h-5 bg-border/50 ml-1" />
+          <div className="w-px h-5 bg-border/50 ml-1 hidden md:block" />
 
           {/* Design & Map buttons - icon only */}
           <button 
             onClick={() => setShowDesignSystem(true)}
-            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors hidden md:block"
             title="Дизайн"
           >
             <Palette className="w-4 h-4" />
           </button>
 
           {onUpdateLessonsDisplayType && (
+            <div className="hidden md:block">
             <Popover open={showMapSettings} onOpenChange={setShowMapSettings}>
               <PopoverTrigger asChild>
                 <button 
@@ -390,9 +391,11 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                 </div>
               </PopoverContent>
             </Popover>
+            </div>
           )}
 
           {/* Language settings popover */}
+          <div className="hidden md:block">
           <Popover open={showLangSettings} onOpenChange={setShowLangSettings}>
             <PopoverTrigger asChild>
               <button 
@@ -419,10 +422,11 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
               </div>
             </PopoverContent>
           </Popover>
+          </div>
 
           {/* Language switcher - only show when languages are configured */}
           {languages.length > 1 && (
-            <>
+            <div className="hidden md:contents">
               <div className="w-px h-5 bg-border/50 mx-1" />
               <div className="flex items-center gap-0.5">
                 {/* Primary language */}
@@ -458,12 +462,12 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                   );
                 })}
               </div>
-            </>
+            </div>
           )}
         </div>
 
         {/* Center section - Undo/Redo + Sound + Cloud */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={onUndo}
             disabled={!canUndo}
@@ -479,12 +483,12 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
             <Redo2 className="w-4 h-4" />
           </button>
 
-          <div className="w-px h-5 bg-border/50 mx-1" />
+          <div className="w-px h-5 bg-border/50 mx-1 hidden sm:block" />
 
           {onToggleMute && (
             <button
               onClick={onToggleMute}
-              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors hidden sm:block"
               title={isPreviewMuted ? 'Включить звук' : 'Выключить звук'}
             >
               {isPreviewMuted ? (
@@ -512,7 +516,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         </div>
 
         {/* Right section */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           {/* Theme toggle */}
           <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -528,10 +532,11 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
           <button 
             onClick={onPreview}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            className="flex items-center gap-1.5 px-2 lg:px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            title="Предпросмотр"
           >
             <Eye className="w-3.5 h-3.5" />
-            Предпросмотр
+            <span className="hidden lg:inline">Предпросмотр</span>
           </button>
 
           {course.lessons.length === 0 ? (
@@ -540,10 +545,10 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                 <span>
                   <button 
                     disabled
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-primary text-primary-foreground opacity-50 cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1.5 px-2 lg:px-3 py-1.5 rounded-lg text-sm font-medium bg-primary text-primary-foreground opacity-50 cursor-not-allowed transition-colors"
                   >
                     <Share2 className="w-3.5 h-3.5" />
-                    Опубликовать
+                    <span className="hidden lg:inline">Опубликовать</span>
                   </button>
                 </span>
               </TooltipTrigger>
@@ -552,10 +557,11 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           ) : (
             <button 
               onClick={handlePublishClick}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+              className="flex items-center gap-1.5 px-2 lg:px-3 py-1.5 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+              title="Опубликовать"
             >
               <Share2 className="w-3.5 h-3.5" />
-              Опубликовать
+              <span className="hidden lg:inline">Опубликовать</span>
             </button>
           )}
         </div>
