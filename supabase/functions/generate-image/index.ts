@@ -189,17 +189,31 @@ Style requirements:
     // Generate unique filename
     const fileName = `generated/${user.id}/${crypto.randomUUID()}.${imageType}`;
 
-    // Upload to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabaseClient
-      .storage
-      .from('course-images')
-      .upload(fileName, imageBytes, {
-        contentType: imageMimeType,
-        upsert: false
-      });
+    // Upload to Supabase Storage with retry
+    let uploadError: any = null;
+    for (let uploadAttempt = 0; uploadAttempt < 3; uploadAttempt++) {
+      const { error: err } = await supabaseClient
+        .storage
+        .from('course-images')
+        .upload(uploadAttempt === 0 ? fileName : `generated/${user.id}/${crypto.randomUUID()}.${imageType}`, imageBytes, {
+          contentType: imageMimeType,
+          upsert: false
+        });
+
+      if (!err) {
+        uploadError = null;
+        break;
+      }
+
+      console.error(`Storage upload error (attempt ${uploadAttempt + 1}/3):`, err.message);
+      uploadError = err;
+
+      if (uploadAttempt < 2) {
+        await new Promise(resolve => setTimeout(resolve, 1000 * (uploadAttempt + 1)));
+      }
+    }
 
     if (uploadError) {
-      console.error("Storage upload error:", uploadError);
       throw new Error(`Failed to upload image: ${uploadError.message}`);
     }
 
