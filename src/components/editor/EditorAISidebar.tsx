@@ -1095,6 +1095,12 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                 onClick={() => {
                   if (isGenerating) {
                     cancelGeneration();
+                    // Immediately update generation message in UI
+                    const gid = generationMsgIdRef.current;
+                    if (gid) {
+                      setMessages(prev => prev.map(m => m.id === gid ? { ...m, isGenerating: false, content: 'Остановлено.' } : m));
+                      generationMsgIdRef.current = null;
+                    }
                   } else if (editAbortRef.current) {
                     editAbortRef.current.abort();
                     editAbortRef.current = null;
