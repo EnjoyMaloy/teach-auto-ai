@@ -293,7 +293,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
                         toast.success('Курс убран из комьюнити');
                         onUpdate?.();
                       }}
-                      className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+                      className="text-xs px-2 py-0.5 rounded border border-muted-foreground/20 text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-colors"
                     >
                       Снять
                     </button>
