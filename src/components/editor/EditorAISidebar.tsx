@@ -216,6 +216,10 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     const existingGenMsg = messages.find(m => m.type === 'generation' && m.isGenerating);
     if (existingGenMsg) {
       generationMsgIdRef.current = existingGenMsg.id;
+      // Immediately sync current steps so UI shows latest progress
+      setMessages(prev => prev.map(m => 
+        m.id === existingGenMsg.id ? { ...m, steps: [...state.steps], isGenerating: true } : m
+      ));
     } else {
       const genMsgId = crypto.randomUUID();
       generationMsgIdRef.current = genMsgId;
@@ -229,6 +233,21 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       }]);
     }
   }, [messagesLoaded, state.status]);
+
+  // ── Keep generation message synced even after reconnect ──
+  // This handles the case where the sync effect missed updates
+  // because generationMsgIdRef wasn't set yet during earlier renders
+  const prevStepsLenRef = useRef(0);
+  useEffect(() => {
+    if (!generationMsgIdRef.current) return;
+    if (state.status !== 'generating') return;
+    if (state.steps.length === prevStepsLenRef.current) return;
+    prevStepsLenRef.current = state.steps.length;
+    const msgId = generationMsgIdRef.current;
+    setMessages(prev => prev.map(m => 
+      m.id === msgId ? { ...m, steps: [...state.steps], isGenerating: true } : m
+    ));
+  });
 
   useEffect(() => {
     setDesignSystem(designSystem);
