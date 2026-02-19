@@ -87,7 +87,6 @@ export const usePublishing = () => {
         })
         .eq('id', course.id);
 
-      toast.success('Курс опубликован!');
       return true;
     } catch (error) {
       console.error('Error publishing course:', error);
