@@ -192,6 +192,8 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     };
     saveMessages();
   }, [messages, messagesLoaded, courseId]);
+
+  
   
   const { systems: designSystems, isLoading: isLoadingDS } = useBaseDesignSystems();
 
@@ -204,6 +206,29 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   
   const { runGeneration } = useGenerateCourse(courseId);
   const { refineCourse, isRefining } = useRefineCourse(courseId);
+
+  // ── Reconnect to active generation after remount ────────
+  useEffect(() => {
+    if (!messagesLoaded) return;
+    if (state.status !== 'generating') return;
+    if (generationMsgIdRef.current) return; // already connected
+    
+    const existingGenMsg = messages.find(m => m.type === 'generation' && m.isGenerating);
+    if (existingGenMsg) {
+      generationMsgIdRef.current = existingGenMsg.id;
+    } else {
+      const genMsgId = crypto.randomUUID();
+      generationMsgIdRef.current = genMsgId;
+      setMessages(prev => [...prev, {
+        id: genMsgId,
+        type: 'generation',
+        content: '',
+        timestamp: Date.now(),
+        steps: [...state.steps],
+        isGenerating: true,
+      }]);
+    }
+  }, [messagesLoaded, state.status]);
 
   useEffect(() => {
     setDesignSystem(designSystem);
