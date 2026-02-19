@@ -53,6 +53,8 @@ interface EditorHeaderProps {
   onUpdateLessonsDisplayType?: (type: LessonsDisplayType) => void;
   onAIGenerate?: (lessons: Lesson[], designConfig?: DesignSystemConfig, designSystemId?: string) => void;
   onBack?: () => void;
+  currentEditLanguage?: string | null;
+  onLanguageChange?: (lang: string | null) => void;
 }
 
 export const EditorHeader: React.FC<EditorHeaderProps> = ({
@@ -76,6 +78,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   onUpdateLessonsDisplayType,
   onAIGenerate,
   onBack,
+  currentEditLanguage,
+  onLanguageChange,
 }) => {
   const { isAdmin } = useUserRole();
   const { theme, setTheme } = useTheme();
@@ -88,7 +92,6 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   const [showDesignSystem, setShowDesignSystem] = useState(false);
   const [showMapSettings, setShowMapSettings] = useState(false);
   const [showLangSettings, setShowLangSettings] = useState(false);
-  const [currentEditLanguage, setCurrentEditLanguage] = useState<string | null>(null);
   const [selectedBaseSystemId, setSelectedBaseSystemId] = useState<string | null>(
     course.designSystem?.themeId || null
   );
@@ -418,8 +421,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
               <div className="w-px h-5 bg-border/50 mx-1" />
               <div className="flex items-center gap-0.5">
                 {/* Primary language */}
-                <button
-                  onClick={() => setCurrentEditLanguage(null)}
+                  <button
+                    onClick={() => onLanguageChange?.(null)}
                   className={cn(
                     "px-1.5 py-1 rounded text-xs font-medium transition-colors",
                     currentEditLanguage === null
@@ -434,9 +437,9 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                 {translationLanguages.map(code => {
                   const info = getLanguageInfo(code);
                   return (
-                    <button
-                      key={code}
-                      onClick={() => setCurrentEditLanguage(code)}
+                      <button
+                        key={code}
+                        onClick={() => onLanguageChange?.(code)}
                       className={cn(
                         "px-1.5 py-1 rounded text-xs font-medium transition-colors",
                         currentEditLanguage === code
