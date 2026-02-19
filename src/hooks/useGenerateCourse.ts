@@ -495,5 +495,9 @@ export const useGenerateCourse = (courseId: string) => {
     }
   }, [courseId, startGeneration, updateStep, setSteps, setError, completeGeneration, abortController, designSystem]);
 
-  return { runGeneration };
+  const forceReset = useCallback(() => {
+    isGeneratingRef.current = false;
+  }, []);
+
+  return { runGeneration, forceReset };
 };

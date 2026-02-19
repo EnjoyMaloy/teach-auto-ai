@@ -204,7 +204,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     setDesignSystem,
   } = useAIGeneration();
   
-  const { runGeneration } = useGenerateCourse(courseId);
+  const { runGeneration, forceReset } = useGenerateCourse(courseId);
   const { refineCourse, isRefining } = useRefineCourse(courseId);
 
   // ── Reconnect to active generation after remount ────────
@@ -418,6 +418,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     if (mode === 'generate') {
       if (isCompleted || state.status === 'cancelled' || state.status === 'error') {
         resetGeneration();
+        forceReset();
         prevStepsLenRef.current = 0;
       }
       if (onBeforeGenerate) {
