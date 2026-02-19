@@ -596,6 +596,8 @@ const Editor: React.FC = () => {
         isOpen={isAISidebarOpen}
         onClose={() => setIsAISidebarOpen(false)}
         initialMode={(location.state as any)?.openAIGenerate ? 'generate' : undefined}
+        autoPrompt={(location.state as any)?.autoPrompt}
+        autoSettings={(location.state as any)?.generationSettings}
         courseId={course.id}
         designSystem={course.designSystem}
         selectedBlock={selectedBlock}

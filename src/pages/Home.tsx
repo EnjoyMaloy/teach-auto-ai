@@ -1,145 +1,41 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, ArrowUp, Loader2, Gauge, Palette, Sparkles } from 'lucide-react';
+import { Plus, ArrowUp, Loader2, Gauge, Palette, Sparkles, BookOpen, Star, Zap, ImageOff, ImageIcon, Check } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/hooks/useAuth';
-import { useCourses } from '@/hooks/useCourses';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useBaseDesignSystems } from '@/hooks/useBaseDesignSystems';
 import { cn } from '@/lib/utils';
-
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { createCourse } = useCourses();
+  const { systems: designSystems } = useBaseDesignSystems();
+  
   const [prompt, setPrompt] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generationStatus, setGenerationStatus] = useState('');
+  const [showSettings, setShowSettings] = useState(false);
+  const [selectedDesignSystemId, setSelectedDesignSystemId] = useState<string | null>(null);
+  const [lessonCount, setLessonCount] = useState(3);
+  const [skipImages, setSkipImages] = useState(false);
+  const [imageModel, setImageModel] = useState<'gemini-3-pro' | 'gemini-2.5-flash'>('gemini-3-pro');
 
   const userName = 'Павел';
 
-  const handleGenerate = async () => {
-    if (!prompt.trim() || isGenerating || !user) return;
+  const handleGenerate = () => {
+    if (!prompt.trim() || !user) return;
 
-    setIsGenerating(true);
-    setGenerationStatus('Создаю курс...');
-
-    try {
-      // 1. Create a new course
-      const course = await createCourse(prompt.slice(0, 50) + (prompt.length > 50 ? '...' : ''));
-      if (!course) {
-        throw new Error('Не удалось создать курс');
-      }
-
-      setGenerationStatus('Генерирую контент с помощью ИИ...');
-
-      // 2. Call the AI generation function
-      const { data, error } = await supabase.functions.invoke('generate-course', {
-        body: {
-          userMessage: prompt,
-          courseId: course.id,
-          skipImages: true,
+    // Navigate to editor with all generation settings
+    navigate('/editor/new', {
+      state: {
+        openAIGenerate: true,
+        autoPrompt: prompt.trim(),
+        generationSettings: {
+          designSystemId: selectedDesignSystemId,
+          lessonCount,
+          skipImages,
+          imageModel,
         },
-      });
-
-      if (error) {
-        console.error('AI generation error:', error);
-        throw new Error('Ошибка генерации контента');
-      }
-
-      // Parse the AI response - it returns {content: "JSON string"}
-      let parsedData = data;
-      if (data?.content && typeof data.content === 'string') {
-        try {
-          parsedData = JSON.parse(data.content);
-        } catch (parseError) {
-          console.error('Failed to parse AI response:', parseError);
-          throw new Error('Ошибка парсинга ответа ИИ');
-        }
-      }
-
-      if (parsedData?.lessons && Array.isArray(parsedData.lessons)) {
-        // 3. Save generated lessons to database
-        setGenerationStatus('Сохраняю уроки...');
-        
-        for (let i = 0; i < parsedData.lessons.length; i++) {
-          const lesson = parsedData.lessons[i];
-          
-          // Create lesson
-          const { data: lessonData, error: lessonError } = await supabase
-            .from('lessons')
-            .insert({
-              course_id: course.id,
-              title: lesson.title || `Урок ${i + 1}`,
-              description: lesson.description || '',
-              order: i,
-            })
-            .select()
-            .single();
-
-          if (lessonError) {
-            console.error('Error creating lesson:', lessonError);
-            continue;
-          }
-
-          // Create slides for this lesson
-          if (lesson.slides && Array.isArray(lesson.slides)) {
-            for (let j = 0; j < lesson.slides.length; j++) {
-              const slide = lesson.slides[j];
-              
-              // Helper to strip HTML tags from text
-              const stripHtml = (text: string | undefined): string => {
-                if (!text) return '';
-                return text.replace(/<[^>]*>/g, '').trim();
-              };
-              
-              // Clean subBlocks from HTML tags
-              const cleanSubBlocks = slide.subBlocks?.map((sb: any) => ({
-                ...sb,
-                content: stripHtml(sb.content),
-              }));
-              
-              await supabase.from('slides').insert({
-                lesson_id: lessonData.id,
-                type: slide.type || 'info',
-                order: j,
-                content: stripHtml(slide.content),
-                image_url: slide.imageUrl,
-                options: slide.options ? slide.options.map((o: string, idx: number) => ({
-                  id: `opt-${idx}`,
-                  text: stripHtml(o),
-                })) : null,
-                correct_answer: slide.correctAnswer,
-                explanation: stripHtml(slide.explanation),
-                explanation_correct: stripHtml(slide.explanationCorrect),
-                explanation_partial: stripHtml(slide.explanationPartial),
-                blank_word: slide.blankWord,
-                matching_pairs: slide.matchingPairs,
-                ordering_items: slide.orderingItems,
-                correct_order: slide.correctOrder,
-                slider_min: slide.sliderMin,
-                slider_max: slide.sliderMax,
-                slider_correct: slide.sliderCorrect,
-                slider_step: slide.sliderStep,
-                sub_blocks: cleanSubBlocks,
-              });
-            }
-          }
-        }
-
-        toast.success('Курс успешно создан!');
-        navigate(`/editor/${course.id}`);
-      } else {
-        throw new Error('ИИ не вернул данные курса');
-      }
-    } catch (error) {
-      console.error('Generation error:', error);
-      toast.error(error instanceof Error ? error.message : 'Ошибка генерации курса');
-    } finally {
-      setIsGenerating(false);
-      setGenerationStatus('');
-    }
+      },
+    });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -155,7 +51,6 @@ const Home: React.FC = () => {
     target.style.height = Math.min(target.scrollHeight, 120) + 'px';
   };
 
-  // Shared input card JSX
   const inputCardContent = (
     <>
       <div className="flex items-start gap-3 px-3 md:px-4 py-3">
@@ -164,7 +59,6 @@ const Home: React.FC = () => {
           onChange={(e) => setPrompt(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Опиши идею курса..."
-          disabled={isGenerating}
           className="flex-1 bg-transparent text-foreground dark:text-white placeholder:text-muted-foreground dark:placeholder:text-white/40 resize-none outline-none text-[14px] md:text-[15px] min-h-[24px] max-h-[120px]"
           rows={1}
           style={{ height: 'auto' }}
@@ -172,12 +66,145 @@ const Home: React.FC = () => {
         />
       </div>
       
-      {/* Generation status */}
-      {isGenerating && generationStatus && (
-        <div className="px-4 py-2 border-t border-border dark:border-white/5">
-          <div className="flex items-center gap-2 text-muted-foreground dark:text-white/60 text-sm">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            <span>{generationStatus}</span>
+      {/* Settings panel */}
+      {showSettings && (
+        <div className="px-3 md:px-4 pb-3 border-t border-border dark:border-white/5">
+          <div className="space-y-4 pt-3">
+            {/* Design System selector */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <Palette className="w-3.5 h-3.5" />
+                Дизайн-система
+              </div>
+              <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+                {designSystems.map((ds) => {
+                  const dsConfig = ds.config;
+                  const isSelected = selectedDesignSystemId === ds.id;
+                  const primaryHsl = dsConfig.primaryColor;
+                  const bgHsl = dsConfig.backgroundColor || '0 0% 100%';
+                  const fgHsl = dsConfig.foregroundColor || '0 0% 10%';
+                  const btnRadius = dsConfig.buttonStyle === 'pill' ? '9999px' : dsConfig.buttonStyle === 'square' ? '0' : '4px';
+                  const db = dsConfig.designBlock;
+                  const dot1Hsl = db?.buttonBgColor || primaryHsl;
+                  const fifthBg = dsConfig.themeBackgrounds?.[4];
+                  const dot2Hsl = fifthBg
+                    ? (fifthBg.type === 'solid' ? fifthBg.color || bgHsl : fifthBg.from || bgHsl)
+                    : bgHsl;
+                  const dot3Hsl = db?.backdropDarkColor || '0 0% 0% / 0.9';
+
+                  return (
+                    <button
+                      key={ds.id}
+                      onClick={() => setSelectedDesignSystemId(selectedDesignSystemId === ds.id ? null : ds.id)}
+                      className={cn(
+                        "group relative rounded-xl overflow-hidden transition-all duration-200 text-left",
+                        isSelected 
+                          ? "ring-2 ring-primary ring-offset-2 ring-offset-background shadow-lg" 
+                          : "ring-1 ring-border/60 hover:ring-border hover:shadow-sm"
+                      )}
+                      style={{ backgroundColor: `hsl(${bgHsl})` }}
+                    >
+                      <div className="px-2.5 pt-2.5 pb-2 space-y-2">
+                        <p className="text-[11px] font-bold truncate leading-none"
+                          style={{ fontFamily: dsConfig.headingFontFamily || dsConfig.fontFamily || 'inherit', color: `hsl(${fgHsl})` }}
+                        >{ds.name}</p>
+                        <p className="text-[8px] leading-tight opacity-50"
+                          style={{ fontFamily: dsConfig.fontFamily || 'inherit', color: `hsl(${fgHsl})` }}
+                        >Пример текста</p>
+                        <div className="flex items-center justify-between">
+                          <div className="h-4 px-2.5 flex items-center justify-center"
+                            style={{ backgroundColor: `hsl(${primaryHsl})`, borderRadius: btnRadius,
+                              boxShadow: dsConfig.buttonDepth === 'raised' ? `0 2px 0 0 hsl(${primaryHsl} / 0.35)` : 'none' }}
+                          >
+                            <span className="text-[7px] font-semibold uppercase" style={{ color: `hsl(${dsConfig.primaryForeground || '0 0% 100%'})` }}>Далее</span>
+                          </div>
+                          <div className="flex items-center -space-x-1.5">
+                            <div className="w-4 h-4 rounded-full border border-black/5 z-[3]" style={{ backgroundColor: `hsl(${dot1Hsl})` }} />
+                            <div className="w-4 h-4 rounded-full border border-black/5 z-[2]" style={{ backgroundColor: `hsl(${dot2Hsl})` }} />
+                            <div className="w-4 h-4 rounded-full border border-black/5 z-[1]" style={{ backgroundColor: `hsl(${dot3Hsl})` }} />
+                          </div>
+                        </div>
+                      </div>
+                      {isSelected && (
+                        <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-primary flex items-center justify-center shadow-sm">
+                          <Check className="w-2.5 h-2.5 text-primary-foreground" />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Illustrations */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <ImageIcon className="w-3.5 h-3.5" />
+                Иллюстрации
+              </div>
+              <div className="flex gap-1.5">
+                <button
+                  onClick={() => { setSkipImages(false); setImageModel('gemini-3-pro'); }}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
+                    !skipImages && imageModel === 'gemini-3-pro'
+                      ? "bg-primary/10 border-primary/30 text-primary"
+                      : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
+                  )}
+                >
+                  <Star className="w-3.5 h-3.5" />
+                  Детальные
+                </button>
+                <button
+                  onClick={() => { setSkipImages(false); setImageModel('gemini-2.5-flash'); }}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
+                    !skipImages && imageModel === 'gemini-2.5-flash'
+                      ? "bg-primary/10 border-primary/30 text-primary"
+                      : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
+                  )}
+                >
+                  <Zap className="w-3.5 h-3.5" />
+                  Быстрые
+                </button>
+                <button
+                  onClick={() => setSkipImages(true)}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
+                    skipImages
+                      ? "bg-primary/10 border-primary/30 text-primary"
+                      : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
+                  )}
+                >
+                  <ImageOff className="w-3.5 h-3.5" />
+                  Без картинок
+                </button>
+              </div>
+            </div>
+
+            {/* Lesson count */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <BookOpen className="w-3.5 h-3.5" />
+                Кол-во уроков
+              </div>
+              <div className="flex gap-1.5">
+                {[3, 5, 10].map((count) => (
+                  <button
+                    key={count}
+                    onClick={() => setLessonCount(count)}
+                    className={cn(
+                      "flex-1 py-2 rounded-xl text-xs font-medium transition-all border",
+                      lessonCount === count
+                        ? "bg-primary/10 border-primary/30 text-primary"
+                        : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
+                    )}
+                  >
+                    {count}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -185,93 +212,43 @@ const Home: React.FC = () => {
       <div className="flex items-center justify-between px-3 md:px-4 py-2 border-t border-border dark:border-white/5">
         <TooltipProvider delayDuration={300}>
           <div className="flex items-center gap-1 md:gap-1.5">
-            {/* Add attachment */}
+            {/* Settings toggle */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <button 
-                  disabled
-                  className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-muted dark:bg-white/5 flex items-center justify-center opacity-50 cursor-not-allowed hover:bg-muted/80 dark:hover:bg-white/[0.08] transition-colors"
+                  onClick={() => setShowSettings(!showSettings)}
+                  className={cn(
+                    "w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center transition-colors",
+                    showSettings
+                      ? "bg-primary/10 text-primary"
+                      : "bg-muted dark:bg-white/5 text-muted-foreground dark:text-white/30 hover:bg-muted/80 dark:hover:bg-white/[0.08]"
+                  )}
                 >
-                  <Plus className="w-3.5 h-3.5 md:w-4 md:h-4 text-muted-foreground dark:text-white/30" />
+                  <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 </button>
               </TooltipTrigger>
               <TooltipContent side="top">
-                Прикрепить файл
+                Настройки генерации
               </TooltipContent>
             </Tooltip>
-
-            {/* Options - hidden on mobile, show fewer items */}
-            <div className="hidden sm:flex items-center gap-1.5">
-              {/* Difficulty selector */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button 
-                    disabled
-                    className="h-8 px-3 rounded-lg bg-muted dark:bg-white/5 flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-muted/80 dark:hover:bg-white/[0.08] transition-colors"
-                  >
-                    <Gauge className="w-3.5 h-3.5 text-muted-foreground dark:text-white/30" />
-                    <span className="text-[12px] text-muted-foreground dark:text-white/30">Сложность</span>
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  Скоро
-                </TooltipContent>
-              </Tooltip>
-
-              {/* Design system selector */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button 
-                    disabled
-                    className="h-8 px-3 rounded-lg bg-muted dark:bg-white/5 flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-muted/80 dark:hover:bg-white/[0.08] transition-colors"
-                  >
-                    <Palette className="w-3.5 h-3.5 text-muted-foreground dark:text-white/30" />
-                    <span className="text-[12px] text-muted-foreground dark:text-white/30">Дизайн</span>
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  Скоро
-                </TooltipContent>
-              </Tooltip>
-
-              {/* Mascot selector */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button 
-                    disabled
-                    className="h-8 px-3 rounded-lg bg-muted dark:bg-white/5 flex items-center gap-1.5 opacity-50 cursor-not-allowed hover:bg-muted/80 dark:hover:bg-white/[0.08] transition-colors"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-muted-foreground dark:text-white/30" />
-                    <span className="text-[12px] text-muted-foreground dark:text-white/30">Маскот</span>
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  Скоро
-                </TooltipContent>
-              </Tooltip>
-            </div>
           </div>
         </TooltipProvider>
         <button
           onClick={handleGenerate}
-          disabled={!prompt.trim() || isGenerating}
+          disabled={!prompt.trim()}
           className={cn(
             "w-7 h-7 rounded-full flex items-center justify-center transition-all",
-            prompt.trim() && !isGenerating
+            prompt.trim()
               ? "bg-primary dark:bg-white text-primary-foreground dark:text-black hover:bg-primary/90 dark:hover:bg-white/90 cursor-pointer"
               : "bg-muted dark:bg-white/20 cursor-not-allowed"
           )}
         >
-          {isGenerating ? (
-            <Loader2 className="w-4 h-4 text-muted-foreground dark:text-black/50 animate-spin" />
-          ) : (
-            <ArrowUp className={cn(
-              "w-4 h-4",
-              prompt.trim() && !isGenerating 
-                ? "text-primary-foreground dark:text-black" 
-                : "text-muted-foreground dark:text-white/30"
-            )} strokeWidth={2.5} />
-          )}
+          <ArrowUp className={cn(
+            "w-4 h-4",
+            prompt.trim() 
+              ? "text-primary-foreground dark:text-black" 
+              : "text-muted-foreground dark:text-white/30"
+          )} strokeWidth={2.5} />
         </button>
       </div>
     </>
@@ -279,21 +256,16 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
-      
-      {/* Mobile top spacer for header */}
       <div className="h-16 md:hidden shrink-0" />
       
-      {/* Content - centered accounting for sidebar */}
       <div 
         className="flex-1 flex flex-col items-center justify-center relative z-10 px-4 md:px-6 transition-all duration-200"
         style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
       >
-        {/* Welcome Text - smaller on desktop */}
         <h1 className="text-2xl sm:text-3xl md:text-3xl lg:text-4xl font-semibold mb-6 md:mb-10 text-foreground dark:text-white text-center px-2">
           Чему научим мир сегодня, <span className="text-primary dark:animate-[name-glow_4s_ease-in-out_infinite]" style={{ color: 'hsl(var(--primary))' }}>{userName}</span>?
         </h1>
 
-        {/* Desktop Action Card */}
         <div className="hidden md:block w-full max-w-[700px]">
           <div className="w-full rounded-2xl p-2 transition-all bg-card dark:bg-[#1a1a1b] border border-foreground/20 dark:border-white/[0.08] dark:shadow-2xl">
             {inputCardContent}
@@ -301,14 +273,12 @@ const Home: React.FC = () => {
         </div>
       </div>
       
-      {/* Mobile bottom input bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 z-20">
         <div className="w-full rounded-2xl p-2 transition-all bg-card dark:bg-[#1a1a1b] border border-foreground/20 dark:border-white/[0.08] dark:shadow-2xl">
           {inputCardContent}
         </div>
       </div>
       
-      {/* Mobile bottom spacer to prevent content from being hidden behind fixed input */}
       <div className="h-[120px] md:hidden shrink-0" />
     </div>
   );
