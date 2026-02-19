@@ -216,7 +216,7 @@ export const useGenerateCourse = (courseId: string) => {
       checkCancelled();
       
       const researchResponse = await supabase.functions.invoke('generate-course', {
-        body: { userMessage: `Исследуй тему: "${prompt}"${lessonInstruction}`, agentRole: 'research' },
+        body: { userMessage: `Исследуй тему: "${prompt}"\n\nВАЖНО: Раздели тему ровно на ${lessonCount} концепций (каждая концепция = 1 урок). Определи логическую последовательность изучения.`, agentRole: 'research' },
       });
       checkCancelled();
       if (researchResponse.error) throw new Error(researchResponse.error.message || 'Ошибка при исследовании');
@@ -239,7 +239,7 @@ export const useGenerateCourse = (courseId: string) => {
       
       const structureResponse = await supabase.functions.invoke('generate-course', {
         body: { 
-          userMessage: `На основе исследования:\n${JSON.stringify(researchData)}\n\nЗапрос пользователя: "${prompt}"${lessonInstruction}\n\nСпланируй структуру курса.`, 
+          userMessage: `На основе исследования:\n${JSON.stringify(researchData)}\n\nЗапрос пользователя: "${prompt}"\n\nВАЖНО: Создай ровно ${lessonCount} уроков. Каждый урок = 1 концепция из исследования. В "contentOutline" для каждого блока напиши КОНКРЕТНО что будет в этом блоке. В "quizSource" для квизов укажи какой тезис из теории проверяется.\n\nСпланируй структуру курса.`, 
           agentRole: 'structure' 
         },
       });
@@ -264,7 +264,7 @@ export const useGenerateCourse = (courseId: string) => {
 
       const generateResponse = await supabase.functions.invoke('generate-course', {
         body: { 
-          userMessage: `Исследование:\n${JSON.stringify(researchData)}\n\nСтруктура:\n${JSON.stringify(structureData)}${lessonInstruction}\n\nСоздай полный контент для всех блоков.`, 
+          userMessage: `Исследование:\n${JSON.stringify(researchData)}\n\nСтруктура:\n${JSON.stringify(structureData)}\n\nВАЖНО: Создай ровно ${lessonCount} уроков по 10 блоков каждый.\n\n## КРИТИЧЕСКИЕ ПРАВИЛА СВЯЗНОСТИ:\n1. Квиз в блоке 4 проверяет ТОЛЬКО материал из блоков 2-3 этого урока\n2. Квиз в блоке 7 проверяет ТОЛЬКО материал из блоков 5-6 этого урока\n3. Блок 1 каждого урока говорит "чему научимся"\n4. Блок 10 каждого урока подводит итоги + тизер следующего урока\n5. Следуй "contentOutline" из структуры для каждого блока!\n\nСоздай полный контент для всех блоков.`, 
           agentRole: 'content' 
         },
       });
