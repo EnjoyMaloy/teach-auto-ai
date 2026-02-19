@@ -35,6 +35,7 @@ interface CourseTimelineProps {
   lessons: Lesson[];
   selectedLessonId: string | null;
   selectedBlockId: string | null;
+  isGenerating?: boolean;
   onSelectLesson: (lessonId: string) => void;
   onSelectBlock: (blockId: string, lessonId: string) => void;
   onAddLesson: () => void;
@@ -177,6 +178,7 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
   lessons,
   selectedLessonId,
   selectedBlockId,
+  isGenerating,
   onSelectLesson,
   onSelectBlock,
   onAddLesson,
@@ -301,10 +303,12 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
                               e.stopPropagation();
                               onSelectLesson(lesson.id);
                             }}
+                            disabled={isGenerating}
                             className={cn(
                               'flex-shrink-0 rounded-lg border-2 border-dashed border-border',
                               'flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary',
-                              'transition-all duration-200 hover:bg-primary/5'
+                              'transition-all duration-200 hover:bg-primary/5',
+                              isGenerating && 'opacity-30 pointer-events-none'
                             )}
                             style={{ width: THUMB_W, height: THUMB_H }}
                           >
@@ -373,10 +377,12 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
             {/* Add lesson button */}
             <button
               onClick={onAddLesson}
+              disabled={isGenerating}
               className={cn(
                 'flex-shrink-0 w-12 h-12 rounded-xl border-2 border-dashed border-border',
                 'flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary',
-                'transition-all duration-200 hover:bg-primary/5'
+                'transition-all duration-200 hover:bg-primary/5',
+                isGenerating && 'opacity-30 pointer-events-none'
               )}
               title="Добавить урок"
             >

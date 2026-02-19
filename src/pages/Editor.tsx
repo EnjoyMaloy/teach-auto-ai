@@ -133,6 +133,7 @@ const Editor: React.FC = () => {
     (location.state as any)?.openAIGenerate ? 'generate' : null
   );
   const [currentEditLanguage, setCurrentEditLanguage] = useState<string | null>(null);
+  const { state: aiState } = useAIGeneration();
   const [translatedSlides, setTranslatedSlides] = useState<Record<string, any>>({});
   const [translatedLessons, setTranslatedLessons] = useState<Record<string, any>>({});
 
@@ -803,6 +804,7 @@ const Editor: React.FC = () => {
         {/* Bottom: Course Timeline */}
         <CourseTimeline
           lessons={course.lessons}
+          isGenerating={aiState.status === 'generating'}
           selectedLessonId={selectedLessonId}
           selectedBlockId={selectedBlockId}
           onSelectLesson={handleSelectLesson}
