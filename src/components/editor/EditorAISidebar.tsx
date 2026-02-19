@@ -35,6 +35,11 @@ interface UnifiedMessage {
   isGenerating?: boolean;
   lessonCount?: number;
   duration?: number;
+  blockContext?: {
+    blockType: string;
+    lessonOrder?: number;
+    blockOrder?: number;
+  };
 }
 
 // ── Props ─────────────────────────────────────────────────
@@ -133,6 +138,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           if (meta.duration) msg.duration = meta.duration;
           if (meta.steps) msg.steps = meta.steps;
           if (meta.isGenerating !== undefined) msg.isGenerating = meta.isGenerating;
+          if (meta.blockContext) msg.blockContext = meta.blockContext;
           return msg;
         });
         loaded.forEach(m => savedMessageIdsRef.current.add(m.id));
@@ -162,6 +168,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
         if (msg.lessonCount) metadata.lessonCount = msg.lessonCount;
         if (msg.duration) metadata.duration = msg.duration;
         if (msg.steps) metadata.steps = msg.steps;
+        if (msg.blockContext) metadata.blockContext = msg.blockContext;
 
         const { error } = await supabase
           .from('course_ai_messages')
@@ -351,6 +358,13 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       type: 'user',
       content: chatInput.trim(),
       timestamp: Date.now(),
+      ...(mode === 'edit-block' && selectedBlock ? {
+        blockContext: {
+          blockType: selectedBlock.type,
+          lessonOrder: selectedLessonOrder,
+          blockOrder: selectedBlockOrder,
+        },
+      } : {}),
     };
     setMessages(prev => [...prev, userMsg]);
 
@@ -578,7 +592,23 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     switch (msg.type) {
       case 'user':
         return (
-          <div key={msg.id} className="flex justify-end">
+          <div key={msg.id} className="flex flex-col items-end gap-1">
+            {msg.blockContext && (() => {
+              const iconName = BLOCK_CONFIGS[msg.blockContext.blockType]?.icon;
+              const IconComp = iconName ? lucideIcons[iconName as keyof typeof lucideIcons] : null;
+              const label = BLOCK_CONFIGS[msg.blockContext.blockType]?.labelRu || msg.blockContext.blockType;
+              return (
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[hsl(270,60%,90%)]/60 dark:bg-[hsl(270,40%,25%)]/60 border border-[hsl(270,40%,80%)]/30 dark:border-[hsl(270,40%,40%)]/30">
+                  {IconComp && <IconComp className="w-3 h-3 text-[hsl(270,50%,50%)] dark:text-[hsl(270,60%,75%)] flex-shrink-0" />}
+                  <span className="text-[11px] font-medium text-[hsl(270,50%,35%)] dark:text-[hsl(270,60%,75%)]">
+                    {msg.blockContext.lessonOrder && msg.blockContext.blockOrder
+                      ? `Урок ${msg.blockContext.lessonOrder} · Блок ${msg.blockContext.blockOrder} · `
+                      : ''
+                    }{label}
+                  </span>
+                </div>
+              );
+            })()}
             <div className="max-w-[85%] px-3.5 py-2.5 rounded-2xl rounded-tr-md bg-primary text-primary-foreground text-sm">
               {msg.content}
             </div>
