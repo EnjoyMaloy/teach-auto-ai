@@ -679,10 +679,20 @@ const Editor: React.FC = () => {
         onAIGenerate={async (generatedLessons, designConfig, designSystemId) => {
           await ensurePersisted();
           pushToUndo();
+          
+          // Fetch the updated course title/description from DB (set by generation)
+          const { data: updatedCourse } = await supabase
+            .from('courses')
+            .select('title, description')
+            .eq('id', course.id)
+            .single();
+          
           setCourse(prev => prev ? ({
             ...prev,
             lessons: generatedLessons.map((l, i) => ({ ...l, courseId: prev.id, order: i + 1 })),
             ...(designConfig ? { designSystem: designConfig as any } : {}),
+            ...(updatedCourse?.title ? { title: updatedCourse.title } : {}),
+            ...(updatedCourse?.description ? { description: updatedCourse.description } : {}),
             updatedAt: new Date(),
           }) : null);
           if (generatedLessons.length > 0) {
@@ -741,10 +751,19 @@ const Editor: React.FC = () => {
             if (!course) return;
             await ensurePersisted();
             pushToUndo();
+            
+            const { data: updatedCourse } = await supabase
+              .from('courses')
+              .select('title, description')
+              .eq('id', course.id)
+              .single();
+            
             setCourse(prev => prev ? ({
               ...prev,
               lessons: generatedLessons.map((l, i) => ({ ...l, courseId: prev.id, order: i + 1 })),
               ...(designConfig ? { designSystem: designConfig as any } : {}),
+              ...(updatedCourse?.title ? { title: updatedCourse.title } : {}),
+              ...(updatedCourse?.description ? { description: updatedCourse.description } : {}),
               updatedAt: new Date(),
             }) : null);
             if (generatedLessons.length > 0) {
