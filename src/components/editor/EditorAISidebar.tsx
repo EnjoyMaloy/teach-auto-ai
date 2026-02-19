@@ -95,10 +95,93 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
 
   // ── Unified messages state ──────────────────────────────
   const [messages, setMessages] = useState<UnifiedMessage[]>([]);
+  const [messagesLoaded, setMessagesLoaded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasAppliedRef = useRef(false);
   const completionAddedRef = useRef(false);
   const generationMsgIdRef = useRef<string | null>(null);
+  const savedMessageIdsRef = useRef<Set<string>>(new Set());
+
+  // ── Load messages from DB on mount ─────────────────────
+  useEffect(() => {
+    const loadMessages = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      const { data, error } = await supabase
+        .from('course_ai_messages')
+        .select('*')
+        .eq('course_id', courseId)
+        .order('created_at', { ascending: true });
+      
+      if (error) {
+        console.error('Failed to load AI messages:', error);
+        setMessagesLoaded(true);
+        return;
+      }
+      
+      if (data && data.length > 0) {
+        const loaded: UnifiedMessage[] = data.map((row: any) => {
+          const meta = row.metadata || {};
+          const msg: UnifiedMessage = {
+            id: row.id,
+            type: row.type,
+            content: row.content,
+            timestamp: new Date(row.created_at).getTime(),
+          };
+          if (meta.lessonCount) msg.lessonCount = meta.lessonCount;
+          if (meta.duration) msg.duration = meta.duration;
+          if (meta.steps) msg.steps = meta.steps;
+          if (meta.isGenerating !== undefined) msg.isGenerating = meta.isGenerating;
+          return msg;
+        });
+        loaded.forEach(m => savedMessageIdsRef.current.add(m.id));
+        setMessages(loaded);
+      }
+      setMessagesLoaded(true);
+    };
+    loadMessages();
+  }, [courseId]);
+
+  // ── Save new messages to DB ────────────────────────────
+  useEffect(() => {
+    if (!messagesLoaded) return;
+    const unsaved = messages.filter(m => 
+      !savedMessageIdsRef.current.has(m.id) && 
+      m.content !== '...' && // skip loading placeholders
+      !m.isGenerating // skip in-progress generation messages
+    );
+    if (unsaved.length === 0) return;
+
+    const saveMessages = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      for (const msg of unsaved) {
+        const metadata: Record<string, any> = {};
+        if (msg.lessonCount) metadata.lessonCount = msg.lessonCount;
+        if (msg.duration) metadata.duration = msg.duration;
+        if (msg.steps) metadata.steps = msg.steps;
+
+        const { error } = await supabase
+          .from('course_ai_messages')
+          .insert({
+            id: msg.id,
+            course_id: courseId,
+            user_id: user.id,
+            type: msg.type,
+            content: msg.content,
+            metadata: Object.keys(metadata).length > 0 ? metadata : null,
+            created_at: new Date(msg.timestamp).toISOString(),
+          } as any);
+        
+        if (!error) {
+          savedMessageIdsRef.current.add(msg.id);
+        }
+      }
+    };
+    saveMessages();
+  }, [messages, messagesLoaded, courseId]);
   
   const { systems: designSystems, isLoading: isLoadingDS } = useBaseDesignSystems();
 
@@ -180,12 +263,28 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   useEffect(() => {
     if (isCompleted && state.generatedLessons && !completionAddedRef.current) {
       completionAddedRef.current = true;
-      // Mark generation message as done
+      // Mark generation message as done and save to DB
       if (generationMsgIdRef.current) {
         const msgId = generationMsgIdRef.current;
         setMessages(prev => prev.map(m => 
           m.id === msgId ? { ...m, isGenerating: false, steps: [...state.steps] } : m
         ));
+        // Save the finished generation message to DB
+        const saveGenMsg = async () => {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) return;
+          const steps = [...state.steps];
+          await supabase.from('course_ai_messages').upsert({
+            id: msgId,
+            course_id: courseId,
+            user_id: user.id,
+            type: 'generation',
+            content: '',
+            metadata: { steps, isGenerating: false } as any,
+          } as any);
+          savedMessageIdsRef.current.add(msgId);
+        };
+        saveGenMsg();
       }
       // Add completion message
       setMessages(prev => [...prev, {
@@ -200,7 +299,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     if (!isCompleted) {
       completionAddedRef.current = false;
     }
-  }, [isCompleted, state.generatedLessons, state.steps, duration]);
+  }, [isCompleted, state.generatedLessons, state.steps, duration, courseId]);
 
   // ── Add error message ───────────────────────────────────
   useEffect(() => {
