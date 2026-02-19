@@ -722,6 +722,12 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                   <span className="font-semibold text-foreground">Создаю курс</span>
                 </div>
               )}
+              {!msg.isGenerating && msg.steps && msg.steps.some(s => s.status === 'error') && (
+                <div className="flex items-center gap-2">
+                  <Square className="w-4 h-4 text-muted-foreground" />
+                  <span className="font-semibold text-muted-foreground">Генерация остановлена</span>
+                </div>
+              )}
               {!msg.isGenerating && (!msg.steps || msg.steps.length === 0) && (
                 <div className="flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin text-primary" />
@@ -1117,7 +1123,16 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                     // Immediately update generation message in UI
                     const gid = generationMsgIdRef.current;
                     if (gid) {
-                      setMessages(prev => prev.map(m => m.id === gid ? { ...m, isGenerating: false, content: 'Остановлено.' } : m));
+                      setMessages(prev => prev.map(m => {
+                        if (m.id !== gid) return m;
+                        // Mark all active/pending steps as stopped
+                        const stoppedSteps = m.steps?.map(s => 
+                          s.status === 'active' || s.status === 'pending' 
+                            ? { ...s, status: 'error' as const, message: 'Остановлено' } 
+                            : s
+                        );
+                        return { ...m, isGenerating: false, steps: stoppedSteps };
+                      }));
                       generationMsgIdRef.current = null;
                     }
                   } else if (editAbortRef.current) {
