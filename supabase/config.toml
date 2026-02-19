@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.refine-course]
 verify_jwt = false
+
+[functions.translate-course]
+verify_jwt = false

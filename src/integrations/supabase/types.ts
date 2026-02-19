@@ -123,6 +123,38 @@ export type Database = {
           },
         ]
       }
+      course_languages: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          is_primary: boolean
+          language_code: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          language_code: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          language_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_languages_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_reviews: {
         Row: {
           ai_recommendation: string | null
@@ -296,6 +328,44 @@ export type Database = {
         }
         Relationships: []
       }
+      lesson_translations: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          language_code: string
+          lesson_id: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          language_code: string
+          lesson_id: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          language_code?: string
+          lesson_id?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_translations_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lessons: {
         Row: {
           course_id: string
@@ -370,6 +440,44 @@ export type Database = {
         }
         Relationships: []
       }
+      published_lesson_translations: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          language_code: string
+          published_lesson_id: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          language_code: string
+          published_lesson_id: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          language_code?: string
+          published_lesson_id?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "published_lesson_translations_published_lesson_id_fkey"
+            columns: ["published_lesson_id"]
+            isOneToOne: false
+            referencedRelation: "published_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       published_lessons: {
         Row: {
           course_id: string
@@ -416,6 +524,71 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      published_slide_translations: {
+        Row: {
+          blank_word: string | null
+          content: string | null
+          created_at: string
+          explanation: string | null
+          explanation_correct: string | null
+          explanation_partial: string | null
+          hints: Json | null
+          id: string
+          is_stale: boolean
+          language_code: string
+          matching_pairs: Json | null
+          options: Json | null
+          ordering_items: Json | null
+          published_slide_id: string
+          sub_blocks: Json | null
+          updated_at: string
+        }
+        Insert: {
+          blank_word?: string | null
+          content?: string | null
+          created_at?: string
+          explanation?: string | null
+          explanation_correct?: string | null
+          explanation_partial?: string | null
+          hints?: Json | null
+          id?: string
+          is_stale?: boolean
+          language_code: string
+          matching_pairs?: Json | null
+          options?: Json | null
+          ordering_items?: Json | null
+          published_slide_id: string
+          sub_blocks?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          blank_word?: string | null
+          content?: string | null
+          created_at?: string
+          explanation?: string | null
+          explanation_correct?: string | null
+          explanation_partial?: string | null
+          hints?: Json | null
+          id?: string
+          is_stale?: boolean
+          language_code?: string
+          matching_pairs?: Json | null
+          options?: Json | null
+          ordering_items?: Json | null
+          published_slide_id?: string
+          sub_blocks?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "published_slide_translations_published_slide_id_fkey"
+            columns: ["published_slide_id"]
+            isOneToOne: false
+            referencedRelation: "published_slides"
             referencedColumns: ["id"]
           },
         ]
@@ -520,6 +693,71 @@ export type Database = {
             columns: ["published_lesson_id"]
             isOneToOne: false
             referencedRelation: "published_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      slide_translations: {
+        Row: {
+          blank_word: string | null
+          content: string | null
+          created_at: string
+          explanation: string | null
+          explanation_correct: string | null
+          explanation_partial: string | null
+          hints: Json | null
+          id: string
+          is_stale: boolean
+          language_code: string
+          matching_pairs: Json | null
+          options: Json | null
+          ordering_items: Json | null
+          slide_id: string
+          sub_blocks: Json | null
+          updated_at: string
+        }
+        Insert: {
+          blank_word?: string | null
+          content?: string | null
+          created_at?: string
+          explanation?: string | null
+          explanation_correct?: string | null
+          explanation_partial?: string | null
+          hints?: Json | null
+          id?: string
+          is_stale?: boolean
+          language_code: string
+          matching_pairs?: Json | null
+          options?: Json | null
+          ordering_items?: Json | null
+          slide_id: string
+          sub_blocks?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          blank_word?: string | null
+          content?: string | null
+          created_at?: string
+          explanation?: string | null
+          explanation_correct?: string | null
+          explanation_partial?: string | null
+          hints?: Json | null
+          id?: string
+          is_stale?: boolean
+          language_code?: string
+          matching_pairs?: Json | null
+          options?: Json | null
+          ordering_items?: Json | null
+          slide_id?: string
+          sub_blocks?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "slide_translations_slide_id_fkey"
+            columns: ["slide_id"]
+            isOneToOne: false
+            referencedRelation: "slides"
             referencedColumns: ["id"]
           },
         ]
