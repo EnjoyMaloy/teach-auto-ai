@@ -98,8 +98,8 @@ Deno.serve(async (req) => {
       let translatedLessons = 0;
       let translatedSlides = 0;
 
-      // Translate lessons
-      for (const lesson of lessons) {
+      // Translate lessons in parallel
+      const lessonPromises = lessons.map(async (lesson) => {
         const prompt = `Translate the following course lesson metadata from ${sourceLangName} to ${targetLangName}. Return ONLY a JSON object with "title" and "description" fields. Keep formatting, do not add explanations.
 
 Title: ${lesson.title}
@@ -116,12 +116,15 @@ Description: ${lesson.description || ''}`;
               title: parsed.title,
               description: parsed.description || '',
             }, { onConflict: "lesson_id,language_code" });
-            translatedLessons++;
+            return 1;
           }
         } catch (e) {
           console.error(`Failed to translate lesson ${lesson.id} to ${targetLang}:`, e);
         }
-      }
+        return 0;
+      });
+      const lessonResults = await Promise.all(lessonPromises);
+      translatedLessons = lessonResults.reduce((a, b) => a + b, 0);
 
       // Translate slides in batches
       if (slides?.length) {
@@ -131,7 +134,8 @@ Description: ${lesson.description || ''}`;
           batches.push(slides.slice(i, i + 10));
         }
 
-        for (const batch of batches) {
+        // Process all batches in parallel
+        const batchPromises = batches.map(async (batch) => {
           const slidesPayload = batch.map(s => ({
             id: s.id,
             content: s.content || '',
@@ -154,6 +158,7 @@ ${JSON.stringify(slidesPayload, null, 2)}`;
           try {
             const translated = await callGemini(geminiApiKey, textModel, prompt);
             const parsed = parseJsonResponse(translated);
+            let count = 0;
             
             if (Array.isArray(parsed)) {
               for (const item of parsed) {
@@ -173,13 +178,17 @@ ${JSON.stringify(slidesPayload, null, 2)}`;
                   sub_blocks: item.sub_blocks ?? null,
                   is_stale: false,
                 }, { onConflict: "slide_id,language_code" });
-                translatedSlides++;
+                count++;
               }
             }
+            return count;
           } catch (e) {
             console.error(`Failed to translate slide batch to ${targetLang}:`, e);
+            return 0;
           }
-        }
+        });
+        const batchResults = await Promise.all(batchPromises);
+        translatedSlides = batchResults.reduce((a, b) => a + b, 0);
       }
 
       results[targetLang] = { lessons: translatedLessons, slides: translatedSlides };
