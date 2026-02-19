@@ -108,6 +108,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   const generationMsgIdRef = useRef<string | null>(null);
   const savedMessageIdsRef = useRef<Set<string>>(new Set());
   const editAbortRef = useRef<AbortController | null>(null);
+  const editLoadingIdRef = useRef<string | null>(null);
 
   // ── Load messages from DB on mount ─────────────────────
   useEffect(() => {
@@ -412,6 +413,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     editAbortRef.current = controller;
     setIsEditingBlock(true);
     const loadingId = crypto.randomUUID();
+    editLoadingIdRef.current = loadingId;
     setMessages(prev => [...prev, { id: loadingId, type: 'assistant', content: '...', timestamp: Date.now() }]);
 
     try {
@@ -479,6 +481,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     if (mode === 'idle' && allLessons && allLessons.length > 0 && onRefineCourse) {
       setIsEditingBlock(true);
       const loadingId = crypto.randomUUID();
+      editLoadingIdRef.current = loadingId;
       setMessages(prev => [...prev, { id: loadingId, type: 'assistant', content: '...', timestamp: Date.now() }]);
       
       try {
@@ -516,6 +519,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     // Otherwise: block-level editing via subblock-ai
     setIsEditingBlock(true);
     const loadingId = crypto.randomUUID();
+    editLoadingIdRef.current = loadingId;
     setMessages(prev => [...prev, { id: loadingId, type: 'assistant', content: '...', timestamp: Date.now() }]);
     
     try {
@@ -1069,6 +1073,12 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                   } else if (editAbortRef.current) {
                     editAbortRef.current.abort();
                     editAbortRef.current = null;
+                    // Immediately update the loading message and stop state
+                    const lid = editLoadingIdRef.current;
+                    if (lid) {
+                      setMessages(prev => prev.map(m => m.id === lid ? { ...m, content: 'Остановлено.' } : m));
+                      editLoadingIdRef.current = null;
+                    }
                     setIsEditingBlock(false);
                   }
                 }}
