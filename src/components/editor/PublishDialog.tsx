@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, Check, Bot, ExternalLink, Loader2, MessageCircle, BookOpen, RefreshCw, Compass, X } from 'lucide-react';
+import { Copy, Check, Bot, ExternalLink, Loader2, MessageCircle, BookOpen, RefreshCw, Compass, X, Pencil } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -55,6 +55,8 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
   const webUrl = `${publishedUrl}/course/${courseId}`;
 
   const [actualIsPublished, setActualIsPublished] = useState(isPublished);
+
+  const [isEditingCategory, setIsEditingCategory] = useState(false);
 
   useEffect(() => {
     if (open && courseId) {
@@ -287,6 +289,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
                         }
                         setActualIsPublished(false);
                         setSelectedCategory(null);
+                        setIsEditingCategory(false);
                         toast.success('Курс убран из комьюнити');
                         onUpdate?.();
                       }}
@@ -295,14 +298,21 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
                       Снять
                     </button>
                   </div>
-                  <p className="text-sm text-green-600 dark:text-green-500">
-                    Раздел: {COURSE_CATEGORIES.find(c => c.id === (selectedCategory || category))?.name || 'Не указан'}
-                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm text-green-600 dark:text-green-500">
+                      Раздел: {COURSE_CATEGORIES.find(c => c.id === (selectedCategory || category))?.name || 'Не указан'}
+                    </p>
+                    <button
+                      onClick={() => setIsEditingCategory(!isEditingCategory)}
+                      className="text-green-500 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors"
+                    >
+                      <Pencil className="w-3 h-3" />
+                    </button>
+                  </div>
                 </div>
 
-                {/* Change category */}
-                <div className="space-y-2">
-                  <Label>Изменить раздел</Label>
+                {/* Inline category picker */}
+                {isEditingCategory && (
                   <div className="grid grid-cols-2 gap-2">
                     {COURSE_CATEGORIES.map(cat => (
                       <button
@@ -314,6 +324,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
                             .update({ category: cat.id })
                             .eq('id', courseId);
                           toast.success(`Раздел изменён на «${cat.name}»`);
+                          setIsEditingCategory(false);
                           onUpdate?.();
                         }}
                         className={cn(
@@ -328,7 +339,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
                       </button>
                     ))}
                   </div>
-                </div>
+                )}
               </div>
             ) : (
               <div className="space-y-4">
