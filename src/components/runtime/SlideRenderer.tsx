@@ -1115,7 +1115,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
       {/* Контент с анимацией появления */}
       <div 
         key={slide.id} 
-        className="flex-1 min-h-0 overflow-auto animate-slide-fade-in"
+        className="flex-1 min-h-0 overflow-auto"
+        style={{
+          animation: 'slideFadeIn 0.35s ease-out both',
+        }}
       >
         {renderContent()}
       </div>
