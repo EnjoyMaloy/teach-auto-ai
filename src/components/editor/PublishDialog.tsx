@@ -110,7 +110,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
       if (error) throw error;
 
       setHasPublished(true);
-      toast.success(isPublished ? 'Курс обновлён в каталоге' : 'Курс опубликован в каталоге!');
+      toast.success(isPublished ? 'Курс обновлён в комьюнити' : 'Курс опубликован в комьюнити!');
       onUpdate?.();
     } catch (error) {
       console.error('Error publishing to explore:', error);
@@ -217,7 +217,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
               <div>
                 <p className="font-medium text-sm">Обновить публичную версию</p>
                 <p className="text-xs text-muted-foreground">
-                  Применить изменения из редактора для каталога и Telegram
+                  Применить изменения из редактора для комьюнити и Telegram
                 </p>
               </div>
               <Button
@@ -242,7 +242,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="explore" className="flex items-center gap-2">
               <Compass className="w-4 h-4" />
-              Исследовать
+              Комьюнити
             </TabsTrigger>
             <TabsTrigger value="telegram" className="flex items-center gap-2">
               <Bot className="w-4 h-4" />
@@ -256,7 +256,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
               <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
                 <div className="flex items-center gap-2 text-green-700 dark:text-green-400 mb-2">
                   <Check className="w-5 h-5" />
-                  <span className="font-semibold">Курс опубликован в каталоге</span>
+                  <span className="font-semibold">Курс опубликован в комьюнити</span>
                 </div>
                 <p className="text-sm text-green-600 dark:text-green-500">
                   Раздел: {COURSE_CATEGORIES.find(c => c.id === (selectedCategory || category))?.name || 'Не указан'}
@@ -266,7 +266,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
               <div className="space-y-4">
                 <div className="p-4 rounded-lg bg-muted/50">
                   <p className="text-sm text-muted-foreground mb-1">
-                    Курс будет доступен всем в разделе «Исследовать». Выберите категорию:
+                    Курс будет доступен всем в комьюнити. Выберите категорию:
                   </p>
                 </div>
 
@@ -302,7 +302,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
                   ) : (
                     <BookOpen className="w-4 h-4 mr-2" />
                   )}
-                  Опубликовать в каталог
+                  Опубликовать в комьюнити
                 </Button>
               </div>
             )}
