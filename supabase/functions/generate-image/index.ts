@@ -101,52 +101,68 @@ Style requirements:
 - Simple backgrounds, no complex textures${colorGuidance}`;
 
     const useFlash = imageModel === 'gemini-2.5-flash';
-    const MODEL = useFlash ? "gemini-2.5-flash-image" : "gemini-3-pro-image-preview";
+    const primaryModel = useFlash ? "gemini-2.5-flash-image" : "gemini-3-pro-image-preview";
+    const fallbackModel = "gemini-2.5-flash-image";
     
-    console.log(`Generating image via ${MODEL} for: ${(slideContext || prompt).substring(0, 60)}...`);
-
-    const MAX_RETRIES = 3;
+    const modelsToTry = useFlash ? [primaryModel] : [primaryModel, fallbackModel];
+    
     let response: Response | null = null;
-    
-    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-      response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: imagePrompt }] }],
-          generationConfig: {
-            responseModalities: ["TEXT", "IMAGE"],
-            ...(useFlash ? {} : { imageConfig: { aspectRatio: "1:1", imageSize: "1K" } }),
-          },
-        }),
-      });
+    let lastError = '';
 
-      if (response.ok) break;
+    for (const MODEL of modelsToTry) {
+      const MAX_RETRIES = MODEL === primaryModel && !useFlash ? 2 : 3;
+      console.log(`Generating image via ${MODEL} for: ${(slideContext || prompt).substring(0, 60)}...`);
+      
+      let succeeded = false;
+      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: imagePrompt }] }],
+            generationConfig: {
+              responseModalities: ["TEXT", "IMAGE"],
+              ...(MODEL === "gemini-2.5-flash-image" ? {} : { imageConfig: { aspectRatio: "1:1", imageSize: "1K" } }),
+            },
+          }),
+        });
 
-      const errorText = await response.text();
-      console.error(`Gemini Image API error (attempt ${attempt + 1}):`, response.status, errorText);
+        if (response.ok) { succeeded = true; break; }
 
-      if (response.status === 503 || response.status === 429) {
-        if (attempt < MAX_RETRIES - 1) {
-          const delay = Math.pow(2, attempt) * 2000;
-          console.log(`Retrying in ${delay}ms...`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-          continue;
+        const errorText = await response.text();
+        lastError = errorText;
+        console.error(`${MODEL} error (attempt ${attempt + 1}/${MAX_RETRIES}):`, response.status, errorText);
+
+        if (response.status === 503 || response.status === 429) {
+          if (attempt < MAX_RETRIES - 1) {
+            const delay = Math.pow(2, attempt) * 2000 + Math.random() * 1000;
+            console.log(`Retrying in ${Math.round(delay)}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            continue;
+          }
+          // Fall through to try fallback model
+          break;
         }
-        return new Response(
-          JSON.stringify({ error: response.status === 429 
-            ? "Превышен лимит запросов Gemini API. Попробуйте позже." 
-            : "Сервис генерации изображений временно перегружен. Попробуйте через минуту." }),
-          { status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        if (response.status === 403 || response.status === 400) {
+          return new Response(
+            JSON.stringify({ error: "Ошибка Gemini API. Проверьте ключ и биллинг.", details: errorText }),
+            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        throw new Error(`Gemini API error: ${response.status}`);
       }
-      if (response.status === 403 || response.status === 400) {
-        return new Response(
-          JSON.stringify({ error: "Ошибка Gemini API. Проверьте ключ и биллинг.", details: errorText }),
-          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+      if (succeeded) break;
+      
+      if (MODEL !== modelsToTry[modelsToTry.length - 1]) {
+        console.log(`${MODEL} exhausted retries, falling back to ${fallbackModel}...`);
       }
-      throw new Error(`Gemini API error: ${response.status}`);
+    }
+
+    if (!response?.ok) {
+      return new Response(
+        JSON.stringify({ error: "Сервис генерации изображений временно перегружен. Попробуйте через минуту." }),
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const data = await response.json();
