@@ -95,12 +95,30 @@ export const AIGenerationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, []);
 
   const updateStep = useCallback((stepId: string, updates: Partial<GenerationStep>) => {
-    setState(prev => ({
-      ...prev,
-      steps: prev.steps.map(step =>
-        step.id === stepId ? { ...step, ...updates } : step
-      ),
-    }));
+    setState(prev => {
+      const stepIndex = prev.steps.findIndex(s => s.id === stepId);
+      if (stepIndex === -1) return prev;
+
+      const newSteps = prev.steps.map((step, idx) => {
+        if (idx < stepIndex) {
+          // All previous steps should be completed
+          if (step.status !== 'completed' && step.status !== 'error') {
+            return { ...step, status: 'completed' as const };
+          }
+          return step;
+        }
+        if (idx === stepIndex) {
+          return { ...step, ...updates };
+        }
+        // Steps after current one: if current is becoming active, ensure later steps stay pending
+        if (updates.status === 'active' && step.status === 'active') {
+          return { ...step, status: 'pending' as const };
+        }
+        return step;
+      });
+
+      return { ...prev, steps: newSteps };
+    });
   }, []);
 
   const setSteps = useCallback((steps: GenerationStep[]) => {
