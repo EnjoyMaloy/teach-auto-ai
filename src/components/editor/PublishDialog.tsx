@@ -54,10 +54,24 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
   const publishedUrl = 'https://teach-auto-ai.lovable.app';
   const webUrl = `${publishedUrl}/course/${courseId}`;
 
+  const [actualIsPublished, setActualIsPublished] = useState(isPublished);
+
   useEffect(() => {
     if (open && courseId) {
       hasPublishedVersion(courseId).then(setHasPublished);
       setSelectedCategory(category);
+      // Fetch actual publish status from DB
+      supabase
+        .from('courses')
+        .select('is_published, category')
+        .eq('id', courseId)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setActualIsPublished(data.is_published ?? false);
+            setSelectedCategory(data.category ?? category);
+          }
+        });
     }
   }, [open, courseId, category]);
 
@@ -110,7 +124,8 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
       if (error) throw error;
 
       setHasPublished(true);
-      toast.success(isPublished ? 'Курс обновлён в комьюнити' : 'Курс опубликован в комьюнити!');
+      setActualIsPublished(true);
+      toast.success(actualIsPublished ? 'Курс обновлён в комьюнити' : 'Курс опубликован в комьюнити!');
       onUpdate?.();
     } catch (error) {
       console.error('Error publishing to explore:', error);
@@ -198,7 +213,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
     setBotLink(null);
   };
 
-  const showUpdateButton = isPublished && hasPublished;
+  const showUpdateButton = actualIsPublished && hasPublished;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -252,7 +267,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
 
           {/* Explore / Catalog Tab */}
           <TabsContent value="explore" className="space-y-4 mt-4">
-            {isPublished ? (
+            {actualIsPublished ? (
               <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
                 <div className="flex items-center gap-2 text-green-700 dark:text-green-400 mb-2">
                   <Check className="w-5 h-5" />
