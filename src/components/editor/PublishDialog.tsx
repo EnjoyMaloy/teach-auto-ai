@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Course } from '@/types/course';
@@ -270,76 +271,76 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
           {/* Explore / Catalog Tab */}
           <TabsContent value="explore" className="space-y-4 mt-4">
             {actualIsPublished ? (
-              <div className="space-y-4">
-                <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
-                      <Check className="w-5 h-5" />
-                      <span className="font-semibold">Курс опубликован в комьюнити</span>
-                    </div>
-                    <button
-                      onClick={async () => {
-                        const { error } = await supabase
-                          .from('courses')
-                          .update({ is_published: false, category: null })
-                          .eq('id', courseId);
-                        if (error) {
-                          toast.error('Ошибка снятия с публикации');
-                          return;
-                        }
-                        setActualIsPublished(false);
-                        setSelectedCategory(null);
-                        setIsEditingCategory(false);
-                        toast.success('Курс убран из комьюнити');
-                        onUpdate?.();
-                      }}
-                      className="text-xs px-2 py-0.5 rounded border border-muted-foreground/20 text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-colors"
-                    >
-                      Снять
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-sm text-green-600 dark:text-green-500">
-                      Раздел: {COURSE_CATEGORIES.find(c => c.id === (selectedCategory || category))?.name || 'Не указан'}
-                    </p>
-                    <button
-                      onClick={() => setIsEditingCategory(!isEditingCategory)}
-                      className="text-green-500 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors"
-                    >
-                      <Pencil className="w-3 h-3" />
-                    </button>
-                  </div>
+              <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-400 mb-3">
+                  <Check className="w-5 h-5" />
+                  <span className="font-semibold">Курс опубликован в комьюнити</span>
                 </div>
-
-                {/* Inline category picker */}
-                {isEditingCategory && (
-                  <div className="grid grid-cols-2 gap-2">
-                    {COURSE_CATEGORIES.map(cat => (
-                      <button
-                        key={cat.id}
-                        onClick={async () => {
-                          setSelectedCategory(cat.id);
-                          await supabase
-                            .from('courses')
-                            .update({ category: cat.id })
-                            .eq('id', courseId);
-                          toast.success(`Раздел изменён на «${cat.name}»`);
-                          setIsEditingCategory(false);
-                          onUpdate?.();
-                        }}
-                        className={cn(
-                          "flex items-center gap-2 p-2.5 rounded-lg border text-sm font-medium transition-all text-left",
-                          (selectedCategory || category) === cat.id
-                            ? "border-primary bg-primary/5 text-foreground"
-                            : "border-border bg-card text-muted-foreground hover:border-primary/30"
-                        )}
-                      >
-                        <cat.icon className="w-4 h-4 flex-shrink-0" />
-                        {cat.name}
+                <div className="flex items-center gap-2">
+                  {/* Category dropdown */}
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-green-300 dark:border-green-700 bg-green-100/50 dark:bg-green-900/30 text-sm text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors flex-1">
+                        {(() => {
+                          const cat = COURSE_CATEGORIES.find(c => c.id === (selectedCategory || category));
+                          return cat ? (
+                            <>
+                              <cat.icon className="w-3.5 h-3.5" />
+                              {cat.name}
+                            </>
+                          ) : 'Выбрать раздел';
+                        })()}
+                        <Pencil className="w-3 h-3 ml-auto opacity-50" />
                       </button>
-                    ))}
-                  </div>
-                )}
+                    </PopoverTrigger>
+                    <PopoverContent className="w-56 p-1.5" align="start">
+                      {COURSE_CATEGORIES.map(cat => (
+                        <button
+                          key={cat.id}
+                          onClick={async () => {
+                            setSelectedCategory(cat.id);
+                            await supabase
+                              .from('courses')
+                              .update({ category: cat.id })
+                              .eq('id', courseId);
+                            toast.success(`Раздел изменён на «${cat.name}»`);
+                            onUpdate?.();
+                          }}
+                          className={cn(
+                            "flex items-center gap-2 w-full px-2.5 py-2 rounded-md text-sm transition-colors",
+                            (selectedCategory || category) === cat.id
+                              ? "bg-primary/10 text-foreground font-medium"
+                              : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                          )}
+                        >
+                          <cat.icon className="w-4 h-4" />
+                          {cat.name}
+                        </button>
+                      ))}
+                    </PopoverContent>
+                  </Popover>
+
+                  {/* Unpublish button */}
+                  <button
+                    onClick={async () => {
+                      const { error } = await supabase
+                        .from('courses')
+                        .update({ is_published: false, category: null })
+                        .eq('id', courseId);
+                      if (error) {
+                        toast.error('Ошибка снятия с публикации');
+                        return;
+                      }
+                      setActualIsPublished(false);
+                      setSelectedCategory(null);
+                      toast.success('Курс убран из комьюнити');
+                      onUpdate?.();
+                    }}
+                    className="px-2.5 py-1.5 rounded-md border border-green-300 dark:border-green-700 text-xs text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-colors whitespace-nowrap"
+                  >
+                    Снять
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="space-y-4">
