@@ -35,6 +35,8 @@ import { DesignSystemEditor } from '@/components/editor/DesignSystemEditor';
 import { DesignSystemConfig, DEFAULT_DESIGN_SYSTEM } from '@/types/designSystem';
 import { CourseDesignSystem } from '@/types/course';
 import { COURSE_CATEGORIES } from '@/lib/categories';
+import { LanguageSettings } from '@/components/editor/LanguageSettings';
+import { Globe } from 'lucide-react';
 
 const CourseSettings: React.FC = () => {
   const { courseId } = useParams();
@@ -260,6 +262,10 @@ const CourseSettings: React.FC = () => {
               <Palette className="w-3.5 h-3.5 md:w-4 md:h-4" />
               Дизайн
             </TabsTrigger>
+            <TabsTrigger value="languages" className="gap-1 md:gap-2 flex-1 sm:flex-initial text-xs md:text-sm">
+              <Globe className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              Языки
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="general">
@@ -435,6 +441,23 @@ const CourseSettings: React.FC = () => {
               selectedBaseSystemId={selectedBaseSystemId}
               onBaseSystemSelect={setSelectedBaseSystemId}
             />
+          </TabsContent>
+
+          <TabsContent value="languages">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Globe className="w-5 h-5" />
+                  Языки курса
+                </CardTitle>
+                <CardDescription>
+                  Настройте основной язык и добавьте переводы. AI переведёт весь текстовый контент.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {courseId && <LanguageSettings courseId={courseId} />}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </main>
