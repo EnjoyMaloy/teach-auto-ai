@@ -230,30 +230,18 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
 
         {/* Unified Update Button - shown when course is already published */}
         {showUpdateButton && (
-          <div className="p-3 rounded-lg border bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-sm">Обновить публичную версию</p>
-                <p className="text-xs text-muted-foreground">
-                  Применить изменения из редактора для комьюнити и Telegram
-                </p>
-              </div>
-              <Button
-                size="sm"
-                onClick={handleUnifiedUpdate}
-                disabled={isUpdatingCatalog || isPublishing}
-              >
-                {isUpdatingCatalog || isPublishing ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <>
-                    <RefreshCw className="w-4 h-4 mr-1" />
-                    Обновить
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
+          <button
+            onClick={handleUnifiedUpdate}
+            disabled={isUpdatingCatalog || isPublishing}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-border bg-muted/50 text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+          >
+            {isUpdatingCatalog || isPublishing ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <RefreshCw className="w-3.5 h-3.5" />
+            )}
+            Обновить публичную версию
+          </button>
         )}
 
         <Tabs defaultValue="explore" className="mt-2">
@@ -280,7 +268,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
                   {/* Category dropdown */}
                   <Popover>
                     <PopoverTrigger asChild>
-                      <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-green-300 dark:border-green-700 bg-green-100/50 dark:bg-green-900/30 text-sm text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors flex-1">
+                      <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-green-300 dark:border-green-700 bg-green-100/50 dark:bg-green-900/30 text-sm text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors min-w-0">
                         {(() => {
                           const cat = COURSE_CATEGORIES.find(c => c.id === (selectedCategory || category));
                           return cat ? (
@@ -338,7 +326,7 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
                     }}
                     className="px-2.5 py-1.5 rounded-md border border-green-300 dark:border-green-700 text-xs text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-colors whitespace-nowrap"
                   >
-                    Снять
+                    Снять с публикации
                   </button>
                 </div>
               </div>
