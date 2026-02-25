@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   BadgeCheck,
   Bell,
@@ -26,6 +27,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { courseKeys } from '@/hooks/useCachedCourses';
+import { favoriteKeys } from '@/hooks/useCachedFavorites';
 import pavelAvatar from '@/assets/pavel-avatar.jpg';
 import AcademyLogo from './AcademyLogo';
 import {
@@ -75,6 +78,66 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   const { language, setLanguage } = useLanguage();
   const [recentCourses, setRecentCourses] = useState<RecentCourse[]>([]);
   const { setOpenMobile, isMobile } = useSidebar();
+  const queryClient = useQueryClient();
+
+  // Prefetch data on hover for instant page switches
+  const prefetchWorkshop = useCallback(() => {
+    if (!user) return;
+    queryClient.prefetchQuery({
+      queryKey: courseKeys.userCourses(user.id),
+      queryFn: async () => {
+        const { data } = await supabase
+          .from('courses')
+          .select('id, title, description, cover_image, author_id, is_published, category, estimated_minutes, updated_at, lessons(id)')
+          .eq('author_id', user.id)
+          .order('updated_at', { ascending: false });
+        return (data || []).map((c: any) => ({
+          id: c.id, title: c.title, description: c.description || '',
+          coverImage: c.cover_image || undefined, authorId: c.author_id,
+          isPublished: c.is_published || false, category: c.category || undefined,
+          lessonsCount: c.lessons?.length || 0, estimatedMinutes: c.estimated_minutes || 0,
+          updatedAt: new Date(c.updated_at),
+        }));
+      },
+      staleTime: 1000 * 60 * 2,
+    });
+  }, [user, queryClient]);
+
+  const prefetchCatalog = useCallback(() => {
+    queryClient.prefetchQuery({
+      queryKey: courseKeys.published(),
+      queryFn: async () => {
+        const { data } = await supabase
+          .from('courses')
+          .select('id, title, description, cover_image, author_id, is_published, category, estimated_minutes, updated_at, lessons:published_lessons(id)')
+          .eq('is_published', true)
+          .order('published_at', { ascending: false });
+        return (data || []).map((c: any) => ({
+          id: c.id, title: c.title, description: c.description || '',
+          coverImage: c.cover_image || undefined, authorId: c.author_id,
+          isPublished: true, category: c.category || undefined,
+          lessonsCount: c.lessons?.length || 0, estimatedMinutes: c.estimated_minutes || 0,
+          updatedAt: new Date(c.updated_at),
+        }));
+      },
+      staleTime: 1000 * 60 * 5,
+    });
+  }, [queryClient]);
+
+  const prefetchFavorites = useCallback(() => {
+    if (!user) return;
+    queryClient.prefetchQuery({
+      queryKey: favoriteKeys.ids(user.id),
+      queryFn: async () => {
+        const { data } = await supabase
+          .from('user_favorite_courses')
+          .select('course_id')
+          .eq('user_id', user.id);
+        return (data || []).map((f: any) => f.course_id);
+      },
+      staleTime: 1000 * 60 * 2,
+    });
+  }, [user, queryClient]);
 
   const userName = 'Pavel';
   const userEmail = user?.email || 'pavel@example.com';
@@ -291,6 +354,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                 <SidebarMenuButton
                   isActive={isActive('/workshop')}
                   onClick={() => handleNavigate('/workshop')}
+                  onMouseEnter={prefetchWorkshop}
                 >
                   <Folder className="size-4" />
                   <span>Все курсы</span>
@@ -302,6 +366,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                 <SidebarMenuButton
                   isActive={isActive('/favorites')}
                   onClick={() => handleNavigate('/favorites')}
+                  onMouseEnter={prefetchFavorites}
                 >
                   <Star className="size-4" />
                   <span>Избранное</span>
@@ -320,6 +385,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                 <SidebarMenuButton
                   isActive={isActive('/catalog')}
                   onClick={() => handleNavigate('/catalog')}
+                  onMouseEnter={prefetchCatalog}
                 >
                   <Compass className="size-4" />
                   <span>Исследовать</span>
