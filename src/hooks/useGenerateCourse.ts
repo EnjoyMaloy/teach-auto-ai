@@ -541,6 +541,31 @@ export const useGenerateCourse = (courseId: string) => {
         courseUpdate.design_system = JSON.parse(JSON.stringify(selectedDesignConfig));
         courseUpdate.base_design_system_id = selectedDesignSystemId;
       }
+
+      // Auto-extract cover_image from first image in generated content
+      let coverImage: string | null = null;
+      for (const lesson of courseData.lessons) {
+        if (coverImage) break;
+        for (const slide of lesson.slides) {
+          if (coverImage) break;
+          if (slide.imageUrl && !slide.imageUrl.startsWith('data:')) {
+            coverImage = slide.imageUrl;
+            break;
+          }
+          if (slide.subBlocks) {
+            const sorted = [...slide.subBlocks].sort((a, b) => (a.order || 0) - (b.order || 0));
+            for (const sb of sorted) {
+              if (sb.type === 'image' && sb.imageUrl && !sb.imageUrl.startsWith('data:')) {
+                coverImage = sb.imageUrl;
+                break;
+              }
+            }
+          }
+        }
+      }
+      if (coverImage) {
+        courseUpdate.cover_image = coverImage;
+      }
       if (Object.keys(courseUpdate).length > 0) {
         try {
           await supabase
