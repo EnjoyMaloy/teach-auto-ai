@@ -150,7 +150,7 @@ const Auth: React.FC = () => {
               <Separator className="w-full bg-gray-200" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-4 text-gray-400">Или</span>
+              <span className="bg-white px-4 text-gray-500">Или</span>
             </div>
           </div>
 
