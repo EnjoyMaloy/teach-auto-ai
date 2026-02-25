@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import emptyCatalogImage from '@/assets/empty-catalog.png';
+
+// Eagerly preload the empty state image so it's instant when needed
+const preloadImg = new Image();
+preloadImg.src = emptyCatalogImage;
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { usePublishedCourses } from '@/hooks/useCachedCourses';
