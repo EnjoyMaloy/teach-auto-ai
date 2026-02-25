@@ -11,20 +11,20 @@ import { LanguageProvider } from "@/hooks/useLanguage";
 import { Loader2 } from "lucide-react";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 
-// Lazy load route components for code splitting
+// Direct imports for main nav pages (fast switching)
+import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
+import Catalog from "./pages/Catalog";
+import Favorites from "./pages/Favorites";
+import Pricing from "./pages/Pricing";
+
+// Lazy load heavy/rare pages only
 const Editor = lazy(() => import("./pages/Editor"));
 const Auth = lazy(() => import("./pages/Auth"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const Home = lazy(() => import("./pages/Home"));
-const Catalog = lazy(() => import("./pages/Catalog"));
 const CourseSettings = lazy(() => import("./pages/CourseSettings"));
 const CourseStats = lazy(() => import("./pages/CourseStats"));
 const PublicCourse = lazy(() => import("./pages/PublicCourse"));
 const ShortCourse = lazy(() => import("./pages/ShortCourse"));
-
-
-const Favorites = lazy(() => import("./pages/Favorites"));
-const Pricing = lazy(() => import("./pages/Pricing"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -80,13 +80,11 @@ const AppRoutes = () => (
     
     {/* Protected routes with persistent layout */}
     <Route element={<ProtectedRoute><ProtectedLayout /></ProtectedRoute>}>
-      <Route path="/" element={<Suspense fallback={<PageLoader />}><Home /></Suspense>} />
-      <Route path="/catalog" element={<Suspense fallback={<PageLoader />}><Catalog /></Suspense>} />
-      <Route path="/workshop" element={<Suspense fallback={<PageLoader />}><Dashboard /></Suspense>} />
-      
-      
-      <Route path="/favorites" element={<Suspense fallback={<PageLoader />}><Favorites /></Suspense>} />
-      <Route path="/pricing" element={<Suspense fallback={<PageLoader />}><Pricing /></Suspense>} />
+      <Route path="/" element={<Home />} />
+      <Route path="/catalog" element={<Catalog />} />
+      <Route path="/workshop" element={<Dashboard />} />
+      <Route path="/favorites" element={<Favorites />} />
+      <Route path="/pricing" element={<Pricing />} />
     </Route>
     
     {/* Protected routes without sidebar layout */}
