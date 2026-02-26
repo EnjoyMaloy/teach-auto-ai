@@ -101,11 +101,10 @@ Style requirements:
 - Simple backgrounds, no complex textures
 
 Character consistency (CRITICAL):
-- Every illustration MUST feature the same single mascot character throughout the entire course
-- The mascot is a friendly, round-shaped cartoon character with simple expressive features
-- The mascot should interact with the scene: pointing at objects, holding items, reacting emotionally to the topic
-- Keep the mascot's design extremely simple and consistent: same body shape, same color, same proportions
-- The mascot acts as a guide/teacher — it should feel like the same character across all slides${colorGuidance}`;
+- Every illustration in this course MUST feature the same single character/mascot
+- The character should fit the course topic naturally — the AI decides what kind of character it is
+- Keep the character visually consistent across ALL images: same shape, colors, proportions, and style
+- The character interacts with each scene as a guide: pointing, holding items, reacting to the topic${colorGuidance}`;
 
     const useFlash = imageModel === 'gemini-2.5-flash';
     const useNB2 = imageModel === 'gemini-3.1-flash';
