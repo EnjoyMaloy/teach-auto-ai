@@ -101,7 +101,8 @@ Style requirements:
 - Simple backgrounds, no complex textures${colorGuidance}`;
 
     const useFlash = imageModel === 'gemini-2.5-flash';
-    const primaryModel = useFlash ? "gemini-2.5-flash-image" : "gemini-3-pro-image-preview";
+    const useNB2 = imageModel === 'gemini-3.1-flash';
+    const primaryModel = useFlash ? "gemini-2.5-flash-image" : useNB2 ? "gemini-3.1-flash-image-preview" : "gemini-3-pro-image-preview";
     const fallbackModel = "gemini-2.5-flash-image";
     
     const modelsToTry = useFlash ? [primaryModel] : [primaryModel, fallbackModel];
