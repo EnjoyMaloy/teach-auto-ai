@@ -176,7 +176,8 @@ const generateImageForSlide = async (
   slideContent: string,
   coursePrompt: string,
   designSystem?: CourseDesignSystem,
-  imageModel?: string
+  imageModel?: string,
+  mascotDescription?: string
 ): Promise<string | null> => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 20000);
@@ -188,6 +189,7 @@ const generateImageForSlide = async (
         slideContext: slideContent,
         colorPalette: getColorPalette(designSystem),
         imageModel: imageModel || 'gemini-3-pro',
+        mascotDescription: mascotDescription || undefined,
       },
     });
     clearTimeout(timeoutId);
@@ -359,6 +361,23 @@ export const useGenerateCourse = (courseId: string) => {
       if (skipImages) {
         updateStep('images', { status: 'completed', message: 'Пропущено (быстрый режим)' });
       } else {
+        updateStep('images', { status: 'active', message: 'Придумываю персонажа...' });
+        checkCancelled();
+
+        // Generate mascot description for visual consistency
+        let mascotDesc: string | undefined;
+        try {
+          const mascotResponse = await invokeWithRetry('generate-course', {
+            userMessage: `Тема курса: "${prompt}"\n\nПридумай персонажа-маскота для иллюстраций этого курса. Ответь ТОЛЬКО описанием персонажа на английском (2-3 предложения). Опиши: тип существа, форму тела, основные цвета, одежду/аксессуары, стиль (мультяшный/геометричный/и т.д.). Пример: "A small round orange fox with big curious eyes, wearing a tiny blue backpack. Simple geometric flat design style with bold outlines."`,
+            agentRole: 'research',
+          });
+          mascotDesc = mascotResponse.data?.content?.trim();
+          if (mascotDesc && mascotDesc.length > 500) mascotDesc = mascotDesc.substring(0, 500);
+          console.log('Generated mascot description:', mascotDesc);
+        } catch (e) {
+          console.warn('Mascot description generation failed, proceeding without:', e);
+        }
+
         updateStep('images', { status: 'active', message: 'Генерирую иллюстрации...' });
         checkCancelled();
 
@@ -402,7 +421,7 @@ export const useGenerateCourse = (courseId: string) => {
               try {
                 await Promise.all(batch.map(async ({ lessonIdx, slideIdx, subBlockIdx, description }) => {
                   try {
-                    const imageUrl = await generateImageForSlide(description, prompt, designSystem, imageModel);
+                    const imageUrl = await generateImageForSlide(description, prompt, designSystem, imageModel, mascotDesc);
                     if (imageUrl) {
                       if (subBlockIdx !== undefined) {
                         const subBlocks = courseData.lessons[lessonIdx].slides[slideIdx].subBlocks as any[];
