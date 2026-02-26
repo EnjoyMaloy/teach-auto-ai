@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
       return authError;
     }
 
-    const { prompt, slideContext, colorPalette, imageModel } = await req.json();
+    const { prompt, slideContext, colorPalette, imageModel, mascotDescription } = await req.json();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     
     if (!GEMINI_API_KEY) {
@@ -90,6 +90,10 @@ Color palette guidance:
     }
 
     // Create image generation prompt - minimalist flat design style with consistent mascot
+    const mascotBlock = mascotDescription
+      ? `\n\nCharacter/Mascot (MUST appear in the illustration):\n${mascotDescription}\n- The character should be present in EVERY image, interacting naturally with the scene\n- Vary the character's actions: studying, celebrating, thinking, building, exploring, presenting, surprised, relaxed — NOT just pointing\n- Keep the character's appearance EXACTLY consistent: same shape, colors, proportions, outfit`
+      : '';
+
     const imagePrompt = `${slideContext || prompt}
 
 Style requirements:
@@ -98,13 +102,7 @@ Style requirements:
 - Bold, vibrant colors with good contrast
 - NO text, words, letters, or labels on the image
 - Modern, professional look suitable for educational content
-- Simple backgrounds, no complex textures
-
-Character consistency (CRITICAL):
-- Every illustration in this course MUST feature the same single character/mascot
-- The character should fit the course topic naturally — the AI decides what kind of character it is
-- Keep the character visually consistent across ALL images: same shape, colors, proportions, and style
-- The character interacts with each scene as a guide: pointing, holding items, reacting to the topic${colorGuidance}`;
+- Simple backgrounds, no complex textures${mascotBlock}${colorGuidance}`;
 
     const useFlash = imageModel === 'gemini-2.5-flash';
     const useNB2 = imageModel === 'gemini-3.1-flash';
