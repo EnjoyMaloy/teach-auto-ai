@@ -89,7 +89,7 @@ Color palette guidance:
 - Keep the overall palette cohesive and professional`;
     }
 
-    // Create image generation prompt - minimalist flat design style
+    // Create image generation prompt - minimalist flat design style with consistent mascot
     const imagePrompt = `${slideContext || prompt}
 
 Style requirements:
@@ -98,7 +98,14 @@ Style requirements:
 - Bold, vibrant colors with good contrast
 - NO text, words, letters, or labels on the image
 - Modern, professional look suitable for educational content
-- Simple backgrounds, no complex textures${colorGuidance}`;
+- Simple backgrounds, no complex textures
+
+Character consistency (CRITICAL):
+- Every illustration MUST feature the same single mascot character throughout the entire course
+- The mascot is a friendly, round-shaped cartoon character with simple expressive features
+- The mascot should interact with the scene: pointing at objects, holding items, reacting emotionally to the topic
+- Keep the mascot's design extremely simple and consistent: same body shape, same color, same proportions
+- The mascot acts as a guide/teacher — it should feel like the same character across all slides${colorGuidance}`;
 
     const useFlash = imageModel === 'gemini-2.5-flash';
     const useNB2 = imageModel === 'gemini-3.1-flash';
