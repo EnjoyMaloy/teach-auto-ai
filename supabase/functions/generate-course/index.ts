@@ -621,7 +621,13 @@ serve(async (req) => {
     }
     
     const data = await response.json();
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    // Gemini 3 models may return "thinking" parts before the actual text
+    // Extract text from all parts, skipping empty/thinking ones
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    const content = parts
+      .map((p: any) => p.text || '')
+      .filter((t: string) => t.trim().length > 0)
+      .pop() || ''; // Take the LAST non-empty part (actual response, not thinking)
     
     console.log("Gemini response received:", content?.substring(0, 200));
     
