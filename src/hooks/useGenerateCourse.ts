@@ -368,7 +368,7 @@ export const useGenerateCourse = (courseId: string) => {
         let mascotDesc: string | undefined;
         try {
           const mascotResponse = await invokeWithRetry('generate-course', {
-            userMessage: `Тема курса: "${prompt}"\n\nПридумай персонажа-маскота для иллюстраций этого курса. Ответь ТОЛЬКО описанием персонажа на английском (2-3 предложения). Опиши: тип существа, форму тела, основные цвета, одежду/аксессуары, стиль (мультяшный/геометричный/и т.д.). Пример: "A small round orange fox with big curious eyes, wearing a tiny blue backpack. Simple geometric flat design style with bold outlines."`,
+            userMessage: `Тема курса: "${prompt}"\n\nПридумай персонажа-маскота для иллюстраций этого курса. Ответь ТОЛЬКО описанием персонажа на английском (3-4 предложения). Опиши:\n1. Тип существа, форму тела, пропорции\n2. Основные цвета (точные: \"orange\", \"sky blue\" и т.д.), одежду/аксессуары\n3. ОБЯЗАТЕЛЬНО укажи стиль рендеринга: \"2D flat vector illustration with bold black outlines, no gradients, no 3D shading, no realistic textures\"\n\nПример: \"A small round orange fox with big curious eyes and stubby legs, wearing a tiny blue backpack and a yellow scarf. 2D flat vector illustration style with bold black outlines, solid color fills, no gradients, no 3D shading, no realistic textures. The character has simple geometric shapes and a friendly cartoon appearance.\"`,
             agentRole: 'research',
           });
           mascotDesc = mascotResponse.data?.content?.trim();
