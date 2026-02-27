@@ -91,18 +91,20 @@ Color palette guidance:
 
     // Create image generation prompt - minimalist flat design style with consistent mascot
     const mascotBlock = mascotDescription
-      ? `\n\nCharacter/Mascot (MUST appear in the illustration):\n${mascotDescription}\n- The character should be present in EVERY image, interacting naturally with the scene\n- Vary the character's actions: studying, celebrating, thinking, building, exploring, presenting, surprised, relaxed — NOT just pointing\n- Keep the character's appearance EXACTLY consistent: same shape, colors, proportions, outfit`
+      ? `\n\nCharacter/Mascot (MUST appear in the illustration):\n${mascotDescription}\n- The character MUST appear in EVERY image, interacting naturally with the scene\n- Vary the character's actions: studying, celebrating, thinking, building, exploring, presenting, surprised, relaxed — NOT just pointing\n- Keep the character's appearance EXACTLY consistent across all images: same shape, same colors, same proportions, same outfit, same art style\n- CRITICAL: The character must ALWAYS be rendered in 2D flat vector style — NO 3D, NO realistic rendering, NO gradients on the character`
       : '';
 
     const imagePrompt = `${slideContext || prompt}
 
-Style requirements:
-- Minimalist flat design illustration
-- Clean geometric shapes and simplified forms
+Style requirements (STRICTLY FOLLOW):
+- 2D flat vector illustration — absolutely NO 3D rendering, NO realistic shading, NO photorealism
+- Clean geometric shapes and simplified forms with bold black outlines
+- Solid color fills only — NO gradients, NO drop shadows, NO glossy effects
 - Bold, vibrant colors with good contrast
 - NO text, words, letters, or labels on the image
 - Modern, professional look suitable for educational content
-- Simple backgrounds, no complex textures${mascotBlock}${colorGuidance}`;
+- Simple flat backgrounds, no complex textures or depth effects
+- Everything in the image must follow the same 2D flat vector style consistently${mascotBlock}${colorGuidance}`;
 
     const useFlash = imageModel === 'gemini-2.5-flash';
     const useNB2 = imageModel === 'gemini-3.1-flash';
