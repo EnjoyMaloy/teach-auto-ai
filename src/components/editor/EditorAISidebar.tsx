@@ -124,7 +124,10 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   const [imageModel, setImageModel] = useState<'gemini-3-pro' | 'gemini-3.1-flash' | 'gemini-2.5-flash'>(autoSettings?.imageModel ?? 'gemini-3-pro');
   const [selectedDesignSystemId, setSelectedDesignSystemId] = useState<string | null>(autoSettings?.designSystemId ?? null);
   const [lessonCount, setLessonCount] = useState(autoSettings?.lessonCount ?? 3);
-
+  const [sourceType, setSourceType] = useState<'none' | 'link' | 'file'>('none');
+  const [sourceUrl, setSourceUrl] = useState('');
+  const [sourceFile, setSourceFile] = useState<File | null>(null);
+  const fileInputRef2 = useRef<HTMLInputElement>(null);
   // ── Unified messages state ──────────────────────────────
   const [messages, setMessages] = useState<UnifiedMessage[]>([]);
   const [messagesLoaded, setMessagesLoaded] = useState(false);
