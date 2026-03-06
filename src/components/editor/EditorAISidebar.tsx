@@ -4,7 +4,7 @@ import {
   AlertCircle, Search, Brain, Layers, BookOpen, CheckCircle2, 
   Image, Clock, RotateCcw, PartyPopper, Send, CornerDownLeft, Square,
   Plus, MousePointerClick, Palette, GraduationCap, Pencil, BookPlus,
-  ImageOff, ImageIcon, Star, Zap,
+  ImageOff, ImageIcon, Star, Zap, Paperclip, Link, FileText, Upload, X,
   icons as lucideIcons
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
