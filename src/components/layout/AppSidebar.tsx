@@ -235,9 +235,9 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                   >
                     <Avatar className="size-8 rounded-lg">
-                      <AvatarImage src={pavelAvatar} alt={userName} />
+                      {userAvatarUrl && <AvatarImage src={userAvatarUrl} alt={userName} />}
                       <AvatarFallback className="rounded-lg">
-                        {userName.split(' ').map((n) => n[0]).join('')}
+                        {userName.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">

@@ -83,6 +83,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
           <DropdownMenuTrigger asChild>
             <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20">
               <Avatar className="w-10 h-10 cursor-pointer hover:opacity-80 transition-opacity">
+                {userAvatarUrl && <AvatarImage src={userAvatarUrl} alt={userName} />}
                 <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
                   {userInitials}
                 </AvatarFallback>
