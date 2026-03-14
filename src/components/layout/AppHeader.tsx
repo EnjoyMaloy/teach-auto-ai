@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogOut, User, ChevronDown, Search, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -19,18 +19,22 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<{ name: string | null; avatar_url: string | null }>({ name: null, avatar_url: null });
 
   useEffect(() => {
-    const fetchUserRole = async () => {
+    const fetchProfile = async () => {
       if (!user) return;
       const { data } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, name, avatar_url')
         .eq('id', user.id)
         .single();
-      setUserRole(data?.role || null);
+      if (data) {
+        setUserRole(data.role || null);
+        setUserProfile({ name: data.name, avatar_url: data.avatar_url });
+      }
     };
-    fetchUserRole();
+    fetchProfile();
   }, [user]);
 
   const handleSignOut = async () => {
@@ -39,7 +43,9 @@ const AppHeader: React.FC<AppHeaderProps> = ({
     navigate('/auth');
   };
 
-  const userInitials = user?.email?.slice(0, 2).toUpperCase() || 'U';
+  const userName = userProfile.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'U';
+  const userAvatarUrl = userProfile.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
+  const userInitials = userName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
   const isModerator = userRole === 'moderator' || userRole === 'admin';
 
   return (
@@ -77,6 +83,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
           <DropdownMenuTrigger asChild>
             <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20">
               <Avatar className="w-10 h-10 cursor-pointer hover:opacity-80 transition-opacity">
+                {userAvatarUrl && <AvatarImage src={userAvatarUrl} alt={userName} />}
                 <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
                   {userInitials}
                 </AvatarFallback>

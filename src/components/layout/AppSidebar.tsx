@@ -29,7 +29,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { courseKeys } from '@/hooks/useCachedCourses';
 import { favoriteKeys } from '@/hooks/useCachedFavorites';
-import pavelAvatar from '@/assets/pavel-avatar.jpg';
 import AcademyLogo from './AcademyLogo';
 import {
   Sidebar,
@@ -139,9 +138,24 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
     });
   }, [user, queryClient]);
 
-  const userName = 'Pavel';
-  const userEmail = user?.email || 'pavel@example.com';
-  const isAdmin = user?.email === 'trupcgames@gmail.com' || user?.email === 'vazhenka.hello@gmail.com';
+  const [profile, setProfile] = useState<{ name: string | null; avatar_url: string | null }>({ name: null, avatar_url: null });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from('profiles')
+        .select('name, avatar_url')
+        .eq('id', user.id)
+        .single();
+      if (data) setProfile(data);
+    };
+    fetchProfile();
+  }, [user]);
+
+  const userName = profile.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User';
+  const userAvatarUrl = profile.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
+  const userEmail = user?.email || '';
 
   // Fetch recent courses
   useEffect(() => {
@@ -221,9 +235,9 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                   >
                     <Avatar className="size-8 rounded-lg">
-                      <AvatarImage src={pavelAvatar} alt={userName} />
+                      {userAvatarUrl && <AvatarImage src={userAvatarUrl} alt={userName} />}
                       <AvatarFallback className="rounded-lg">
-                        {userName.split(' ').map((n) => n[0]).join('')}
+                        {userName.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
