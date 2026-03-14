@@ -138,9 +138,24 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
     });
   }, [user, queryClient]);
 
-  const userName = 'Pavel';
-  const userEmail = user?.email || 'pavel@example.com';
-  const isAdmin = user?.email === 'trupcgames@gmail.com' || user?.email === 'vazhenka.hello@gmail.com';
+  const [profile, setProfile] = useState<{ name: string | null; avatar_url: string | null }>({ name: null, avatar_url: null });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from('profiles')
+        .select('name, avatar_url')
+        .eq('id', user.id)
+        .single();
+      if (data) setProfile(data);
+    };
+    fetchProfile();
+  }, [user]);
+
+  const userName = profile.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User';
+  const userAvatarUrl = profile.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
+  const userEmail = user?.email || '';
 
   // Fetch recent courses
   useEffect(() => {
