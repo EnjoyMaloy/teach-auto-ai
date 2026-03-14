@@ -29,7 +29,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { courseKeys } from '@/hooks/useCachedCourses';
 import { favoriteKeys } from '@/hooks/useCachedFavorites';
-import pavelAvatar from '@/assets/pavel-avatar.jpg';
 import AcademyLogo from './AcademyLogo';
 import {
   Sidebar,
