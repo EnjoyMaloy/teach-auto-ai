@@ -19,18 +19,22 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<{ name: string | null; avatar_url: string | null }>({ name: null, avatar_url: null });
 
   useEffect(() => {
-    const fetchUserRole = async () => {
+    const fetchProfile = async () => {
       if (!user) return;
       const { data } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, name, avatar_url')
         .eq('id', user.id)
         .single();
-      setUserRole(data?.role || null);
+      if (data) {
+        setUserRole(data.role || null);
+        setUserProfile({ name: data.name, avatar_url: data.avatar_url });
+      }
     };
-    fetchUserRole();
+    fetchProfile();
   }, [user]);
 
   const handleSignOut = async () => {
