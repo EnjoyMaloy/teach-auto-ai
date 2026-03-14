@@ -43,7 +43,9 @@ const AppHeader: React.FC<AppHeaderProps> = ({
     navigate('/auth');
   };
 
-  const userInitials = user?.email?.slice(0, 2).toUpperCase() || 'U';
+  const userName = userProfile.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'U';
+  const userAvatarUrl = userProfile.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
+  const userInitials = userName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
   const isModerator = userRole === 'moderator' || userRole === 'admin';
 
   return (
