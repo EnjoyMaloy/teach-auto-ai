@@ -831,6 +831,7 @@ const Editor: React.FC = () => {
           onAddBlock={handleAddBlock}
           onReorderBlocks={handleReorderBlocks}
           onDeleteBlock={handleDeleteBlock}
+          onDuplicateBlock={handleDuplicateBlock}
           slideToBlock={slideToBlock}
           designSystem={course.designSystem}
         />
