@@ -1334,7 +1334,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
             ) : (
               <button
                 onClick={handleSubmit}
-                disabled={!chatInput.trim() || isInputDisabled}
+                disabled={(!chatInput.trim() && !(sourceType === 'md' && sourceFile)) || isInputDisabled}
                 className="p-1.5 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30 rounded-lg hover:bg-foreground/5"
                 title="Отправить"
               >
