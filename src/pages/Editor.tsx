@@ -145,15 +145,19 @@ const Editor: React.FC = () => {
 
   // Load or create course - only once on mount
   useEffect(() => {
-    // Skip if course is already loaded for this courseId
-    if (course && course.id === courseId) return;
+    // Skip if course is already loaded for this courseId (but never skip for 'new')
+    if (courseId !== 'new' && course && course.id === courseId) return;
     
     const loadCourse = async () => {
       if (!user) return;
       
       setIsLoadingCourse(true);
       
+      // Reset state when creating a new course to avoid stale data from previous course
       if (courseId === 'new') {
+        setCourse(null);
+        setSelectedLessonId(null);
+        setSelectedBlockId(null);
         // Create in-memory course without saving to DB
         const tempId = crypto.randomUUID();
         const navState = location.state as any;
