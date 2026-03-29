@@ -69,19 +69,61 @@ import {
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 
-// Curated backdrop color palettes
-const BACKDROP_PALETTES = [
-  { name: 'Лаванда', light: { backdropLightColor: '270 30% 95%', backdropLightTextColor: '270 20% 25%', backdropLightMarkerColor: '45 90% 65% / 0.5', backdropLightUnderlineColor: '270 60% 55%', backdropLightWavyColor: '330 70% 55%' }, dark: { backdropDarkColor: '270 30% 12%', backdropDarkTextColor: '270 20% 90%', backdropDarkMarkerColor: '45 90% 55% / 0.6', backdropDarkUnderlineColor: '270 60% 65%', backdropDarkWavyColor: '330 70% 65%' }, primary: { backdropPrimaryColor: '270 50% 55%', backdropPrimaryTextColor: '0 0% 100%', backdropPrimaryMarkerColor: '45 90% 70% / 0.5', backdropPrimaryUnderlineColor: '200 70% 75%', backdropPrimaryWavyColor: '330 80% 75%' }, blur: { backdropBlurColor: '270 30% 90% / 0.6', backdropBlurTextColor: '270 20% 20%', backdropBlurMarkerColor: '45 90% 60% / 0.5', backdropBlurUnderlineColor: '270 60% 50%', backdropBlurWavyColor: '330 70% 50%' } },
-  { name: 'Океан', light: { backdropLightColor: '200 40% 94%', backdropLightTextColor: '200 30% 20%', backdropLightMarkerColor: '170 60% 50% / 0.4', backdropLightUnderlineColor: '210 70% 50%', backdropLightWavyColor: '260 60% 55%' }, dark: { backdropDarkColor: '210 40% 10%', backdropDarkTextColor: '200 20% 92%', backdropDarkMarkerColor: '170 60% 55% / 0.5', backdropDarkUnderlineColor: '200 70% 60%', backdropDarkWavyColor: '260 60% 65%' }, primary: { backdropPrimaryColor: '200 65% 45%', backdropPrimaryTextColor: '0 0% 100%', backdropPrimaryMarkerColor: '45 80% 65% / 0.5', backdropPrimaryUnderlineColor: '170 60% 70%', backdropPrimaryWavyColor: '300 50% 70%' }, blur: { backdropBlurColor: '200 40% 88% / 0.6', backdropBlurTextColor: '200 30% 18%', backdropBlurMarkerColor: '170 60% 45% / 0.4', backdropBlurUnderlineColor: '210 70% 45%', backdropBlurWavyColor: '260 60% 50%' } },
-  { name: 'Закат', light: { backdropLightColor: '30 50% 95%', backdropLightTextColor: '20 30% 22%', backdropLightMarkerColor: '45 100% 60% / 0.45', backdropLightUnderlineColor: '350 70% 55%', backdropLightWavyColor: '20 80% 50%' }, dark: { backdropDarkColor: '15 40% 10%', backdropDarkTextColor: '30 25% 90%', backdropDarkMarkerColor: '45 100% 55% / 0.55', backdropDarkUnderlineColor: '350 70% 65%', backdropDarkWavyColor: '20 80% 60%' }, primary: { backdropPrimaryColor: '15 70% 50%', backdropPrimaryTextColor: '0 0% 100%', backdropPrimaryMarkerColor: '45 100% 70% / 0.5', backdropPrimaryUnderlineColor: '350 60% 75%', backdropPrimaryWavyColor: '280 50% 70%' }, blur: { backdropBlurColor: '30 50% 90% / 0.6', backdropBlurTextColor: '20 30% 18%', backdropBlurMarkerColor: '45 100% 55% / 0.45', backdropBlurUnderlineColor: '350 70% 50%', backdropBlurWavyColor: '20 80% 45%' } },
-  { name: 'Мята', light: { backdropLightColor: '160 35% 94%', backdropLightTextColor: '160 25% 20%', backdropLightMarkerColor: '80 60% 55% / 0.4', backdropLightUnderlineColor: '160 55% 40%', backdropLightWavyColor: '200 60% 50%' }, dark: { backdropDarkColor: '160 35% 10%', backdropDarkTextColor: '160 15% 92%', backdropDarkMarkerColor: '80 60% 55% / 0.5', backdropDarkUnderlineColor: '160 55% 55%', backdropDarkWavyColor: '200 60% 60%' }, primary: { backdropPrimaryColor: '160 50% 40%', backdropPrimaryTextColor: '0 0% 100%', backdropPrimaryMarkerColor: '80 60% 65% / 0.5', backdropPrimaryUnderlineColor: '200 55% 70%', backdropPrimaryWavyColor: '300 40% 65%' }, blur: { backdropBlurColor: '160 35% 90% / 0.6', backdropBlurTextColor: '160 25% 18%', backdropBlurMarkerColor: '80 60% 50% / 0.4', backdropBlurUnderlineColor: '160 55% 38%', backdropBlurWavyColor: '200 60% 45%' } },
-  { name: 'Роза', light: { backdropLightColor: '340 35% 95%', backdropLightTextColor: '340 20% 22%', backdropLightMarkerColor: '340 60% 70% / 0.4', backdropLightUnderlineColor: '290 55% 55%', backdropLightWavyColor: '20 70% 55%' }, dark: { backdropDarkColor: '340 30% 10%', backdropDarkTextColor: '340 15% 92%', backdropDarkMarkerColor: '340 60% 60% / 0.5', backdropDarkUnderlineColor: '290 55% 65%', backdropDarkWavyColor: '20 70% 65%' }, primary: { backdropPrimaryColor: '340 55% 50%', backdropPrimaryTextColor: '0 0% 100%', backdropPrimaryMarkerColor: '45 80% 70% / 0.5', backdropPrimaryUnderlineColor: '290 50% 75%', backdropPrimaryWavyColor: '20 60% 70%' }, blur: { backdropBlurColor: '340 35% 90% / 0.6', backdropBlurTextColor: '340 20% 18%', backdropBlurMarkerColor: '340 60% 65% / 0.4', backdropBlurUnderlineColor: '290 55% 50%', backdropBlurWavyColor: '20 70% 50%' } },
-  { name: 'Графит', light: { backdropLightColor: '220 10% 93%', backdropLightTextColor: '220 10% 18%', backdropLightMarkerColor: '45 70% 55% / 0.4', backdropLightUnderlineColor: '220 40% 50%', backdropLightWavyColor: '0 60% 50%' }, dark: { backdropDarkColor: '220 10% 8%', backdropDarkTextColor: '220 5% 90%', backdropDarkMarkerColor: '45 70% 55% / 0.5', backdropDarkUnderlineColor: '220 40% 60%', backdropDarkWavyColor: '0 60% 60%' }, primary: { backdropPrimaryColor: '220 15% 35%', backdropPrimaryTextColor: '0 0% 98%', backdropPrimaryMarkerColor: '45 70% 65% / 0.5', backdropPrimaryUnderlineColor: '200 50% 65%', backdropPrimaryWavyColor: '0 50% 65%' }, blur: { backdropBlurColor: '220 10% 88% / 0.6', backdropBlurTextColor: '220 10% 15%', backdropBlurMarkerColor: '45 70% 50% / 0.4', backdropBlurUnderlineColor: '220 40% 45%', backdropBlurWavyColor: '0 60% 45%' } },
-  { name: 'Золото', light: { backdropLightColor: '40 40% 94%', backdropLightTextColor: '35 30% 20%', backdropLightMarkerColor: '40 80% 50% / 0.4', backdropLightUnderlineColor: '25 70% 45%', backdropLightWavyColor: '350 60% 50%' }, dark: { backdropDarkColor: '35 30% 8%', backdropDarkTextColor: '40 20% 92%', backdropDarkMarkerColor: '40 80% 55% / 0.5', backdropDarkUnderlineColor: '25 70% 60%', backdropDarkWavyColor: '350 60% 60%' }, primary: { backdropPrimaryColor: '35 60% 42%', backdropPrimaryTextColor: '0 0% 100%', backdropPrimaryMarkerColor: '50 80% 65% / 0.5', backdropPrimaryUnderlineColor: '15 60% 70%', backdropPrimaryWavyColor: '280 40% 65%' }, blur: { backdropBlurColor: '40 40% 90% / 0.6', backdropBlurTextColor: '35 30% 18%', backdropBlurMarkerColor: '40 80% 45% / 0.4', backdropBlurUnderlineColor: '25 70% 40%', backdropBlurWavyColor: '350 60% 45%' } },
-  { name: 'Индиго', light: { backdropLightColor: '240 30% 95%', backdropLightTextColor: '240 20% 22%', backdropLightMarkerColor: '55 80% 55% / 0.45', backdropLightUnderlineColor: '240 60% 55%', backdropLightWavyColor: '15 70% 55%' }, dark: { backdropDarkColor: '240 30% 10%', backdropDarkTextColor: '240 15% 92%', backdropDarkMarkerColor: '55 80% 55% / 0.55', backdropDarkUnderlineColor: '240 60% 65%', backdropDarkWavyColor: '15 70% 65%' }, primary: { backdropPrimaryColor: '240 55% 50%', backdropPrimaryTextColor: '0 0% 100%', backdropPrimaryMarkerColor: '55 80% 70% / 0.5', backdropPrimaryUnderlineColor: '180 60% 70%', backdropPrimaryWavyColor: '15 60% 70%' }, blur: { backdropBlurColor: '240 30% 90% / 0.6', backdropBlurTextColor: '240 20% 18%', backdropBlurMarkerColor: '55 80% 50% / 0.45', backdropBlurUnderlineColor: '240 60% 50%', backdropBlurWavyColor: '15 70% 50%' } },
-  { name: 'Коралл', light: { backdropLightColor: '5 40% 95%', backdropLightTextColor: '5 25% 22%', backdropLightMarkerColor: '30 80% 60% / 0.4', backdropLightUnderlineColor: '350 60% 55%', backdropLightWavyColor: '270 50% 55%' }, dark: { backdropDarkColor: '5 35% 10%', backdropDarkTextColor: '5 15% 92%', backdropDarkMarkerColor: '30 80% 55% / 0.5', backdropDarkUnderlineColor: '350 60% 65%', backdropDarkWavyColor: '270 50% 65%' }, primary: { backdropPrimaryColor: '5 65% 52%', backdropPrimaryTextColor: '0 0% 100%', backdropPrimaryMarkerColor: '40 80% 65% / 0.5', backdropPrimaryUnderlineColor: '180 50% 70%', backdropPrimaryWavyColor: '270 45% 70%' }, blur: { backdropBlurColor: '5 40% 90% / 0.6', backdropBlurTextColor: '5 25% 18%', backdropBlurMarkerColor: '30 80% 55% / 0.4', backdropBlurUnderlineColor: '350 60% 50%', backdropBlurWavyColor: '270 50% 50%' } },
-  { name: 'Изумруд', light: { backdropLightColor: '145 30% 94%', backdropLightTextColor: '145 25% 18%', backdropLightMarkerColor: '60 70% 50% / 0.4', backdropLightUnderlineColor: '145 55% 40%', backdropLightWavyColor: '330 55% 50%' }, dark: { backdropDarkColor: '145 30% 8%', backdropDarkTextColor: '145 15% 92%', backdropDarkMarkerColor: '60 70% 55% / 0.5', backdropDarkUnderlineColor: '145 55% 55%', backdropDarkWavyColor: '330 55% 60%' }, primary: { backdropPrimaryColor: '145 50% 38%', backdropPrimaryTextColor: '0 0% 100%', backdropPrimaryMarkerColor: '60 70% 65% / 0.5', backdropPrimaryUnderlineColor: '200 50% 65%', backdropPrimaryWavyColor: '330 45% 65%' }, blur: { backdropBlurColor: '145 30% 90% / 0.6', backdropBlurTextColor: '145 25% 15%', backdropBlurMarkerColor: '60 70% 45% / 0.4', backdropBlurUnderlineColor: '145 55% 35%', backdropBlurWavyColor: '330 55% 45%' } },
-];
+// Generate backdrop palette from a base HSL color string like "262 83% 58%"
+// variation: 0-5, each gives a different complementary scheme
+const generateBackdropPalette = (primaryHsl: string, variation: number) => {
+  // Parse HSL: "262 83% 58%" → [262, 83, 58]
+  const parts = primaryHsl.replace(/%/g, '').split(/\s+/).map(Number);
+  const h = parts[0] || 262;
+  const s = parts[1] || 83;
+  const l = parts[2] || 58;
+
+  // Complementary hue offsets for variety
+  const schemes = [
+    { marker: 0, underline: 30, wavy: -40 },       // Analogous
+    { marker: 180, underline: 0, wavy: 120 },       // Complementary
+    { marker: 60, underline: -30, wavy: 150 },      // Triadic warm
+    { marker: -60, underline: 120, wavy: 30 },      // Triadic cool
+    { marker: 30, underline: 180, wavy: -60 },      // Split-complementary
+    { marker: -30, underline: 60, wavy: 180 },      // Split-complementary alt
+  ];
+  const scheme = schemes[variation % schemes.length];
+  const hm = (h + scheme.marker + 360) % 360;
+  const hu = (h + scheme.underline + 360) % 360;
+  const hw = (h + scheme.wavy + 360) % 360;
+
+  return {
+    light: {
+      backdropLightColor: `${h} ${Math.min(s, 35)}% 94%`,
+      backdropLightTextColor: `${h} ${Math.min(s, 25)}% 20%`,
+      backdropLightMarkerColor: `${hm} ${Math.min(s, 70)}% 60% / 0.45`,
+      backdropLightUnderlineColor: `${hu} ${Math.min(s, 65)}% 50%`,
+      backdropLightWavyColor: `${hw} ${Math.min(s, 65)}% 50%`,
+    },
+    dark: {
+      backdropDarkColor: `${h} ${Math.min(s, 35)}% 10%`,
+      backdropDarkTextColor: `${h} ${Math.min(s, 20)}% 92%`,
+      backdropDarkMarkerColor: `${hm} ${Math.min(s, 70)}% 55% / 0.55`,
+      backdropDarkUnderlineColor: `${hu} ${Math.min(s, 65)}% 60%`,
+      backdropDarkWavyColor: `${hw} ${Math.min(s, 65)}% 60%`,
+    },
+    primary: {
+      backdropPrimaryColor: `${h} ${Math.min(s, 55)}% ${Math.min(l, 50)}%`,
+      backdropPrimaryTextColor: '0 0% 100%',
+      backdropPrimaryMarkerColor: `${hm} ${Math.min(s, 70)}% 70% / 0.5`,
+      backdropPrimaryUnderlineColor: `${hu} ${Math.min(s, 60)}% 72%`,
+      backdropPrimaryWavyColor: `${hw} ${Math.min(s, 60)}% 72%`,
+    },
+    blur: {
+      backdropBlurColor: `${h} ${Math.min(s, 35)}% 90% / 0.6`,
+      backdropBlurTextColor: `${h} ${Math.min(s, 25)}% 18%`,
+      backdropBlurMarkerColor: `${hm} ${Math.min(s, 70)}% 55% / 0.45`,
+      backdropBlurUnderlineColor: `${hu} ${Math.min(s, 65)}% 48%`,
+      backdropBlurWavyColor: `${hw} ${Math.min(s, 65)}% 48%`,
+    },
+  };
+};
+
 
 interface DesignSystemEditorProps {
   config: DesignSystemConfig;
