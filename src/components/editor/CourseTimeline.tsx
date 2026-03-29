@@ -297,6 +297,30 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
                         </SortableContext>
                       </DndContext>
 
+                      {/* Duplicate last block button */}
+                      {blocks.length > 0 && onDuplicateBlock && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectLesson(lesson.id);
+                            const lastBlock = blocks[blocks.length - 1];
+                            onDuplicateBlock(lastBlock.id);
+                          }}
+                          disabled={isGenerating}
+                          className={cn(
+                            'flex-shrink-0 rounded-lg border-2 border-dashed border-border',
+                            'flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-primary hover:border-primary',
+                            'transition-all duration-200 hover:bg-primary/5',
+                            isGenerating && 'opacity-30 pointer-events-none'
+                          )}
+                          style={{ width: THUMB_W, height: THUMB_H }}
+                          title="Скопировать последний блок"
+                        >
+                          <Copy className="w-5 h-5" />
+                          <span className="text-[9px] font-medium">Копия</span>
+                        </button>
+                      )}
+
                       {/* Add block button with popover */}
                       <Popover>
                         <PopoverTrigger asChild>
