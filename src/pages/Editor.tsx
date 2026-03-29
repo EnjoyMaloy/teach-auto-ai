@@ -781,7 +781,7 @@ const Editor: React.FC = () => {
 
         <div className="flex-1 flex overflow-hidden relative bg-secondary dark:bg-black/10">
           {/* Preview area - full width */}
-          <div className="flex-1 flex items-center justify-center overflow-hidden m-2 rounded-2xl bg-background">
+          <div className={`flex-1 flex items-center justify-center overflow-hidden m-2 rounded-2xl bg-background transition-all duration-300 ${selectedBlock ? 'md:pr-[396px]' : ''}`}>
             <div 
               className="h-full w-full py-3"
             >
