@@ -1081,6 +1081,18 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                   <FileText className="w-3.5 h-3.5" />
                   Файл
                 </button>
+                <button
+                  onClick={() => setSourceType(sourceType === 'md' ? 'none' : 'md')}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
+                    sourceType === 'md'
+                      ? "bg-primary/10 border-primary/30 text-primary"
+                      : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
+                  )}
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  MD
+                </button>
               </div>
               {sourceType === 'link' && (
                 <input
@@ -1118,6 +1130,37 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                     >
                       <Upload className="w-3.5 h-3.5" />
                       PDF, DOCX, TXT
+                    </button>
+                  )}
+                </div>
+              )}
+              {sourceType === 'md' && (
+                <div>
+                  <input
+                    ref={fileInputRef2}
+                    type="file"
+                    accept=".md"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setSourceFile(file);
+                    }}
+                  />
+                  {sourceFile ? (
+                    <div className="flex items-center gap-2 bg-muted/30 dark:bg-white/5 border border-border dark:border-white/10 rounded-xl px-3 py-2">
+                      <FileText className="w-4 h-4 text-primary flex-shrink-0" />
+                      <span className="text-xs text-foreground truncate flex-1">{sourceFile.name}</span>
+                      <button onClick={() => { setSourceFile(null); if (fileInputRef2.current) fileInputRef2.current.value = ''; }} className="text-muted-foreground hover:text-foreground">
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => fileInputRef2.current?.click()}
+                      className="w-full flex items-center justify-center gap-2 bg-muted/30 dark:bg-white/5 border border-dashed border-border dark:border-white/10 rounded-xl px-3 py-3 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      Markdown (.md)
                     </button>
                   )}
                 </div>
