@@ -111,24 +111,42 @@ Style requirements (STRICTLY FOLLOW):
 - Simple flat backgrounds, no complex textures or depth effects
 - Everything in the image must follow the same 2D flat vector style consistently${mascotBlock}${referenceBlock}${colorGuidance}`;
 
-    // Fetch reference image if provided
+    // Fetch reference images in parallel
     let referenceImageData: { base64: string; mimeType: string } | null = null;
-    if (referenceImageUrl) {
-      referenceImageData = await fetchImageAsBase64(referenceImageUrl);
-      if (referenceImageData) {
-        console.log('Reference image fetched successfully');
-      } else {
-        console.warn('Failed to fetch reference image, proceeding without');
-      }
-    }
+    let styleImageData: { base64: string; mimeType: string } | null = null;
 
-    // Build request parts — text + optional reference image
+    const fetchPromises: Promise<void>[] = [];
+    if (referenceImageUrl) {
+      fetchPromises.push(fetchImageAsBase64(referenceImageUrl).then(data => {
+        referenceImageData = data;
+        if (data) console.log('Reference image fetched successfully');
+        else console.warn('Failed to fetch reference image, proceeding without');
+      }));
+    }
+    if (styleReferenceUrl) {
+      fetchPromises.push(fetchImageAsBase64(styleReferenceUrl).then(data => {
+        styleImageData = data;
+        if (data) console.log('Style reference image fetched successfully');
+        else console.warn('Failed to fetch style reference image, proceeding without');
+      }));
+    }
+    if (fetchPromises.length > 0) await Promise.all(fetchPromises);
+
+    // Build request parts — text + optional mascot reference + optional style reference
     const requestParts: any[] = [{ text: imagePrompt }];
     if (referenceImageData) {
       requestParts.push({
         inlineData: {
           mimeType: referenceImageData.mimeType,
           data: referenceImageData.base64,
+        }
+      });
+    }
+    if (styleImageData) {
+      requestParts.push({
+        inlineData: {
+          mimeType: styleImageData.mimeType,
+          data: styleImageData.base64,
         }
       });
     }
