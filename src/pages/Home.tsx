@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { parseMdCourse } from '@/lib/mdCourseParser';
 import { useNavigate } from 'react-router-dom';
 import { Plus, ArrowUp, Loader2, Gauge, Palette, Sparkles, BookOpen, Star, Zap, ImageOff, ImageIcon, Check, Paperclip, Link, FileText, Upload, X } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
