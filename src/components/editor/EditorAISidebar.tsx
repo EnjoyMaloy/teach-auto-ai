@@ -428,19 +428,45 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
 
   // ── Submit handler ──────────────────────────────────────
   const handleSubmit = async () => {
-    // MD file direct import
+    // MD file AI-powered import
     if (sourceType === 'md' && sourceFile && mode === 'generate') {
       const mdContent = await sourceFile.text();
-      const parsed = parseMdCourse(mdContent);
-      if (parsed.lessons.length > 0) {
-        onAIGenerate(parsed.lessons);
-        toast.success(`Импортировано из MD: ${parsed.lessons.length} уроков`);
-        setSourceFile(null);
-        setSourceType('none');
-        setMode('idle');
-      } else {
-        toast.error('Не удалось распарсить MD файл');
+      if (!mdContent.trim()) {
+        toast.error('MD файл пуст');
+        return;
       }
+
+      if (onBeforeGenerate) {
+        const ok = await onBeforeGenerate();
+        if (!ok) return;
+      }
+
+      // Add user message
+      const userMsg: UnifiedMessage = {
+        id: crypto.randomUUID(),
+        type: 'user',
+        content: `📄 Импорт из MD: ${sourceFile.name}`,
+        timestamp: Date.now(),
+      };
+      setMessages(prev => [...prev, userMsg]);
+
+      // Add generation placeholder
+      const genMsgId = crypto.randomUUID();
+      generationMsgIdRef.current = genMsgId;
+      setMessages(prev => [...prev, {
+        id: genMsgId,
+        type: 'generation',
+        content: '',
+        timestamp: Date.now(),
+        steps: [],
+        isGenerating: true,
+      }]);
+
+      const selectedDS = designSystems.find(ds => ds.id === selectedDesignSystemId);
+      runMdGeneration(mdContent, localSkipImages, selectedDS?.config, selectedDS?.id, imageModel);
+      setSourceFile(null);
+      setSourceType('none');
+      setMode('idle');
       return;
     }
 
