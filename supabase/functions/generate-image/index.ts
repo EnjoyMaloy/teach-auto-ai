@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
     const { user, supabaseClient, error: authError } = await verifyAuth(req);
     if (authError) return authError;
 
-    const { prompt, slideContext, colorPalette, imageModel, mascotDescription, referenceImageUrl } = await req.json();
+    const { prompt, slideContext, colorPalette, imageModel, mascotDescription, referenceImageUrl, styleReferenceUrl } = await req.json();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     
     if (!GEMINI_API_KEY) {
