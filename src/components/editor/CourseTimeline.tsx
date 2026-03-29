@@ -42,6 +42,7 @@ interface CourseTimelineProps {
   onAddBlock: (type: BlockType) => void;
   onReorderBlocks: (event: DragEndEvent) => void;
   onDeleteBlock?: (blockId: string) => void;
+  onDuplicateBlock?: (blockId: string) => void;
   onDeleteLesson?: (lessonId: string) => void;
   slideToBlock: (slide: any) => Block;
   designSystem?: CourseDesignSystem | DesignSystemConfig;
