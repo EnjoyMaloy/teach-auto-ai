@@ -687,6 +687,7 @@ const Editor: React.FC = () => {
         initialMode={(location.state as any)?.openAIGenerate ? 'generate' : undefined}
         autoPrompt={(location.state as any)?.autoPrompt}
         autoSettings={(location.state as any)?.generationSettings}
+        autoMdContent={(location.state as any)?.mdContent}
         courseId={course.id}
         designSystem={course.designSystem}
         selectedBlock={selectedBlock}
