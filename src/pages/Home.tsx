@@ -254,6 +254,18 @@ const Home: React.FC = () => {
                   <FileText className="w-3.5 h-3.5" />
                   Файл
                 </button>
+                <button
+                  onClick={() => setSourceType(sourceType === 'md' ? 'none' : 'md')}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
+                    sourceType === 'md'
+                      ? "bg-primary/10 border-primary/30 text-primary"
+                      : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
+                  )}
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  MD
+                </button>
               </div>
               {sourceType === 'link' && (
                 <input
