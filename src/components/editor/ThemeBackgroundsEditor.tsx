@@ -10,9 +10,10 @@ import {
   DialogTitle, 
   DialogFooter 
 } from '@/components/ui/dialog';
-import { Plus, Trash2, Check, Edit } from 'lucide-react';
+import { Plus, Trash2, Check, Edit, Shuffle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AnglePicker } from './AnglePicker';
+import { parseHSL, formatHSL } from '@/lib/colorUtils';
 
 interface ThemeBackgroundsEditorProps {
   backgrounds: BackgroundPreset[];
@@ -22,6 +23,89 @@ interface ThemeBackgroundsEditorProps {
   selectedBackgroundId?: string;
   onSelectBackground?: (id: string) => void;
   maxBackgrounds?: number;
+  primaryColor?: string;
+}
+
+// Generate background presets based on accent color
+function generateBackgroundsFromAccent(primaryHsl: string, variation: number): BackgroundPreset[] {
+  const parsed = parseHSL(primaryHsl);
+  if (!parsed) return [];
+
+  const { h, s } = parsed;
+
+  // 6 palette variations, each produces 5 backgrounds (3 solid + 2 gradient)
+  const palettes: Array<{
+    names: string[];
+    bgs: Array<{ type: 'solid' | 'gradient'; color?: string; from?: string; to?: string; angle?: number }>;
+  }> = [
+    {
+      names: ['Светлый', 'Тёплый', 'Насыщенный', 'Мягкий градиент', 'Глубокий градиент'],
+      bgs: [
+        { type: 'solid', color: formatHSL(h, Math.round(s * 0.3), 95) },
+        { type: 'solid', color: formatHSL(h, Math.round(s * 0.4), 88) },
+        { type: 'solid', color: formatHSL(h, Math.round(s * 0.6), 78) },
+        { type: 'gradient', from: formatHSL(h, Math.round(s * 0.25), 95), to: formatHSL((h + 15) % 360, Math.round(s * 0.3), 90), angle: 135 },
+        { type: 'gradient', from: formatHSL(h, Math.round(s * 0.5), 82), to: formatHSL((h - 10 + 360) % 360, Math.round(s * 0.6), 70), angle: 160 },
+      ],
+    },
+    {
+      names: ['Пастельный', 'Дымчатый', 'Акцентный', 'Закат', 'Рассвет'],
+      bgs: [
+        { type: 'solid', color: formatHSL(h, Math.round(s * 0.2), 96) },
+        { type: 'solid', color: formatHSL((h + 8) % 360, Math.round(s * 0.15), 90) },
+        { type: 'solid', color: formatHSL(h, Math.round(s * 0.7), 75) },
+        { type: 'gradient', from: formatHSL(h, Math.round(s * 0.4), 90), to: formatHSL((h + 20) % 360, Math.round(s * 0.5), 85), angle: 120 },
+        { type: 'gradient', from: formatHSL((h - 15 + 360) % 360, Math.round(s * 0.3), 93), to: formatHSL(h, Math.round(s * 0.4), 88), angle: 180 },
+      ],
+    },
+    {
+      names: ['Кремовый', 'Песочный', 'Терракот', 'Аналогичный', 'Глубина'],
+      bgs: [
+        { type: 'solid', color: formatHSL(h, Math.round(s * 0.25), 94) },
+        { type: 'solid', color: formatHSL((h + 5) % 360, Math.round(s * 0.35), 86) },
+        { type: 'solid', color: formatHSL((h - 5 + 360) % 360, Math.round(s * 0.55), 72) },
+        { type: 'gradient', from: formatHSL((h - 8 + 360) % 360, Math.round(s * 0.3), 92), to: formatHSL((h + 8) % 360, Math.round(s * 0.35), 88), angle: 145 },
+        { type: 'gradient', from: formatHSL(h, Math.round(s * 0.45), 80), to: formatHSL(h, Math.round(s * 0.65), 55), angle: 170 },
+      ],
+    },
+    {
+      names: ['Облачный', 'Пепельный', 'Бронзовый', 'Нежность', 'Контраст'],
+      bgs: [
+        { type: 'solid', color: formatHSL(h, Math.round(s * 0.1), 97) },
+        { type: 'solid', color: formatHSL(h, Math.round(s * 0.18), 85) },
+        { type: 'solid', color: formatHSL(h, Math.round(s * 0.5), 60) },
+        { type: 'gradient', from: formatHSL(h, Math.round(s * 0.15), 96), to: formatHSL((h + 12) % 360, Math.round(s * 0.2), 92), angle: 110 },
+        { type: 'gradient', from: formatHSL(h, Math.round(s * 0.35), 85), to: formatHSL(h, Math.round(s * 0.55), 50), angle: 150 },
+      ],
+    },
+    {
+      names: ['Жемчужный', 'Льняной', 'Карамель', 'Сумерки', 'Восход'],
+      bgs: [
+        { type: 'solid', color: formatHSL((h + 10) % 360, Math.round(s * 0.15), 95) },
+        { type: 'solid', color: formatHSL(h, Math.round(s * 0.3), 87) },
+        { type: 'solid', color: formatHSL((h - 5 + 360) % 360, Math.round(s * 0.6), 65) },
+        { type: 'gradient', from: formatHSL(h, Math.round(s * 0.2), 93), to: formatHSL((h - 15 + 360) % 360, Math.round(s * 0.25), 90), angle: 130 },
+        { type: 'gradient', from: formatHSL((h + 10) % 360, Math.round(s * 0.4), 88), to: formatHSL(h, Math.round(s * 0.5), 75), angle: 155 },
+      ],
+    },
+    {
+      names: ['Молочный', 'Сливочный', 'Глиняный', 'Туман', 'Янтарь'],
+      bgs: [
+        { type: 'solid', color: formatHSL(h, Math.round(s * 0.12), 97) },
+        { type: 'solid', color: formatHSL((h + 6) % 360, Math.round(s * 0.28), 90) },
+        { type: 'solid', color: formatHSL(h, Math.round(s * 0.45), 68) },
+        { type: 'gradient', from: formatHSL(h, Math.round(s * 0.1), 96), to: formatHSL((h + 18) % 360, Math.round(s * 0.15), 93), angle: 140 },
+        { type: 'gradient', from: formatHSL((h - 6 + 360) % 360, Math.round(s * 0.38), 82), to: formatHSL(h, Math.round(s * 0.55), 62), angle: 165 },
+      ],
+    },
+  ];
+
+  const palette = palettes[variation % palettes.length];
+  return palette.bgs.map((bg, i) => ({
+    id: `bg-gen-${Date.now()}-${i}`,
+    name: palette.names[i],
+    ...bg,
+  }));
 }
 
 // Color input for HSL values
@@ -105,6 +189,7 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
   selectedBackgroundId,
   onSelectBackground,
   maxBackgrounds = 5,
+  primaryColor,
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBackground, setEditingBackground] = useState<BackgroundPreset | null>(null);
@@ -114,6 +199,16 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
   const [newGradientFrom, setNewGradientFrom] = useState('262 83% 95%');
   const [newGradientTo, setNewGradientTo] = useState('200 83% 95%');
   const [newGradientAngle, setNewGradientAngle] = useState(135);
+  const [bgVariation, setBgVariation] = useState(0);
+
+  const handleGenerateFromAccent = () => {
+    if (!primaryColor) return;
+    const generated = generateBackgroundsFromAccent(primaryColor, bgVariation);
+    setBgVariation(prev => prev + 1);
+    const defaultId = generated[0]?.id;
+    onChange(generated, defaultId);
+    if (defaultId) onDefaultChange(defaultId);
+  };
 
   const canAddMore = backgrounds.length < maxBackgrounds;
 
@@ -190,6 +285,20 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
 
   return (
     <div className="space-y-3">
+      {/* Generate from accent button */}
+      {primaryColor && (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleGenerateFromAccent}
+          className="w-full gap-2"
+        >
+          <Shuffle className="w-4 h-4" />
+          Подобрать фоны из акцентного цвета
+        </Button>
+      )}
+
       {/* Background list */}
       <div className="grid grid-cols-3 gap-2">
         {backgrounds.map((bg) => {

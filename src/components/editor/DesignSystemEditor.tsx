@@ -853,6 +853,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                   selectedBackgroundId={config.defaultBackgroundId}
                   onSelectBackground={(id) => updateConfig({ defaultBackgroundId: id })}
                   maxBackgrounds={5}
+                  primaryColor={config.primaryColor}
                 />
               </SettingsCard>
 
