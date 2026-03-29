@@ -385,17 +385,17 @@ const Home: React.FC = () => {
         </TooltipProvider>
         <button
           onClick={handleGenerate}
-          disabled={!prompt.trim()}
+          disabled={!prompt.trim() && !(sourceType === 'md' && sourceFile)}
           className={cn(
             "w-7 h-7 rounded-full flex items-center justify-center transition-all",
-            prompt.trim()
+            (prompt.trim() || (sourceType === 'md' && sourceFile))
               ? "bg-primary dark:bg-white text-primary-foreground dark:text-black hover:bg-primary/90 dark:hover:bg-white/90 cursor-pointer"
               : "bg-muted dark:bg-white/20 cursor-not-allowed"
           )}
         >
           <ArrowUp className={cn(
             "w-4 h-4",
-            prompt.trim() 
+            (prompt.trim() || (sourceType === 'md' && sourceFile))
               ? "text-primary-foreground dark:text-black" 
               : "text-muted-foreground dark:text-white/30"
           )} strokeWidth={2.5} />
