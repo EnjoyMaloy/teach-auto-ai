@@ -161,11 +161,8 @@ function parseQuizBlock(lines: string[]): Partial<Slide> | null {
   if (quizType === 'ordering') {
     // Items in correct order marked with numbers: `1. First`, `2. Second`
     const orderLines = lines.filter(l => /^\s*\d+\.\s/.test(l));
-    const orderingItems = orderLines.map((l, i) => ({
-      id: String(i + 1),
-      text: l.trim().replace(/^\d+\.\s*/, ''),
-    }));
-    const correctOrder = orderingItems.map(item => item.id);
+    const orderingItems = orderLines.map((l) => l.trim().replace(/^\d+\.\s*/, ''));
+    const correctOrder = orderingItems.map((_, i) => String(i + 1));
     return {
       type: 'ordering' as any,
       content: question,
