@@ -1334,6 +1334,32 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                 description="Цвет фона и текста для каждой подложки"
               >
                 <div className="space-y-6">
+                  {/* Shuffle palette button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full gap-2"
+                    onClick={() => {
+                      const currentIndex = BACKDROP_PALETTES.findIndex(p => 
+                        p.light.backdropLightColor === (config.designBlock?.backdropLightColor)
+                      );
+                      const nextIndex = (currentIndex + 1) % BACKDROP_PALETTES.length;
+                      const palette = BACKDROP_PALETTES[nextIndex];
+                      updateConfig({
+                        designBlock: {
+                          ...DEFAULT_DESIGN_BLOCK_SETTINGS,
+                          ...config.designBlock,
+                          ...palette.light,
+                          ...palette.dark,
+                          ...palette.primary,
+                          ...palette.blur,
+                        }
+                      });
+                    }}
+                  >
+                    <Shuffle className="w-3.5 h-3.5" />
+                    Подобрать палитру
+                  </Button>
                   {/* Light backdrop */}
                   <div className="space-y-3 p-3 rounded-lg bg-muted/30">
                     <Label className="text-xs font-semibold text-foreground">Светлая подложка</Label>
