@@ -285,6 +285,20 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
 
   return (
     <div className="space-y-3">
+      {/* Generate from accent button */}
+      {primaryColor && (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleGenerateFromAccent}
+          className="w-full gap-2"
+        >
+          <Shuffle className="w-4 h-4" />
+          Подобрать фоны из акцентного цвета
+        </Button>
+      )}
+
       {/* Background list */}
       <div className="grid grid-cols-3 gap-2">
         {backgrounds.map((bg) => {
