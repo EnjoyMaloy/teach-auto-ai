@@ -10,9 +10,10 @@ import {
   DialogTitle, 
   DialogFooter 
 } from '@/components/ui/dialog';
-import { Plus, Trash2, Check, Edit } from 'lucide-react';
+import { Plus, Trash2, Check, Edit, Shuffle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AnglePicker } from './AnglePicker';
+import { parseHSL, formatHSL } from '@/lib/colorUtils';
 
 interface ThemeBackgroundsEditorProps {
   backgrounds: BackgroundPreset[];
