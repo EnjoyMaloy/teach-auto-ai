@@ -114,7 +114,7 @@ Style requirements (STRICTLY FOLLOW):
 - NO text, words, letters, or labels on the image
 - Modern, professional look suitable for educational content
 - Simple flat backgrounds, no complex textures or depth effects
-- Everything in the image must follow the same 2D flat vector style consistently${mascotBlock}${referenceBlock}${colorGuidance}`;
+- Everything in the image must follow the same 2D flat vector style consistently${mascotBlock}${referenceBlock}${styleBlock}${colorGuidance}`;
 
     // Fetch reference images in parallel
     let referenceImageData: { base64: string; mimeType: string } | null = null;
