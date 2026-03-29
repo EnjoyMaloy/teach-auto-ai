@@ -134,7 +134,7 @@ function parseQuizBlock(lines: string[]): Partial<Slide> | null {
   }
 
   if (quizType === 'fill_blank') {
-    const blankWord = correctOptions[0] || '';
+    const blankWord = correctTexts[0] || '';
     return {
       type: 'fill_blank' as any,
       content: question,
