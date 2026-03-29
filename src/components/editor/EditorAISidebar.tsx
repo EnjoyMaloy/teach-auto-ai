@@ -427,8 +427,23 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
 
   // ── Submit handler ──────────────────────────────────────
   const handleSubmit = async () => {
+    // MD file direct import
+    if (sourceType === 'md' && sourceFile && mode === 'generate') {
+      const mdContent = await sourceFile.text();
+      const parsed = parseMdCourse(mdContent);
+      if (parsed.lessons.length > 0) {
+        onAIGenerate(parsed.lessons);
+        toast.success(`Импортировано из MD: ${parsed.lessons.length} уроков`);
+        setSourceFile(null);
+        setSourceType('none');
+        setMode('idle');
+      } else {
+        toast.error('Не удалось распарсить MD файл');
+      }
+      return;
+    }
+
     if (!chatInput.trim()) return;
-    
     // Add user message to unified list
     const userMsg: UnifiedMessage = {
       id: crypto.randomUUID(),
