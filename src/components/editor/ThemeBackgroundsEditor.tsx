@@ -189,6 +189,7 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
   selectedBackgroundId,
   onSelectBackground,
   maxBackgrounds = 5,
+  primaryColor,
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBackground, setEditingBackground] = useState<BackgroundPreset | null>(null);
@@ -198,6 +199,16 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
   const [newGradientFrom, setNewGradientFrom] = useState('262 83% 95%');
   const [newGradientTo, setNewGradientTo] = useState('200 83% 95%');
   const [newGradientAngle, setNewGradientAngle] = useState(135);
+  const [bgVariation, setBgVariation] = useState(0);
+
+  const handleGenerateFromAccent = () => {
+    if (!primaryColor) return;
+    const generated = generateBackgroundsFromAccent(primaryColor, bgVariation);
+    setBgVariation(prev => prev + 1);
+    const defaultId = generated[0]?.id;
+    onChange(generated, defaultId);
+    if (defaultId) onDefaultChange(defaultId);
+  };
 
   const canAddMore = backgrounds.length < maxBackgrounds;
 
