@@ -699,6 +699,7 @@ export const useGenerateCourse = (courseId: string) => {
 
       // Step 2: Mascot generation for visual consistency
       let mascotDesc: string | undefined;
+      let mascotRefUrl: string | undefined;
       if (skipImages) {
         updateStep('mascot', { status: 'completed', message: 'Пропущено' });
       } else {
@@ -713,6 +714,13 @@ export const useGenerateCourse = (courseId: string) => {
           mascotDesc = mascotResponse.data?.content?.trim();
           if (mascotDesc && mascotDesc.length > 500) mascotDesc = mascotDesc.substring(0, 500);
           console.log('Generated mascot description:', mascotDesc);
+
+          // Generate visual reference image of the mascot
+          if (mascotDesc) {
+            updateStep('mascot', { status: 'active', message: 'Рисую референс персонажа...' });
+            mascotRefUrl = (await generateMascotReference(mascotDesc, designSystem, imageModel)) || undefined;
+          }
+
           updateStep('mascot', { status: 'completed', message: 'Персонаж создан' });
         } catch (e) {
           console.warn('Mascot description generation failed:', e);
