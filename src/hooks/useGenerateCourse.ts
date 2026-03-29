@@ -172,15 +172,43 @@ const getColorPalette = (designSystem?: CourseDesignSystem) => {
   };
 };
 
+const generateMascotReference = async (
+  mascotDescription: string,
+  designSystem?: CourseDesignSystem,
+  imageModel?: string,
+): Promise<string | null> => {
+  try {
+    const referencePrompt = `Full-body character portrait on a plain white background. Show the character standing, facing forward, in a neutral friendly pose. No other objects, no scene, no text. The character:\n${mascotDescription}`;
+    const response = await supabase.functions.invoke('generate-image', {
+      body: {
+        prompt: referencePrompt,
+        slideContext: referencePrompt,
+        colorPalette: getColorPalette(designSystem),
+        imageModel: imageModel || 'gemini-3-pro',
+        mascotDescription,
+      },
+    });
+    if (response.error) return null;
+    const imageUrl = response.data?.imageUrl;
+    if (!imageUrl) return null;
+    console.log('Mascot reference image generated:', imageUrl);
+    return imageUrl;
+  } catch (e) {
+    console.warn('Mascot reference generation failed:', e);
+    return null;
+  }
+};
+
 const generateImageForSlide = async (
   slideContent: string,
   coursePrompt: string,
   designSystem?: CourseDesignSystem,
   imageModel?: string,
-  mascotDescription?: string
+  mascotDescription?: string,
+  referenceImageUrl?: string,
 ): Promise<string | null> => {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 20000);
+  const timeoutId = setTimeout(() => controller.abort(), 25000);
 
   try {
     const response = await supabase.functions.invoke('generate-image', {
@@ -190,6 +218,7 @@ const generateImageForSlide = async (
         colorPalette: getColorPalette(designSystem),
         imageModel: imageModel || 'gemini-3-pro',
         mascotDescription: mascotDescription || undefined,
+        referenceImageUrl: referenceImageUrl || undefined,
       },
     });
     clearTimeout(timeoutId);
