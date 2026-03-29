@@ -55,7 +55,8 @@ import {
   Link2,
   Copy,
   MousePointerClick,
-  Table2
+  Table2,
+  Shuffle
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import {
