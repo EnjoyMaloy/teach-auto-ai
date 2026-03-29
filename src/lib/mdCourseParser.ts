@@ -173,7 +173,7 @@ function parseQuizBlock(lines: string[]): Partial<Slide> | null {
   }
 
   // single_choice or multiple_choice
-  const correctAnswer = quizType === 'multiple_choice' ? correctOptions : correctOptions[0] || '';
+  const correctAnswer = quizType === 'multiple_choice' ? correctTexts : correctTexts[0] || '';
 
   return {
     type: quizType as any,
