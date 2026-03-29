@@ -624,6 +624,7 @@ export const useGenerateCourse = (courseId: string) => {
 
     const initialSteps: GenerationStep[] = [
       { id: 'parse', label: 'Парсинг MD файла', status: 'pending' },
+      { id: 'mascot', label: 'Создание персонажа', status: 'pending' },
       { id: 'images', label: 'Создание иллюстраций', status: 'pending' },
     ];
     setSteps(initialSteps);
