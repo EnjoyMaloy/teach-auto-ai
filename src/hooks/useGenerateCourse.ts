@@ -172,15 +172,43 @@ const getColorPalette = (designSystem?: CourseDesignSystem) => {
   };
 };
 
+const generateMascotReference = async (
+  mascotDescription: string,
+  designSystem?: CourseDesignSystem,
+  imageModel?: string,
+): Promise<string | null> => {
+  try {
+    const referencePrompt = `Full-body character portrait on a plain white background. Show the character standing, facing forward, in a neutral friendly pose. No other objects, no scene, no text. The character:\n${mascotDescription}`;
+    const response = await supabase.functions.invoke('generate-image', {
+      body: {
+        prompt: referencePrompt,
+        slideContext: referencePrompt,
+        colorPalette: getColorPalette(designSystem),
+        imageModel: imageModel || 'gemini-3-pro',
+        mascotDescription,
+      },
+    });
+    if (response.error) return null;
+    const imageUrl = response.data?.imageUrl;
+    if (!imageUrl) return null;
+    console.log('Mascot reference image generated:', imageUrl);
+    return imageUrl;
+  } catch (e) {
+    console.warn('Mascot reference generation failed:', e);
+    return null;
+  }
+};
+
 const generateImageForSlide = async (
   slideContent: string,
   coursePrompt: string,
   designSystem?: CourseDesignSystem,
   imageModel?: string,
-  mascotDescription?: string
+  mascotDescription?: string,
+  referenceImageUrl?: string,
 ): Promise<string | null> => {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 20000);
+  const timeoutId = setTimeout(() => controller.abort(), 25000);
 
   try {
     const response = await supabase.functions.invoke('generate-image', {
@@ -190,6 +218,7 @@ const generateImageForSlide = async (
         colorPalette: getColorPalette(designSystem),
         imageModel: imageModel || 'gemini-3-pro',
         mascotDescription: mascotDescription || undefined,
+        referenceImageUrl: referenceImageUrl || undefined,
       },
     });
     clearTimeout(timeoutId);
@@ -366,6 +395,7 @@ export const useGenerateCourse = (courseId: string) => {
 
         // Generate mascot description for visual consistency
         let mascotDesc: string | undefined;
+        let mascotRefUrl: string | undefined;
         try {
           const mascotResponse = await invokeWithRetry('generate-course', {
             userMessage: `Тема курса: "${prompt}"\n\nПридумай персонажа-маскота для иллюстраций этого курса. Ответь ТОЛЬКО описанием персонажа на английском (3-4 предложения). Опиши:\n1. Тип существа, форму тела, пропорции\n2. Основные цвета (точные: \"orange\", \"sky blue\" и т.д.), одежду/аксессуары\n3. ОБЯЗАТЕЛЬНО укажи стиль рендеринга: \"2D flat vector illustration with bold black outlines, no gradients, no 3D shading, no realistic textures\"\n\nПример: \"A small round orange fox with big curious eyes and stubby legs, wearing a tiny blue backpack and a yellow scarf. 2D flat vector illustration style with bold black outlines, solid color fills, no gradients, no 3D shading, no realistic textures. The character has simple geometric shapes and a friendly cartoon appearance.\"`,
@@ -374,6 +404,12 @@ export const useGenerateCourse = (courseId: string) => {
           mascotDesc = mascotResponse.data?.content?.trim();
           if (mascotDesc && mascotDesc.length > 500) mascotDesc = mascotDesc.substring(0, 500);
           console.log('Generated mascot description:', mascotDesc);
+
+          // Generate visual reference image of the mascot
+          if (mascotDesc) {
+            updateStep('images', { status: 'active', message: 'Рисую референс персонажа...' });
+            mascotRefUrl = (await generateMascotReference(mascotDesc, designSystem, imageModel)) || undefined;
+          }
         } catch (e) {
           console.warn('Mascot description generation failed, proceeding without:', e);
         }
@@ -421,7 +457,7 @@ export const useGenerateCourse = (courseId: string) => {
               try {
                 await Promise.all(batch.map(async ({ lessonIdx, slideIdx, subBlockIdx, description }) => {
                   try {
-                    const imageUrl = await generateImageForSlide(description, prompt, designSystem, imageModel, mascotDesc);
+                    const imageUrl = await generateImageForSlide(description, prompt, designSystem, imageModel, mascotDesc, mascotRefUrl);
                     if (imageUrl) {
                       if (subBlockIdx !== undefined) {
                         const subBlocks = courseData.lessons[lessonIdx].slides[slideIdx].subBlocks as any[];
@@ -663,6 +699,7 @@ export const useGenerateCourse = (courseId: string) => {
 
       // Step 2: Mascot generation for visual consistency
       let mascotDesc: string | undefined;
+      let mascotRefUrl: string | undefined;
       if (skipImages) {
         updateStep('mascot', { status: 'completed', message: 'Пропущено' });
       } else {
@@ -677,6 +714,13 @@ export const useGenerateCourse = (courseId: string) => {
           mascotDesc = mascotResponse.data?.content?.trim();
           if (mascotDesc && mascotDesc.length > 500) mascotDesc = mascotDesc.substring(0, 500);
           console.log('Generated mascot description:', mascotDesc);
+
+          // Generate visual reference image of the mascot
+          if (mascotDesc) {
+            updateStep('mascot', { status: 'active', message: 'Рисую референс персонажа...' });
+            mascotRefUrl = (await generateMascotReference(mascotDesc, designSystem, imageModel)) || undefined;
+          }
+
           updateStep('mascot', { status: 'completed', message: 'Персонаж создан' });
         } catch (e) {
           console.warn('Mascot description generation failed:', e);
@@ -725,7 +769,7 @@ export const useGenerateCourse = (courseId: string) => {
               try {
                 await Promise.all(batch.map(async ({ lessonIdx, slideIdx, subBlockIdx, description }) => {
                   try {
-                    const imageUrl = await generateImageForSlide(description, courseData.title || 'MD import', designSystem, imageModel, mascotDesc);
+                    const imageUrl = await generateImageForSlide(description, courseData.title || 'MD import', designSystem, imageModel, mascotDesc, mascotRefUrl);
                     if (imageUrl) {
                       if (subBlockIdx !== undefined) {
                         const subBlocks = courseData.lessons[lessonIdx].slides[slideIdx].subBlocks as any[];
