@@ -381,7 +381,7 @@ const SortableSubBlockItem: React.FC<{
             }}
           >
             <RichTextEditor
-              content={stripHtml(subBlock.content) || (isEditing ? '' : 'Текст абзаца')}
+              content={subBlock.content || (isEditing ? '' : 'Текст абзаца')}
               onChange={(content) => onUpdate({ content })}
               placeholder="Текст абзаца..."
               textSize={subBlock.textSize || 'medium'}
