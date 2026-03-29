@@ -1383,11 +1383,10 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
                     size="sm"
                     className="w-full gap-2"
                     onClick={() => {
-                      const currentIndex = BACKDROP_PALETTES.findIndex(p => 
-                        p.light.backdropLightColor === (config.designBlock?.backdropLightColor)
-                      );
-                      const nextIndex = (currentIndex + 1) % BACKDROP_PALETTES.length;
-                      const palette = BACKDROP_PALETTES[nextIndex];
+                      const primaryColor = config.primaryColor || DEFAULT_DESIGN_SYSTEM.primaryColor;
+                      const nextVar = paletteVariation + 1;
+                      setPaletteVariation(nextVar);
+                      const palette = generateBackdropPalette(primaryColor, nextVar);
                       updateConfig({
                         designBlock: {
                           ...DEFAULT_DESIGN_BLOCK_SETTINGS,
