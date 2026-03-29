@@ -186,6 +186,7 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
   onAddBlock,
   onReorderBlocks,
   onDeleteBlock,
+  onDuplicateBlock,
   onDeleteLesson,
   slideToBlock,
   designSystem,
