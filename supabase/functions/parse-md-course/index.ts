@@ -6,90 +6,91 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const SYSTEM_PROMPT = `Ты — парсер MD-файлов для мобильных образовательных курсов. Твоя задача — преобразовать Markdown-документ в структурированный JSON курса.
+const SYSTEM_PROMPT = `You are a LOSSLESS Markdown-to-Course-JSON converter for mobile educational courses.
 
-## ТВОЯ ЗАДАЧА:
-1. Определи заголовок курса (первый # заголовок)
-2. Определи уроки (## заголовки = отдельные уроки)
-3. Для каждого урока определи блоки (разделённые --- или логически)
-4. Определи тип каждого блока: design (теория) или quiz (single_choice, multiple_choice, true_false, fill_blank, matching, ordering)
-5. Для design-блоков создай subBlocks из контента
-6. Для quiz-блоков определи вопрос, варианты ответов и правильный ответ
-7. Найди промпты/описания для генерации картинок и добавь их как image subBlocks
+## ABSOLUTE RULES — ZERO CONTENT LOSS:
+1. **COPY** every lesson, heading, paragraph, list item, quiz, callout, caption, and prompt EXACTLY as written in the source MD. NEVER shorten, rewrite, merge, omit, reorder, summarize, or infer missing text.
+2. **PRESERVE** the original lesson count and block count exactly. If the MD has 5 lessons with 12 blocks each, your output MUST have 5 lessons with 12 blocks each.
+3. For each text block, include "raw_md" with the exact source text slice so we can verify nothing was lost.
+4. If you are unsure how to classify a block, output it as a design block with the full raw text — do NOT drop it.
 
-## ПРАВИЛА ПАРСИНГА:
+## BLOCK TYPES:
 
-### Определение типов блоков:
-- Если блок содержит вопрос с вариантами ответов (А/Б/В или маркеры + -) → quiz
-- Если блок содержит текстовый контент, заголовки, описания → design
-- Если в блоке есть промпт для картинки (описание иллюстрации, ![...]) → добавь image subBlock
+### DESIGN blocks (theory/content):
+Each design block contains subBlocks array:
+- Headings (### or **bold**) → { "type": "heading", "content": "EXACT TEXT", "raw_md": "EXACT SOURCE", "textAlign": "center", "textSize": "large", "fontWeight": "bold", "padding": "small" }
+- Paragraphs → { "type": "text", "content": "EXACT TEXT with <b>bold</b>, <i>italic</i>, <mark>highlight</mark>", "raw_md": "EXACT SOURCE", "textAlign": "left", "textSize": "medium", "padding": "small" }
+- Lists → { "type": "badge", "badges": [{"text": "EXACT ITEM TEXT", "iconType": "emoji", "iconValue": "relevant emoji"}], "badgeVariant": "oval", "badgeLayout": "vertical", "textAlign": "center", "padding": "small" }
+- Image prompts (any description of illustration, ![...], or text describing what image should show) → { "type": "image", "imageDescription": "ENGLISH translation of the description, 2D flat vector illustration style", "imageSize": "medium", "textAlign": "center", "padding": "small" }
 
-### Для DESIGN блоков создавай subBlocks:
-- Заголовки (### или **bold**) → { "type": "heading", "content": "...", "textAlign": "center", "textSize": "large", "fontWeight": "bold", "padding": "small" }
-- Абзацы текста → { "type": "text", "content": "...", "textAlign": "left", "textSize": "medium", "padding": "small" }
-- Списки через бейджи → { "type": "badge", "badges": [...], "badgeVariant": "oval", "badgeLayout": "vertical", "textAlign": "center", "padding": "small" }
-- Описания картинок → { "type": "image", "imageDescription": "... (НА АНГЛИЙСКОМ!)", "imageSize": "medium", "textAlign": "center", "padding": "small" }
+### TEXT subBlock formatting rules:
+- Split text longer than 120 chars into multiple text subBlocks
+- Use HTML: <b>bold</b>, <i>italic</i>, <mark>highlighted</mark>
+- Add visual styling to 40-60% of text blocks:
+  - "backdrop": "light" | "primary" | "dark" | "blur"
+  - "backdropRounded": true (always when backdrop is set)
+  - "highlight": "marker" | "underline" | "wavy" — for 30-50% of key terms
 
-### Для TEXT subBlocks обязательно:
-- Максимум 120 символов на один text subBlock! Если текст длиннее — разбей на несколько text subBlocks
-- Используй HTML-форматирование: <b>жирный</b>, <i>курсив</i>, <mark>выделение</mark>
-- Добавляй визуальное оформление:
-  - "backdrop": "light" | "primary" | "dark" | "blur" — для 40-60% текстов
-  - "backdropRounded": true — всегда при backdrop
-  - "highlight": "marker" | "underline" | "wavy" — для 30-50% текстов для выделения ключевых слов
+### QUIZ blocks:
+Identify quizzes by: questions with answer options (А/Б/В, A/B/C, markers +/-, checkboxes)
+- single_choice: one correct answer
+- multiple_choice: multiple correct
+- true_false: true/false question
+- fill_blank: missing word (use ___ in content, set blankWord)
+- matching: pairs to connect
+- ordering: items to order
 
-### Для QUIZ блоков:
-- Определи тип квиза по контексту:
-  - Один правильный ответ → single_choice
-  - Несколько правильных → multiple_choice
-  - Верно/Неверно → true_false
-  - Пропуск слова → fill_blank
-  - Соединить пары → matching
-  - Порядок → ordering
-- Найди правильный ответ (отмечен ✅, +, (правильно) или по контексту)
-- Создай объяснение (explanation)
-
-### Промпты для картинок:
-- Если в тексте есть описание иллюстрации, промпт для картинки или ![описание] → создай image subBlock
-- imageDescription ВСЕГДА на английском языке!
-- Если промпт на русском — переведи на английский
-- Стиль: "2D flat vector illustration, minimalist, clean background"
-
-## КРИТИЧЕСКИЕ ОГРАНИЧЕНИЯ (iPhone 16, 393×852):
-- МИНИМУМ 3 саб-блока на design слайд
-- МАКСИМУМ 6 саб-блоков на design слайд
-- heading: МАКС 45 символов
-- text: МАКС 120 символов
-- Для backdrop ВСЕГДА backdropRounded: true
-
-## ФОРМАТ ОТВЕТА:
-Верни ТОЛЬКО валидный JSON:
+Quiz format:
 {
-  "title": "Название курса",
-  "description": "Описание курса",
+  "type": "single_choice",
+  "content": "EXACT question text",
+  "options": ["EXACT option A", "EXACT option B", "EXACT option C", "EXACT option D"],
+  "correctAnswer": "EXACT correct option text",
+  "explanation": "EXACT explanation or auto-generated",
+  "explanationCorrect": "Positive feedback"
+}
+
+## CONSTRAINTS (iPhone 16 screen, 393×852):
+- MIN 3, MAX 6 subBlocks per design slide
+- heading: MAX 45 chars
+- text: MAX 120 chars per subBlock (split longer text into multiple subBlocks!)
+- If a section has too many elements for one slide, split into multiple slides within the same lesson
+- NEVER drop content to fit constraints — create more slides instead
+
+## IMAGE DESCRIPTIONS:
+- ALL imageDescription values MUST be in English
+- Translate from source language if needed
+- Always append style: "2D flat vector illustration, minimalist, bold outlines, clean background"
+- Describe the scene specifically related to the educational content
+
+## OUTPUT FORMAT:
+Return ONLY valid JSON, no markdown fences:
+{
+  "title": "Course title from MD",
+  "description": "Course description from MD or auto-generated",
   "lessons": [
     {
-      "title": "Название урока",
-      "description": "Описание урока",
+      "title": "Lesson title — EXACT from MD",
+      "description": "Lesson description",
       "slides": [
         {
           "type": "design",
-          "subBlocks": [ /* subBlocks */ ]
+          "subBlocks": [/* subBlocks with raw_md */]
         },
         {
           "type": "single_choice",
-          "content": "Вопрос?",
+          "content": "EXACT question",
           "options": ["A", "B", "C", "D"],
           "correctAnswer": "B",
-          "explanation": "Потому что...",
-          "explanationCorrect": "Верно! Потому что..."
+          "explanation": "Because...",
+          "explanationCorrect": "Correct!"
         }
       ]
     }
   ]
 }
 
-Верни ТОЛЬКО валидный JSON без markdown-обёртки.`;
+CRITICAL REMINDER: Your #1 job is ZERO CONTENT LOSS. Every piece of text from the MD file must appear in the output. Count lessons and blocks — they must match the source exactly.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -97,7 +98,6 @@ serve(async (req) => {
   }
 
   try {
-    // Verify auth
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       return new Response(
@@ -145,10 +145,10 @@ serve(async (req) => {
       body: JSON.stringify({
         contents: [{
           role: "user",
-          parts: [{ text: SYSTEM_PROMPT + "\n\n## MD-ФАЙЛ ДЛЯ ПАРСИНГА:\n\n" + mdContent }]
+          parts: [{ text: SYSTEM_PROMPT + "\n\n## SOURCE MD FILE (preserve ALL content):\n\n" + mdContent }]
         }],
         generationConfig: {
-          temperature: 0.3,
+          temperature: 0.1,
           maxOutputTokens: 65536,
         }
       }),
