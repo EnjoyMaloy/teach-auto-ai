@@ -307,6 +307,37 @@ const Home: React.FC = () => {
                   )}
                 </div>
               )}
+              {sourceType === 'md' && (
+                <div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".md"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setSourceFile(file);
+                    }}
+                  />
+                  {sourceFile ? (
+                    <div className="flex items-center gap-2 bg-muted/30 dark:bg-white/5 border border-border dark:border-white/10 rounded-xl px-3 py-2">
+                      <FileText className="w-4 h-4 text-primary flex-shrink-0" />
+                      <span className="text-xs text-foreground truncate flex-1">{sourceFile.name}</span>
+                      <button onClick={() => { setSourceFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }} className="text-muted-foreground hover:text-foreground">
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full flex items-center justify-center gap-2 bg-muted/30 dark:bg-white/5 border border-dashed border-border dark:border-white/10 rounded-xl px-3 py-3 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      Markdown (.md)
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
