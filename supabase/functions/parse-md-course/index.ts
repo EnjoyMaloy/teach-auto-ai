@@ -128,39 +128,65 @@ serve(async (req) => {
       );
     }
 
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) {
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
       return new Response(
-        JSON.stringify({ error: "GEMINI_API_KEY не настроен" }),
+        JSON.stringify({ error: "LOVABLE_API_KEY не настроен" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const MODEL = "gemini-3-flash-preview";
     console.log(`[parse-md-course] Parsing MD for user ${user.id}, content length: ${mdContent.length}`);
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{
-          role: "user",
-          parts: [{ text: SYSTEM_PROMPT + "\n\n## SOURCE MD FILE (preserve ALL content):\n\n" + mdContent }]
-        }],
-        generationConfig: {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 90000); // 90s timeout
+
+    let response: Response;
+    try {
+      response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            { role: "user", content: "## SOURCE MD FILE (preserve ALL content):\n\n" + mdContent }
+          ],
           temperature: 0.1,
-          maxOutputTokens: 65536,
-        }
-      }),
-    });
+          max_tokens: 65536,
+        }),
+      });
+    } catch (e) {
+      clearTimeout(timer);
+      if (e.name === 'AbortError') {
+        console.error("[parse-md-course] Request timed out after 90s");
+        return new Response(
+          JSON.stringify({ error: "Таймаут: файл слишком большой, попробуйте разбить на части" }),
+          { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      throw e;
+    }
+    clearTimeout(timer);
 
     if (!response.ok) {
       const status = response.status;
-      console.error("[parse-md-course] Gemini API error:", status);
+      const errorText = await response.text();
+      console.error("[parse-md-course] AI gateway error:", status, errorText);
       if (status === 429) {
         return new Response(
-          JSON.stringify({ error: "Превышен лимит запросов" }),
+          JSON.stringify({ error: "Превышен лимит запросов, попробуйте позже" }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (status === 402) {
+        return new Response(
+          JSON.stringify({ error: "Недостаточно средств для AI запроса" }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       return new Response(
@@ -170,11 +196,7 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const parts = data.candidates?.[0]?.content?.parts || [];
-    const content = parts
-      .map((p: any) => p.text || '')
-      .filter((t: string) => t.trim().length > 0)
-      .pop() || '';
+    const content = data.choices?.[0]?.message?.content || '';
 
     console.log("[parse-md-course] Response length:", content.length);
 
