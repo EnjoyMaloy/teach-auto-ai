@@ -1069,7 +1069,8 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
               </div>
             </div>
 
-            {/* Lesson count */}
+            {/* Lesson count - hidden when MD is selected */}
+            {sourceType !== 'md' && (
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 <BookOpen className="w-3.5 h-3.5" />
@@ -1092,6 +1093,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                 ))}
               </div>
             </div>
+            )}
 
             {/* Source (optional) */}
             <div className="space-y-2">
