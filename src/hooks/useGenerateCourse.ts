@@ -769,7 +769,7 @@ export const useGenerateCourse = (courseId: string) => {
               try {
                 await Promise.all(batch.map(async ({ lessonIdx, slideIdx, subBlockIdx, description }) => {
                   try {
-                    const imageUrl = await generateImageForSlide(description, courseData.title || 'MD import', designSystem, imageModel, mascotDesc);
+                    const imageUrl = await generateImageForSlide(description, courseData.title || 'MD import', designSystem, imageModel, mascotDesc, mascotRefUrl);
                     if (imageUrl) {
                       if (subBlockIdx !== undefined) {
                         const subBlocks = courseData.lessons[lessonIdx].slides[slideIdx].subBlocks as any[];
