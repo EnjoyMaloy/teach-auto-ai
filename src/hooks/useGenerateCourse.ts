@@ -784,16 +784,37 @@ export const useGenerateCourse = (courseId: string) => {
           } else {
             let imagesGenerated = 0;
             let imageErrors = 0;
+            let styleAnchorUrl: string | undefined;
+
+            // Generate first image as style anchor
+            const firstSlide = slidesToIllustrate[0];
+            updateStep('images', { status: 'active', message: 'Создаю стилевой эталон (1-я картинка)...' });
+            try {
+              const firstUrl = await generateImageForSlide(firstSlide.description, courseData.title || 'MD import', designSystem, imageModel, mascotDesc, mascotRefUrl);
+              if (firstUrl) {
+                styleAnchorUrl = firstUrl;
+                if (firstSlide.subBlockIdx !== undefined) {
+                  const subBlocks = courseData.lessons[firstSlide.lessonIdx].slides[firstSlide.slideIdx].subBlocks as any[];
+                  if (subBlocks?.[firstSlide.subBlockIdx]) subBlocks[firstSlide.subBlockIdx].imageUrl = firstUrl;
+                }
+                imagesGenerated++;
+              } else {
+                imageErrors++;
+              }
+            } catch { imageErrors++; }
+
+            // Generate remaining images in batches with style anchor
+            const remaining = slidesToIllustrate.slice(1);
             const batchSize = 4;
 
-            for (let i = 0; i < slidesToIllustrate.length; i += batchSize) {
+            for (let i = 0; i < remaining.length; i += batchSize) {
               checkCancelled();
-              const batch = slidesToIllustrate.slice(i, i + batchSize);
+              const batch = remaining.slice(i, i + batchSize);
 
               try {
                 await Promise.all(batch.map(async ({ lessonIdx, slideIdx, subBlockIdx, description }) => {
                   try {
-                    const imageUrl = await generateImageForSlide(description, courseData.title || 'MD import', designSystem, imageModel, mascotDesc, mascotRefUrl);
+                    const imageUrl = await generateImageForSlide(description, courseData.title || 'MD import', designSystem, imageModel, mascotDesc, mascotRefUrl, styleAnchorUrl);
                     if (imageUrl) {
                       if (subBlockIdx !== undefined) {
                         const subBlocks = courseData.lessons[lessonIdx].slides[slideIdx].subBlocks as any[];
@@ -811,7 +832,7 @@ export const useGenerateCourse = (courseId: string) => {
 
               updateStep('images', { status: 'active', message: `Создано ${imagesGenerated}/${totalImages} иллюстраций` });
 
-              if (i + batchSize < slidesToIllustrate.length) {
+              if (i + batchSize < remaining.length) {
                 await new Promise(resolve => setTimeout(resolve, 300));
               }
             }
