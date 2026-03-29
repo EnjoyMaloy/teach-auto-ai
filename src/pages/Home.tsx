@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { parseMdCourse } from '@/lib/mdCourseParser';
 import { useNavigate } from 'react-router-dom';
 import { Plus, ArrowUp, Loader2, Gauge, Palette, Sparkles, BookOpen, Star, Zap, ImageOff, ImageIcon, Check, Paperclip, Link, FileText, Upload, X } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -17,15 +18,31 @@ const Home: React.FC = () => {
   const [lessonCount, setLessonCount] = useState(3);
   const [skipImages, setSkipImages] = useState(false);
   const [imageModel, setImageModel] = useState<'gemini-3-pro' | 'gemini-3.1-flash' | 'gemini-2.5-flash'>('gemini-3-pro');
-  const [sourceType, setSourceType] = useState<'none' | 'link' | 'file'>('none');
+  const [sourceType, setSourceType] = useState<'none' | 'link' | 'file' | 'md'>('none');
   const [sourceUrl, setSourceUrl] = useState('');
   const [sourceFile, setSourceFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const userName = 'Павел';
 
-  const handleGenerate = () => {
-    if (!prompt.trim() || !user) return;
+  const handleGenerate = async () => {
+    if (!user) return;
+
+    // MD file direct import (no AI)
+    if (sourceType === 'md' && sourceFile) {
+      const mdContent = await sourceFile.text();
+      const parsed = parseMdCourse(mdContent);
+      navigate('/editor/new', {
+        state: {
+          importedLessons: parsed.lessons,
+          importedTitle: parsed.title,
+          importedDescription: parsed.description,
+        },
+      });
+      return;
+    }
+
+    if (!prompt.trim()) return;
 
     // Navigate to editor with all generation settings
     navigate('/editor/new', {
@@ -253,6 +270,18 @@ const Home: React.FC = () => {
                   <FileText className="w-3.5 h-3.5" />
                   Файл
                 </button>
+                <button
+                  onClick={() => setSourceType(sourceType === 'md' ? 'none' : 'md')}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
+                    sourceType === 'md'
+                      ? "bg-primary/10 border-primary/30 text-primary"
+                      : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
+                  )}
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  MD
+                </button>
               </div>
               {sourceType === 'link' && (
                 <input
@@ -294,6 +323,37 @@ const Home: React.FC = () => {
                   )}
                 </div>
               )}
+              {sourceType === 'md' && (
+                <div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".md"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setSourceFile(file);
+                    }}
+                  />
+                  {sourceFile ? (
+                    <div className="flex items-center gap-2 bg-muted/30 dark:bg-white/5 border border-border dark:border-white/10 rounded-xl px-3 py-2">
+                      <FileText className="w-4 h-4 text-primary flex-shrink-0" />
+                      <span className="text-xs text-foreground truncate flex-1">{sourceFile.name}</span>
+                      <button onClick={() => { setSourceFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }} className="text-muted-foreground hover:text-foreground">
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full flex items-center justify-center gap-2 bg-muted/30 dark:bg-white/5 border border-dashed border-border dark:border-white/10 rounded-xl px-3 py-3 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      Markdown (.md)
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -325,17 +385,17 @@ const Home: React.FC = () => {
         </TooltipProvider>
         <button
           onClick={handleGenerate}
-          disabled={!prompt.trim()}
+          disabled={!prompt.trim() && !(sourceType === 'md' && sourceFile)}
           className={cn(
             "w-7 h-7 rounded-full flex items-center justify-center transition-all",
-            prompt.trim()
+            (prompt.trim() || (sourceType === 'md' && sourceFile))
               ? "bg-primary dark:bg-white text-primary-foreground dark:text-black hover:bg-primary/90 dark:hover:bg-white/90 cursor-pointer"
               : "bg-muted dark:bg-white/20 cursor-not-allowed"
           )}
         >
           <ArrowUp className={cn(
             "w-4 h-4",
-            prompt.trim() 
+            (prompt.trim() || (sourceType === 'md' && sourceFile))
               ? "text-primary-foreground dark:text-black" 
               : "text-muted-foreground dark:text-white/30"
           )} strokeWidth={2.5} />

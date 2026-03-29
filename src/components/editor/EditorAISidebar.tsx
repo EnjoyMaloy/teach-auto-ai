@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { parseMdCourse } from '@/lib/mdCourseParser';
+import { toast } from 'sonner';
 import { 
   Sparkles, MessageSquare, Wand2, Loader2, Check, 
   AlertCircle, Search, Brain, Layers, BookOpen, CheckCircle2, 
@@ -124,7 +126,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   const [imageModel, setImageModel] = useState<'gemini-3-pro' | 'gemini-3.1-flash' | 'gemini-2.5-flash'>(autoSettings?.imageModel ?? 'gemini-3-pro');
   const [selectedDesignSystemId, setSelectedDesignSystemId] = useState<string | null>(autoSettings?.designSystemId ?? null);
   const [lessonCount, setLessonCount] = useState(autoSettings?.lessonCount ?? 3);
-  const [sourceType, setSourceType] = useState<'none' | 'link' | 'file'>('none');
+  const [sourceType, setSourceType] = useState<'none' | 'link' | 'file' | 'md'>('none');
   const [sourceUrl, setSourceUrl] = useState('');
   const [sourceFile, setSourceFile] = useState<File | null>(null);
   const fileInputRef2 = useRef<HTMLInputElement>(null);
@@ -426,8 +428,23 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
 
   // ── Submit handler ──────────────────────────────────────
   const handleSubmit = async () => {
+    // MD file direct import
+    if (sourceType === 'md' && sourceFile && mode === 'generate') {
+      const mdContent = await sourceFile.text();
+      const parsed = parseMdCourse(mdContent);
+      if (parsed.lessons.length > 0) {
+        onAIGenerate(parsed.lessons);
+        toast.success(`Импортировано из MD: ${parsed.lessons.length} уроков`);
+        setSourceFile(null);
+        setSourceType('none');
+        setMode('idle');
+      } else {
+        toast.error('Не удалось распарсить MD файл');
+      }
+      return;
+    }
+
     if (!chatInput.trim()) return;
-    
     // Add user message to unified list
     const userMsg: UnifiedMessage = {
       id: crypto.randomUUID(),
@@ -1081,6 +1098,18 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                   <FileText className="w-3.5 h-3.5" />
                   Файл
                 </button>
+                <button
+                  onClick={() => setSourceType(sourceType === 'md' ? 'none' : 'md')}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
+                    sourceType === 'md'
+                      ? "bg-primary/10 border-primary/30 text-primary"
+                      : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
+                  )}
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  MD
+                </button>
               </div>
               {sourceType === 'link' && (
                 <input
@@ -1118,6 +1147,37 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                     >
                       <Upload className="w-3.5 h-3.5" />
                       PDF, DOCX, TXT
+                    </button>
+                  )}
+                </div>
+              )}
+              {sourceType === 'md' && (
+                <div>
+                  <input
+                    ref={fileInputRef2}
+                    type="file"
+                    accept=".md"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setSourceFile(file);
+                    }}
+                  />
+                  {sourceFile ? (
+                    <div className="flex items-center gap-2 bg-muted/30 dark:bg-white/5 border border-border dark:border-white/10 rounded-xl px-3 py-2">
+                      <FileText className="w-4 h-4 text-primary flex-shrink-0" />
+                      <span className="text-xs text-foreground truncate flex-1">{sourceFile.name}</span>
+                      <button onClick={() => { setSourceFile(null); if (fileInputRef2.current) fileInputRef2.current.value = ''; }} className="text-muted-foreground hover:text-foreground">
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => fileInputRef2.current?.click()}
+                      className="w-full flex items-center justify-center gap-2 bg-muted/30 dark:bg-white/5 border border-dashed border-border dark:border-white/10 rounded-xl px-3 py-3 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      Markdown (.md)
                     </button>
                   )}
                 </div>
@@ -1274,7 +1334,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
             ) : (
               <button
                 onClick={handleSubmit}
-                disabled={!chatInput.trim() || isInputDisabled}
+                disabled={(!chatInput.trim() && !(sourceType === 'md' && sourceFile)) || isInputDisabled}
                 className="p-1.5 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30 rounded-lg hover:bg-foreground/5"
                 title="Отправить"
               >
