@@ -395,6 +395,7 @@ export const useGenerateCourse = (courseId: string) => {
 
         // Generate mascot description for visual consistency
         let mascotDesc: string | undefined;
+        let mascotRefUrl: string | undefined;
         try {
           const mascotResponse = await invokeWithRetry('generate-course', {
             userMessage: `Тема курса: "${prompt}"\n\nПридумай персонажа-маскота для иллюстраций этого курса. Ответь ТОЛЬКО описанием персонажа на английском (3-4 предложения). Опиши:\n1. Тип существа, форму тела, пропорции\n2. Основные цвета (точные: \"orange\", \"sky blue\" и т.д.), одежду/аксессуары\n3. ОБЯЗАТЕЛЬНО укажи стиль рендеринга: \"2D flat vector illustration with bold black outlines, no gradients, no 3D shading, no realistic textures\"\n\nПример: \"A small round orange fox with big curious eyes and stubby legs, wearing a tiny blue backpack and a yellow scarf. 2D flat vector illustration style with bold black outlines, solid color fills, no gradients, no 3D shading, no realistic textures. The character has simple geometric shapes and a friendly cartoon appearance.\"`,
@@ -403,6 +404,12 @@ export const useGenerateCourse = (courseId: string) => {
           mascotDesc = mascotResponse.data?.content?.trim();
           if (mascotDesc && mascotDesc.length > 500) mascotDesc = mascotDesc.substring(0, 500);
           console.log('Generated mascot description:', mascotDesc);
+
+          // Generate visual reference image of the mascot
+          if (mascotDesc) {
+            updateStep('images', { status: 'active', message: 'Рисую референс персонажа...' });
+            mascotRefUrl = (await generateMascotReference(mascotDesc, designSystem, imageModel)) || undefined;
+          }
         } catch (e) {
           console.warn('Mascot description generation failed, proceeding without:', e);
         }
