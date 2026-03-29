@@ -28,15 +28,20 @@ const Home: React.FC = () => {
   const handleGenerate = async () => {
     if (!user) return;
 
-    // MD file direct import (no AI)
+    // MD file → navigate to editor with MD content for AI-powered import
     if (sourceType === 'md' && sourceFile) {
       const mdContent = await sourceFile.text();
-      const parsed = parseMdCourse(mdContent);
+      if (!mdContent.trim()) return;
       navigate('/editor/new', {
         state: {
-          importedLessons: parsed.lessons,
-          importedTitle: parsed.title,
-          importedDescription: parsed.description,
+          openAIGenerate: true,
+          autoPrompt: '📄 Импорт из MD',
+          mdContent,
+          generationSettings: {
+            designSystemId: selectedDesignSystemId,
+            skipImages,
+            imageModel,
+          },
         },
       });
       return;
