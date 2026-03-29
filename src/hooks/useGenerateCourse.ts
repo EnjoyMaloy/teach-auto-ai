@@ -624,6 +624,7 @@ export const useGenerateCourse = (courseId: string) => {
 
     const initialSteps: GenerationStep[] = [
       { id: 'parse', label: 'Парсинг MD файла', status: 'pending' },
+      { id: 'mascot', label: 'Создание персонажа', status: 'pending' },
       { id: 'images', label: 'Создание иллюстраций', status: 'pending' },
     ];
     setSteps(initialSteps);
@@ -660,7 +661,30 @@ export const useGenerateCourse = (courseId: string) => {
         message: `Найдено ${courseData.lessons.length} уроков, ${courseData.lessons.reduce((s, l) => s + (l.slides?.length || 0), 0)} блоков`
       });
 
-      // Step 2: Images
+      // Step 2: Mascot generation for visual consistency
+      let mascotDesc: string | undefined;
+      if (skipImages) {
+        updateStep('mascot', { status: 'completed', message: 'Пропущено' });
+      } else {
+        updateStep('mascot', { status: 'active', message: 'Придумываю персонажа...' });
+        checkCancelled();
+        try {
+          const courseTitle = courseData.title || 'Образовательный курс';
+          const mascotResponse = await invokeWithRetry('generate-course', {
+            userMessage: `Тема курса: "${courseTitle}"\n\nПридумай персонажа-маскота для иллюстраций этого курса. Ответь ТОЛЬКО описанием персонажа на английском (3-4 предложения). Опиши:\n1. Тип существа, форму тела, пропорции\n2. Основные цвета (точные: \"orange\", \"sky blue\" и т.д.), одежду/аксессуары\n3. ОБЯЗАТЕЛЬНО укажи стиль рендеринга: \"2D flat vector illustration with bold black outlines, no gradients, no 3D shading, no realistic textures\"\n\nПример: \"A small round orange fox with big curious eyes and stubby legs, wearing a tiny blue backpack and a yellow scarf. 2D flat vector illustration style with bold black outlines, solid color fills, no gradients, no 3D shading, no realistic textures. The character has simple geometric shapes and a friendly cartoon appearance.\"`,
+            agentRole: 'research',
+          });
+          mascotDesc = mascotResponse.data?.content?.trim();
+          if (mascotDesc && mascotDesc.length > 500) mascotDesc = mascotDesc.substring(0, 500);
+          console.log('Generated mascot description:', mascotDesc);
+          updateStep('mascot', { status: 'completed', message: 'Персонаж создан' });
+        } catch (e) {
+          console.warn('Mascot description generation failed:', e);
+          updateStep('mascot', { status: 'completed', message: 'Пропущено' });
+        }
+      }
+
+      // Step 3: Images
       if (skipImages) {
         updateStep('images', { status: 'completed', message: 'Пропущено' });
       } else {
@@ -701,7 +725,7 @@ export const useGenerateCourse = (courseId: string) => {
               try {
                 await Promise.all(batch.map(async ({ lessonIdx, slideIdx, subBlockIdx, description }) => {
                   try {
-                    const imageUrl = await generateImageForSlide(description, 'MD import', designSystem, imageModel);
+                    const imageUrl = await generateImageForSlide(description, courseData.title || 'MD import', designSystem, imageModel, mascotDesc);
                     if (imageUrl) {
                       if (subBlockIdx !== undefined) {
                         const subBlocks = courseData.lessons[lessonIdx].slides[slideIdx].subBlocks as any[];
