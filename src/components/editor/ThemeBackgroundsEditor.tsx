@@ -207,7 +207,6 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
     bgVariationRef.current += 1;
     const defaultId = generated[0]?.id;
     onChange(generated, defaultId);
-    if (defaultId) onDefaultChange(defaultId);
   };
 
   const canAddMore = backgrounds.length < maxBackgrounds;
