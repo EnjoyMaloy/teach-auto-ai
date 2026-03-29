@@ -402,7 +402,7 @@ export const DesignPreviewBlocks: React.FC<DesignPreviewBlocksProps> = ({ config
         </div>
 
         {/* Right: Phone preview - use aspect ratio to fill height */}
-        <div className="h-full overflow-hidden" style={{ aspectRatio: '390 / 760' }}>
+        <div className="h-full overflow-visible" style={{ aspectRatio: '390 / 760' }}>
           <MobilePreviewFrame
             block={selectedBlock}
             lessonTitle="Демо-урок"
