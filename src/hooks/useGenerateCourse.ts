@@ -206,6 +206,7 @@ const generateImageForSlide = async (
   imageModel?: string,
   mascotDescription?: string,
   referenceImageUrl?: string,
+  styleReferenceUrl?: string,
 ): Promise<string | null> => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 25000);
@@ -219,6 +220,7 @@ const generateImageForSlide = async (
         imageModel: imageModel || 'gemini-3-pro',
         mascotDescription: mascotDescription || undefined,
         referenceImageUrl: referenceImageUrl || undefined,
+        styleReferenceUrl: styleReferenceUrl || undefined,
       },
     });
     clearTimeout(timeoutId);
