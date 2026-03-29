@@ -173,6 +173,13 @@ const SortableSubBlockItem: React.FC<{
     return text.replace(/<[^>]*>/g, '').trim();
   };
 
+  // Strip only wrapping <p> tags but preserve formatting (mark, u, span, strong, em)
+  const stripWrappingTags = (text: string | undefined): string => {
+    if (!text) return '';
+    // Remove only outer <p> and </p> tags, keep inner formatting
+    return text.replace(/^<p>/, '').replace(/<\/p>$/, '').trim();
+  };
+
   const textAlignClass = {
     left: 'text-left',
     center: 'text-center',
@@ -374,7 +381,7 @@ const SortableSubBlockItem: React.FC<{
             }}
           >
             <RichTextEditor
-              content={stripHtml(subBlock.content) || (isEditing ? '' : 'Текст абзаца')}
+              content={subBlock.content || (isEditing ? '' : 'Текст абзаца')}
               onChange={(content) => onUpdate({ content })}
               placeholder="Текст абзаца..."
               textSize={subBlock.textSize || 'medium'}
