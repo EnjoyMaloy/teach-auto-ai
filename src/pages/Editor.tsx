@@ -783,7 +783,7 @@ const Editor: React.FC = () => {
           {/* Preview area - full width */}
           <div className="flex-1 flex items-center justify-center overflow-hidden m-2 rounded-2xl bg-background">
             <div 
-              className="h-full w-full"
+              className="h-full w-full py-3"
             >
               <MobilePreviewFrame
                 block={selectedBlock}
