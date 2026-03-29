@@ -25,8 +25,24 @@ const Home: React.FC = () => {
 
   const userName = 'Павел';
 
-  const handleGenerate = () => {
-    if (!prompt.trim() || !user) return;
+  const handleGenerate = async () => {
+    if (!user) return;
+
+    // MD file direct import (no AI)
+    if (sourceType === 'md' && sourceFile) {
+      const mdContent = await sourceFile.text();
+      const parsed = parseMdCourse(mdContent);
+      navigate('/editor/new', {
+        state: {
+          importedLessons: parsed.lessons,
+          importedTitle: parsed.title,
+          importedDescription: parsed.description,
+        },
+      });
+      return;
+    }
+
+    if (!prompt.trim()) return;
 
     // Navigate to editor with all generation settings
     navigate('/editor/new', {
