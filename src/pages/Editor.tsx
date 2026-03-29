@@ -156,13 +156,22 @@ const Editor: React.FC = () => {
       if (courseId === 'new') {
         // Create in-memory course without saving to DB
         const tempId = crypto.randomUUID();
+        const navState = location.state as any;
+        
+        // Check if we have imported lessons from MD file
+        const importedLessons = navState?.importedLessons as Lesson[] | undefined;
+        const importedTitle = navState?.importedTitle as string | undefined;
+        const importedDescription = navState?.importedDescription as string | undefined;
+        
         const tempCourse: Course = {
           id: tempId,
-          title: 'Новый курс',
-          description: '',
+          title: importedTitle || 'Новый курс',
+          description: importedDescription || '',
           authorId: user.id,
           targetAudience: '',
-          lessons: [],
+          lessons: importedLessons 
+            ? importedLessons.map((l, i) => ({ ...l, courseId: tempId, order: i + 1 }))
+            : [],
           currentVersion: 1,
           versions: [],
           isPublished: false,
@@ -174,6 +183,15 @@ const Editor: React.FC = () => {
         };
         setCourse(tempCourse);
         setIsNewCourse(true);
+        
+        // If imported, select first lesson/block
+        if (importedLessons && importedLessons.length > 0) {
+          setSelectedLessonId(importedLessons[0].id);
+          if (importedLessons[0].slides?.length > 0) {
+            setSelectedBlockId(importedLessons[0].slides[0].id);
+          }
+        }
+        
         navigate(`/editor/${tempId}`, { replace: true, state: location.state });
       } else if (courseId) {
         const loadedCourse = await fetchCourse(courseId);
