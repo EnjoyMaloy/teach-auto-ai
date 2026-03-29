@@ -97,6 +97,7 @@ interface EditorAISidebarProps {
   onBeforeGenerate?: () => Promise<boolean>;
   autoPrompt?: string;
   autoSettings?: GenerationSettings;
+  autoMdContent?: string;
 }
 
 type SidebarMode = 'idle' | 'generate' | 'edit-block';
