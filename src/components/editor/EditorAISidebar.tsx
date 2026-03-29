@@ -235,7 +235,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     setDesignSystem,
   } = useAIGeneration();
   
-  const { runGeneration, forceReset } = useGenerateCourse(courseId);
+  const { runGeneration, runMdGeneration, forceReset } = useGenerateCourse(courseId);
   const { refineCourse, isRefining } = useRefineCourse(courseId);
 
   // ── Reconnect to active generation after remount ────────
