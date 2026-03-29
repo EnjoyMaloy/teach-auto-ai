@@ -119,6 +119,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   onBeforeGenerate,
   autoPrompt,
   autoSettings,
+  autoMdContent,
 }) => {
   const [mode, setMode] = useState<SidebarMode>(initialMode === 'generate' ? 'generate' : 'idle');
   const [chatInput, setChatInput] = useState('');
