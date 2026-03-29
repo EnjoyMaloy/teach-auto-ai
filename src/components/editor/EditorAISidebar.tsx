@@ -297,13 +297,11 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   useEffect(() => {
     if (autoPrompt && isOpen && !autoStartedRef.current && designSystems.length > 0 && state.status === 'idle') {
       autoStartedRef.current = true;
-      // Trigger generation with pre-configured settings
       const doAutoGenerate = async () => {
         if (onBeforeGenerate) {
           const ok = await onBeforeGenerate();
           if (!ok) return;
         }
-        // Add user message
         const userMsg: UnifiedMessage = {
           id: crypto.randomUUID(),
           type: 'user',
@@ -311,7 +309,6 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           timestamp: Date.now(),
         };
         setMessages(prev => [...prev, userMsg]);
-        // Add generation placeholder
         const genMsgId = crypto.randomUUID();
         generationMsgIdRef.current = genMsgId;
         setMessages(prev => [...prev, {
@@ -323,7 +320,13 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           isGenerating: true,
         }]);
         const selectedDS = designSystems.find(ds => ds.id === selectedDesignSystemId);
-        runGeneration(autoPrompt, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id, imageModel);
+        
+        if (autoMdContent) {
+          // MD import flow
+          runMdGeneration(autoMdContent, localSkipImages, selectedDS?.config, selectedDS?.id, imageModel);
+        } else {
+          runGeneration(autoPrompt, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id, imageModel);
+        }
         setMode('idle');
       };
       doAutoGenerate();
