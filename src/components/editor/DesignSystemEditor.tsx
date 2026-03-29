@@ -739,11 +739,12 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
       ...DEFAULT_DESIGN_SYSTEM,
       ...themeConfig,
       themeId: system.id,
-      // If the theme has its own backgrounds, use them; otherwise preserve course-specific ones
-      themeBackgrounds: (themeConfig.themeBackgrounds && themeConfig.themeBackgrounds.length > 0)
+      // Respect theme backgrounds even when the array is intentionally empty.
+      // Only preserve current course backgrounds when the theme has no background setting at all.
+      themeBackgrounds: Array.isArray(themeConfig.themeBackgrounds)
         ? themeConfig.themeBackgrounds
         : config.themeBackgrounds || [],
-      defaultBackgroundId: (themeConfig.themeBackgrounds && themeConfig.themeBackgrounds.length > 0)
+      defaultBackgroundId: Array.isArray(themeConfig.themeBackgrounds)
         ? themeConfig.defaultBackgroundId
         : config.defaultBackgroundId,
     };
