@@ -610,9 +610,266 @@ export const useGenerateCourse = (courseId: string) => {
     }
   }, [courseId, startGeneration, updateStep, setSteps, setError, completeGeneration, abortController, designSystem]);
 
+  const runMdGeneration = useCallback(async (
+    mdContent: string,
+    skipImages: boolean,
+    selectedDesignConfig?: DesignSystemConfig,
+    selectedDesignSystemId?: string,
+    imageModel?: string,
+  ) => {
+    if (!mdContent.trim() || isGeneratingRef.current) return;
+
+    isGeneratingRef.current = true;
+    startGeneration('MD Import', skipImages);
+
+    const initialSteps: GenerationStep[] = [
+      { id: 'parse', label: 'Парсинг MD файла', status: 'pending' },
+      { id: 'images', label: 'Создание иллюстраций', status: 'pending' },
+    ];
+    setSteps(initialSteps);
+
+    try {
+      const checkCancelled = () => {
+        if (abortController.current?.signal.aborted) {
+          throw new Error('CANCELLED');
+        }
+      };
+
+      // Step 1: Parse MD via AI
+      updateStep('parse', { status: 'active', message: 'AI анализирует структуру файла...' });
+      checkCancelled();
+
+      const parseResponse = await invokeWithRetry('parse-md-course', {
+        mdContent,
+      });
+      checkCancelled();
+
+      let courseData: GeneratedCourse;
+      try {
+        courseData = extractAndFixJson(parseResponse.data?.content || '');
+      } catch (e) {
+        throw new Error('Не удалось распознать структуру MD файла');
+      }
+
+      if (!courseData.lessons || courseData.lessons.length === 0) {
+        throw new Error('В файле не найдены уроки');
+      }
+
+      updateStep('parse', {
+        status: 'completed',
+        message: `Найдено ${courseData.lessons.length} уроков, ${courseData.lessons.reduce((s, l) => s + (l.slides?.length || 0), 0)} блоков`
+      });
+
+      // Step 2: Images
+      if (skipImages) {
+        updateStep('images', { status: 'completed', message: 'Пропущено' });
+      } else {
+        updateStep('images', { status: 'active', message: 'Генерирую иллюстрации...' });
+        checkCancelled();
+
+        try {
+          const slidesToIllustrate: { lessonIdx: number; slideIdx: number; subBlockIdx?: number; description: string }[] = [];
+
+          courseData.lessons.forEach((lesson, lessonIdx) => {
+            lesson.slides.forEach((slide, slideIdx) => {
+              if (slide.subBlocks) {
+                slide.subBlocks.forEach((sb: any, sbIdx: number) => {
+                  if (sb.type === 'image' && sb.imageDescription && !sb.imageUrl) {
+                    slidesToIllustrate.push({
+                      lessonIdx, slideIdx, subBlockIdx: sbIdx,
+                      description: sb.imageDescription,
+                    });
+                  }
+                });
+              }
+            });
+          });
+
+          const totalImages = slidesToIllustrate.length;
+
+          if (totalImages === 0) {
+            updateStep('images', { status: 'completed', message: 'Иллюстрации не требуются' });
+          } else {
+            let imagesGenerated = 0;
+            let imageErrors = 0;
+            const batchSize = 4;
+
+            for (let i = 0; i < slidesToIllustrate.length; i += batchSize) {
+              checkCancelled();
+              const batch = slidesToIllustrate.slice(i, i + batchSize);
+
+              try {
+                await Promise.all(batch.map(async ({ lessonIdx, slideIdx, subBlockIdx, description }) => {
+                  try {
+                    const imageUrl = await generateImageForSlide(description, 'MD import', designSystem, imageModel);
+                    if (imageUrl) {
+                      if (subBlockIdx !== undefined) {
+                        const subBlocks = courseData.lessons[lessonIdx].slides[slideIdx].subBlocks as any[];
+                        if (subBlocks?.[subBlockIdx]) subBlocks[subBlockIdx].imageUrl = imageUrl;
+                      }
+                      imagesGenerated++;
+                    } else {
+                      imageErrors++;
+                    }
+                  } catch { imageErrors++; }
+                }));
+              } catch (batchError) {
+                console.error('Batch image error:', batchError);
+              }
+
+              updateStep('images', { status: 'active', message: `Создано ${imagesGenerated}/${totalImages} иллюстраций` });
+
+              if (i + batchSize < slidesToIllustrate.length) {
+                await new Promise(resolve => setTimeout(resolve, 300));
+              }
+            }
+
+            updateStep('images', {
+              status: 'completed',
+              message: imageErrors > 0
+                ? `Создано ${imagesGenerated} из ${totalImages} (${imageErrors} ошибок)`
+                : `Создано ${imagesGenerated} иллюстраций`
+            });
+          }
+        } catch (imageError) {
+          if ((imageError as Error).message === 'CANCELLED') throw imageError;
+          updateStep('images', { status: 'completed', message: 'Иллюстрации пропущены из-за ошибки' });
+        }
+      }
+
+      checkCancelled();
+
+      // Convert to Lesson/Slide format (same logic as runGeneration)
+      const lessons: Lesson[] = courseData.lessons.map((genLesson, lessonIndex) => {
+        const lessonId = crypto.randomUUID();
+
+        const slides: Slide[] = (genLesson.slides || []).map((genSlide, slideIndex) => {
+          const subBlocks = genSlide.subBlocks?.map((sb, sbIndex) => ({
+            id: crypto.randomUUID(),
+            type: sb.type as any,
+            order: sb.order || sbIndex + 1,
+            content: sb.content,
+            textAlign: sb.textAlign as any,
+            textSize: sb.textSize as any,
+            fontWeight: sb.fontWeight as any,
+            badgeText: sb.badgeText,
+            badgeVariant: sb.badgeVariant as any,
+            badgeSize: sb.badgeSize as any,
+            badges: sb.badges?.map(b => ({ ...b, id: crypto.randomUUID(), iconType: (b.iconType || 'none') as 'none' | 'emoji' | 'lucide' | 'custom' })),
+            badgeLayout: sb.badgeLayout as any,
+            iconName: sb.iconName,
+            buttonLabel: sb.buttonLabel,
+            buttonUrl: sb.buttonUrl,
+            buttonVariant: sb.buttonVariant as any,
+            imageUrl: sb.imageUrl,
+            imageDescription: sb.imageDescription,
+            imageSize: sb.imageSize as any,
+            imageRotation: sb.imageRotation,
+            textRotation: sb.textRotation,
+            backdrop: sb.backdrop as any,
+            backdropRounded: sb.backdropRounded,
+            highlight: sb.highlight as any,
+            padding: sb.padding as any,
+            dividerStyle: sb.dividerStyle as any,
+            tableData: sb.tableData?.map(row => row.map(cell => ({ ...cell, id: crypto.randomUUID() }))),
+            tableStyle: sb.tableStyle as any,
+            tableTextSize: sb.tableTextSize as any,
+          }));
+
+          return {
+            id: crypto.randomUUID(),
+            lessonId,
+            type: genSlide.type || 'design',
+            order: slideIndex + 1,
+            content: genSlide.content || '',
+            imageUrl: genSlide.imageUrl,
+            subBlocks: genSlide.type === 'design' ? subBlocks : undefined,
+            options: genSlide.options?.map(opt => ({
+              id: crypto.randomUUID(),
+              text: opt,
+              isCorrect: Array.isArray(genSlide.correctAnswer)
+                ? genSlide.correctAnswer.includes(opt)
+                : genSlide.correctAnswer === opt,
+            })),
+            correctAnswer: genSlide.correctAnswer,
+            explanation: genSlide.explanation,
+            explanationCorrect: genSlide.explanationCorrect,
+            explanationPartial: genSlide.explanationPartial,
+            blankWord: genSlide.blankWord,
+            matchingPairs: genSlide.matchingPairs?.map(p => ({ ...p, id: crypto.randomUUID() })),
+            orderingItems: genSlide.orderingItems,
+            correctOrder: genSlide.correctOrder,
+            sliderMin: genSlide.sliderMin,
+            sliderMax: genSlide.sliderMax,
+            sliderCorrect: genSlide.sliderCorrect,
+            sliderStep: genSlide.sliderStep,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+        });
+
+        return {
+          id: lessonId,
+          courseId,
+          title: genLesson.title || `Урок ${lessonIndex + 1}`,
+          description: genLesson.description || '',
+          order: lessonIndex + 1,
+          slides,
+          estimatedMinutes: Math.ceil(slides.length * 0.5),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+      });
+
+      // Update course metadata
+      const courseUpdate: Record<string, any> = {};
+      if (courseData.title) courseUpdate.title = courseData.title;
+      if (courseData.description) courseUpdate.description = courseData.description;
+      if (selectedDesignConfig && selectedDesignSystemId) {
+        courseUpdate.design_system = JSON.parse(JSON.stringify(selectedDesignConfig));
+        courseUpdate.base_design_system_id = selectedDesignSystemId;
+      }
+
+      // Extract cover image
+      let coverImage: string | null = null;
+      for (const lesson of courseData.lessons) {
+        if (coverImage) break;
+        for (const slide of lesson.slides) {
+          if (coverImage) break;
+          if (slide.subBlocks) {
+            for (const sb of slide.subBlocks) {
+              if (sb.type === 'image' && sb.imageUrl && !sb.imageUrl.startsWith('data:')) {
+                coverImage = sb.imageUrl;
+                break;
+              }
+            }
+          }
+        }
+      }
+      if (coverImage) courseUpdate.cover_image = coverImage;
+
+      if (Object.keys(courseUpdate).length > 0) {
+        try {
+          await supabase.from('courses').update(courseUpdate).eq('id', courseId);
+        } catch (e) {
+          console.error('Failed to update course:', e);
+        }
+      }
+
+      completeGeneration(lessons);
+      isGeneratingRef.current = false;
+
+    } catch (err) {
+      isGeneratingRef.current = false;
+      if ((err as Error).message === 'CANCELLED') return;
+      console.error('MD generation error:', err);
+      setError(err instanceof Error ? err.message : 'Неизвестная ошибка');
+    }
+  }, [courseId, startGeneration, updateStep, setSteps, setError, completeGeneration, abortController, designSystem]);
+
   const forceReset = useCallback(() => {
     isGeneratingRef.current = false;
   }, []);
 
-  return { runGeneration, forceReset };
+  return { runGeneration, runMdGeneration, forceReset };
 };
