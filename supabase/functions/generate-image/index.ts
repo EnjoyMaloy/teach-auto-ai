@@ -99,6 +99,11 @@ Deno.serve(async (req) => {
       ? `\n\nVISUAL REFERENCE IMAGE IS ATTACHED. You MUST copy this character EXACTLY as shown:\n- Same face shape, eye style, body proportions\n- Same colors, outfit, and accessories\n- Same art style (2D flat vector with bold outlines)\n- DO NOT redesign or reinterpret the character — COPY it precisely`
       : '';
 
+    // Style anchor instruction
+    const styleBlock = styleReferenceUrl
+      ? `\n\nSTYLE REFERENCE IMAGE IS ATTACHED. You MUST match the EXACT art style of this reference:\n- Same line weight and outline thickness\n- Same level of detail and simplification\n- Same color saturation and palette mood\n- Same shading technique (flat fills, no gradients)\n- Same background treatment\n- The result must look like it was drawn by the SAME artist`
+      : '';
+
     const imagePrompt = `${slideContext || prompt}
 
 Style requirements (STRICTLY FOLLOW):
