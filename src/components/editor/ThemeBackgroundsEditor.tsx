@@ -266,9 +266,14 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
   };
 
   const handleDelete = (id: string) => {
-    onChange(backgrounds.filter(bg => bg.id !== id));
+    const filtered = backgrounds.filter(bg => bg.id !== id);
     if (defaultBackgroundId === id) {
-      onDefaultChange(backgrounds.length > 1 ? backgrounds.find(bg => bg.id !== id)?.id : undefined);
+      // Combine both updates in a single onChange call to avoid stale config overwrite
+      const newDefaultId = filtered.length > 0 ? filtered[0].id : undefined;
+      onChange(filtered, newDefaultId);
+      onDefaultChange(newDefaultId);
+    } else {
+      onChange(filtered);
     }
   };
 
