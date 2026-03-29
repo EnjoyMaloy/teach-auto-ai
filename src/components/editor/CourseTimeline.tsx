@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
-import { Plus, Play, Volume2, Heading, Type, Image, LayoutList, CircleDot, CheckSquare, ToggleLeft, PenLine, Link2, ListOrdered, SlidersHorizontal, Layers, GripVertical, Trash2 } from 'lucide-react';
+import { Plus, Play, Volume2, Heading, Type, Image, LayoutList, CircleDot, CheckSquare, ToggleLeft, PenLine, Link2, ListOrdered, SlidersHorizontal, Layers, GripVertical, Trash2, Copy } from 'lucide-react';
 import { Lesson, CourseDesignSystem } from '@/types/course';
 import { Block, BLOCK_CONFIGS, BlockType } from '@/types/blocks';
 import { DesignSystemConfig } from '@/types/designSystem';
