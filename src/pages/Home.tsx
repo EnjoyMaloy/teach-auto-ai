@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import { parseMdCourse } from '@/lib/mdCourseParser';
 import { useNavigate } from 'react-router-dom';
 import { Plus, ArrowUp, Loader2, Gauge, Palette, Sparkles, BookOpen, Star, Zap, ImageOff, ImageIcon, Check, Paperclip, Link, FileText, Upload, X } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -28,15 +27,20 @@ const Home: React.FC = () => {
   const handleGenerate = async () => {
     if (!user) return;
 
-    // MD file direct import (no AI)
+    // MD file → navigate to editor with MD content for AI-powered import
     if (sourceType === 'md' && sourceFile) {
       const mdContent = await sourceFile.text();
-      const parsed = parseMdCourse(mdContent);
+      if (!mdContent.trim()) return;
       navigate('/editor/new', {
         state: {
-          importedLessons: parsed.lessons,
-          importedTitle: parsed.title,
-          importedDescription: parsed.description,
+          openAIGenerate: true,
+          autoPrompt: '📄 Импорт из MD',
+          mdContent,
+          generationSettings: {
+            designSystemId: selectedDesignSystemId,
+            skipImages,
+            imageModel,
+          },
         },
       });
       return;
@@ -215,7 +219,8 @@ const Home: React.FC = () => {
               </div>
             </div>
 
-            {/* Lesson count */}
+            {/* Lesson count - hidden when MD is selected */}
+            {sourceType !== 'md' && (
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 <BookOpen className="w-3.5 h-3.5" />
@@ -238,6 +243,7 @@ const Home: React.FC = () => {
                 ))}
               </div>
             </div>
+            )}
 
             {/* Source (optional) */}
             <div className="space-y-2">

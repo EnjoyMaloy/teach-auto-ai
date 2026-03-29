@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { parseMdCourse } from '@/lib/mdCourseParser';
 import { toast } from 'sonner';
 import { 
   Sparkles, MessageSquare, Wand2, Loader2, Check, 
@@ -97,6 +96,7 @@ interface EditorAISidebarProps {
   onBeforeGenerate?: () => Promise<boolean>;
   autoPrompt?: string;
   autoSettings?: GenerationSettings;
+  autoMdContent?: string;
 }
 
 type SidebarMode = 'idle' | 'generate' | 'edit-block';
@@ -118,6 +118,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   onBeforeGenerate,
   autoPrompt,
   autoSettings,
+  autoMdContent,
 }) => {
   const [mode, setMode] = useState<SidebarMode>(initialMode === 'generate' ? 'generate' : 'idle');
   const [chatInput, setChatInput] = useState('');
@@ -235,7 +236,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
     setDesignSystem,
   } = useAIGeneration();
   
-  const { runGeneration, forceReset } = useGenerateCourse(courseId);
+  const { runGeneration, runMdGeneration, forceReset } = useGenerateCourse(courseId);
   const { refineCourse, isRefining } = useRefineCourse(courseId);
 
   // ── Reconnect to active generation after remount ────────
@@ -295,13 +296,11 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   useEffect(() => {
     if (autoPrompt && isOpen && !autoStartedRef.current && designSystems.length > 0 && state.status === 'idle') {
       autoStartedRef.current = true;
-      // Trigger generation with pre-configured settings
       const doAutoGenerate = async () => {
         if (onBeforeGenerate) {
           const ok = await onBeforeGenerate();
           if (!ok) return;
         }
-        // Add user message
         const userMsg: UnifiedMessage = {
           id: crypto.randomUUID(),
           type: 'user',
@@ -309,7 +308,6 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           timestamp: Date.now(),
         };
         setMessages(prev => [...prev, userMsg]);
-        // Add generation placeholder
         const genMsgId = crypto.randomUUID();
         generationMsgIdRef.current = genMsgId;
         setMessages(prev => [...prev, {
@@ -321,7 +319,13 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           isGenerating: true,
         }]);
         const selectedDS = designSystems.find(ds => ds.id === selectedDesignSystemId);
-        runGeneration(autoPrompt, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id, imageModel);
+        
+        if (autoMdContent) {
+          // MD import flow
+          runMdGeneration(autoMdContent, localSkipImages, selectedDS?.config, selectedDS?.id, imageModel);
+        } else {
+          runGeneration(autoPrompt, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id, imageModel);
+        }
         setMode('idle');
       };
       doAutoGenerate();
@@ -428,19 +432,45 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
 
   // ── Submit handler ──────────────────────────────────────
   const handleSubmit = async () => {
-    // MD file direct import
+    // MD file AI-powered import
     if (sourceType === 'md' && sourceFile && mode === 'generate') {
       const mdContent = await sourceFile.text();
-      const parsed = parseMdCourse(mdContent);
-      if (parsed.lessons.length > 0) {
-        onAIGenerate(parsed.lessons);
-        toast.success(`Импортировано из MD: ${parsed.lessons.length} уроков`);
-        setSourceFile(null);
-        setSourceType('none');
-        setMode('idle');
-      } else {
-        toast.error('Не удалось распарсить MD файл');
+      if (!mdContent.trim()) {
+        toast.error('MD файл пуст');
+        return;
       }
+
+      if (onBeforeGenerate) {
+        const ok = await onBeforeGenerate();
+        if (!ok) return;
+      }
+
+      // Add user message
+      const userMsg: UnifiedMessage = {
+        id: crypto.randomUUID(),
+        type: 'user',
+        content: `📄 Импорт из MD: ${sourceFile.name}`,
+        timestamp: Date.now(),
+      };
+      setMessages(prev => [...prev, userMsg]);
+
+      // Add generation placeholder
+      const genMsgId = crypto.randomUUID();
+      generationMsgIdRef.current = genMsgId;
+      setMessages(prev => [...prev, {
+        id: genMsgId,
+        type: 'generation',
+        content: '',
+        timestamp: Date.now(),
+        steps: [],
+        isGenerating: true,
+      }]);
+
+      const selectedDS = designSystems.find(ds => ds.id === selectedDesignSystemId);
+      runMdGeneration(mdContent, localSkipImages, selectedDS?.config, selectedDS?.id, imageModel);
+      setSourceFile(null);
+      setSourceType('none');
+      setMode('idle');
       return;
     }
 
@@ -1043,7 +1073,8 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
               </div>
             </div>
 
-            {/* Lesson count */}
+            {/* Lesson count - hidden when MD is selected */}
+            {sourceType !== 'md' && (
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 <BookOpen className="w-3.5 h-3.5" />
@@ -1066,6 +1097,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                 ))}
               </div>
             </div>
+            )}
 
             {/* Source (optional) */}
             <div className="space-y-2">
