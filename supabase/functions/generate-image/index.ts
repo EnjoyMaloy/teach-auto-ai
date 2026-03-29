@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
     const { user, supabaseClient, error: authError } = await verifyAuth(req);
     if (authError) return authError;
 
-    const { prompt, slideContext, colorPalette, imageModel, mascotDescription, referenceImageUrl } = await req.json();
+    const { prompt, slideContext, colorPalette, imageModel, mascotDescription, referenceImageUrl, styleReferenceUrl } = await req.json();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     
     if (!GEMINI_API_KEY) {
@@ -99,6 +99,11 @@ Deno.serve(async (req) => {
       ? `\n\nVISUAL REFERENCE IMAGE IS ATTACHED. You MUST copy this character EXACTLY as shown:\n- Same face shape, eye style, body proportions\n- Same colors, outfit, and accessories\n- Same art style (2D flat vector with bold outlines)\n- DO NOT redesign or reinterpret the character — COPY it precisely`
       : '';
 
+    // Style anchor instruction
+    const styleBlock = styleReferenceUrl
+      ? `\n\nSTYLE REFERENCE IMAGE IS ATTACHED. You MUST match the EXACT art style of this reference:\n- Same line weight and outline thickness\n- Same level of detail and simplification\n- Same color saturation and palette mood\n- Same shading technique (flat fills, no gradients)\n- Same background treatment\n- The result must look like it was drawn by the SAME artist`
+      : '';
+
     const imagePrompt = `${slideContext || prompt}
 
 Style requirements (STRICTLY FOLLOW):
@@ -109,26 +114,44 @@ Style requirements (STRICTLY FOLLOW):
 - NO text, words, letters, or labels on the image
 - Modern, professional look suitable for educational content
 - Simple flat backgrounds, no complex textures or depth effects
-- Everything in the image must follow the same 2D flat vector style consistently${mascotBlock}${referenceBlock}${colorGuidance}`;
+- Everything in the image must follow the same 2D flat vector style consistently${mascotBlock}${referenceBlock}${styleBlock}${colorGuidance}`;
 
-    // Fetch reference image if provided
+    // Fetch reference images in parallel
     let referenceImageData: { base64: string; mimeType: string } | null = null;
-    if (referenceImageUrl) {
-      referenceImageData = await fetchImageAsBase64(referenceImageUrl);
-      if (referenceImageData) {
-        console.log('Reference image fetched successfully');
-      } else {
-        console.warn('Failed to fetch reference image, proceeding without');
-      }
-    }
+    let styleImageData: { base64: string; mimeType: string } | null = null;
 
-    // Build request parts — text + optional reference image
+    const fetchPromises: Promise<void>[] = [];
+    if (referenceImageUrl) {
+      fetchPromises.push(fetchImageAsBase64(referenceImageUrl).then(data => {
+        referenceImageData = data;
+        if (data) console.log('Reference image fetched successfully');
+        else console.warn('Failed to fetch reference image, proceeding without');
+      }));
+    }
+    if (styleReferenceUrl) {
+      fetchPromises.push(fetchImageAsBase64(styleReferenceUrl).then(data => {
+        styleImageData = data;
+        if (data) console.log('Style reference image fetched successfully');
+        else console.warn('Failed to fetch style reference image, proceeding without');
+      }));
+    }
+    if (fetchPromises.length > 0) await Promise.all(fetchPromises);
+
+    // Build request parts — text + optional mascot reference + optional style reference
     const requestParts: any[] = [{ text: imagePrompt }];
     if (referenceImageData) {
       requestParts.push({
         inlineData: {
           mimeType: referenceImageData.mimeType,
           data: referenceImageData.base64,
+        }
+      });
+    }
+    if (styleImageData) {
+      requestParts.push({
+        inlineData: {
+          mimeType: styleImageData.mimeType,
+          data: styleImageData.base64,
         }
       });
     }
