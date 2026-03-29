@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
-import { Plus, Play, Volume2, Heading, Type, Image, LayoutList, CircleDot, CheckSquare, ToggleLeft, PenLine, Link2, ListOrdered, SlidersHorizontal, Layers, GripVertical, Trash2 } from 'lucide-react';
+import { Plus, Play, Volume2, Heading, Type, Image, LayoutList, CircleDot, CheckSquare, ToggleLeft, PenLine, Link2, ListOrdered, SlidersHorizontal, Layers, GripVertical, Trash2, Copy } from 'lucide-react';
 import { Lesson, CourseDesignSystem } from '@/types/course';
 import { Block, BLOCK_CONFIGS, BlockType } from '@/types/blocks';
 import { DesignSystemConfig } from '@/types/designSystem';
@@ -42,6 +42,7 @@ interface CourseTimelineProps {
   onAddBlock: (type: BlockType) => void;
   onReorderBlocks: (event: DragEndEvent) => void;
   onDeleteBlock?: (blockId: string) => void;
+  onDuplicateBlock?: (blockId: string) => void;
   onDeleteLesson?: (lessonId: string) => void;
   slideToBlock: (slide: any) => Block;
   designSystem?: CourseDesignSystem | DesignSystemConfig;
@@ -185,6 +186,7 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
   onAddBlock,
   onReorderBlocks,
   onDeleteBlock,
+  onDuplicateBlock,
   onDeleteLesson,
   slideToBlock,
   designSystem,
@@ -294,6 +296,30 @@ export const CourseTimeline: React.FC<CourseTimelineProps> = ({
                           </div>
                         </SortableContext>
                       </DndContext>
+
+                      {/* Duplicate last block button */}
+                      {blocks.length > 0 && onDuplicateBlock && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectLesson(lesson.id);
+                            const lastBlock = blocks[blocks.length - 1];
+                            onDuplicateBlock(lastBlock.id);
+                          }}
+                          disabled={isGenerating}
+                          className={cn(
+                            'flex-shrink-0 rounded-lg border-2 border-dashed border-border',
+                            'flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-primary hover:border-primary',
+                            'transition-all duration-200 hover:bg-primary/5',
+                            isGenerating && 'opacity-30 pointer-events-none'
+                          )}
+                          style={{ width: THUMB_W, height: THUMB_H }}
+                          title="Скопировать последний блок"
+                        >
+                          <Copy className="w-5 h-5" />
+                          <span className="text-[9px] font-medium">Копия</span>
+                        </button>
+                      )}
 
                       {/* Add block button with popover */}
                       <Popover>
