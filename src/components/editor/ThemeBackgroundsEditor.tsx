@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { BackgroundPreset } from '@/types/designSystem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -199,12 +199,12 @@ export const ThemeBackgroundsEditor: React.FC<ThemeBackgroundsEditorProps> = ({
   const [newGradientFrom, setNewGradientFrom] = useState('262 83% 95%');
   const [newGradientTo, setNewGradientTo] = useState('200 83% 95%');
   const [newGradientAngle, setNewGradientAngle] = useState(135);
-  const [bgVariation, setBgVariation] = useState(0);
+  const bgVariationRef = useRef(0);
 
   const handleGenerateFromAccent = () => {
     if (!primaryColor) return;
-    const generated = generateBackgroundsFromAccent(primaryColor, bgVariation);
-    setBgVariation(prev => prev + 1);
+    const generated = generateBackgroundsFromAccent(primaryColor, bgVariationRef.current);
+    bgVariationRef.current += 1;
     const defaultId = generated[0]?.id;
     onChange(generated, defaultId);
     if (defaultId) onDefaultChange(defaultId);
