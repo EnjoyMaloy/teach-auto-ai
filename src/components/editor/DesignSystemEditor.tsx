@@ -72,54 +72,50 @@ import { supabase } from '@/integrations/supabase/client';
 // Generate backdrop palette from a base HSL color string like "262 83% 58%"
 // variation: 0-5, each gives a different complementary scheme
 const generateBackdropPalette = (primaryHsl: string, variation: number) => {
-  // Parse HSL: "262 83% 58%" → [262, 83, 58]
-  const parts = primaryHsl.replace(/%/g, '').split(/\s+/).map(Number);
-  const h = parts[0] || 262;
-  const s = parts[1] || 83;
-  const l = parts[2] || 58;
+  const parts = primaryHsl.replace(/%/g, '').trim().split(/\s+/).map(Number);
+  const h0 = parts[0] || 28;
+  const s0 = parts[1] || 45;
+  const l0 = parts[2] || 42;
 
-  // Complementary hue offsets for variety
-  const schemes = [
-    { marker: 0, underline: 30, wavy: -40 },       // Analogous
-    { marker: 180, underline: 0, wavy: 120 },       // Complementary
-    { marker: 60, underline: -30, wavy: 150 },      // Triadic warm
-    { marker: -60, underline: 120, wavy: 30 },      // Triadic cool
-    { marker: 30, underline: 180, wavy: -60 },      // Split-complementary
-    { marker: -30, underline: 60, wavy: 180 },      // Split-complementary alt
-  ];
-  const scheme = schemes[variation % schemes.length];
-  const hm = (h + scheme.marker + 360) % 360;
-  const hu = (h + scheme.underline + 360) % 360;
-  const hw = (h + scheme.wavy + 360) % 360;
+  // Gentle hue offsets that stay close to the base color
+  const offsets = [0, 8, -8, 12, -12, 16];
+  const h = (h0 + offsets[variation % offsets.length] + 360) % 360;
+  const s = Math.max(35, Math.min(70, s0));
+
+  const hs = (hh: number, ss: number, ll: number) =>
+    `${Math.round(hh)} ${Math.round(ss)}% ${Math.round(ll)}%`;
+
+  const hMarker = (h + 6) % 360;
+  const hWavy = (h - 6 + 360) % 360;
 
   return {
     light: {
-      backdropLightColor: `${h} ${Math.min(s, 35)}% 94%`,
-      backdropLightTextColor: `${h} ${Math.min(s, 25)}% 20%`,
-      backdropLightMarkerColor: `${hm} ${Math.min(s, 70)}% 60% / 0.45`,
-      backdropLightUnderlineColor: `${hu} ${Math.min(s, 65)}% 50%`,
-      backdropLightWavyColor: `${hw} ${Math.min(s, 65)}% 50%`,
+      backdropLightColor: hs(h, s * 0.45, 96),
+      backdropLightTextColor: hs(h, s * 0.4, 20),
+      backdropLightMarkerColor: `${hs(hMarker, s * 0.85, 78)} / 0.45`,
+      backdropLightUnderlineColor: hs(h, s * 0.8, 62),
+      backdropLightWavyColor: hs(hWavy, s * 0.8, 56),
     },
     dark: {
-      backdropDarkColor: `${h} ${Math.min(s, 35)}% 10%`,
-      backdropDarkTextColor: `${h} ${Math.min(s, 20)}% 92%`,
-      backdropDarkMarkerColor: `${hm} ${Math.min(s, 70)}% 55% / 0.55`,
-      backdropDarkUnderlineColor: `${hu} ${Math.min(s, 65)}% 60%`,
-      backdropDarkWavyColor: `${hw} ${Math.min(s, 65)}% 60%`,
+      backdropDarkColor: hs(h, s * 0.45, 12),
+      backdropDarkTextColor: hs(h, s * 0.2, 92),
+      backdropDarkMarkerColor: `${hs(hMarker, s * 0.85, 55)} / 0.55`,
+      backdropDarkUnderlineColor: hs(h, s * 0.8, 60),
+      backdropDarkWavyColor: hs(hWavy, s * 0.8, 58),
     },
     primary: {
-      backdropPrimaryColor: `${h} ${Math.min(s, 55)}% ${Math.min(l, 50)}%`,
+      backdropPrimaryColor: hs(h, s * 0.65, Math.min(l0, 50)),
       backdropPrimaryTextColor: '0 0% 100%',
-      backdropPrimaryMarkerColor: `${hm} ${Math.min(s, 70)}% 70% / 0.5`,
-      backdropPrimaryUnderlineColor: `${hu} ${Math.min(s, 60)}% 72%`,
-      backdropPrimaryWavyColor: `${hw} ${Math.min(s, 60)}% 72%`,
+      backdropPrimaryMarkerColor: `${hs(hMarker, s * 0.7, 70)} / 0.5`,
+      backdropPrimaryUnderlineColor: hs(h, s * 0.6, 72),
+      backdropPrimaryWavyColor: hs(hWavy, s * 0.6, 68),
     },
     blur: {
-      backdropBlurColor: `${h} ${Math.min(s, 35)}% 90% / 0.6`,
-      backdropBlurTextColor: `${h} ${Math.min(s, 25)}% 18%`,
-      backdropBlurMarkerColor: `${hm} ${Math.min(s, 70)}% 55% / 0.45`,
-      backdropBlurUnderlineColor: `${hu} ${Math.min(s, 65)}% 48%`,
-      backdropBlurWavyColor: `${hw} ${Math.min(s, 65)}% 48%`,
+      backdropBlurColor: `${hs(h, s * 0.45, 90)} / 0.6`,
+      backdropBlurTextColor: hs(h, s * 0.4, 18),
+      backdropBlurMarkerColor: `${hs(hMarker, s * 0.85, 55)} / 0.45`,
+      backdropBlurUnderlineColor: hs(h, s * 0.8, 48),
+      backdropBlurWavyColor: hs(hWavy, s * 0.8, 46),
     },
   };
 };
