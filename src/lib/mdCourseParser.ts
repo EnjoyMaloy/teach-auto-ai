@@ -108,17 +108,27 @@ function parseQuizBlock(lines: string[]): Partial<Slide> | null {
     return t.startsWith('+ ') || t.startsWith('- ');
   });
 
-  const options = optionLines.map(l => l.trim().slice(2).trim());
-  const correctOptions = optionLines
+  const optionTexts = optionLines.map(l => l.trim().slice(2).trim());
+  const correctTexts = optionLines
     .filter(l => l.trim().startsWith('+ '))
     .map(l => l.trim().slice(2).trim());
+
+  // Build SlideOption[] 
+  const options: Array<{ id: string; text: string; isCorrect: boolean }> = optionTexts.map((text, i) => ({
+    id: String(i + 1),
+    text,
+    isCorrect: correctTexts.includes(text),
+  }));
 
   if (quizType === 'true_false') {
     return {
       type: 'true_false' as any,
       content: question,
-      options: ['Верно', 'Неверно'],
-      correctAnswer: correctOptions[0] === 'true' || correctOptions[0] === 'Верно' ? 'Верно' : 'Неверно',
+      options: [
+        { id: '1', text: 'Верно', isCorrect: correctTexts[0] === 'true' || correctTexts[0] === 'Верно' },
+        { id: '2', text: 'Неверно', isCorrect: correctTexts[0] === 'false' || correctTexts[0] === 'Неверно' },
+      ],
+      correctAnswer: correctTexts[0] === 'true' || correctTexts[0] === 'Верно' ? 'Верно' : 'Неверно',
       explanation,
     };
   }
