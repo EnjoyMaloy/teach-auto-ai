@@ -575,6 +575,7 @@ export const DesignSystemEditor: React.FC<DesignSystemEditorProps> = ({
 }) => {
   // Initialize activePreset from config.themeId if available
   const [activePreset, setActivePreset] = useState<string | null>(config.themeId || null);
+  const [paletteVariation, setPaletteVariation] = useState(0);
   
   // Sync activePreset with config.themeId when config changes from outside
   React.useEffect(() => {
