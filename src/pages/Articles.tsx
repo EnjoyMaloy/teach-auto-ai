@@ -42,6 +42,8 @@ const ArticleEditor: React.FC<{
   const [lang, setLang] = useState<'ru' | 'en'>('ru');
   const [coverGradient, setCoverGradient] = useState(article.cover_gradient);
   const [coverImage, setCoverImage] = useState(article.cover_image);
+  const [category, setCategory] = useState(article.category || '');
+  const [customCategoryInput, setCustomCategoryInput] = useState('');
   const [translationStale, setTranslationStale] = useState(article.translation_stale);
 
   const hasEnContent = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
