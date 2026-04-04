@@ -213,10 +213,15 @@ const ArticleEditor: React.FC<{
             <Settings className="w-4 h-4" />
           </Button>
 
-          <Button onClick={handleSave} disabled={saving} size="sm" className="rounded-lg gap-1.5 h-8 px-3 text-primary-foreground">
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving}
+            className="article-action-hover inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border border-transparent bg-primary-hover px-3 text-xs font-semibold text-primary-foreground shadow-primary ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+          >
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
             <span className="text-xs">Сохранить</span>
-          </Button>
+          </button>
           </div>
         </div>
       </div>
