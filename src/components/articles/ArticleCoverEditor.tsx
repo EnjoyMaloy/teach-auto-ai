@@ -1,9 +1,11 @@
 import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ImagePlus, X, Loader2 } from 'lucide-react';
+import { ImagePlus, X, Loader2, Plus, RotateCcw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 export const ARTICLE_GRADIENTS = [
   'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -28,12 +30,111 @@ export const ARTICLE_GRADIENTS = [
   'linear-gradient(135deg, #ff8177 0%, #b12a5b 100%)',
 ];
 
+const ANGLE_PRESETS = [0, 45, 90, 135, 180, 225, 270, 315];
+
 interface ArticleCoverEditorProps {
   gradient: string | null;
   image: string | null;
   articleId: string;
   onUpdate: (gradient: string | null, image: string | null) => void;
 }
+
+const CustomGradientBuilder: React.FC<{
+  onApply: (gradient: string) => void;
+}> = ({ onApply }) => {
+  const [color1, setColor1] = useState('#667eea');
+  const [color2, setColor2] = useState('#764ba2');
+  const [angle, setAngle] = useState(135);
+
+  const gradientValue = `linear-gradient(${angle}deg, ${color1} 0%, ${color2} 100%)`;
+
+  return (
+    <div className="space-y-4">
+      {/* Preview */}
+      <div
+        className="w-full aspect-[2/1] rounded-xl border border-border"
+        style={{ background: gradientValue }}
+      />
+
+      {/* Color pickers */}
+      <div className="flex gap-3">
+        <div className="flex-1 space-y-1.5">
+          <Label className="text-xs text-muted-foreground">Цвет 1</Label>
+          <div className="flex items-center gap-2">
+            <input
+              type="color"
+              value={color1}
+              onChange={(e) => setColor1(e.target.value)}
+              className="w-8 h-8 rounded-lg border border-border cursor-pointer p-0.5"
+            />
+            <span className="text-xs text-muted-foreground font-mono">{color1}</span>
+          </div>
+        </div>
+        <div className="flex-1 space-y-1.5">
+          <Label className="text-xs text-muted-foreground">Цвет 2</Label>
+          <div className="flex items-center gap-2">
+            <input
+              type="color"
+              value={color2}
+              onChange={(e) => setColor2(e.target.value)}
+              className="w-8 h-8 rounded-lg border border-border cursor-pointer p-0.5"
+            />
+            <span className="text-xs text-muted-foreground font-mono">{color2}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Swap colors */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => { setColor1(color2); setColor2(color1); }}
+        className="w-full rounded-xl text-xs gap-1.5 text-muted-foreground"
+      >
+        <RotateCcw className="w-3.5 h-3.5" />
+        Поменять цвета местами
+      </Button>
+
+      {/* Angle */}
+      <div className="space-y-1.5">
+        <Label className="text-xs text-muted-foreground">Угол: {angle}°</Label>
+        <div className="flex gap-1.5 flex-wrap">
+          {ANGLE_PRESETS.map((a) => (
+            <button
+              key={a}
+              onClick={() => setAngle(a)}
+              className={cn(
+                'w-8 h-8 rounded-lg text-xs font-medium transition-colors border',
+                angle === a
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-muted text-muted-foreground border-transparent hover:bg-muted/80'
+              )}
+            >
+              {a}°
+            </button>
+          ))}
+        </div>
+        <input
+          type="range"
+          min={0}
+          max={360}
+          value={angle}
+          onChange={(e) => setAngle(Number(e.target.value))}
+          className="w-full mt-1"
+        />
+      </div>
+
+      {/* Apply */}
+      <Button
+        onClick={() => onApply(gradientValue)}
+        size="sm"
+        className="w-full rounded-xl"
+      >
+        Применить градиент
+      </Button>
+    </div>
+  );
+};
 
 const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
   gradient,
@@ -150,6 +251,20 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
             style={{ background: g }}
           />
         ))}
+
+        {/* Custom gradient button */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              className="aspect-square rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-muted-foreground/60 transition-all hover:scale-110 flex items-center justify-center"
+            >
+              <Plus className="w-3.5 h-3.5 text-muted-foreground" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-72 p-3" align="end">
+            <CustomGradientBuilder onApply={(g) => onUpdate(g, image)} />
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   );
