@@ -4,7 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, Settings, Languages, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, Settings, Languages, AlertTriangle, X, Tag } from 'lucide-react';
+import { COURSE_CATEGORIES } from '@/lib/categories';
 import { toast } from 'sonner';
 import { Editor } from '@tiptap/react';
 import { cn } from '@/lib/utils';
@@ -20,6 +21,7 @@ interface Article {
   content_en: string | null;
   cover_gradient: string | null;
   cover_image: string | null;
+  category: string | null;
   translation_stale: boolean;
   created_at: string;
   updated_at: string;
@@ -40,6 +42,8 @@ const ArticleEditor: React.FC<{
   const [lang, setLang] = useState<'ru' | 'en'>('ru');
   const [coverGradient, setCoverGradient] = useState(article.cover_gradient);
   const [coverImage, setCoverImage] = useState(article.cover_image);
+  const [category, setCategory] = useState(article.category || '');
+  const [customCategoryInput, setCustomCategoryInput] = useState('');
   const [translationStale, setTranslationStale] = useState(article.translation_stale);
 
   const hasEnContent = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
@@ -111,6 +115,7 @@ const ArticleEditor: React.FC<{
         content_en: htmlEn || null,
         cover_gradient: coverGradient,
         cover_image: coverImage,
+        category: category || null,
         translation_stale: newStale,
       })
       .eq('id', article.id)
@@ -234,6 +239,67 @@ const ArticleEditor: React.FC<{
               setCoverImage(img);
             }}
           />
+
+          {/* Category selector */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Категория</Label>
+            <div className="flex flex-wrap gap-2">
+              {COURSE_CATEGORIES.map((cat) => {
+                const Icon = cat.icon;
+                const isSelected = category === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setCategory(isSelected ? '' : cat.id)}
+                    className={cn(
+                      'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all border',
+                      isSelected
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-muted text-muted-foreground border-transparent hover:border-border'
+                    )}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {cat.name}
+                  </button>
+                );
+              })}
+              {category && !COURSE_CATEGORIES.find(c => c.id === category) && (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-primary text-primary-foreground border border-primary">
+                  <Tag className="w-3.5 h-3.5" />
+                  {category}
+                  <button onClick={() => setCategory('')} className="ml-0.5 hover:opacity-70">
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-2 mt-2">
+              <Input
+                value={customCategoryInput}
+                onChange={(e) => setCustomCategoryInput(e.target.value)}
+                placeholder="Своя категория..."
+                className="rounded-xl text-xs h-8 flex-1"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && customCategoryInput.trim()) {
+                    setCategory(customCategoryInput.trim());
+                    setCustomCategoryInput('');
+                  }
+                }}
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                className="rounded-xl h-8 text-xs"
+                disabled={!customCategoryInput.trim()}
+                onClick={() => {
+                  setCategory(customCategoryInput.trim());
+                  setCustomCategoryInput('');
+                }}
+              >
+                <Plus className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          </div>
 
           <div className="pt-4 border-t border-border">
             <Button
