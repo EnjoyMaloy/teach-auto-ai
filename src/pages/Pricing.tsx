@@ -102,7 +102,7 @@ const Pricing = () => {
       <div 
         className="flex-1 flex flex-col relative z-10 py-8 md:py-12 lg:py-20 px-4 md:px-6 transition-all duration-300"
         style={{
-          paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)',
+          paddingLeft: '1rem',
         }}
       >
         {/* Top spacer for sidebar trigger on mobile */}

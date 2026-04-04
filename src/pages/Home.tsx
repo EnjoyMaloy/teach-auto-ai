@@ -416,7 +416,7 @@ const Home: React.FC = () => {
       
       <div 
         className="flex-1 flex flex-col items-center justify-center relative z-10 px-4 md:px-6 transition-all duration-200"
-        style={{ paddingLeft: 'calc(var(--sidebar-offset, 0px) + 1rem)' }}
+        style={{ paddingLeft: '1rem' }}
       >
         <h1 className="text-2xl sm:text-3xl md:text-3xl lg:text-4xl font-semibold mb-6 md:mb-10 text-foreground dark:text-white text-center px-2">
           Чему научим мир сегодня, <span className="text-primary dark:animate-[name-glow_4s_ease-in-out_infinite]" style={{ color: 'hsl(var(--primary))' }}>{userName}</span>?
