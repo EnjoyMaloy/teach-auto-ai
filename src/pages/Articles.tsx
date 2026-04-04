@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, MoreVertical, Languages } from 'lucide-react';
+import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, MoreVertical, Languages, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ARTICLE_GRADIENTS } from '@/components/articles/ArticleCoverEditor';
 import ArticleSettingsDialog from '@/components/articles/ArticleSettingsDialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface Article {
   id: string;
@@ -220,10 +221,15 @@ const ArticleEditor: React.FC<{
           </button>
         </div>
 
-        {lang === 'ru' && hasEnContent && translationStale && (
-          <span className="text-xs text-amber-500 flex items-center gap-1">
-            ⚠ RU изменён — обновите перевод
-          </span>
+        {hasEnContent && translationStale && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+            </TooltipTrigger>
+            <TooltipContent>
+              {lang === 'ru' ? 'RU изменён — обновите перевод' : 'Перевод может быть устаревшим'}
+            </TooltipContent>
+          </Tooltip>
         )}
 
         {lang === 'ru' && (
@@ -237,12 +243,6 @@ const ArticleEditor: React.FC<{
             {translating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Languages className="w-3.5 h-3.5" />}
             {hasEnContent ? 'Перевести заново' : 'Перевести на EN'}
           </Button>
-        )}
-
-        {lang === 'en' && translationStale && hasEnContent && (
-          <span className="text-xs text-amber-500 flex items-center gap-1">
-            ⚠ Перевод может быть устаревшим
-          </span>
         )}
 
         {lang === 'en' && !hasEnContent && (
