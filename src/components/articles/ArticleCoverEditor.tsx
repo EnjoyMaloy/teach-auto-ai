@@ -143,6 +143,9 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
   gradient,
   image,
   articleId,
+  title,
+  authorName,
+  authorAvatar,
   onUpdate,
 }) => {
   const fileRef = useRef<HTMLInputElement>(null);
