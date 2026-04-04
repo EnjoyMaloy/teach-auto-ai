@@ -37,6 +37,7 @@ interface ArticleCoverEditorProps {
   image: string | null;
   articleId: string;
   title?: string;
+  titleEn?: string;
   authorName?: string;
   authorAvatar?: string;
   onUpdate: (gradient: string | null, image: string | null) => void;
@@ -141,6 +142,7 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
   image,
   articleId,
   title,
+  titleEn,
   authorName,
   authorAvatar,
   onUpdate,
@@ -200,70 +202,83 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
     <div className="space-y-3">
       <p className="text-sm font-medium text-foreground">Обложка</p>
 
-      {/* Card-style Preview */}
-      <div
-        className="w-full max-w-[280px] mx-auto rounded-2xl overflow-hidden relative border border-border shadow-lg"
-        style={{ background: gradient || ARTICLE_GRADIENTS[0] }}
-      >
-        {/* Top-right icons */}
-        <div className="absolute top-3 right-3 z-20 flex gap-1.5">
-          <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <Unlink className="w-4 h-4 text-white" />
-          </div>
-          <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <Bookmark className="w-4 h-4 text-white" />
-          </div>
-        </div>
-
-        {/* Image area */}
-        <div className="w-full aspect-square flex items-center justify-center relative p-6">
-          {image && (
-            <img
-              src={image}
-              alt="cover"
-              className="max-h-full max-w-full object-contain relative z-10 drop-shadow-lg"
-            />
-          )}
-          {!image && !uploading && (
-            <button
-              onClick={() => fileRef.current?.click()}
-              className="flex flex-col items-center gap-1 text-white/60 hover:text-white/90 transition-colors z-10"
+      {/* Two card previews side by side */}
+      <div className="flex gap-3">
+        {[
+          { label: 'RU', cardTitle: title || 'Заголовок инструкции' },
+          { label: 'EN', cardTitle: titleEn || 'Instruction title' },
+        ].map(({ label, cardTitle }) => (
+          <div key={label} className="flex-1 space-y-1.5">
+            <span className="text-[10px] font-medium text-muted-foreground uppercase">{label}</span>
+            <div
+              className="w-full rounded-2xl overflow-hidden relative border border-border shadow-md"
+              style={{ background: gradient || ARTICLE_GRADIENTS[0] }}
             >
-              <ImagePlus className="w-8 h-8" />
-              <span className="text-xs">Загрузить PNG</span>
-            </button>
-          )}
-          {uploading && (
-            <Loader2 className="w-6 h-6 animate-spin text-white/80 z-10" />
-          )}
-          {image && (
-            <button
-              onClick={() => onUpdate(gradient, null)}
-              className="absolute top-2 left-2 z-20 w-6 h-6 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors"
-            >
-              <X className="w-3.5 h-3.5 text-white" />
-            </button>
-          )}
-        </div>
+              {/* Top-right icons */}
+              <div className="absolute top-2 right-2 z-20 flex gap-1">
+                <div className="w-5 h-5 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Unlink className="w-2.5 h-2.5 text-white" />
+                </div>
+                <div className="w-5 h-5 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Bookmark className="w-2.5 h-2.5 text-white" />
+                </div>
+              </div>
 
-        {/* Bottom info */}
-        <div className="px-4 pb-4 pt-0 space-y-3">
-          <h3 className="text-white/80 font-semibold text-base leading-tight text-center">
-            {title || 'Заголовок инструкции'}
-          </h3>
-          <div className="flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 mx-auto w-fit">
-            {authorAvatar ? (
-              <img src={authorAvatar} alt="" className="w-5 h-5 rounded-full object-cover" />
-            ) : (
-              <div className="w-5 h-5 rounded-full bg-white/30" />
-            )}
-            <span className="text-white text-xs font-medium truncate max-w-[120px]">
-              {authorName || 'Автор'}
-            </span>
-            <Eye className="w-3.5 h-3.5 text-white/70 ml-1" />
-            <span className="text-white/70 text-xs">1337</span>
+              {/* Image area */}
+              <div className="w-full aspect-square flex items-center justify-center relative p-4">
+                {image && (
+                  <img
+                    src={image}
+                    alt="cover"
+                    className="max-h-full max-w-full object-contain relative z-10 drop-shadow-lg"
+                  />
+                )}
+                {!image && !uploading && label === 'RU' && (
+                  <button
+                    onClick={() => fileRef.current?.click()}
+                    className="flex flex-col items-center gap-1 text-white/60 hover:text-white/90 transition-colors z-10"
+                  >
+                    <ImagePlus className="w-6 h-6" />
+                    <span className="text-[10px]">PNG</span>
+                  </button>
+                )}
+                {!image && !uploading && label === 'EN' && (
+                  <div className="text-white/30 text-[10px]">No image</div>
+                )}
+                {uploading && label === 'RU' && (
+                  <Loader2 className="w-5 h-5 animate-spin text-white/80 z-10" />
+                )}
+                {image && label === 'RU' && (
+                  <button
+                    onClick={() => onUpdate(gradient, null)}
+                    className="absolute top-1 left-1 z-20 w-4 h-4 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors"
+                  >
+                    <X className="w-2.5 h-2.5 text-white" />
+                  </button>
+                )}
+              </div>
+
+              {/* Bottom info */}
+              <div className="px-3 pb-3 pt-0 space-y-2">
+                <h3 className="text-white/80 font-semibold text-xs leading-tight text-center line-clamp-2">
+                  {cardTitle}
+                </h3>
+                <div className="flex items-center justify-center gap-1.5 bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 mx-auto w-fit">
+                  {authorAvatar ? (
+                    <img src={authorAvatar} alt="" className="w-4 h-4 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-4 h-4 rounded-full bg-white/30" />
+                  )}
+                  <span className="text-white text-[10px] font-medium truncate max-w-[60px]">
+                    {authorName || 'Автор'}
+                  </span>
+                  <Eye className="w-2.5 h-2.5 text-white/70" />
+                  <span className="text-white/70 text-[10px]">1337</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        ))}
       </div>
 
       {/* Upload button when image exists */}
