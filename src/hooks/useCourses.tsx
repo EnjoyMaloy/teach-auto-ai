@@ -364,7 +364,6 @@ export const useCourses = () => {
             slider_min: slide.sliderMin,
             slider_max: slide.sliderMax,
             slider_correct: slide.sliderCorrect,
-            slider_correct_max: slide.sliderCorrectMax,
             slider_step: slide.sliderStep,
             ordering_items: slide.orderingItems as any,
             correct_order: slide.correctOrder as any,
