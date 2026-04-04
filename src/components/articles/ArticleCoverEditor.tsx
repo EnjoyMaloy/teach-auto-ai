@@ -151,6 +151,7 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
     setCustomGradients(updated);
     saveCustomGradients(updated);
     onUpdate(g, image);
+    setGradientPopoverOpen(false);
   };
 
   const handleDeleteCustomGradient = (g: string) => {
