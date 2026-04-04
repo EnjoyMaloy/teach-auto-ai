@@ -451,37 +451,35 @@ const Articles: React.FC = () => {
           </Button>
         </div>
       ) : (
-        <div className="grid gap-3">
-          {articles.map((article) => (
-            <button
-              key={article.id}
-              onClick={() => setEditingArticle(article)}
-              className={cn(
-                'w-full text-left p-4 rounded-2xl border border-border',
-                'bg-card hover:bg-muted/50 transition-colors',
-                'flex items-center gap-3'
-              )}
-            >
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden"
-                style={{ background: article.cover_gradient || ARTICLE_GRADIENTS[0] }}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          {articles.map((article) => {
+            const hasTitle = article.title && article.title !== 'Без названия' && article.title !== 'Новая инструкция';
+            const gradient = article.cover_gradient || ARTICLE_GRADIENTS[Math.abs(article.id.charCodeAt(0)) % ARTICLE_GRADIENTS.length];
+            return (
+              <button
+                key={article.id}
+                onClick={() => setEditingArticle(article)}
+                className="group relative aspect-square rounded-2xl overflow-hidden border border-border hover:ring-2 hover:ring-primary/50 transition-all"
+                style={{ background: gradient }}
               >
-                {article.cover_image ? (
-                  <img src={article.cover_image} alt="" className="w-7 h-7 object-contain" />
-                ) : (
-                  <FileText className="w-5 h-5 text-white/60" />
+                {article.cover_image && (
+                  <img
+                    src={article.cover_image}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-contain p-4 drop-shadow-lg"
+                  />
                 )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-foreground truncate">
-                  {article.title || 'Без названия'}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {new Date(article.updated_at).toLocaleDateString('ru-RU')}
-                </p>
-              </div>
-            </button>
-          ))}
+                <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/60 to-transparent">
+                  <p className="text-white font-semibold text-sm leading-tight line-clamp-2">
+                    {article.title || 'Новая инструкция'}
+                  </p>
+                  <p className="text-white/60 text-[10px] mt-1">
+                    {new Date(article.updated_at).toLocaleDateString('ru-RU')}
+                  </p>
+                </div>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
