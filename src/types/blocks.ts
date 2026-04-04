@@ -84,6 +84,9 @@ export interface Block {
   // Background from theme (references themeBackgrounds by id)
   backgroundId?: string;
   
+  // Article reference
+  articleId?: string;
+  
   // Timestamps
   createdAt: Date;
   updatedAt: Date;
