@@ -188,38 +188,70 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
     <div className="space-y-3">
       <p className="text-sm font-medium text-foreground">Обложка</p>
 
-      {/* Preview */}
+      {/* Card-style Preview */}
       <div
-        className="w-full aspect-[2/1] rounded-xl overflow-hidden relative flex items-center justify-center border border-border"
+        className="w-full max-w-[280px] mx-auto rounded-2xl overflow-hidden relative border border-border shadow-lg"
         style={{ background: gradient || ARTICLE_GRADIENTS[0] }}
       >
-        {image && (
-          <img
-            src={image}
-            alt="cover"
-            className="h-3/4 w-auto object-contain relative z-10"
-          />
-        )}
-        {!image && !uploading && (
-          <button
-            onClick={() => fileRef.current?.click()}
-            className="flex flex-col items-center gap-1 text-white/60 hover:text-white/90 transition-colors z-10"
-          >
-            <ImagePlus className="w-6 h-6" />
-            <span className="text-xs">Загрузить PNG</span>
-          </button>
-        )}
-        {uploading && (
-          <Loader2 className="w-6 h-6 animate-spin text-white/80 z-10" />
-        )}
-        {image && (
-          <button
-            onClick={() => onUpdate(gradient, null)}
-            className="absolute top-2 right-2 z-20 w-6 h-6 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors"
-          >
-            <X className="w-3.5 h-3.5 text-white" />
-          </button>
-        )}
+        {/* Top-right icons */}
+        <div className="absolute top-3 right-3 z-20 flex gap-1.5">
+          <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+            <Link2 className="w-4 h-4 text-white" />
+          </div>
+          <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+            <Bookmark className="w-4 h-4 text-white" />
+          </div>
+        </div>
+
+        {/* Image area */}
+        <div className="w-full aspect-square flex items-center justify-center relative p-6">
+          {image && (
+            <img
+              src={image}
+              alt="cover"
+              className="max-h-full max-w-full object-contain relative z-10 drop-shadow-lg"
+            />
+          )}
+          {!image && !uploading && (
+            <button
+              onClick={() => fileRef.current?.click()}
+              className="flex flex-col items-center gap-1 text-white/60 hover:text-white/90 transition-colors z-10"
+            >
+              <ImagePlus className="w-8 h-8" />
+              <span className="text-xs">Загрузить PNG</span>
+            </button>
+          )}
+          {uploading && (
+            <Loader2 className="w-6 h-6 animate-spin text-white/80 z-10" />
+          )}
+          {image && (
+            <button
+              onClick={() => onUpdate(gradient, null)}
+              className="absolute top-2 left-2 z-20 w-6 h-6 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors"
+            >
+              <X className="w-3.5 h-3.5 text-white" />
+            </button>
+          )}
+        </div>
+
+        {/* Bottom info */}
+        <div className="px-4 pb-4 pt-0 space-y-3">
+          <h3 className="text-white font-semibold text-base leading-tight text-center">
+            {title || 'Заголовок инструкции'}
+          </h3>
+          <div className="flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 mx-auto w-fit">
+            {authorAvatar ? (
+              <img src={authorAvatar} alt="" className="w-5 h-5 rounded-full object-cover" />
+            ) : (
+              <div className="w-5 h-5 rounded-full bg-white/30" />
+            )}
+            <span className="text-white text-xs font-medium truncate max-w-[120px]">
+              {authorName || 'Автор'}
+            </span>
+            <Eye className="w-3.5 h-3.5 text-white/70 ml-1" />
+            <span className="text-white/70 text-xs">1337</span>
+          </div>
+        </div>
       </div>
 
       {/* Upload button when image exists */}
