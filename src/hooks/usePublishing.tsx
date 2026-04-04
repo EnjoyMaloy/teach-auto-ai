@@ -68,6 +68,7 @@ export const usePublishing = () => {
             background_color: slide.backgroundColor,
             text_color: slide.textColor,
             text_size: slide.textSize,
+            article_id: slide.articleId || null,
           }));
 
           const { error: slidesError } = await supabase
