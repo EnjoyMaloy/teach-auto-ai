@@ -1,0 +1,1 @@
+ALTER TABLE public.articles ADD COLUMN content_en TEXT DEFAULT '';

@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, MoreVertical } from 'lucide-react';
+import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, MoreVertical, Languages } from 'lucide-react';
 import { toast } from 'sonner';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -24,6 +24,7 @@ interface Article {
   title: string;
   title_en: string | null;
   content: string;
+  content_en: string | null;
   cover_gradient: string | null;
   cover_image: string | null;
   created_at: string;
@@ -38,11 +39,14 @@ const ArticleEditor: React.FC<{
 }> = ({ article, onBack, onSaved, onDelete }) => {
   const [title, setTitle] = useState(article.title);
   const [titleEn, setTitleEn] = useState(article.title_en || '');
+  const [contentEn, setContentEn] = useState(article.content_en || '');
   const [saving, setSaving] = useState(false);
+  const [translating, setTranslating] = useState(false);
+  const [lang, setLang] = useState<'ru' | 'en'>('ru');
   const [coverGradient, setCoverGradient] = useState(article.cover_gradient);
   const [coverImage, setCoverImage] = useState(article.cover_image);
 
-  const editor = useEditor({
+  const editorRu = useEditor({
     extensions: [StarterKit, Highlight, Underline],
     content: article.content || '<p></p>',
     editorProps: {
@@ -52,16 +56,66 @@ const ArticleEditor: React.FC<{
     },
   });
 
+  const editorEn = useEditor({
+    extensions: [StarterKit, Highlight, Underline],
+    content: article.content_en || '<p></p>',
+    editorProps: {
+      attributes: {
+        class: 'prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[300px] p-4',
+      },
+    },
+    editable: true,
+  });
+
+  const handleTranslate = async () => {
+    if (!editorRu) return;
+    // Save RU content first
+    const htmlRu = editorRu.getHTML();
+    setTranslating(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('translate-article', {
+        body: { articleId: article.id },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      setTitleEn(data.title_en);
+      setContentEn(data.content_en);
+      editorEn?.commands.setContent(data.content_en);
+      toast.success('Перевод готов');
+      setLang('en');
+      
+      // Update parent
+      onSaved({
+        ...article,
+        title,
+        title_en: data.title_en,
+        content: htmlRu,
+        content_en: data.content_en,
+        cover_gradient: coverGradient,
+        cover_image: coverImage,
+      });
+    } catch (e: any) {
+      toast.error(e.message || 'Ошибка перевода');
+    } finally {
+      setTranslating(false);
+    }
+  };
+
   const handleSave = async () => {
-    if (!editor) return;
+    if (!editorRu || !editorEn) return;
     setSaving(true);
-    const html = editor.getHTML();
+    const htmlRu = editorRu.getHTML();
+    const htmlEn = editorEn.getHTML();
     const { data, error } = await supabase
       .from('articles')
       .update({
         title,
         title_en: titleEn || null,
-        content: html,
+        content: htmlRu,
+        content_en: htmlEn || null,
         cover_gradient: coverGradient,
         cover_image: coverImage,
       })
@@ -78,13 +132,17 @@ const ArticleEditor: React.FC<{
     }
   };
 
+  const hasEnContent = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 h-10">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-xl h-10 w-10 shrink-0">
           <ArrowLeft className="w-5 h-5" />
         </Button>
-        <span className="text-lg font-semibold flex-1 truncate">{title || 'Без названия'}</span>
+        <span className="text-lg font-semibold flex-1 truncate">
+          {lang === 'ru' ? (title || 'Без названия') : (titleEn || title || 'Untitled')}
+        </span>
         <ArticleSettingsDialog
           title={title}
           titleEn={titleEn}
@@ -113,12 +171,57 @@ const ArticleEditor: React.FC<{
         </DropdownMenu>
         <Button onClick={handleSave} disabled={saving} className="rounded-xl gap-2 h-10 shrink-0">
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          Сохранить
         </Button>
       </div>
 
+      {/* Language bar */}
+      <div className="flex items-center gap-2">
+        <div className="flex bg-muted rounded-xl p-0.5">
+          <button
+            onClick={() => setLang('ru')}
+            className={cn(
+              'px-3 py-1.5 text-sm font-medium rounded-lg transition-colors',
+              lang === 'ru' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+            )}
+          >
+            RU
+          </button>
+          <button
+            onClick={() => setLang('en')}
+            className={cn(
+              'px-3 py-1.5 text-sm font-medium rounded-lg transition-colors',
+              lang === 'en' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+            )}
+          >
+            EN
+          </button>
+        </div>
+
+        {lang === 'ru' && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleTranslate}
+            disabled={translating}
+            className="rounded-xl gap-1.5 h-8 text-xs"
+          >
+            {translating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Languages className="w-3.5 h-3.5" />}
+            {hasEnContent ? 'Перевести заново' : 'Перевести на EN'}
+          </Button>
+        )}
+
+        {lang === 'en' && !hasEnContent && (
+          <span className="text-xs text-muted-foreground">Английская версия пуста — переведите с русского</span>
+        )}
+      </div>
+
       <div className="border border-border rounded-2xl overflow-hidden bg-card">
-        <EditorContent editor={editor} />
+        <div className={lang === 'ru' ? '' : 'hidden'}>
+          <EditorContent editor={editorRu} />
+        </div>
+        <div className={lang === 'en' ? '' : 'hidden'}>
+          <EditorContent editor={editorEn} />
+        </div>
       </div>
     </div>
   );
