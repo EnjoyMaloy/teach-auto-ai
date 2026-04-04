@@ -132,6 +132,66 @@ const ArticleEditor: React.FC<{
     }
   };
 
+          {/* Category selector */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Категория</Label>
+            <div className="flex flex-wrap gap-2">
+              {COURSE_CATEGORIES.map((cat) => {
+                const Icon = cat.icon;
+                const isSelected = category === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setCategory(isSelected ? '' : cat.id)}
+                    className={cn(
+                      'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all border',
+                      isSelected
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-muted text-muted-foreground border-transparent hover:border-border'
+                    )}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {cat.name}
+                  </button>
+                );
+              })}
+              {category && !COURSE_CATEGORIES.find(c => c.id === category) && (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-primary text-primary-foreground border border-primary">
+                  <Tag className="w-3.5 h-3.5" />
+                  {category}
+                  <button onClick={() => setCategory('')} className="ml-0.5 hover:opacity-70">
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-2 mt-2">
+              <Input
+                value={customCategoryInput}
+                onChange={(e) => setCustomCategoryInput(e.target.value)}
+                placeholder="Своя категория..."
+                className="rounded-xl text-xs h-8 flex-1"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && customCategoryInput.trim()) {
+                    setCategory(customCategoryInput.trim());
+                    setCustomCategoryInput('');
+                  }
+                }}
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                className="rounded-xl h-8 text-xs"
+                disabled={!customCategoryInput.trim()}
+                onClick={() => {
+                  setCategory(customCategoryInput.trim());
+                  setCustomCategoryInput('');
+                }}
+              >
+                <Plus className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          </div>
 
   const [showSettings, setShowSettings] = useState(false);
   const displayTitle = lang === 'ru' ? title : (titleEn || title);
