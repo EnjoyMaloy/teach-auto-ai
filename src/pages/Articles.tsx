@@ -84,12 +84,7 @@ const ArticleEditor: React.FC<{
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-xl h-10 w-10 shrink-0">
           <ArrowLeft className="w-5 h-5" />
         </Button>
-        <Input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Название инструкции..."
-          className="text-lg font-semibold flex-1 rounded-xl h-10"
-        />
+        <span className="text-lg font-semibold flex-1 truncate">{title || 'Без названия'}</span>
         <ArticleSettingsDialog
           title={title}
           titleEn={titleEn}
