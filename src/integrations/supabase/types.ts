@@ -37,6 +37,7 @@ export type Database = {
       }
       articles: {
         Row: {
+          category: string | null
           content: string
           content_en: string | null
           cover_gradient: string | null
@@ -50,6 +51,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          category?: string | null
           content?: string
           content_en?: string | null
           cover_gradient?: string | null
@@ -63,6 +65,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          category?: string | null
           content?: string
           content_en?: string | null
           cover_gradient?: string | null
