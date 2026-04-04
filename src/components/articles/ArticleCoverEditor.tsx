@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ImagePlus, X, Loader2, Plus, RotateCcw, Eye, Link2, Bookmark } from 'lucide-react';
+import { ImagePlus, X, Loader2, Plus, RotateCcw, Eye, Unlink, Bookmark } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
