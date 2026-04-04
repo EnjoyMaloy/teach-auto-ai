@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ARTICLE_GRADIENTS } from '@/components/articles/ArticleCoverEditor';
 import ArticleSettingsDialog from '@/components/articles/ArticleSettingsDialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface Article {
   id: string;
