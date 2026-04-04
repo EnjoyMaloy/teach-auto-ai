@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Block, BLOCK_CONFIGS } from '@/types/blocks';
+import { supabase } from '@/integrations/supabase/client';
 import { CourseDesignSystem } from '@/types/course';
 import { DesignSystemConfig } from '@/types/designSystem';
 import { cn } from '@/lib/utils';
@@ -140,6 +141,51 @@ const getBackgroundStyle = (ds: {
     };
   }
   return { backgroundColor: `hsl(${ds.backgroundColor})` };
+};
+
+// Article preview for mobile frame
+const ArticlePreviewContent: React.FC<{ articleId?: string; ds: any }> = ({ articleId, ds }) => {
+  const [html, setHtml] = useState('');
+  const [title, setTitle] = useState('');
+
+  useEffect(() => {
+    if (!articleId) return;
+    supabase
+      .from('articles')
+      .select('title, content')
+      .eq('id', articleId)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          setTitle(data.title || '');
+          setHtml(data.content || '');
+        }
+      });
+  }, [articleId]);
+
+  if (!articleId) {
+    return (
+      <div className="h-full flex items-center justify-center p-8">
+        <p style={{ color: `hsl(${ds.foregroundColor} / 0.5)` }} className="text-sm">
+          Статья не выбрана
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full overflow-y-auto p-5" style={{ color: `hsl(${ds.foregroundColor})` }}>
+      {title && (
+        <h2 className="text-xl font-bold mb-4" style={{ fontFamily: ds.headingFontFamily }}>
+          {title}
+        </h2>
+      )}
+      <div
+        className="prose prose-sm dark:prose-invert max-w-none"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    </div>
+  );
 };
 
 export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
@@ -502,6 +548,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
             onSelectSubBlock={onSelectSubBlock}
           />
         );
+
+      case 'article':
+        return <ArticlePreviewContent articleId={block.articleId} ds={ds} />;
 
       case 'single_choice':
         return (
