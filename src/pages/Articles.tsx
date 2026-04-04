@@ -244,21 +244,22 @@ const ArticleEditor: React.FC<{
           <div className="space-y-2">
             <Label className="text-sm font-medium">Категория</Label>
             <div className="flex flex-wrap gap-2">
-              {COURSE_CATEGORIES.map((cat) => {
-                const Icon = cat.icon;
+              {[
+                { id: 'ai', name: 'ИИ' },
+                { id: 'crypto', name: 'Крипта' },
+              ].map((cat) => {
                 const isSelected = category === cat.id;
                 return (
                   <button
                     key={cat.id}
                     onClick={() => setCategory(isSelected ? '' : cat.id)}
                     className={cn(
-                      'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all border',
+                      'px-3 py-1.5 rounded-full text-xs font-medium transition-all border',
                       isSelected
                         ? 'bg-primary text-primary-foreground border-primary'
                         : 'bg-muted text-muted-foreground border-transparent hover:border-border'
                     )}
                   >
-                    <Icon className="w-3.5 h-3.5" />
                     {cat.name}
                   </button>
                 );
