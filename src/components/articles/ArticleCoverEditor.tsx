@@ -122,7 +122,7 @@ const CustomGradientBuilder: React.FC<{
       <Button
         onClick={() => onSave(gradientValue)}
         size="sm"
-        className="w-full rounded-xl gap-1.5 hover:text-foreground"
+        className="w-full rounded-xl gap-1.5 text-primary-foreground"
       >
         <Save className="w-3.5 h-3.5" />
         Сохранить градиент
