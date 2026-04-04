@@ -16,6 +16,7 @@ import {
 import { ARTICLE_GRADIENTS } from '@/components/articles/ArticleCoverEditor';
 import ArticleSettingsDialog from '@/components/articles/ArticleSettingsDialog';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import NotionEditor from '@/components/articles/NotionEditor';
 
 interface Article {
   id: string;
