@@ -323,7 +323,7 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
         ))}
 
         {/* Custom gradient button */}
-        <Popover>
+        <Popover open={gradientPopoverOpen} onOpenChange={setGradientPopoverOpen}>
           <PopoverTrigger asChild>
             <button
               className="aspect-square rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-muted-foreground/60 transition-all hover:scale-110 flex items-center justify-center"
