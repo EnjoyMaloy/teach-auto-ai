@@ -307,7 +307,7 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
             />
             <button
               onClick={() => handleDeleteCustomGradient(g)}
-              className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-destructive text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+              className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-white text-black flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
             >
               <X className="w-2 h-2" />
             </button>
