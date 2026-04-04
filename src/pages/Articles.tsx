@@ -48,6 +48,8 @@ const ArticleEditor: React.FC<{
   const [coverImage, setCoverImage] = useState(article.cover_image);
   const [translationStale, setTranslationStale] = useState(article.translation_stale);
 
+  const hasEnContent = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
+
   const editorRu = useEditor({
     extensions: [StarterKit, Highlight, Underline],
     content: article.content || '<p></p>',
@@ -55,6 +57,11 @@ const ArticleEditor: React.FC<{
       attributes: {
         class: 'prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[300px] p-4',
       },
+    },
+    onUpdate: () => {
+      if (hasEnContent) {
+        setTranslationStale(true);
+      }
     },
   });
 
@@ -149,7 +156,6 @@ const ArticleEditor: React.FC<{
     }
   };
 
-  const hasEnContent = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
 
   return (
     <div className="space-y-4">
