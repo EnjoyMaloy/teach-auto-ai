@@ -40,6 +40,7 @@ const ArticleEditor: React.FC<{
   onSaved: (updated: Article) => void;
   onDelete: (id: string) => void;
 }> = ({ article, onBack, onSaved, onDelete }) => {
+  const { user } = useAuth();
   const [title, setTitle] = useState(article.title);
   const [titleEn, setTitleEn] = useState(article.title_en || '');
   const [contentEn, setContentEn] = useState(article.content_en || '');
@@ -49,15 +50,28 @@ const ArticleEditor: React.FC<{
   const [coverGradient, setCoverGradient] = useState(article.cover_gradient);
   const [coverImage, setCoverImage] = useState(article.cover_image);
   const [translationStale, setTranslationStale] = useState(article.translation_stale);
+  const [authorName, setAuthorName] = useState<string>('');
 
   const hasEnContent = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
 
+  useEffect(() => {
+    if (user) {
+      const meta = user.user_metadata;
+      setAuthorName(meta?.name || meta?.full_name || user.email?.split('@')[0] || '');
+    }
+  }, [user]);
+
   const editorRu = useEditor({
-    extensions: [StarterKit, Highlight, Underline],
+    extensions: [
+      StarterKit,
+      Highlight,
+      Underline,
+      Placeholder.configure({ placeholder: 'Начните писать...' }),
+    ],
     content: article.content || '<p></p>',
     editorProps: {
       attributes: {
-        class: 'prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[300px] p-4',
+        class: 'prose prose-lg dark:prose-invert max-w-none focus:outline-none min-h-[400px] text-foreground',
       },
     },
     onUpdate: () => {
@@ -68,11 +82,16 @@ const ArticleEditor: React.FC<{
   });
 
   const editorEn = useEditor({
-    extensions: [StarterKit, Highlight, Underline],
+    extensions: [
+      StarterKit,
+      Highlight,
+      Underline,
+      Placeholder.configure({ placeholder: 'Start writing...' }),
+    ],
     content: article.content_en || '<p></p>',
     editorProps: {
       attributes: {
-        class: 'prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[300px] p-4',
+        class: 'prose prose-lg dark:prose-invert max-w-none focus:outline-none min-h-[400px] text-foreground',
       },
     },
     editable: true,
