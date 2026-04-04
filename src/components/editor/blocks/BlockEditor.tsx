@@ -92,7 +92,7 @@ const ArticleBlockSelector: React.FC<{
   );
 };
 
-
+export const BlockEditor: React.FC<BlockEditorProps> = ({
   block,
   onUpdate,
   onDelete,
