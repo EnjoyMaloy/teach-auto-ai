@@ -16,11 +16,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import ArticleCoverEditor, { ARTICLE_GRADIENTS } from '@/components/articles/ArticleCoverEditor';
 
 interface Article {
   id: string;
   title: string;
   content: string;
+  cover_gradient: string | null;
+  cover_image: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -33,13 +36,11 @@ const ArticleEditor: React.FC<{
 }> = ({ article, onBack, onSaved, onDelete }) => {
   const [title, setTitle] = useState(article.title);
   const [saving, setSaving] = useState(false);
+  const [coverGradient, setCoverGradient] = useState(article.cover_gradient);
+  const [coverImage, setCoverImage] = useState(article.cover_image);
 
   const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Highlight,
-      Underline,
-    ],
+    extensions: [StarterKit, Highlight, Underline],
     content: article.content || '<p></p>',
     editorProps: {
       attributes: {
@@ -54,7 +55,7 @@ const ArticleEditor: React.FC<{
     const html = editor.getHTML();
     const { data, error } = await supabase
       .from('articles')
-      .update({ title, content: html })
+      .update({ title, content: html, cover_gradient: coverGradient, cover_image: coverImage })
       .eq('id', article.id)
       .select()
       .single();
@@ -66,6 +67,11 @@ const ArticleEditor: React.FC<{
       toast.success('Сохранено');
       onSaved(data as Article);
     }
+  };
+
+  const handleCoverUpdate = (gradient: string | null, image: string | null) => {
+    setCoverGradient(gradient);
+    setCoverImage(image);
   };
 
   return (
@@ -98,6 +104,15 @@ const ArticleEditor: React.FC<{
           Сохранить
         </Button>
       </div>
+
+      {/* Cover editor */}
+      <ArticleCoverEditor
+        gradient={coverGradient}
+        image={coverImage}
+        articleId={article.id}
+        onUpdate={handleCoverUpdate}
+      />
+
       <div className="border border-border rounded-2xl overflow-hidden bg-card">
         <EditorContent editor={editor} />
       </div>
@@ -217,8 +232,16 @@ const Articles: React.FC = () => {
                 'flex items-center gap-3'
               )}
             >
-              <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
-                <FileText className="w-5 h-5 text-muted-foreground" />
+              {/* Cover thumbnail */}
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden"
+                style={{ background: article.cover_gradient || ARTICLE_GRADIENTS[0] }}
+              >
+                {article.cover_image ? (
+                  <img src={article.cover_image} alt="" className="w-7 h-7 object-contain" />
+                ) : (
+                  <FileText className="w-5 h-5 text-white/60" />
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-foreground truncate">
