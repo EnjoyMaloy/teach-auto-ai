@@ -461,41 +461,41 @@ const Articles: React.FC = () => {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {articles.map((article) => {
-            const hasTitle = article.title && article.title !== 'Без названия' && article.title !== 'Новая инструкция';
             const gradient = article.cover_gradient || ARTICLE_GRADIENTS[Math.abs(article.id.charCodeAt(0)) % ARTICLE_GRADIENTS.length];
             return (
               <button
                 key={article.id}
                 onClick={() => setEditingArticle(article)}
-                className="group relative aspect-square rounded-2xl overflow-hidden border border-border hover:ring-2 hover:ring-primary/50 transition-all"
+                className="group text-left rounded-2xl overflow-hidden border border-border shadow-md hover:ring-2 hover:ring-primary/50 transition-all"
                 style={{ background: gradient }}
               >
-                {article.cover_image && (
-                  <img
-                    src={article.cover_image}
-                    alt=""
-                    className="absolute inset-0 w-full h-full object-contain p-4 drop-shadow-lg"
-                  />
-                )}
-                <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/60 to-transparent">
-                  <p className="text-white font-semibold text-sm leading-tight line-clamp-2">
+                {/* Image area */}
+                <div className="w-full aspect-square flex items-center justify-center relative p-4">
+                  {article.cover_image && (
+                    <img
+                      src={article.cover_image}
+                      alt=""
+                      className="max-h-full max-w-full object-contain relative z-10 drop-shadow-lg"
+                    />
+                  )}
+                </div>
+
+                {/* Bottom info */}
+                <div className="px-4 pb-4 pt-0 space-y-2">
+                  <h3 className="text-white font-semibold text-base leading-tight text-center line-clamp-2">
                     {article.title || 'Новая инструкция'}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm rounded-full px-2 py-0.5">
-                      {profile?.avatar_url ? (
-                        <img src={profile.avatar_url} alt="" className="w-4 h-4 rounded-full object-cover" />
-                      ) : (
-                        <div className="w-4 h-4 rounded-full bg-white/30" />
-                      )}
-                      <span className="text-white text-[10px] font-medium truncate max-w-[60px]">
-                        {profile?.name || 'Автор'}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1 text-white/60">
-                      <Eye className="w-3 h-3" />
-                      <span className="text-[10px]">0</span>
-                    </div>
+                  </h3>
+                  <div className="flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 mx-auto w-fit">
+                    {profile?.avatar_url ? (
+                      <img src={profile.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-5 h-5 rounded-full bg-white/30" />
+                    )}
+                    <span className="text-white text-xs font-medium truncate max-w-[70px]">
+                      {profile?.name || 'Автор'}
+                    </span>
+                    <Eye className="w-3 h-3 text-white/70" />
+                    <span className="text-white/70 text-xs">0</span>
                   </div>
                 </div>
               </button>
