@@ -178,99 +178,133 @@ const ArticleEditor: React.FC<{
   };
 
 
+  const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
+  const displayTitle = lang === 'ru' ? title : (titleEn || title);
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2 h-10">
-        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-xl h-10 w-10 shrink-0">
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <span className="text-lg font-semibold flex-1 truncate">
-          {lang === 'ru' ? (title || 'Без названия') : (titleEn || title || 'Untitled')}
-        </span>
-        <ArticleSettingsDialog
-          title={title}
-          titleEn={titleEn}
-          coverGradient={coverGradient}
-          coverImage={coverImage}
-          articleId={article.id}
-          onTitleChange={setTitle}
-          onTitleEnChange={setTitleEn}
-          onCoverUpdate={(g, img) => {
-            setCoverGradient(g);
-            setCoverImage(img);
-          }}
-        />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button size="icon" className="rounded-xl h-10 w-10 shrink-0 bg-muted hover:bg-muted/80 text-muted-foreground border-0">
-              <MoreVertical className="w-4 h-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onDelete(article.id)} className="text-destructive focus:text-destructive">
-              <Trash2 className="w-4 h-4 mr-2" />
-              Удалить
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <Button onClick={handleSave} disabled={saving} className="rounded-xl gap-2 h-10 shrink-0">
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-        </Button>
+    <div className="min-h-screen">
+      {/* Top toolbar */}
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border">
+        <div className="max-w-3xl mx-auto flex items-center gap-2 h-12 px-4">
+          <Button variant="ghost" size="icon" onClick={onBack} className="rounded-xl h-8 w-8 shrink-0">
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+
+          <div className="flex-1" />
+
+          {/* Language toggle */}
+          <div className="flex bg-muted rounded-lg p-0.5">
+            <button
+              onClick={() => setLang('ru')}
+              className={cn(
+                'px-2.5 py-1 text-xs font-medium rounded-md transition-colors',
+                lang === 'ru' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              RU
+            </button>
+            <button
+              onClick={() => setLang('en')}
+              className={cn(
+                'px-2.5 py-1 text-xs font-medium rounded-md transition-colors',
+                lang === 'en' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              EN
+            </button>
+          </div>
+
+          {hasEnContent && translationStale && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                {lang === 'ru' ? 'RU изменён — обновите перевод' : 'Перевод может быть устаревшим'}
+              </TooltipContent>
+            </Tooltip>
+          )}
+
+          {lang === 'ru' && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleTranslate}
+                  disabled={translating}
+                  className={cn("rounded-lg h-8 w-8", translationStale && hasEnContent && "text-amber-500")}
+                >
+                  {translating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Languages className="w-4 h-4" />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {hasEnContent ? 'Перевести заново' : 'Перевести на EN'}
+              </TooltipContent>
+            </Tooltip>
+          )}
+
+          <ArticleSettingsDialog
+            title={title}
+            titleEn={titleEn}
+            coverGradient={coverGradient}
+            coverImage={coverImage}
+            articleId={article.id}
+            onTitleChange={setTitle}
+            onTitleEnChange={setTitleEn}
+            onCoverUpdate={(g, img) => {
+              setCoverGradient(g);
+              setCoverImage(img);
+            }}
+          />
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-lg h-8 w-8 shrink-0 text-muted-foreground">
+                <MoreVertical className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onDelete(article.id)} className="text-destructive focus:text-destructive">
+                <Trash2 className="w-4 h-4 mr-2" />
+                Удалить
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Button onClick={handleSave} disabled={saving} size="sm" className="rounded-lg gap-1.5 h-8 px-3">
+            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+            <span className="text-xs">Сохранить</span>
+          </Button>
+        </div>
       </div>
 
-      {/* Language bar */}
-      <div className="flex items-center gap-2">
-        <div className="flex bg-muted rounded-xl p-0.5">
-          <button
-            onClick={() => setLang('ru')}
-            className={cn(
-              'px-3 py-1.5 text-sm font-medium rounded-lg transition-colors',
-              lang === 'ru' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
-            )}
-          >
-            RU
-          </button>
-          <button
-            onClick={() => setLang('en')}
-            className={cn(
-              'px-3 py-1.5 text-sm font-medium rounded-lg transition-colors',
-              lang === 'en' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
-            )}
-          >
-            EN
-          </button>
+      {/* Editor body */}
+      <div className="max-w-3xl mx-auto px-4 py-10">
+        {/* Author info */}
+        <div className="flex items-center gap-3 mb-8">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="" className="w-10 h-10 rounded-full object-cover" />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground text-sm font-medium">
+              {authorName?.[0]?.toUpperCase() || '?'}
+            </div>
+          )}
+          <div>
+            <p className="text-sm font-medium text-foreground">{authorName}</p>
+            <p className="text-xs text-muted-foreground">{user?.email}</p>
+          </div>
         </div>
 
-        {hasEnContent && translationStale && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
-            </TooltipTrigger>
-            <TooltipContent>
-              {lang === 'ru' ? 'RU изменён — обновите перевод' : 'Перевод может быть устаревшим'}
-            </TooltipContent>
-          </Tooltip>
-        )}
+        {/* Title */}
+        <input
+          value={displayTitle}
+          onChange={(e) => lang === 'ru' ? setTitle(e.target.value) : setTitleEn(e.target.value)}
+          placeholder={lang === 'ru' ? 'Заголовок' : 'Title'}
+          className="w-full text-3xl font-bold bg-transparent border-none outline-none placeholder:text-muted-foreground/50 text-foreground mb-6"
+        />
 
-        {lang === 'ru' && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleTranslate}
-            disabled={translating}
-            className={cn("rounded-xl gap-1.5 h-8 text-xs", translationStale && hasEnContent && "border-amber-500/50 text-amber-600 hover:text-amber-700")}
-          >
-            {translating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Languages className="w-3.5 h-3.5" />}
-            {hasEnContent ? 'Перевести заново' : 'Перевести на EN'}
-          </Button>
-        )}
-
-        {lang === 'en' && !hasEnContent && (
-          <span className="text-xs text-muted-foreground">Английская версия пуста — переведите с русского</span>
-        )}
-      </div>
-
-      <div className="border border-border rounded-2xl overflow-hidden bg-card">
+        {/* Content editor */}
         <div className={lang === 'ru' ? '' : 'hidden'}>
           <EditorContent editor={editorRu} />
         </div>
