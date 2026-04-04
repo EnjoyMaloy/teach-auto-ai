@@ -310,7 +310,7 @@ const ArticleEditor: React.FC<{
             <Button
               variant="ghost"
               onClick={() => onDelete(article.id)}
-              className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-2 dark:text-destructive"
+              className="text-red-400 hover:text-red-500 bg-red-50 hover:bg-red-100 dark:bg-transparent dark:text-destructive dark:hover:bg-destructive/10 gap-2 rounded-xl"
             >
               <Trash2 className="w-4 h-4" />
               Удалить инструкцию
