@@ -15,7 +15,8 @@ export type SlideType =
   | 'fill_blank'
   | 'matching'
   | 'ordering'
-  | 'slider';
+  | 'slider'
+  | 'article';
 
 export interface SlideHint {
   id: string;
