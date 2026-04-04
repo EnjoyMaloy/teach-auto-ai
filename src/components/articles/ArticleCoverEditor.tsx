@@ -144,13 +144,14 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [customGradients, setCustomGradients] = useState<string[]>(loadCustomGradients);
-
+  const [gradientPopoverOpen, setGradientPopoverOpen] = useState(false);
   const handleSaveGradient = (g: string) => {
     if (customGradients.includes(g)) return;
     const updated = [...customGradients, g];
     setCustomGradients(updated);
     saveCustomGradients(updated);
     onUpdate(g, image);
+    setGradientPopoverOpen(false);
   };
 
   const handleDeleteCustomGradient = (g: string) => {
@@ -322,7 +323,7 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
         ))}
 
         {/* Custom gradient button */}
-        <Popover>
+        <Popover open={gradientPopoverOpen} onOpenChange={setGradientPopoverOpen}>
           <PopoverTrigger asChild>
             <button
               className="aspect-square rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-muted-foreground/60 transition-all hover:scale-110 flex items-center justify-center"
