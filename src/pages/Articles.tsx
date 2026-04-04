@@ -221,29 +221,6 @@ const ArticleEditor: React.FC<{
         <div className="max-w-3xl mx-auto px-4 py-10 space-y-6">
           <h2 className="text-xl font-semibold text-foreground">Настройки инструкции</h2>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="title-ru">Название (RU)</Label>
-              <Input
-                id="title-ru"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Название на русском..."
-                className="rounded-xl"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="title-en">Название (EN)</Label>
-              <Input
-                id="title-en"
-                value={titleEn}
-                onChange={(e) => setTitleEn(e.target.value)}
-                placeholder="English title..."
-                className="rounded-xl"
-              />
-            </div>
-          </div>
-
           <ArticleCoverEditor
             gradient={coverGradient}
             image={coverImage}
