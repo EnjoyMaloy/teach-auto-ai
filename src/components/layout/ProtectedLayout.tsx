@@ -26,9 +26,9 @@ const LayoutContent: React.FC = () => {
       
       {/* Scrollable content layer - fixed but with overflow for scrolling */}
       <div 
-        className="fixed inset-0 z-0 overflow-auto"
+        className="fixed inset-0 z-0 overflow-auto transition-[left] duration-200"
         style={{ 
-          // Pass sidebar offset as CSS variable for pages to use for centering
+          left: sidebarOffset,
           '--sidebar-offset': sidebarOffset,
         } as React.CSSProperties}
       >
