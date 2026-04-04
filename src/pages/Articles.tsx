@@ -1,15 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, MoreVertical, Languages, AlertTriangle, Settings } from 'lucide-react';
+import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, MoreVertical, Languages, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Highlight from '@tiptap/extension-highlight';
-import Underline from '@tiptap/extension-underline';
-import Placeholder from '@tiptap/extension-placeholder';
+import { Editor } from '@tiptap/react';
+import { cn } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
