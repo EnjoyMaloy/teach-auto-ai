@@ -15,7 +15,8 @@ export type SlideType =
   | 'fill_blank'
   | 'matching'
   | 'ordering'
-  | 'slider';
+  | 'slider'
+  | 'article';
 
 export interface SlideHint {
   id: string;
@@ -58,6 +59,7 @@ export interface Slide {
   textColor?: string;
   textSize?: 'small' | 'medium' | 'large' | 'xlarge';
   backgroundId?: string; // Reference to theme background preset
+  articleId?: string; // Reference to articles table
   createdAt: Date;
   updatedAt: Date;
 }

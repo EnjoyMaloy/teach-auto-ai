@@ -17,7 +17,8 @@ export type BlockType =
   | 'fill_blank'
   | 'matching'
   | 'ordering'
-  | 'slider';
+  | 'slider'
+  | 'article';
 
 export interface BlockOption {
   id: string;
@@ -82,6 +83,9 @@ export interface Block {
   
   // Background from theme (references themeBackgrounds by id)
   backgroundId?: string;
+  
+  // Article reference
+  articleId?: string;
   
   // Timestamps
   createdAt: Date;
@@ -235,6 +239,16 @@ export const BLOCK_CONFIGS: Record<BlockType, BlockConfig> = {
     bgClass: 'bg-primary/10',
     description: 'Выбрать значение на шкале'
   },
+  article: {
+    type: 'article',
+    icon: 'FileText',
+    label: 'Article',
+    labelRu: 'Статья',
+    category: 'content',
+    colorClass: 'text-foreground',
+    bgClass: 'bg-muted/50',
+    description: 'Встроить инструкцию из библиотеки'
+  },
 };
 
 // Mobile preview dimensions (9:16 aspect ratio)
@@ -272,4 +286,5 @@ export const createEmptyBlock = (type: BlockType, lessonId: string, order: numbe
     correctOrder: ['Пункт 1', 'Пункт 2', 'Пункт 3']
   } : {}),
   ...(type === 'design' ? { subBlocks: [] } : {}),
+  ...(type === 'article' ? { articleId: undefined } : {}),
 });

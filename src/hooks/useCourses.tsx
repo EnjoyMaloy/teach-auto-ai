@@ -34,6 +34,7 @@ const dbSlideToSlide = (row: any): Slide => ({
   backgroundColor: row.background_color,
   textColor: row.text_color,
   textSize: row.text_size as 'small' | 'medium' | 'large' | 'xlarge' | undefined,
+  articleId: row.article_id || undefined,
   createdAt: new Date(row.created_at),
   updatedAt: new Date(row.updated_at),
 });
@@ -371,6 +372,7 @@ export const useCourses = () => {
             background_color: slide.backgroundColor,
             text_color: slide.textColor,
             text_size: slide.textSize,
+            article_id: slide.articleId || null,
             updated_at: new Date().toISOString(),
           };
 

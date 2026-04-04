@@ -15,6 +15,52 @@ import { DEFAULT_SOUND_SETTINGS, DEFAULT_DESIGN_BLOCK_SETTINGS } from '@/types/d
 import { RiveMascot } from './RiveMascot';
 import { getSoftBackgroundColor, getDarkTextColor, getButtonShadowColor } from '@/lib/colorUtils';
 import { OptimizedImage } from '@/components/ui/optimized-image';
+import { supabase } from '@/integrations/supabase/client';
+
+// Article slide content component
+const ArticleSlideContent: React.FC<{ articleId?: string; ds: any }> = ({ articleId, ds }) => {
+  const [html, setHtml] = useState<string>('');
+  const [title, setTitle] = useState<string>('');
+
+  useEffect(() => {
+    if (!articleId) return;
+    supabase
+      .from('articles')
+      .select('title, content')
+      .eq('id', articleId)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          setTitle(data.title || '');
+          setHtml(data.content || '');
+        }
+      });
+  }, [articleId]);
+
+  if (!articleId) {
+    return (
+      <div className="h-full flex items-center justify-center p-8">
+        <p style={{ color: `hsl(${ds.foregroundColor} / 0.5)` }} className="text-sm">
+          Статья не выбрана
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full overflow-y-auto p-5" style={{ color: `hsl(${ds.foregroundColor})` }}>
+      {title && (
+        <h2 className="text-xl font-bold mb-4" style={{ fontFamily: ds.headingFontFamily }}>
+          {title}
+        </h2>
+      )}
+      <div
+        className="prose prose-sm dark:prose-invert max-w-none"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    </div>
+  );
+};
 
 interface SlideRendererProps {
   slide: Slide | null;
@@ -399,6 +445,9 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
             isEditing={false}
           />
         );
+
+      case 'article':
+        return <ArticleSlideContent articleId={slide.articleId} ds={ds} />;
 
       case 'single_choice':
       case 'multiple_choice':

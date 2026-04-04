@@ -5,14 +5,14 @@ import {
   Heading, Type, Image, Play, Volume2, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
   Link2, ListOrdered, SlidersHorizontal, MousePointer2,
-  X, Sparkles
+  X, Sparkles, FileText
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const iconMap = {
   Heading, Type, Image, Play, Volume2, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
-  Link2, ListOrdered, SlidersHorizontal, MousePointer2
+  Link2, ListOrdered, SlidersHorizontal, MousePointer2, FileText
 };
 
 interface BlockTypeSelectorProps {

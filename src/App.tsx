@@ -24,6 +24,7 @@ const CourseStats = lazy(() => import("./pages/CourseStats"));
 const PublicCourse = lazy(() => import("./pages/PublicCourse"));
 const ShortCourse = lazy(() => import("./pages/ShortCourse"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Articles = lazy(() => import("./pages/Articles"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -83,6 +84,7 @@ const AppRoutes = () => (
       <Route path="/workshop" element={<Suspense fallback={<PageLoader />}><Dashboard /></Suspense>} />
       <Route path="/favorites" element={<Suspense fallback={<PageLoader />}><Favorites /></Suspense>} />
       <Route path="/pricing" element={<Suspense fallback={<PageLoader />}><Pricing /></Suspense>} />
+      <Route path="/articles" element={<Suspense fallback={<PageLoader />}><Articles /></Suspense>} />
     </Route>
     
     {/* Protected routes without sidebar layout */}

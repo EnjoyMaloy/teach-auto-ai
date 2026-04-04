@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Block, BlockType, BLOCK_CONFIGS, BlockOption } from '@/types/blocks';
 import { SubBlock, SubBlockType, SUB_BLOCK_CONFIGS, createSubBlock } from '@/types/designBlock';
 import { BackgroundPreset } from '@/types/designSystem';
@@ -18,13 +18,22 @@ import {
   CircleDot, CheckSquare, ToggleLeft, PenLine,
   Link2, ListOrdered, SlidersHorizontal, MousePointer2,
   Lightbulb, Layers, CheckCircle, XCircle, AlertCircle,
-  MousePointerClick, Minus, Sparkles, Tag, RotateCcw, Table
+  MousePointerClick, Minus, Sparkles, Tag, RotateCcw, Table, FileText
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const iconMap = {
   Heading, Type, Image, Play, Volume2, LayoutList,
   CircleDot, CheckSquare, ToggleLeft, PenLine,
-  Link2, ListOrdered, SlidersHorizontal, MousePointer2, Layers
+  Link2, ListOrdered, SlidersHorizontal, MousePointer2, Layers, FileText
 };
 
 const subBlockIconMap = {
@@ -39,6 +48,49 @@ interface BlockEditorProps {
   onSelectSubBlock?: (id: string | null) => void;
   themeBackgrounds?: BackgroundPreset[];
 }
+// Article selector sub-component
+const ArticleBlockSelector: React.FC<{
+  articleId?: string;
+  onSelect: (articleId: string) => void;
+}> = ({ articleId, onSelect }) => {
+  const { user } = useAuth();
+  const [articles, setArticles] = useState<{ id: string; title: string }[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('articles')
+      .select('id, title')
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false })
+      .then(({ data }) => {
+        if (data) setArticles(data);
+      });
+  }, [user]);
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-foreground font-medium">Выберите инструкцию</Label>
+      <Select value={articleId || ''} onValueChange={onSelect}>
+        <SelectTrigger className="rounded-xl">
+          <SelectValue placeholder="Выберите статью..." />
+        </SelectTrigger>
+        <SelectContent>
+          {articles.map((a) => (
+            <SelectItem key={a.id} value={a.id}>
+              {a.title || 'Без названия'}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {articles.length === 0 && (
+        <p className="text-xs text-muted-foreground">
+          Нет инструкций. Создайте их в разделе «Инструкции».
+        </p>
+      )}
+    </div>
+  );
+};
 
 export const BlockEditor: React.FC<BlockEditorProps> = ({
   block,
@@ -671,6 +723,14 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
               Добавить пункт
             </Button>
           </div>
+        )}
+
+        {/* Article block - select from user's articles */}
+        {block.type === 'article' && (
+          <ArticleBlockSelector
+            articleId={block.articleId}
+            onSelect={(articleId) => onUpdate({ articleId })}
+          />
         )}
 
         {/* Design block - sub-block settings or add menu */}
