@@ -123,7 +123,7 @@ const CustomGradientBuilder: React.FC<{
         onClick={() => onSave(gradientValue)}
         size="sm"
         variant="outline"
-        className="w-full rounded-xl gap-1.5 text-foreground border-border hover:bg-primary hover:text-white hover:border-primary"
+        className="w-full rounded-xl gap-1.5 text-foreground border-border hover:!bg-primary hover:!text-white hover:!border-primary"
       >
         <Save className="w-3.5 h-3.5" />
         Сохранить градиент
