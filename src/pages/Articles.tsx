@@ -156,7 +156,6 @@ const ArticleEditor: React.FC<{
     }
   };
 
-  const hasEnContent = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
 
   return (
     <div className="space-y-4">
