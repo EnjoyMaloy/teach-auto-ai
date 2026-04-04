@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, Settings, Languages, AlertTriangle, X, Tag } from 'lucide-react';
-import { COURSE_CATEGORIES } from '@/lib/categories';
+
 import { toast } from 'sonner';
 import { Editor } from '@tiptap/react';
 import { cn } from '@/lib/utils';
@@ -244,26 +244,27 @@ const ArticleEditor: React.FC<{
           <div className="space-y-2">
             <Label className="text-sm font-medium">Категория</Label>
             <div className="flex flex-wrap gap-2">
-              {COURSE_CATEGORIES.map((cat) => {
-                const Icon = cat.icon;
+              {[
+                { id: 'ai', name: 'ИИ' },
+                { id: 'crypto', name: 'Крипта' },
+              ].map((cat) => {
                 const isSelected = category === cat.id;
                 return (
                   <button
                     key={cat.id}
                     onClick={() => setCategory(isSelected ? '' : cat.id)}
                     className={cn(
-                      'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all border',
+                      'px-3 py-1.5 rounded-full text-xs font-medium transition-all border',
                       isSelected
                         ? 'bg-primary text-primary-foreground border-primary'
                         : 'bg-muted text-muted-foreground border-transparent hover:border-border'
                     )}
                   >
-                    <Icon className="w-3.5 h-3.5" />
                     {cat.name}
                   </button>
                 );
               })}
-              {category && !COURSE_CATEGORIES.find(c => c.id === category) && (
+              {category && !['ai', 'crypto'].includes(category) && (
                 <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-primary text-primary-foreground border border-primary">
                   <Tag className="w-3.5 h-3.5" />
                   {category}
