@@ -16,11 +16,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import ArticleCoverEditor, { ARTICLE_GRADIENTS } from '@/components/articles/ArticleCoverEditor';
+import { ARTICLE_GRADIENTS } from '@/components/articles/ArticleCoverEditor';
+import ArticleSettingsDialog from '@/components/articles/ArticleSettingsDialog';
 
 interface Article {
   id: string;
   title: string;
+  title_en: string | null;
   content: string;
   cover_gradient: string | null;
   cover_image: string | null;
@@ -35,6 +37,7 @@ const ArticleEditor: React.FC<{
   onDelete: (id: string) => void;
 }> = ({ article, onBack, onSaved, onDelete }) => {
   const [title, setTitle] = useState(article.title);
+  const [titleEn, setTitleEn] = useState(article.title_en || '');
   const [saving, setSaving] = useState(false);
   const [coverGradient, setCoverGradient] = useState(article.cover_gradient);
   const [coverImage, setCoverImage] = useState(article.cover_image);
@@ -55,7 +58,13 @@ const ArticleEditor: React.FC<{
     const html = editor.getHTML();
     const { data, error } = await supabase
       .from('articles')
-      .update({ title, content: html, cover_gradient: coverGradient, cover_image: coverImage })
+      .update({
+        title,
+        title_en: titleEn || null,
+        content: html,
+        cover_gradient: coverGradient,
+        cover_image: coverImage,
+      })
       .eq('id', article.id)
       .select()
       .single();
@@ -69,11 +78,6 @@ const ArticleEditor: React.FC<{
     }
   };
 
-  const handleCoverUpdate = (gradient: string | null, image: string | null) => {
-    setCoverGradient(gradient);
-    setCoverImage(image);
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 h-10">
@@ -85,6 +89,19 @@ const ArticleEditor: React.FC<{
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Название инструкции..."
           className="text-lg font-semibold flex-1 rounded-xl h-10"
+        />
+        <ArticleSettingsDialog
+          title={title}
+          titleEn={titleEn}
+          coverGradient={coverGradient}
+          coverImage={coverImage}
+          articleId={article.id}
+          onTitleChange={setTitle}
+          onTitleEnChange={setTitleEn}
+          onCoverUpdate={(g, img) => {
+            setCoverGradient(g);
+            setCoverImage(img);
+          }}
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -104,14 +121,6 @@ const ArticleEditor: React.FC<{
           Сохранить
         </Button>
       </div>
-
-      {/* Cover editor */}
-      <ArticleCoverEditor
-        gradient={coverGradient}
-        image={coverImage}
-        articleId={article.id}
-        onUpdate={handleCoverUpdate}
-      />
 
       <div className="border border-border rounded-2xl overflow-hidden bg-card">
         <EditorContent editor={editor} />
@@ -232,7 +241,6 @@ const Articles: React.FC = () => {
                 'flex items-center gap-3'
               )}
             >
-              {/* Cover thumbnail */}
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden"
                 style={{ background: article.cover_gradient || ARTICLE_GRADIENTS[0] }}
