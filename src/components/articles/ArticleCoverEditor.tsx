@@ -42,9 +42,22 @@ interface ArticleCoverEditorProps {
   onUpdate: (gradient: string | null, image: string | null) => void;
 }
 
+const CUSTOM_GRADIENTS_KEY = 'article-custom-gradients';
+
+const loadCustomGradients = (): string[] => {
+  try {
+    return JSON.parse(localStorage.getItem(CUSTOM_GRADIENTS_KEY) || '[]');
+  } catch { return []; }
+};
+
+const saveCustomGradients = (gradients: string[]) => {
+  localStorage.setItem(CUSTOM_GRADIENTS_KEY, JSON.stringify(gradients));
+};
+
 const CustomGradientBuilder: React.FC<{
   onChange: (gradient: string) => void;
-}> = ({ onChange }) => {
+  onSave: (gradient: string) => void;
+}> = ({ onChange, onSave }) => {
   const [color1, setColor1] = useState('#667eea');
   const [color2, setColor2] = useState('#764ba2');
   const [angle, setAngle] = useState(135);
