@@ -265,7 +265,7 @@ const ArticleEditor: React.FC<{
                 );
               })}
               {category && !['ai', 'crypto'].includes(category) && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-primary text-primary-foreground border border-primary">
+                <div className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium bg-primary text-primary-foreground border border-primary">
                   {category}
                   <button onClick={() => setCategory('')} className="ml-0.5 hover:opacity-70">
                     <X className="w-3 h-3" />
