@@ -308,7 +308,7 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
       <div className="grid grid-cols-10 gap-1.5">
         {ARTICLE_GRADIENTS.map((g, i) => (
           <button
-            key={i}
+            key={`preset-${i}`}
             onClick={() => onUpdate(g, image)}
             className={cn(
               'aspect-square rounded-lg border-2 transition-all hover:scale-110',
@@ -316,6 +316,26 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
             )}
             style={{ background: g }}
           />
+        ))}
+
+        {/* Custom saved gradients */}
+        {customGradients.map((g, i) => (
+          <div key={`custom-${i}`} className="relative group">
+            <button
+              onClick={() => onUpdate(g, image)}
+              className={cn(
+                'aspect-square rounded-lg border-2 transition-all hover:scale-110 w-full',
+                gradient === g ? 'border-primary ring-1 ring-primary' : 'border-transparent'
+              )}
+              style={{ background: g }}
+            />
+            <button
+              onClick={() => handleDeleteCustomGradient(g)}
+              className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-destructive text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+            >
+              <X className="w-2 h-2" />
+            </button>
+          </div>
         ))}
 
         {/* Custom gradient button */}
@@ -328,7 +348,10 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-72 p-3" align="end">
-            <CustomGradientBuilder onChange={(g) => onUpdate(g, image)} />
+            <CustomGradientBuilder
+              onChange={(g) => onUpdate(g, image)}
+              onSave={handleSaveGradient}
+            />
           </PopoverContent>
         </Popover>
       </div>
