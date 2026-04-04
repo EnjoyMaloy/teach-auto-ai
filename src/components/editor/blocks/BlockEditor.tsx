@@ -18,8 +18,17 @@ import {
   CircleDot, CheckSquare, ToggleLeft, PenLine,
   Link2, ListOrdered, SlidersHorizontal, MousePointer2,
   Lightbulb, Layers, CheckCircle, XCircle, AlertCircle,
-  MousePointerClick, Minus, Sparkles, Tag, RotateCcw, Table
+  MousePointerClick, Minus, Sparkles, Tag, RotateCcw, Table, FileText
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const iconMap = {
   Heading, Type, Image, Play, Volume2, LayoutList,
