@@ -214,17 +214,29 @@ const ArticleEditor: React.FC<{
           </button>
         </div>
 
+        {lang === 'ru' && hasEnContent && translationStale && (
+          <span className="text-xs text-amber-500 flex items-center gap-1">
+            ⚠ RU изменён — обновите перевод
+          </span>
+        )}
+
         {lang === 'ru' && (
           <Button
             variant="outline"
             size="sm"
             onClick={handleTranslate}
             disabled={translating}
-            className="rounded-xl gap-1.5 h-8 text-xs"
+            className={cn("rounded-xl gap-1.5 h-8 text-xs", translationStale && hasEnContent && "border-amber-500/50 text-amber-600 hover:text-amber-700")}
           >
             {translating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Languages className="w-3.5 h-3.5" />}
             {hasEnContent ? 'Перевести заново' : 'Перевести на EN'}
           </Button>
+        )}
+
+        {lang === 'en' && translationStale && hasEnContent && (
+          <span className="text-xs text-amber-500 flex items-center gap-1">
+            ⚠ Перевод может быть устаревшим
+          </span>
         )}
 
         {lang === 'en' && !hasEnContent && (
