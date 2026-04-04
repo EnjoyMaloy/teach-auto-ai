@@ -296,6 +296,7 @@ interface NotionEditorProps {
   placeholder?: string;
   onUpdate?: (html: string) => void;
   editable?: boolean;
+  editorRef?: React.MutableRefObject<Editor | null>;
 }
 
 const NotionEditor: React.FC<NotionEditorProps> = ({
@@ -303,6 +304,7 @@ const NotionEditor: React.FC<NotionEditorProps> = ({
   placeholder = 'Напишите что-нибудь или введите / для команд...',
   onUpdate,
   editable = true,
+  editorRef,
 }) => {
   const [slashPos, setSlashPos] = useState<{ top: number; left: number } | null>(null);
   const [slashFilter, setSlashFilter] = useState('');
