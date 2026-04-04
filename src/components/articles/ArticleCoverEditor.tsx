@@ -138,6 +138,16 @@ const CustomGradientBuilder: React.FC<{
           className="w-full mt-1"
         />
       </div>
+
+      {/* Save */}
+      <Button
+        onClick={() => onSave(gradientValue)}
+        size="sm"
+        className="w-full rounded-xl gap-1.5"
+      >
+        <Save className="w-3.5 h-3.5" />
+        Сохранить градиент
+      </Button>
     </div>
   );
 };
