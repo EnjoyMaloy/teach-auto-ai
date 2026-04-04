@@ -215,6 +215,7 @@ export const usePublishing = () => {
             backgroundColor: s.background_color || undefined,
             textColor: s.text_color || undefined,
             textSize: s.text_size as Slide['textSize'],
+            articleId: (s as any).article_id || undefined,
             createdAt: new Date(s.created_at),
             updatedAt: new Date(s.updated_at),
           })),
