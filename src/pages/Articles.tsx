@@ -283,20 +283,6 @@ const ArticleEditor: React.FC<{
 
       {/* Editor body */}
       <div className="max-w-3xl mx-auto px-4 py-10">
-        {/* Author info */}
-        <div className="flex items-center gap-3 mb-8">
-          {avatarUrl ? (
-            <img src={avatarUrl} alt="" className="w-10 h-10 rounded-full object-cover" />
-          ) : (
-            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground text-sm font-medium">
-              {authorName?.[0]?.toUpperCase() || '?'}
-            </div>
-          )}
-          <div>
-            <p className="text-sm font-medium text-foreground">{authorName}</p>
-            <p className="text-xs text-muted-foreground">{user?.email}</p>
-          </div>
-        </div>
 
         {/* Title */}
         <input
