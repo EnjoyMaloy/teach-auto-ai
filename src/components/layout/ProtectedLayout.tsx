@@ -48,13 +48,11 @@ const LayoutContent: React.FC = () => {
         </div>
       )}
       
-      {/* Desktop sidebar trigger - positioned relative to sidebar */}
-      {!isMobile && (
+      {/* Desktop sidebar trigger - only when collapsed */}
+      {!isMobile && isCollapsed && (
         <div 
-          className="fixed top-4 z-20 transition-all duration-200"
-          style={{ 
-            left: isCollapsed ? '1rem' : 'calc(var(--sidebar-width) + 1rem)'
-          }}
+          className="fixed top-4 z-20"
+          style={{ left: '1rem' }}
         >
           <SidebarTrigger />
         </div>
