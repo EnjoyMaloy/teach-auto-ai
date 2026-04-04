@@ -286,4 +286,5 @@ export const createEmptyBlock = (type: BlockType, lessonId: string, order: numbe
     correctOrder: ['Пункт 1', 'Пункт 2', 'Пункт 3']
   } : {}),
   ...(type === 'design' ? { subBlocks: [] } : {}),
+  ...(type === 'article' ? { articleId: undefined } : {}),
 });
