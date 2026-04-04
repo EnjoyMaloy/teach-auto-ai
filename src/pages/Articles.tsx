@@ -481,9 +481,22 @@ const Articles: React.FC = () => {
                   <p className="text-white font-semibold text-sm leading-tight line-clamp-2">
                     {article.title || 'Новая инструкция'}
                   </p>
-                  <p className="text-white/60 text-[10px] mt-1">
-                    {new Date(article.updated_at).toLocaleDateString('ru-RU')}
-                  </p>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm rounded-full px-2 py-0.5">
+                      {profile?.avatar_url ? (
+                        <img src={profile.avatar_url} alt="" className="w-4 h-4 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-4 h-4 rounded-full bg-white/30" />
+                      )}
+                      <span className="text-white text-[10px] font-medium truncate max-w-[60px]">
+                        {profile?.name || 'Автор'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-white/60">
+                      <Eye className="w-3 h-3" />
+                      <span className="text-[10px]">0</span>
+                    </div>
+                  </div>
                 </div>
               </button>
             );
