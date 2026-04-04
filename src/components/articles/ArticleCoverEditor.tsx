@@ -215,12 +215,12 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
               style={{ background: gradient || ARTICLE_GRADIENTS[0] }}
             >
               {/* Top-right icons */}
-              <div className="absolute top-2 right-2 z-20 flex gap-1">
-                <div className="w-5 h-5 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <Unlink className="w-2.5 h-2.5 text-white" />
+              <div className="absolute top-2 right-2 z-20 flex gap-1.5">
+                <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Unlink className="w-3.5 h-3.5 text-white" />
                 </div>
-                <div className="w-5 h-5 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <Bookmark className="w-2.5 h-2.5 text-white" />
+                <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Bookmark className="w-3.5 h-3.5 text-white" />
                 </div>
               </div>
 
@@ -263,21 +263,21 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
               </div>
 
               {/* Bottom info */}
-              <div className="px-3 pb-3 pt-0 space-y-2">
-                <h3 className="text-white/80 font-semibold text-xs leading-tight text-center line-clamp-2">
+              <div className="px-4 pb-4 pt-0 space-y-2">
+                <h3 className="text-white font-semibold text-sm leading-tight text-center line-clamp-2">
                   {cardTitle}
                 </h3>
-                <div className="flex items-center justify-center gap-1.5 bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 mx-auto w-fit">
+                <div className="flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 mx-auto w-fit">
                   {authorAvatar ? (
-                    <img src={authorAvatar} alt="" className="w-4 h-4 rounded-full object-cover" />
+                    <img src={authorAvatar} alt="" className="w-5 h-5 rounded-full object-cover" />
                   ) : (
-                    <div className="w-4 h-4 rounded-full bg-white/30" />
+                    <div className="w-5 h-5 rounded-full bg-white/30" />
                   )}
-                  <span className="text-white text-[10px] font-medium truncate max-w-[60px]">
+                  <span className="text-white text-xs font-medium truncate max-w-[80px]">
                     {authorName || 'Автор'}
                   </span>
-                  <Eye className="w-2.5 h-2.5 text-white/70" />
-                  <span className="text-white/70 text-[10px]">1337</span>
+                  <Eye className="w-3 h-3 text-white/70" />
+                  <span className="text-white/70 text-xs">1337</span>
                 </div>
               </div>
             </div>
