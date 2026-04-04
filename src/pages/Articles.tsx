@@ -21,6 +21,7 @@ interface Article {
   content_en: string | null;
   cover_gradient: string | null;
   cover_image: string | null;
+  category: string | null;
   translation_stale: boolean;
   created_at: string;
   updated_at: string;
