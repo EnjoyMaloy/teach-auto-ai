@@ -54,8 +54,8 @@ const ArticleEditor: React.FC<{
   const editorEnRef = useRef<Editor | null>(null);
 
   const handleTranslate = async () => {
-    if (!editorRu) return;
-    const htmlRu = editorRu.getHTML();
+    if (!editorRuRef.current) return;
+    const htmlRu = editorRuRef.current.getHTML();
     setTranslating(true);
 
     try {
@@ -75,7 +75,7 @@ const ArticleEditor: React.FC<{
       setTitleEn(data.title_en);
       setContentEn(data.content_en);
       setTranslationStale(false);
-      editorEn?.commands.setContent(data.content_en);
+      editorEnRef.current?.commands.setContent(data.content_en);
       toast.success('Перевод готов');
       setLang('en');
       
@@ -98,10 +98,10 @@ const ArticleEditor: React.FC<{
   };
 
   const handleSave = async () => {
-    if (!editorRu || !editorEn) return;
+    if (!editorRuRef.current || !editorEnRef.current) return;
     setSaving(true);
-    const htmlRu = editorRu.getHTML();
-    const htmlEn = editorEn.getHTML();
+    const htmlRu = editorRuRef.current.getHTML();
+    const htmlEn = editorEnRef.current.getHTML();
     
     // Mark translation as stale if RU content changed and EN translation exists
     const hasEn = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
