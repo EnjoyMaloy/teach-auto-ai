@@ -215,12 +215,12 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
               style={{ background: gradient || ARTICLE_GRADIENTS[0] }}
             >
               {/* Top-right icons */}
-              <div className="absolute top-2 right-2 z-20 flex gap-1">
-                <div className="w-5 h-5 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <Unlink className="w-2.5 h-2.5 text-white" />
+              <div className="absolute top-2 right-2 z-20 flex gap-1.5">
+                <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Unlink className="w-3.5 h-3.5 text-white" />
                 </div>
-                <div className="w-5 h-5 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <Bookmark className="w-2.5 h-2.5 text-white" />
+                <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Bookmark className="w-3.5 h-3.5 text-white" />
                 </div>
               </div>
 
