@@ -278,7 +278,7 @@ const ArticleEditor: React.FC<{
                     value={customCategoryInput}
                     onChange={(e) => setCustomCategoryInput(e.target.value)}
                     placeholder="Название..."
-                    className="rounded-full text-xs h-7 w-28 px-2.5"
+                    className="rounded-full text-sm h-8 w-32 px-3"
                     autoFocus
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && customCategoryInput.trim()) {
