@@ -70,19 +70,19 @@ const ArticleEditor: React.FC<{
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-xl">
+      <div className="flex items-center gap-2 h-10">
+        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-xl h-10 w-10 shrink-0">
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Название инструкции..."
-          className="text-lg font-semibold flex-1 rounded-xl"
+          className="text-lg font-semibold flex-1 rounded-xl h-10"
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-xl text-muted-foreground hover:text-foreground">
+            <Button variant="outline" size="icon" className="rounded-xl h-10 w-10 shrink-0 text-muted-foreground hover:text-foreground">
               <MoreVertical className="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -93,7 +93,7 @@ const ArticleEditor: React.FC<{
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button onClick={handleSave} disabled={saving} className="rounded-xl gap-2">
+        <Button onClick={handleSave} disabled={saving} className="rounded-xl gap-2 h-10 shrink-0">
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Сохранить
         </Button>
