@@ -38,6 +38,7 @@ export type Database = {
       articles: {
         Row: {
           content: string
+          content_en: string | null
           cover_gradient: string | null
           cover_image: string | null
           created_at: string
@@ -49,6 +50,7 @@ export type Database = {
         }
         Insert: {
           content?: string
+          content_en?: string | null
           cover_gradient?: string | null
           cover_image?: string | null
           created_at?: string
@@ -60,6 +62,7 @@ export type Database = {
         }
         Update: {
           content?: string
+          content_en?: string | null
           cover_gradient?: string | null
           cover_image?: string | null
           created_at?: string
