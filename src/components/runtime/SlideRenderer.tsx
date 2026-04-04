@@ -400,6 +400,9 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
           />
         );
 
+      case 'article':
+        return <ArticleSlideContent articleId={slide.articleId} ds={ds} />;
+
       case 'single_choice':
       case 'multiple_choice':
         return (
