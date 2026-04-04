@@ -290,7 +290,7 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-72 p-3" align="end">
-            <CustomGradientBuilder onApply={(g) => onUpdate(g, image)} />
+            <CustomGradientBuilder onChange={(g) => onUpdate(g, image)} />
           </PopoverContent>
         </Popover>
       </div>
