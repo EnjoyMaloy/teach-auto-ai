@@ -113,29 +113,13 @@ const CustomGradientBuilder: React.FC<{
       {/* Angle */}
       <div className="space-y-1.5">
         <Label className="text-xs text-muted-foreground">Угол: {angle}°</Label>
-        <div className="flex gap-1.5 flex-wrap">
-          {ANGLE_PRESETS.map((a) => (
-            <button
-              key={a}
-              onClick={() => updateAngle(a)}
-              className={cn(
-                'w-8 h-8 rounded-lg text-xs font-medium transition-colors border',
-                angle === a
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'bg-muted text-muted-foreground border-transparent hover:bg-muted/80'
-              )}
-            >
-              {a}°
-            </button>
-          ))}
-        </div>
         <input
           type="range"
           min={0}
           max={360}
           value={angle}
           onChange={(e) => updateAngle(Number(e.target.value))}
-          className="w-full mt-1"
+          className="w-full"
         />
       </div>
 
