@@ -48,8 +48,51 @@ interface BlockEditorProps {
   onSelectSubBlock?: (id: string | null) => void;
   themeBackgrounds?: BackgroundPreset[];
 }
+// Article selector sub-component
+const ArticleBlockSelector: React.FC<{
+  articleId?: string;
+  onSelect: (articleId: string) => void;
+}> = ({ articleId, onSelect }) => {
+  const { user } = useAuth();
+  const [articles, setArticles] = useState<{ id: string; title: string }[]>([]);
 
-export const BlockEditor: React.FC<BlockEditorProps> = ({
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('articles')
+      .select('id, title')
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false })
+      .then(({ data }) => {
+        if (data) setArticles(data);
+      });
+  }, [user]);
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-foreground font-medium">Выберите инструкцию</Label>
+      <Select value={articleId || ''} onValueChange={onSelect}>
+        <SelectTrigger className="rounded-xl">
+          <SelectValue placeholder="Выберите статью..." />
+        </SelectTrigger>
+        <SelectContent>
+          {articles.map((a) => (
+            <SelectItem key={a.id} value={a.id}>
+              {a.title || 'Без названия'}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {articles.length === 0 && (
+        <p className="text-xs text-muted-foreground">
+          Нет инструкций. Создайте их в разделе «Инструкции».
+        </p>
+      )}
+    </div>
+  );
+};
+
+
   block,
   onUpdate,
   onDelete,
