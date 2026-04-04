@@ -183,7 +183,7 @@ const ArticleEditor: React.FC<{
                 </Tooltip>
               )}
 
-              {lang === 'ru' && (
+              {(
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
