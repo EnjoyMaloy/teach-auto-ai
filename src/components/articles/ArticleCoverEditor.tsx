@@ -163,6 +163,21 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
 }) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [customGradients, setCustomGradients] = useState<string[]>(loadCustomGradients);
+
+  const handleSaveGradient = (g: string) => {
+    if (customGradients.includes(g)) return;
+    const updated = [...customGradients, g];
+    setCustomGradients(updated);
+    saveCustomGradients(updated);
+    onUpdate(g, image);
+  };
+
+  const handleDeleteCustomGradient = (g: string) => {
+    const updated = customGradients.filter(cg => cg !== g);
+    setCustomGradients(updated);
+    saveCustomGradients(updated);
+  };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
