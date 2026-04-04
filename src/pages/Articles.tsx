@@ -306,11 +306,11 @@ const ArticleEditor: React.FC<{
             </div>
           </div>
 
-          <div className="pt-4 border-t border-border">
+          <div className="pt-4 border-t border-border/50 dark:border-border">
             <Button
               variant="ghost"
               onClick={() => onDelete(article.id)}
-              className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-2"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-2 dark:text-destructive"
             >
               <Trash2 className="w-4 h-4" />
               Удалить инструкцию
