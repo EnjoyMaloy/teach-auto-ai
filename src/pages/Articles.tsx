@@ -254,7 +254,7 @@ const ArticleEditor: React.FC<{
                     key={cat.id}
                     onClick={() => setCategory(isSelected ? '' : cat.id)}
                     className={cn(
-                      'px-3 py-1.5 rounded-full text-xs font-medium transition-all border',
+                      'px-4 py-2 rounded-full text-sm font-medium transition-all border',
                       isSelected
                         ? 'bg-primary text-primary-foreground border-primary'
                         : 'bg-muted text-muted-foreground border-transparent hover:border-border'
