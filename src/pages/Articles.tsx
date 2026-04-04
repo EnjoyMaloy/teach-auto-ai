@@ -69,11 +69,16 @@ const ArticleEditor: React.FC<{
 
   const handleTranslate = async () => {
     if (!editorRu) return;
-    // Save RU content first
     const htmlRu = editorRu.getHTML();
     setTranslating(true);
 
     try {
+      // Save RU content to DB first so edge function can read it
+      await supabase
+        .from('articles')
+        .update({ title, content: htmlRu })
+        .eq('id', article.id);
+
       const { data, error } = await supabase.functions.invoke('translate-article', {
         body: { articleId: article.id },
       });
