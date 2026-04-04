@@ -144,7 +144,7 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [customGradients, setCustomGradients] = useState<string[]>(loadCustomGradients);
-
+  const [gradientPopoverOpen, setGradientPopoverOpen] = useState(false);
   const handleSaveGradient = (g: string) => {
     if (customGradients.includes(g)) return;
     const updated = [...customGradients, g];
