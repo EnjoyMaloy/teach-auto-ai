@@ -230,7 +230,11 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
                   <img
                     src={image}
                     alt="cover"
-                    className="max-h-full max-w-full object-contain relative z-10 drop-shadow-lg"
+                    className={cn(
+                      "max-h-full max-w-full object-contain relative z-10 drop-shadow-lg",
+                      label === 'RU' && "cursor-pointer hover:opacity-80 transition-opacity"
+                    )}
+                    onClick={label === 'RU' ? () => fileRef.current?.click() : undefined}
                   />
                 )}
                 {!image && !uploading && label === 'RU' && (
@@ -281,19 +285,6 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
         ))}
       </div>
 
-      {/* Upload button when image exists */}
-      {image && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => fileRef.current?.click()}
-          disabled={uploading}
-          className="rounded-xl text-xs w-full"
-        >
-          {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <ImagePlus className="w-3.5 h-3.5 mr-1.5" />}
-          Заменить изображение
-        </Button>
-      )}
 
       <input
         ref={fileRef}
