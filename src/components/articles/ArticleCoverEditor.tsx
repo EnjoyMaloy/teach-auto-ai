@@ -43,22 +43,21 @@ interface ArticleCoverEditorProps {
 }
 
 const CustomGradientBuilder: React.FC<{
-  onApply: (gradient: string) => void;
-}> = ({ onApply }) => {
+  onChange: (gradient: string) => void;
+}> = ({ onChange }) => {
   const [color1, setColor1] = useState('#667eea');
   const [color2, setColor2] = useState('#764ba2');
   const [angle, setAngle] = useState(135);
 
   const gradientValue = `linear-gradient(${angle}deg, ${color1} 0%, ${color2} 100%)`;
 
+  const updateColor1 = (v: string) => { setColor1(v); onChange(`linear-gradient(${angle}deg, ${v} 0%, ${color2} 100%)`); };
+  const updateColor2 = (v: string) => { setColor2(v); onChange(`linear-gradient(${angle}deg, ${color1} 0%, ${v} 100%)`); };
+  const updateAngle = (a: number) => { setAngle(a); onChange(`linear-gradient(${a}deg, ${color1} 0%, ${color2} 100%)`); };
+  const swapColors = () => { setColor1(color2); setColor2(color1); onChange(`linear-gradient(${angle}deg, ${color2} 0%, ${color1} 100%)`); };
+
   return (
     <div className="space-y-4">
-      {/* Preview */}
-      <div
-        className="w-full aspect-[2/1] rounded-xl border border-border"
-        style={{ background: gradientValue }}
-      />
-
       {/* Color pickers */}
       <div className="flex gap-3">
         <div className="flex-1 space-y-1.5">
@@ -67,7 +66,7 @@ const CustomGradientBuilder: React.FC<{
             <input
               type="color"
               value={color1}
-              onChange={(e) => setColor1(e.target.value)}
+              onChange={(e) => updateColor1(e.target.value)}
               className="w-8 h-8 rounded-lg border border-border cursor-pointer p-0.5"
             />
             <span className="text-xs text-muted-foreground font-mono">{color1}</span>
@@ -79,7 +78,7 @@ const CustomGradientBuilder: React.FC<{
             <input
               type="color"
               value={color2}
-              onChange={(e) => setColor2(e.target.value)}
+              onChange={(e) => updateColor2(e.target.value)}
               className="w-8 h-8 rounded-lg border border-border cursor-pointer p-0.5"
             />
             <span className="text-xs text-muted-foreground font-mono">{color2}</span>
@@ -91,7 +90,7 @@ const CustomGradientBuilder: React.FC<{
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => { setColor1(color2); setColor2(color1); }}
+        onClick={swapColors}
         className="w-full rounded-xl text-xs gap-1.5 text-muted-foreground"
       >
         <RotateCcw className="w-3.5 h-3.5" />
@@ -105,7 +104,7 @@ const CustomGradientBuilder: React.FC<{
           {ANGLE_PRESETS.map((a) => (
             <button
               key={a}
-              onClick={() => setAngle(a)}
+              onClick={() => updateAngle(a)}
               className={cn(
                 'w-8 h-8 rounded-lg text-xs font-medium transition-colors border',
                 angle === a
@@ -122,19 +121,10 @@ const CustomGradientBuilder: React.FC<{
           min={0}
           max={360}
           value={angle}
-          onChange={(e) => setAngle(Number(e.target.value))}
+          onChange={(e) => updateAngle(Number(e.target.value))}
           className="w-full mt-1"
         />
       </div>
-
-      {/* Apply */}
-      <Button
-        onClick={() => onApply(gradientValue)}
-        size="sm"
-        className="w-full rounded-xl"
-      >
-        Применить градиент
-      </Button>
     </div>
   );
 };
@@ -300,7 +290,7 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-72 p-3" align="end">
-            <CustomGradientBuilder onApply={(g) => onUpdate(g, image)} />
+            <CustomGradientBuilder onChange={(g) => onUpdate(g, image)} />
           </PopoverContent>
         </Popover>
       </div>
