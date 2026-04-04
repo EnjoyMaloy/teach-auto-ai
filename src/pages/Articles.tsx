@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, Settings, Languages, AlertTriangle, X, Tag } from 'lucide-react';
-import { COURSE_CATEGORIES } from '@/lib/categories';
+
 import { toast } from 'sonner';
 import { Editor } from '@tiptap/react';
 import { cn } from '@/lib/utils';
