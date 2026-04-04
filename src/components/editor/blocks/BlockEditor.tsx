@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Block, BlockType, BLOCK_CONFIGS, BlockOption } from '@/types/blocks';
 import { SubBlock, SubBlockType, SUB_BLOCK_CONFIGS, createSubBlock } from '@/types/designBlock';
 import { BackgroundPreset } from '@/types/designSystem';
