@@ -35,6 +35,33 @@ export type Database = {
         }
         Relationships: []
       }
+      articles: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       base_design_systems: {
         Row: {
           config: Json
@@ -633,6 +660,7 @@ export type Database = {
       }
       published_slides: {
         Row: {
+          article_id: string | null
           audio_url: string | null
           background_color: string | null
           blank_word: string | null
@@ -664,6 +692,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          article_id?: string | null
           audio_url?: string | null
           background_color?: string | null
           blank_word?: string | null
@@ -695,6 +724,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          article_id?: string | null
           audio_url?: string | null
           background_color?: string | null
           blank_word?: string | null
@@ -802,6 +832,7 @@ export type Database = {
       }
       slides: {
         Row: {
+          article_id: string | null
           audio_url: string | null
           background_color: string | null
           blank_word: string | null
@@ -832,6 +863,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          article_id?: string | null
           audio_url?: string | null
           background_color?: string | null
           blank_word?: string | null
@@ -862,6 +894,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          article_id?: string | null
           audio_url?: string | null
           background_color?: string | null
           blank_word?: string | null
@@ -892,6 +925,13 @@ export type Database = {
           video_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "slides_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "slides_lesson_id_fkey"
             columns: ["lesson_id"]
