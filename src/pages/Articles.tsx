@@ -118,6 +118,12 @@ const ArticleEditor: React.FC<{
     setSaving(true);
     const htmlRu = editorRu.getHTML();
     const htmlEn = editorEn.getHTML();
+    
+    // Mark translation as stale if RU content changed and EN translation exists
+    const hasEn = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
+    const ruChanged = htmlRu !== article.content || title !== article.title;
+    const newStale = hasEn && ruChanged ? true : translationStale;
+    
     const { data, error } = await supabase
       .from('articles')
       .update({
@@ -127,6 +133,7 @@ const ArticleEditor: React.FC<{
         content_en: htmlEn || null,
         cover_gradient: coverGradient,
         cover_image: coverImage,
+        translation_stale: newStale,
       })
       .eq('id', article.id)
       .select()
@@ -136,6 +143,7 @@ const ArticleEditor: React.FC<{
     if (error) {
       toast.error('Ошибка сохранения');
     } else {
+      setTranslationStale(newStale);
       toast.success('Сохранено');
       onSaved(data as Article);
     }
