@@ -277,6 +277,7 @@ const ArticleEditor: React.FC<{
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
             <span className="text-xs">Сохранить</span>
           </Button>
+          </div>
         </div>
       </div>
 
