@@ -90,6 +90,7 @@ const ArticleEditor: React.FC<{
 
       setTitleEn(data.title_en);
       setContentEn(data.content_en);
+      setTranslationStale(false);
       editorEn?.commands.setContent(data.content_en);
       toast.success('Перевод готов');
       setLang('en');
@@ -103,6 +104,7 @@ const ArticleEditor: React.FC<{
         content_en: data.content_en,
         cover_gradient: coverGradient,
         cover_image: coverImage,
+        translation_stale: false,
       });
     } catch (e: any) {
       toast.error(e.message || 'Ошибка перевода');
