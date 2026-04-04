@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ImagePlus, X, Loader2, Plus, RotateCcw, Eye, Unlink, Bookmark } from 'lucide-react';
+import { ImagePlus, X, Loader2, Plus, RotateCcw, Eye, Unlink, Bookmark, Save, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -42,9 +42,22 @@ interface ArticleCoverEditorProps {
   onUpdate: (gradient: string | null, image: string | null) => void;
 }
 
+const CUSTOM_GRADIENTS_KEY = 'article-custom-gradients';
+
+const loadCustomGradients = (): string[] => {
+  try {
+    return JSON.parse(localStorage.getItem(CUSTOM_GRADIENTS_KEY) || '[]');
+  } catch { return []; }
+};
+
+const saveCustomGradients = (gradients: string[]) => {
+  localStorage.setItem(CUSTOM_GRADIENTS_KEY, JSON.stringify(gradients));
+};
+
 const CustomGradientBuilder: React.FC<{
   onChange: (gradient: string) => void;
-}> = ({ onChange }) => {
+  onSave: (gradient: string) => void;
+}> = ({ onChange, onSave }) => {
   const [color1, setColor1] = useState('#667eea');
   const [color2, setColor2] = useState('#764ba2');
   const [angle, setAngle] = useState(135);
@@ -125,6 +138,16 @@ const CustomGradientBuilder: React.FC<{
           className="w-full mt-1"
         />
       </div>
+
+      {/* Save */}
+      <Button
+        onClick={() => onSave(gradientValue)}
+        size="sm"
+        className="w-full rounded-xl gap-1.5"
+      >
+        <Save className="w-3.5 h-3.5" />
+        Сохранить градиент
+      </Button>
     </div>
   );
 };
@@ -140,6 +163,21 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
 }) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [customGradients, setCustomGradients] = useState<string[]>(loadCustomGradients);
+
+  const handleSaveGradient = (g: string) => {
+    if (customGradients.includes(g)) return;
+    const updated = [...customGradients, g];
+    setCustomGradients(updated);
+    saveCustomGradients(updated);
+    onUpdate(g, image);
+  };
+
+  const handleDeleteCustomGradient = (g: string) => {
+    const updated = customGradients.filter(cg => cg !== g);
+    setCustomGradients(updated);
+    saveCustomGradients(updated);
+  };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -270,7 +308,7 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
       <div className="grid grid-cols-10 gap-1.5">
         {ARTICLE_GRADIENTS.map((g, i) => (
           <button
-            key={i}
+            key={`preset-${i}`}
             onClick={() => onUpdate(g, image)}
             className={cn(
               'aspect-square rounded-lg border-2 transition-all hover:scale-110',
@@ -278,6 +316,26 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
             )}
             style={{ background: g }}
           />
+        ))}
+
+        {/* Custom saved gradients */}
+        {customGradients.map((g, i) => (
+          <div key={`custom-${i}`} className="relative group">
+            <button
+              onClick={() => onUpdate(g, image)}
+              className={cn(
+                'aspect-square rounded-lg border-2 transition-all hover:scale-110 w-full',
+                gradient === g ? 'border-primary ring-1 ring-primary' : 'border-transparent'
+              )}
+              style={{ background: g }}
+            />
+            <button
+              onClick={() => handleDeleteCustomGradient(g)}
+              className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-destructive text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+            >
+              <X className="w-2 h-2" />
+            </button>
+          </div>
         ))}
 
         {/* Custom gradient button */}
@@ -290,7 +348,10 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-72 p-3" align="end">
-            <CustomGradientBuilder onChange={(g) => onUpdate(g, image)} />
+            <CustomGradientBuilder
+              onChange={(g) => onUpdate(g, image)}
+              onSave={handleSaveGradient}
+            />
           </PopoverContent>
         </Popover>
       </div>
