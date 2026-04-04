@@ -46,6 +46,7 @@ const ArticleEditor: React.FC<{
   const [lang, setLang] = useState<'ru' | 'en'>('ru');
   const [coverGradient, setCoverGradient] = useState(article.cover_gradient);
   const [coverImage, setCoverImage] = useState(article.cover_image);
+  const [translationStale, setTranslationStale] = useState(article.translation_stale);
 
   const editorRu = useEditor({
     extensions: [StarterKit, Highlight, Underline],
