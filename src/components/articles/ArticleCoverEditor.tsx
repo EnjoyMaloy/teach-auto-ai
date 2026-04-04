@@ -77,24 +77,18 @@ const CustomGradientBuilder: React.FC<{
         <div className="flex-1 space-y-1.5">
           <Label className="text-xs text-muted-foreground">Цвет 1</Label>
           <div className="flex items-center gap-2">
-            <input
-              type="color"
-              value={color1}
-              onChange={(e) => updateColor1(e.target.value)}
-              className="w-8 h-8 rounded-lg border border-border cursor-pointer p-0.5"
-            />
+            <label className="w-8 h-8 rounded-lg cursor-pointer block shrink-0" style={{ backgroundColor: color1 }}>
+              <input type="color" value={color1} onChange={(e) => updateColor1(e.target.value)} className="sr-only" />
+            </label>
             <span className="text-xs text-muted-foreground font-mono">{color1}</span>
           </div>
         </div>
         <div className="flex-1 space-y-1.5">
           <Label className="text-xs text-muted-foreground">Цвет 2</Label>
           <div className="flex items-center gap-2">
-            <input
-              type="color"
-              value={color2}
-              onChange={(e) => updateColor2(e.target.value)}
-              className="w-8 h-8 rounded-lg border border-border cursor-pointer p-0.5"
-            />
+            <label className="w-8 h-8 rounded-lg cursor-pointer block shrink-0" style={{ backgroundColor: color2 }}>
+              <input type="color" value={color2} onChange={(e) => updateColor2(e.target.value)} className="sr-only" />
+            </label>
             <span className="text-xs text-muted-foreground font-mono">{color2}</span>
           </div>
         </div>
