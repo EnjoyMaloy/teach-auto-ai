@@ -70,6 +70,7 @@ const slideToBlock = (slide: Slide): Block => ({
   textColor: slide.textColor,
   textSize: (slide as any).textSize,
   backgroundId: (slide as any).backgroundId,
+  articleId: slide.articleId,
   createdAt: slide.createdAt,
   updatedAt: slide.updatedAt,
 });
