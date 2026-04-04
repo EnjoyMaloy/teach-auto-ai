@@ -82,7 +82,7 @@ const ArticleEditor: React.FC<{
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="rounded-xl h-10 w-10 shrink-0 text-muted-foreground hover:text-foreground">
+            <Button size="icon" className="rounded-xl h-10 w-10 shrink-0 bg-muted hover:bg-muted/80 text-muted-foreground border-0">
               <MoreVertical className="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
