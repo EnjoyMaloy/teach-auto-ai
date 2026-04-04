@@ -213,7 +213,7 @@ const ArticleEditor: React.FC<{
             <Settings className="w-4 h-4" />
           </Button>
 
-          <Button onClick={handleSave} disabled={saving} size="sm" className="rounded-lg gap-1.5 h-8 px-3">
+          <Button onClick={handleSave} disabled={saving} size="sm" className="rounded-lg gap-1.5 h-8 px-3 text-white">
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
             <span className="text-xs">Сохранить</span>
           </Button>
