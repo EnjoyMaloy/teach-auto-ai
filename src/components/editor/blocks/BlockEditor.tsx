@@ -682,6 +682,14 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
           </div>
         )}
 
+        {/* Article block - select from user's articles */}
+        {block.type === 'article' && (
+          <ArticleBlockSelector
+            articleId={block.articleId}
+            onSelect={(articleId) => onUpdate({ articleId })}
+          />
+        )}
+
         {/* Design block - sub-block settings or add menu */}
         {isDesignBlock && (
           <>
