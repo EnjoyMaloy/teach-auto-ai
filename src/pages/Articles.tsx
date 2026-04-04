@@ -1,15 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, MoreVertical, Languages, AlertTriangle, Settings } from 'lucide-react';
+import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, MoreVertical, Languages, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Highlight from '@tiptap/extension-highlight';
-import Underline from '@tiptap/extension-underline';
-import Placeholder from '@tiptap/extension-placeholder';
+import { Editor } from '@tiptap/react';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
@@ -20,6 +16,7 @@ import {
 import { ARTICLE_GRADIENTS } from '@/components/articles/ArticleCoverEditor';
 import ArticleSettingsDialog from '@/components/articles/ArticleSettingsDialog';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import NotionEditor from '@/components/articles/NotionEditor';
 
 interface Article {
   id: string;
@@ -50,56 +47,15 @@ const ArticleEditor: React.FC<{
   const [coverGradient, setCoverGradient] = useState(article.cover_gradient);
   const [coverImage, setCoverImage] = useState(article.cover_image);
   const [translationStale, setTranslationStale] = useState(article.translation_stale);
-  const [authorName, setAuthorName] = useState<string>('');
 
   const hasEnContent = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
 
-  useEffect(() => {
-    if (user) {
-      const meta = user.user_metadata;
-      setAuthorName(meta?.name || meta?.full_name || user.email?.split('@')[0] || '');
-    }
-  }, [user]);
-
-  const editorRu = useEditor({
-    extensions: [
-      StarterKit,
-      Highlight,
-      Underline,
-      Placeholder.configure({ placeholder: 'Начните писать...' }),
-    ],
-    content: article.content || '<p></p>',
-    editorProps: {
-      attributes: {
-        class: 'prose prose-lg dark:prose-invert max-w-none focus:outline-none min-h-[400px] text-foreground',
-      },
-    },
-    onUpdate: () => {
-      if (hasEnContent) {
-        setTranslationStale(true);
-      }
-    },
-  });
-
-  const editorEn = useEditor({
-    extensions: [
-      StarterKit,
-      Highlight,
-      Underline,
-      Placeholder.configure({ placeholder: 'Start writing...' }),
-    ],
-    content: article.content_en || '<p></p>',
-    editorProps: {
-      attributes: {
-        class: 'prose prose-lg dark:prose-invert max-w-none focus:outline-none min-h-[400px] text-foreground',
-      },
-    },
-    editable: true,
-  });
+  const editorRuRef = useRef<Editor | null>(null);
+  const editorEnRef = useRef<Editor | null>(null);
 
   const handleTranslate = async () => {
-    if (!editorRu) return;
-    const htmlRu = editorRu.getHTML();
+    if (!editorRuRef.current) return;
+    const htmlRu = editorRuRef.current.getHTML();
     setTranslating(true);
 
     try {
@@ -119,7 +75,7 @@ const ArticleEditor: React.FC<{
       setTitleEn(data.title_en);
       setContentEn(data.content_en);
       setTranslationStale(false);
-      editorEn?.commands.setContent(data.content_en);
+      editorEnRef.current?.commands.setContent(data.content_en);
       toast.success('Перевод готов');
       setLang('en');
       
@@ -142,10 +98,10 @@ const ArticleEditor: React.FC<{
   };
 
   const handleSave = async () => {
-    if (!editorRu || !editorEn) return;
+    if (!editorRuRef.current || !editorEnRef.current) return;
     setSaving(true);
-    const htmlRu = editorRu.getHTML();
-    const htmlEn = editorEn.getHTML();
+    const htmlRu = editorRuRef.current.getHTML();
+    const htmlEn = editorEnRef.current.getHTML();
     
     // Mark translation as stale if RU content changed and EN translation exists
     const hasEn = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
@@ -294,10 +250,19 @@ const ArticleEditor: React.FC<{
 
         {/* Content editor */}
         <div className={lang === 'ru' ? '' : 'hidden'}>
-          <EditorContent editor={editorRu} />
+          <NotionEditor
+            content={article.content || ''}
+            placeholder="Напишите что-нибудь или введите / для команд..."
+            editorRef={editorRuRef}
+            onUpdate={() => { if (hasEnContent) setTranslationStale(true); }}
+          />
         </div>
         <div className={lang === 'en' ? '' : 'hidden'}>
-          <EditorContent editor={editorEn} />
+          <NotionEditor
+            content={article.content_en || ''}
+            placeholder="Start writing or type / for commands..."
+            editorRef={editorEnRef}
+          />
         </div>
       </div>
     </div>
