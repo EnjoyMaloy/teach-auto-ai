@@ -205,7 +205,7 @@ const ArticleEditor: React.FC<{
             onClick={() => setShowSettings(!showSettings)}
             className={cn("rounded-lg h-8 w-8 shrink-0", showSettings ? "text-foreground" : "text-muted-foreground")}
           >
-            <MoreVertical className="w-4 h-4" />
+            <Settings className="w-4 h-4" />
           </Button>
 
           <Button onClick={handleSave} disabled={saving} size="sm" className="rounded-lg gap-1.5 h-8 px-3">
