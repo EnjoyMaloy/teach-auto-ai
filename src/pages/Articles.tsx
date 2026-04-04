@@ -248,6 +248,9 @@ const ArticleEditor: React.FC<{
             gradient={coverGradient}
             image={coverImage}
             articleId={article.id}
+            title={title}
+            authorName={user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || ''}
+            authorAvatar={user?.user_metadata?.avatar_url || user?.user_metadata?.picture || ''}
             onUpdate={(g, img) => {
               setCoverGradient(g);
               setCoverImage(img);
