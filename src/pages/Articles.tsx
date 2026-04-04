@@ -298,9 +298,9 @@ const ArticleEditor: React.FC<{
               ) : (
                 <button
                   onClick={() => setCustomCategoryInput(' ')}
-                  className="w-7 h-7 rounded-full bg-muted text-muted-foreground hover:border-border border border-transparent flex items-center justify-center transition-all"
+                  className="w-8 h-8 rounded-full bg-muted text-muted-foreground hover:border-border border border-transparent flex items-center justify-center transition-all"
                 >
-                  <Plus className="w-3.5 h-3.5" />
+                  <Plus className="w-4 h-4" />
                 </button>
               )}
             </div>
