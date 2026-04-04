@@ -1,0 +1,1 @@
+ALTER TABLE public.articles ADD COLUMN translation_stale BOOLEAN NOT NULL DEFAULT false;

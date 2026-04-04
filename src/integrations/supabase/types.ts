@@ -45,6 +45,7 @@ export type Database = {
           id: string
           title: string
           title_en: string | null
+          translation_stale: boolean
           updated_at: string
           user_id: string
         }
@@ -57,6 +58,7 @@ export type Database = {
           id?: string
           title?: string
           title_en?: string | null
+          translation_stale?: boolean
           updated_at?: string
           user_id: string
         }
@@ -69,6 +71,7 @@ export type Database = {
           id?: string
           title?: string
           title_en?: string | null
+          translation_stale?: boolean
           updated_at?: string
           user_id?: string
         }

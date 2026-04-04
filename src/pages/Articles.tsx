@@ -27,6 +27,7 @@ interface Article {
   content_en: string | null;
   cover_gradient: string | null;
   cover_image: string | null;
+  translation_stale: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -45,6 +46,7 @@ const ArticleEditor: React.FC<{
   const [lang, setLang] = useState<'ru' | 'en'>('ru');
   const [coverGradient, setCoverGradient] = useState(article.cover_gradient);
   const [coverImage, setCoverImage] = useState(article.cover_image);
+  const [translationStale, setTranslationStale] = useState(article.translation_stale);
 
   const editorRu = useEditor({
     extensions: [StarterKit, Highlight, Underline],
@@ -88,6 +90,7 @@ const ArticleEditor: React.FC<{
 
       setTitleEn(data.title_en);
       setContentEn(data.content_en);
+      setTranslationStale(false);
       editorEn?.commands.setContent(data.content_en);
       toast.success('Перевод готов');
       setLang('en');
@@ -101,6 +104,7 @@ const ArticleEditor: React.FC<{
         content_en: data.content_en,
         cover_gradient: coverGradient,
         cover_image: coverImage,
+        translation_stale: false,
       });
     } catch (e: any) {
       toast.error(e.message || 'Ошибка перевода');
@@ -114,6 +118,12 @@ const ArticleEditor: React.FC<{
     setSaving(true);
     const htmlRu = editorRu.getHTML();
     const htmlEn = editorEn.getHTML();
+    
+    // Mark translation as stale if RU content changed and EN translation exists
+    const hasEn = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
+    const ruChanged = htmlRu !== article.content || title !== article.title;
+    const newStale = hasEn && ruChanged ? true : translationStale;
+    
     const { data, error } = await supabase
       .from('articles')
       .update({
@@ -123,6 +133,7 @@ const ArticleEditor: React.FC<{
         content_en: htmlEn || null,
         cover_gradient: coverGradient,
         cover_image: coverImage,
+        translation_stale: newStale,
       })
       .eq('id', article.id)
       .select()
@@ -132,6 +143,7 @@ const ArticleEditor: React.FC<{
     if (error) {
       toast.error('Ошибка сохранения');
     } else {
+      setTranslationStale(newStale);
       toast.success('Сохранено');
       onSaved(data as Article);
     }
@@ -202,17 +214,29 @@ const ArticleEditor: React.FC<{
           </button>
         </div>
 
+        {lang === 'ru' && hasEnContent && translationStale && (
+          <span className="text-xs text-amber-500 flex items-center gap-1">
+            ⚠ RU изменён — обновите перевод
+          </span>
+        )}
+
         {lang === 'ru' && (
           <Button
             variant="outline"
             size="sm"
             onClick={handleTranslate}
             disabled={translating}
-            className="rounded-xl gap-1.5 h-8 text-xs"
+            className={cn("rounded-xl gap-1.5 h-8 text-xs", translationStale && hasEnContent && "border-amber-500/50 text-amber-600 hover:text-amber-700")}
           >
             {translating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Languages className="w-3.5 h-3.5" />}
             {hasEnContent ? 'Перевести заново' : 'Перевести на EN'}
           </Button>
+        )}
+
+        {lang === 'en' && translationStale && hasEnContent && (
+          <span className="text-xs text-amber-500 flex items-center gap-1">
+            ⚠ Перевод может быть устаревшим
+          </span>
         )}
 
         {lang === 'en' && !hasEnContent && (
