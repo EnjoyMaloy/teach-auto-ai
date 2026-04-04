@@ -151,6 +151,7 @@ Do not wrap the response in markdown code blocks.`;
       .update({
         title_en: translation.title,
         content_en: translation.content,
+        translation_stale: false,
       })
       .eq("id", articleId);
 
