@@ -248,7 +248,7 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
 
         {/* Bottom info */}
         <div className="px-4 pb-4 pt-0 space-y-3">
-          <h3 className="text-white font-semibold text-base leading-tight text-center">
+          <h3 className="text-white/80 font-semibold text-base leading-tight text-center">
             {title || 'Заголовок инструкции'}
           </h3>
           <div className="flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 mx-auto w-fit">
