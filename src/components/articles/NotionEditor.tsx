@@ -365,6 +365,11 @@ const NotionEditor: React.FC<NotionEditorProps> = ({
     },
   });
 
+  // Expose editor to parent
+  useEffect(() => {
+    if (editorRef) editorRef.current = editor;
+  }, [editor, editorRef]);
+
   const closeSlashMenu = useCallback(() => {
     setSlashPos(null);
     setSlashFilter('');
