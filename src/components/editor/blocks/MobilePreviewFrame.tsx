@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Block, BLOCK_CONFIGS } from '@/types/blocks';
+import { supabase } from '@/integrations/supabase/client';
 import { CourseDesignSystem } from '@/types/course';
 import { DesignSystemConfig } from '@/types/designSystem';
 import { cn } from '@/lib/utils';
