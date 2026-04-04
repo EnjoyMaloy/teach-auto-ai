@@ -7,7 +7,6 @@ import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, MoreVertical, Languag
 import { toast } from 'sonner';
 import { Editor } from '@tiptap/react';
 import { cn } from '@/lib/utils';
-import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
