@@ -387,6 +387,17 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                   <span>Избранное</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+
+              {/* Articles / Instructions */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive('/articles')}
+                  onClick={() => handleNavigate('/articles')}
+                >
+                  <FileText className="size-4" />
+                  <span>Инструкции</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
