@@ -184,8 +184,9 @@ const ArticleEditor: React.FC<{
   return (
     <div className="min-h-screen">
       {/* Top toolbar */}
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border">
-        <div className="max-w-3xl mx-auto flex items-center gap-2 h-12 px-4">
+      <div className="sticky top-4 z-10 max-w-3xl mx-auto px-4">
+        <div className="bg-background/70 backdrop-blur-xl border border-border/50 rounded-2xl shadow-sm">
+          <div className="flex items-center gap-2 h-12 px-3">
           <Button variant="ghost" size="icon" onClick={onBack} className="rounded-xl h-8 w-8 shrink-0">
             <ArrowLeft className="w-4 h-4" />
           </Button>
