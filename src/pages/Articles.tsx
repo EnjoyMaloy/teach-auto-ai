@@ -3,18 +3,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, MoreVertical, Languages, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Editor } from '@tiptap/react';
 import { cn } from '@/lib/utils';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { ARTICLE_GRADIENTS } from '@/components/articles/ArticleCoverEditor';
-import ArticleSettingsDialog from '@/components/articles/ArticleSettingsDialog';
+import ArticleCoverEditor, { ARTICLE_GRADIENTS } from '@/components/articles/ArticleCoverEditor';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import NotionEditor from '@/components/articles/NotionEditor';
 
