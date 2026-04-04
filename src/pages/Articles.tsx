@@ -226,6 +226,7 @@ const ArticleEditor: React.FC<{
             image={coverImage}
             articleId={article.id}
             title={title}
+            titleEn={titleEn}
             authorName={user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || ''}
             authorAvatar={user?.user_metadata?.avatar_url || user?.user_metadata?.picture || ''}
             onUpdate={(g, img) => {
