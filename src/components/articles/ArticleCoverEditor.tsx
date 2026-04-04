@@ -208,8 +208,7 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
           { label: 'RU', cardTitle: title || 'Заголовок инструкции' },
           { label: 'EN', cardTitle: titleEn || 'Instruction title' },
         ].map(({ label, cardTitle }) => (
-          <div key={label} className="flex-1 space-y-1.5">
-            <span className="text-[10px] font-medium text-muted-foreground uppercase">{label}</span>
+          <div key={label} className="flex-1">
             <div
               className="w-full rounded-2xl overflow-hidden relative border border-border shadow-md"
               style={{ background: gradient || ARTICLE_GRADIENTS[0] }}
