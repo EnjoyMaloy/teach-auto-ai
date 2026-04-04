@@ -122,7 +122,7 @@ const CustomGradientBuilder: React.FC<{
       <button
         type="button"
         onClick={() => onSave(gradientValue)}
-        className="inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-xl border border-border bg-background px-3 text-sm font-semibold text-foreground transition-all duration-200 hover:border-primary-hover hover:bg-primary-hover hover:text-white dark:border-transparent dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary-hover dark:hover:text-white"
+        className="inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-xl border border-border bg-background px-3 text-sm font-semibold text-foreground transition-all duration-200 hover:border-primary hover:bg-primary hover:text-white"
       >
         <Save className="w-3.5 h-3.5" />
         Сохранить градиент
