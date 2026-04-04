@@ -99,7 +99,7 @@ const CustomGradientBuilder: React.FC<{
         variant="ghost"
         size="sm"
         onClick={swapColors}
-        className="w-full rounded-xl text-xs gap-1.5 text-muted-foreground"
+        className="w-full rounded-xl text-xs gap-1.5 text-muted-foreground hover:text-foreground"
       >
         <RotateCcw className="w-3.5 h-3.5" />
         Поменять цвета местами
