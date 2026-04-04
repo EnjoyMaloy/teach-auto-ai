@@ -285,19 +285,6 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
         ))}
       </div>
 
-      {/* Upload button when image exists */}
-      {image && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => fileRef.current?.click()}
-          disabled={uploading}
-          className="rounded-xl text-xs w-full"
-        >
-          {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <ImagePlus className="w-3.5 h-3.5 mr-1.5" />}
-          Заменить изображение
-        </Button>
-      )}
 
       <input
         ref={fileRef}
