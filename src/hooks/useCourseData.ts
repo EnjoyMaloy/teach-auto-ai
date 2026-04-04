@@ -48,6 +48,7 @@ const mapDbRowToSlide = (row: any, lessonId: string): Slide => ({
   backgroundColor: row.background_color || undefined,
   textColor: row.text_color || undefined,
   textSize: row.text_size || undefined,
+  articleId: row.article_id || undefined,
   createdAt: new Date(row.created_at),
   updatedAt: new Date(row.updated_at),
 });
