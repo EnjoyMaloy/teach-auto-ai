@@ -386,13 +386,7 @@ const NotionEditor: React.FC<NotionEditorProps> = ({
   return (
     <div ref={containerRef} className="relative">
       {editor && (
-        <BubbleMenu
-          editor={editor}
-          tippyOptions={{
-            duration: 150,
-            placement: 'top',
-          }}
-        >
+        <BubbleMenu editor={editor}>
           <BubbleToolbar editor={editor} />
         </BubbleMenu>
       )}
