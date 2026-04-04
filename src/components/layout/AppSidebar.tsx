@@ -47,6 +47,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   useSidebar,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import {
   Collapsible,
