@@ -24,6 +24,7 @@ const CourseStats = lazy(() => import("./pages/CourseStats"));
 const PublicCourse = lazy(() => import("./pages/PublicCourse"));
 const ShortCourse = lazy(() => import("./pages/ShortCourse"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Articles = lazy(() => import("./pages/Articles"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
