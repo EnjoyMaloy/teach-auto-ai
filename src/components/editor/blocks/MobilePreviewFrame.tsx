@@ -504,6 +504,9 @@ export const MobilePreviewFrame: React.FC<MobilePreviewFrameProps> = ({
           />
         );
 
+      case 'article':
+        return <ArticlePreviewContent articleId={block.articleId} ds={ds} />;
+
       case 'single_choice':
         return (
           <div className="flex-1 flex flex-col items-center justify-center p-4 overflow-auto relative z-0 h-full min-h-0">
