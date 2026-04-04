@@ -196,7 +196,7 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
         {/* Top-right icons */}
         <div className="absolute top-3 right-3 z-20 flex gap-1.5">
           <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <Link2 className="w-4 h-4 text-white" />
+            <Unlink className="w-4 h-4 text-white" />
           </div>
           <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
             <Bookmark className="w-4 h-4 text-white" />
