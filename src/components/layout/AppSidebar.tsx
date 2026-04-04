@@ -11,6 +11,7 @@ import {
   Clock,
   Compass,
   Crown,
+  FileText,
   Folder,
   Globe,
   Home,
