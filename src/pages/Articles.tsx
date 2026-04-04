@@ -47,52 +47,11 @@ const ArticleEditor: React.FC<{
   const [coverGradient, setCoverGradient] = useState(article.cover_gradient);
   const [coverImage, setCoverImage] = useState(article.cover_image);
   const [translationStale, setTranslationStale] = useState(article.translation_stale);
-  const [authorName, setAuthorName] = useState<string>('');
 
   const hasEnContent = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
 
-  useEffect(() => {
-    if (user) {
-      const meta = user.user_metadata;
-      setAuthorName(meta?.name || meta?.full_name || user.email?.split('@')[0] || '');
-    }
-  }, [user]);
-
-  const editorRu = useEditor({
-    extensions: [
-      StarterKit,
-      Highlight,
-      Underline,
-      Placeholder.configure({ placeholder: 'Начните писать...' }),
-    ],
-    content: article.content || '<p></p>',
-    editorProps: {
-      attributes: {
-        class: 'prose prose-lg dark:prose-invert max-w-none focus:outline-none min-h-[400px] text-foreground',
-      },
-    },
-    onUpdate: () => {
-      if (hasEnContent) {
-        setTranslationStale(true);
-      }
-    },
-  });
-
-  const editorEn = useEditor({
-    extensions: [
-      StarterKit,
-      Highlight,
-      Underline,
-      Placeholder.configure({ placeholder: 'Start writing...' }),
-    ],
-    content: article.content_en || '<p></p>',
-    editorProps: {
-      attributes: {
-        class: 'prose prose-lg dark:prose-invert max-w-none focus:outline-none min-h-[400px] text-foreground',
-      },
-    },
-    editable: true,
-  });
+  const editorRuRef = useRef<Editor | null>(null);
+  const editorEnRef = useRef<Editor | null>(null);
 
   const handleTranslate = async () => {
     if (!editorRu) return;
