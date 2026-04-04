@@ -203,7 +203,7 @@ const ArticleEditor: React.FC<{
             variant="ghost"
             size="icon"
             onClick={() => setShowSettings(!showSettings)}
-            className={cn("rounded-lg h-8 w-8 shrink-0 hover:bg-primary hover:text-primary-foreground transition-colors", showSettings ? "bg-primary text-primary-foreground" : "text-muted-foreground")}
+            className={cn("rounded-xl h-8 w-8 shrink-0", showSettings ? "text-foreground" : "text-muted-foreground")}
           >
             <Settings className="w-4 h-4" />
           </Button>
