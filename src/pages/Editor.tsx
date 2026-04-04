@@ -103,6 +103,7 @@ const blockToSlide = (block: Block): Slide => ({
   backgroundColor: block.backgroundColor,
   textColor: block.textColor,
   textSize: block.textSize,
+  articleId: block.articleId,
   createdAt: block.createdAt,
   updatedAt: block.updatedAt,
 } as Slide);
