@@ -74,9 +74,19 @@ const ArticleEditor: React.FC<{
           placeholder="Название инструкции..."
           className="text-lg font-semibold flex-1 rounded-xl"
         />
-        <Button variant="destructive" size="icon" onClick={() => onDelete(article.id)} className="rounded-xl">
-          <Trash2 className="w-4 h-4" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="rounded-xl text-muted-foreground hover:text-foreground">
+              <MoreVertical className="w-4 h-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => onDelete(article.id)} className="text-destructive focus:text-destructive">
+              <Trash2 className="w-4 h-4 mr-2" />
+              Удалить
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button onClick={handleSave} disabled={saving} className="rounded-xl gap-2">
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Сохранить
