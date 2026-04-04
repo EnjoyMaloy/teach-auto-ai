@@ -115,6 +115,7 @@ const ArticleEditor: React.FC<{
         content_en: htmlEn || null,
         cover_gradient: coverGradient,
         cover_image: coverImage,
+        category: category || null,
         translation_stale: newStale,
       })
       .eq('id', article.id)
