@@ -355,6 +355,14 @@ const Articles: React.FC = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
+  const [profile, setProfile] = useState<{ name: string | null; avatar_url: string | null } | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('profiles').select('name, avatar_url').eq('id', user.id).single().then(({ data }) => {
+      if (data) setProfile(data);
+    });
+  }, [user]);
 
   const fetchArticles = useCallback(async () => {
     if (!user) return;
