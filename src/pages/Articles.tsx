@@ -254,7 +254,7 @@ const ArticleEditor: React.FC<{
                     key={cat.id}
                     onClick={() => setCategory(isSelected ? '' : cat.id)}
                     className={cn(
-                      'px-3 py-1.5 rounded-full text-xs font-medium transition-all border',
+                      'px-4 py-2 rounded-full text-sm font-medium transition-all border',
                       isSelected
                         ? 'bg-primary text-primary-foreground border-primary'
                         : 'bg-muted text-muted-foreground border-transparent hover:border-border'
@@ -265,7 +265,7 @@ const ArticleEditor: React.FC<{
                 );
               })}
               {category && !['ai', 'crypto'].includes(category) && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-primary text-primary-foreground border border-primary">
+                <div className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium bg-primary text-primary-foreground border border-primary">
                   {category}
                   <button onClick={() => setCategory('')} className="ml-0.5 hover:opacity-70">
                     <X className="w-3 h-3" />
@@ -278,7 +278,7 @@ const ArticleEditor: React.FC<{
                     value={customCategoryInput}
                     onChange={(e) => setCustomCategoryInput(e.target.value)}
                     placeholder="Название..."
-                    className="rounded-full text-xs h-7 w-28 px-2.5"
+                    className="rounded-full text-sm h-8 w-32 px-3"
                     autoFocus
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && customCategoryInput.trim()) {
@@ -298,19 +298,19 @@ const ArticleEditor: React.FC<{
               ) : (
                 <button
                   onClick={() => setCustomCategoryInput(' ')}
-                  className="w-7 h-7 rounded-full bg-muted text-muted-foreground hover:border-border border border-transparent flex items-center justify-center transition-all"
+                  className="w-8 h-8 rounded-full bg-muted text-muted-foreground hover:border-border border border-transparent flex items-center justify-center transition-all"
                 >
-                  <Plus className="w-3.5 h-3.5" />
+                  <Plus className="w-4 h-4" />
                 </button>
               )}
             </div>
           </div>
 
-          <div className="pt-4 border-t border-border">
+          <div className="pt-4 border-t border-border/50 dark:border-border">
             <Button
               variant="ghost"
               onClick={() => onDelete(article.id)}
-              className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-2"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-2 dark:text-destructive"
             >
               <Trash2 className="w-4 h-4" />
               Удалить инструкцию
