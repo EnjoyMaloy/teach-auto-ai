@@ -250,10 +250,19 @@ const ArticleEditor: React.FC<{
 
         {/* Content editor */}
         <div className={lang === 'ru' ? '' : 'hidden'}>
-          <EditorContent editor={editorRu} />
+          <NotionEditor
+            content={article.content || ''}
+            placeholder="Напишите что-нибудь или введите / для команд..."
+            editorRef={editorRuRef}
+            onUpdate={() => { if (hasEnContent) setTranslationStale(true); }}
+          />
         </div>
         <div className={lang === 'en' ? '' : 'hidden'}>
-          <EditorContent editor={editorEn} />
+          <NotionEditor
+            content={article.content_en || ''}
+            placeholder="Start writing or type / for commands..."
+            editorRef={editorEnRef}
+          />
         </div>
       </div>
     </div>
