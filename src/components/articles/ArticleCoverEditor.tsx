@@ -142,6 +142,7 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
   image,
   articleId,
   title,
+  titleEn,
   authorName,
   authorAvatar,
   onUpdate,
