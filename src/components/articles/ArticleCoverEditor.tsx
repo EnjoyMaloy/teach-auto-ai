@@ -36,6 +36,9 @@ interface ArticleCoverEditorProps {
   gradient: string | null;
   image: string | null;
   articleId: string;
+  title?: string;
+  authorName?: string;
+  authorAvatar?: string;
   onUpdate: (gradient: string | null, image: string | null) => void;
 }
 
