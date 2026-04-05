@@ -37,6 +37,7 @@ export type Database = {
       }
       articles: {
         Row: {
+          access_type: string
           category: string | null
           content: string
           content_en: string | null
@@ -51,6 +52,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          access_type?: string
           category?: string | null
           content?: string
           content_en?: string | null
@@ -65,6 +67,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          access_type?: string
           category?: string | null
           content?: string
           content_en?: string | null

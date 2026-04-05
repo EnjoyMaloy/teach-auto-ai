@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, Settings, Languages, AlertTriangle, X, Tag, Eye } from 'lucide-react';
+import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, Settings, Languages, AlertTriangle, X, Tag, Eye, Clock, Globe, Link2, Lock } from 'lucide-react';
 
 import { toast } from 'sonner';
 import { Editor } from '@tiptap/react';
@@ -23,9 +23,16 @@ interface Article {
   cover_image: string | null;
   category: string | null;
   translation_stale: boolean;
+  access_type: string;
   created_at: string;
   updated_at: string;
 }
+
+const estimateReadingMinutes = (html: string): number => {
+  const text = html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  const words = text ? text.split(' ').length : 0;
+  return Math.max(1, Math.round(words / 200));
+};
 
 const ArticleEditor: React.FC<{
   article: Article;
@@ -45,7 +52,7 @@ const ArticleEditor: React.FC<{
   const [category, setCategory] = useState(article.category || '');
   const [customCategoryInput, setCustomCategoryInput] = useState('');
   const [translationStale, setTranslationStale] = useState(article.translation_stale);
-
+  const [accessType, setAccessType] = useState(article.access_type || 'private');
   const hasEnContent = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
 
   const editorRuRef = useRef<Editor | null>(null);
@@ -117,6 +124,7 @@ const ArticleEditor: React.FC<{
         cover_image: coverImage,
         category: category || null,
         translation_stale: newStale,
+        access_type: accessType,
       })
       .eq('id', article.id)
       .select()
@@ -308,6 +316,42 @@ const ArticleEditor: React.FC<{
                   <Plus className="w-4 h-4" />
                 </button>
               )}
+            </div>
+          </div>
+
+          {/* Reading time */}
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Clock className="w-4 h-4" />
+            <span>Время чтения: ~{estimateReadingMinutes(editorRuRef.current?.getHTML() || article.content || '')} мин</span>
+          </div>
+
+          {/* Access control */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Доступ</Label>
+            <div className="flex flex-wrap items-center gap-2">
+              {([
+                { id: 'private', name: 'Закрытый', icon: Lock },
+                { id: 'link', name: 'По ссылке', icon: Link2 },
+                { id: 'public', name: 'В каталоге', icon: Globe },
+              ] as const).map((opt) => {
+                const isSelected = accessType === opt.id;
+                const Icon = opt.icon;
+                return (
+                  <button
+                    key={opt.id}
+                    onClick={() => setAccessType(opt.id)}
+                    className={cn(
+                      'inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all border',
+                      isSelected
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-muted text-muted-foreground border-transparent hover:border-border'
+                    )}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {opt.name}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
