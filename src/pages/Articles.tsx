@@ -52,7 +52,7 @@ const ArticleEditor: React.FC<{
   const [category, setCategory] = useState(article.category || '');
   const [customCategoryInput, setCustomCategoryInput] = useState('');
   const [translationStale, setTranslationStale] = useState(article.translation_stale);
-
+  const [accessType, setAccessType] = useState(article.access_type || 'private');
   const hasEnContent = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
 
   const editorRuRef = useRef<Editor | null>(null);
