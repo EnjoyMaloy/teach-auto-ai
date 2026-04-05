@@ -34,6 +34,27 @@ const estimateReadingMinutes = (html: string): number => {
   return Math.max(1, Math.round(words / 200));
 };
 
+const LinkCopyRow: React.FC<{ slug: string }> = ({ slug }) => {
+  const [copied, setCopied] = useState(false);
+  const url = `https://learn.open-academy.app/guides/${slug}`;
+  const handleCopy = () => {
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    toast.success('Ссылка скопирована');
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <div className="flex items-center gap-2 mt-2">
+      <div className="flex-1 truncate rounded-lg border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground select-all">
+        {url}
+      </div>
+      <Button variant="outline" size="icon" className="rounded-lg h-9 w-9 shrink-0" onClick={handleCopy}>
+        {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+      </Button>
+    </div>
+  );
+};
+
 const ArticleEditor: React.FC<{
   article: Article;
   onBack: () => void;
