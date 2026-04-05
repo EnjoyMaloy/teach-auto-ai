@@ -319,10 +319,18 @@ const ArticleEditor: React.FC<{
             </div>
           </div>
 
-          {/* Reading time */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Clock className="w-4 h-4" />
-            <span>Время чтения: ~{estimateReadingMinutes(editorRuRef.current?.getHTML() || article.content || '')} мин</span>
+          {/* Details */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Детали</Label>
+            <div className="rounded-xl border border-border bg-muted/50 divide-y divide-border">
+              <div className="flex items-center justify-between px-4 py-3">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Clock className="w-4 h-4" />
+                  <span>Время чтения</span>
+                </div>
+                <span className="text-sm font-medium text-foreground">~{estimateReadingMinutes(editorRuRef.current?.getHTML() || article.content || '')} мин</span>
+              </div>
+            </div>
           </div>
 
           {/* Access control */}
@@ -353,6 +361,9 @@ const ArticleEditor: React.FC<{
                 );
               })}
             </div>
+            {accessType === 'link' && (
+              <LinkCopyRow slug={titleEn ? titleEn.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : article.id} />
+            )}
           </div>
 
           <div className="pt-4 border-t border-border/50 dark:border-border">
