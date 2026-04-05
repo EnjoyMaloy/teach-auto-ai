@@ -124,7 +124,7 @@ const ArticleEditor: React.FC<{
         cover_image: coverImage,
         category: category || null,
         translation_stale: newStale,
-      })
+        access_type: accessType,
       .eq('id', article.id)
       .select()
       .single();
