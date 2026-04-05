@@ -23,9 +23,16 @@ interface Article {
   cover_image: string | null;
   category: string | null;
   translation_stale: boolean;
+  access_type: string;
   created_at: string;
   updated_at: string;
 }
+
+const estimateReadingMinutes = (html: string): number => {
+  const text = html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  const words = text ? text.split(' ').length : 0;
+  return Math.max(1, Math.round(words / 200));
+};
 
 const ArticleEditor: React.FC<{
   article: Article;
