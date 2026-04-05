@@ -319,6 +319,42 @@ const ArticleEditor: React.FC<{
             </div>
           </div>
 
+          {/* Reading time */}
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Clock className="w-4 h-4" />
+            <span>Время чтения: ~{estimateReadingMinutes(editorRuRef.current?.getHTML() || article.content || '')} мин</span>
+          </div>
+
+          {/* Access control */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Доступ</Label>
+            <div className="flex flex-wrap items-center gap-2">
+              {([
+                { id: 'private', name: 'Закрытый', icon: Lock },
+                { id: 'link', name: 'По ссылке', icon: Link2 },
+                { id: 'public', name: 'В каталоге', icon: Globe },
+              ] as const).map((opt) => {
+                const isSelected = accessType === opt.id;
+                const Icon = opt.icon;
+                return (
+                  <button
+                    key={opt.id}
+                    onClick={() => setAccessType(opt.id)}
+                    className={cn(
+                      'inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all border',
+                      isSelected
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-muted text-muted-foreground border-transparent hover:border-border'
+                    )}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {opt.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div className="pt-4 border-t border-border/50 dark:border-border">
             <Button
               variant="ghost"
