@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, Settings, Languages, AlertTriangle, X, Tag, Eye, Clock, Globe, Link2, Lock } from 'lucide-react';
+import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, Settings, Languages, AlertTriangle, X, Tag, Eye, Clock, Globe, Link2, Lock, Copy, Check } from 'lucide-react';
 
 import { toast } from 'sonner';
 import { Editor } from '@tiptap/react';
@@ -32,6 +32,27 @@ const estimateReadingMinutes = (html: string): number => {
   const text = html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
   const words = text ? text.split(' ').length : 0;
   return Math.max(1, Math.round(words / 200));
+};
+
+const LinkCopyRow: React.FC<{ slug: string }> = ({ slug }) => {
+  const [copied, setCopied] = useState(false);
+  const url = `https://learn.open-academy.app/guides/${slug}`;
+  const handleCopy = () => {
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    toast.success('Ссылка скопирована');
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <div className="flex items-center gap-2 mt-2">
+      <div className="flex-1 truncate rounded-lg border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground select-all">
+        {url}
+      </div>
+      <Button variant="outline" size="icon" className="rounded-lg h-9 w-9 shrink-0" onClick={handleCopy}>
+        {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+      </Button>
+    </div>
+  );
 };
 
 const ArticleEditor: React.FC<{
@@ -319,10 +340,18 @@ const ArticleEditor: React.FC<{
             </div>
           </div>
 
-          {/* Reading time */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Clock className="w-4 h-4" />
-            <span>Время чтения: ~{estimateReadingMinutes(editorRuRef.current?.getHTML() || article.content || '')} мин</span>
+          {/* Details */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Детали</Label>
+            <div className="rounded-xl border border-border bg-muted/50 divide-y divide-border">
+              <div className="flex items-center justify-between px-4 py-3">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Clock className="w-4 h-4" />
+                  <span>Время чтения</span>
+                </div>
+                <span className="text-sm font-medium text-foreground">~{estimateReadingMinutes(editorRuRef.current?.getHTML() || article.content || '')} мин</span>
+              </div>
+            </div>
           </div>
 
           {/* Access control */}
@@ -353,6 +382,9 @@ const ArticleEditor: React.FC<{
                 );
               })}
             </div>
+            {accessType === 'link' && (
+              <LinkCopyRow slug={titleEn ? titleEn.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : article.id} />
+            )}
           </div>
 
           <div className="pt-4 border-t border-border/50 dark:border-border">
