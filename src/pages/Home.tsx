@@ -222,7 +222,42 @@ const Home: React.FC = () => {
               </div>
             </div>
 
-            {/* Lesson count - hidden when MD is selected */}
+            {/* Mascot mode - only when images enabled */}
+            {!skipImages && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <User className="w-3.5 h-3.5" />
+                Персонаж
+              </div>
+              <div className="flex gap-1.5">
+                <button
+                  onClick={() => setMascotMode('fixed')}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
+                    mascotMode === 'fixed'
+                      ? "bg-primary/10 border-primary/30 text-primary"
+                      : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
+                  )}
+                >
+                  <User className="w-3.5 h-3.5" />
+                  Один
+                </button>
+                <button
+                  onClick={() => setMascotMode('varied')}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
+                    mascotMode === 'varied'
+                      ? "bg-primary/10 border-primary/30 text-primary"
+                      : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
+                  )}
+                >
+                  <Users className="w-3.5 h-3.5" />
+                  Разные
+                </button>
+              </div>
+            </div>
+            )}
+
             {sourceType !== 'md' && (
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
