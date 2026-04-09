@@ -77,6 +77,7 @@ interface GenerationSettings {
   lessonCount?: number;
   skipImages?: boolean;
   imageModel?: 'gemini-3-pro' | 'gemini-3.1-flash' | 'gemini-2.5-flash';
+  mascotMode?: 'fixed' | 'varied';
 }
 
 interface EditorAISidebarProps {
