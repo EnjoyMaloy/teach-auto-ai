@@ -253,6 +253,7 @@ export const useGenerateCourse = (courseId: string) => {
     selectedDesignConfig?: DesignSystemConfig,
     selectedDesignSystemId?: string,
     imageModel?: string,
+    mascotMode: 'fixed' | 'varied' = 'fixed',
   ) => {
     if (!prompt.trim() || isGeneratingRef.current) return;
 
