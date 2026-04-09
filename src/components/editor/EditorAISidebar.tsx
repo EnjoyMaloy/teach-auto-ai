@@ -326,7 +326,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           // MD import flow
           runMdGeneration(autoMdContent, localSkipImages, selectedDS?.config, selectedDS?.id, imageModel);
         } else {
-          runGeneration(autoPrompt, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id, imageModel);
+          runGeneration(autoPrompt, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id, imageModel, mascotMode);
         }
         setMode('idle');
       };
