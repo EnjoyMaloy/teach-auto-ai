@@ -17,6 +17,7 @@ const Home: React.FC = () => {
   const [lessonCount, setLessonCount] = useState(3);
   const [skipImages, setSkipImages] = useState(false);
   const [imageModel, setImageModel] = useState<'gemini-3-pro' | 'gemini-3.1-flash' | 'gemini-2.5-flash'>('gemini-3-pro');
+  const [mascotMode, setMascotMode] = useState<'fixed' | 'varied'>('fixed');
   const [sourceType, setSourceType] = useState<'none' | 'link' | 'file' | 'md'>('none');
   const [sourceUrl, setSourceUrl] = useState('');
   const [sourceFile, setSourceFile] = useState<File | null>(null);
