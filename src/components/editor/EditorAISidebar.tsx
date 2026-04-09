@@ -515,7 +515,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
         isGenerating: true,
       }]);
       const selectedDS = designSystems.find(ds => ds.id === selectedDesignSystemId);
-      runGeneration(chatInput, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id, imageModel);
+      runGeneration(chatInput, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id, imageModel, mascotMode);
       setChatInput('');
       // Switch to idle so chat history is shown instead of settings
       setMode('idle');
