@@ -60,6 +60,7 @@ const Home: React.FC = () => {
           lessonCount,
           skipImages,
           imageModel,
+          mascotMode,
         },
       },
     });
