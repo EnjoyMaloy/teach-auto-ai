@@ -41,6 +41,7 @@ const Home: React.FC = () => {
             designSystemId: selectedDesignSystemId,
             skipImages,
             imageModel,
+            mascotMode,
           },
         },
       });
