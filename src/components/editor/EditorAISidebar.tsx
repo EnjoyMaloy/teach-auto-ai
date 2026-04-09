@@ -77,6 +77,7 @@ interface GenerationSettings {
   lessonCount?: number;
   skipImages?: boolean;
   imageModel?: 'gemini-3-pro' | 'gemini-3.1-flash' | 'gemini-2.5-flash';
+  mascotMode?: 'fixed' | 'varied';
 }
 
 interface EditorAISidebarProps {
@@ -127,6 +128,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
   const [imageModel, setImageModel] = useState<'gemini-3-pro' | 'gemini-3.1-flash' | 'gemini-2.5-flash'>(autoSettings?.imageModel ?? 'gemini-3-pro');
   const [selectedDesignSystemId, setSelectedDesignSystemId] = useState<string | null>(autoSettings?.designSystemId ?? null);
   const [lessonCount, setLessonCount] = useState(autoSettings?.lessonCount ?? 3);
+  const [mascotMode, setMascotMode] = useState<'fixed' | 'varied'>(autoSettings?.mascotMode ?? 'fixed');
   const [sourceType, setSourceType] = useState<'none' | 'link' | 'file' | 'md'>('none');
   const [sourceUrl, setSourceUrl] = useState('');
   const [sourceFile, setSourceFile] = useState<File | null>(null);
@@ -324,7 +326,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
           // MD import flow
           runMdGeneration(autoMdContent, localSkipImages, selectedDS?.config, selectedDS?.id, imageModel);
         } else {
-          runGeneration(autoPrompt, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id, imageModel);
+          runGeneration(autoPrompt, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id, imageModel, mascotMode);
         }
         setMode('idle');
       };
@@ -513,7 +515,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
         isGenerating: true,
       }]);
       const selectedDS = designSystems.find(ds => ds.id === selectedDesignSystemId);
-      runGeneration(chatInput, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id, imageModel);
+      runGeneration(chatInput, localSkipImages, lessonCount, selectedDS?.config, selectedDS?.id, imageModel, mascotMode);
       setChatInput('');
       // Switch to idle so chat history is shown instead of settings
       setMode('idle');
