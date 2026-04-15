@@ -177,7 +177,7 @@ const Auth: React.FC = () => {
                 <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Введите код</h2>
               </div>
               <p className="text-sm text-gray-500 mb-6">
-                Откройте нашего бота <a href="https://t.me/nutsfarm_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] font-medium hover:underline">@nutsfarm_bot</a> — код придёт автоматически
+                Откройте бота <a href="https://t.me/nutsfarm_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] font-medium hover:underline">@openacademy</a> — код придёт автоматически
               </p>
 
               <div className="flex justify-center gap-3 mb-6">
