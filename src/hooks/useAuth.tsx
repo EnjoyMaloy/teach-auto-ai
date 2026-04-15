@@ -8,6 +8,7 @@ interface AuthContextType {
   isLoading: boolean;
   signInWithMagicLink: (email: string) => Promise<{ error: Error | null }>;
   signInWithGoogle: () => Promise<{ error: Error | null }>;
+  verifyEmailOtp: (email: string, token: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -61,6 +62,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       options: {
         redirectTo: `${window.location.origin}/`,
       },
+    });
+    return { error: error as Error | null };
+  };
+
+  const verifyEmailOtp = async (email: string, token: string) => {
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: 'email',
     });
     return { error: error as Error | null };
   };
