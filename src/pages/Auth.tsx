@@ -135,7 +135,7 @@ const Auth: React.FC = () => {
                   {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
                 </div>
                 <Button type="submit" className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium mt-2" disabled={isLoading}>
-                  {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Отправка...</> : <><Send className="w-4 h-4 mr-2" />Получить ссылку для входа</>}
+                  {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Отправка...</> : <><Mail className="w-4 h-4 mr-2" />Получить код для входа</>}
                 </Button>
               </form>
             </>
