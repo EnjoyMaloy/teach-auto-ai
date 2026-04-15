@@ -196,9 +196,6 @@ const Auth: React.FC = () => {
                 Подтвердить
               </Button>
 
-              <p className="text-center text-xs text-gray-400 mt-4">
-                Код действителен 5 минут
-              </p>
             </>
           )}
 
