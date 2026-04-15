@@ -177,9 +177,9 @@ const Auth: React.FC = () => {
                 <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Введите код</h2>
               </div>
               <p className="text-sm text-gray-500 mb-1">
-                Откройте нашего бота <a href="https://t.me/OpenAcademyBot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] font-medium hover:underline">@OpenAcademyBot</a> и отправьте команду <span className="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-gray-700 text-xs">/login</span>
+                Откройте нашего бота <a href="https://t.me/nutsfarm_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] font-medium hover:underline">@nutsfarm_bot</a> — код придёт автоматически
               </p>
-              <p className="text-sm text-gray-500 mb-6">Бот отправит вам 4-значный код — введите его ниже</p>
+              <p className="text-sm text-gray-500 mb-6">Если код не пришёл, отправьте боту команду <span className="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-gray-700 text-xs">/start</span></p>
 
               <div className="flex justify-center mb-6">
                 <InputOTP maxLength={4} value={tgCode} onChange={setTgCode}>
