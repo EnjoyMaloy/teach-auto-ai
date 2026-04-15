@@ -176,10 +176,9 @@ const Auth: React.FC = () => {
                 <div className="w-10 h-10 rounded-full bg-[#2AABEE] flex items-center justify-center text-white"><TelegramIcon /></div>
                 <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Введите код</h2>
               </div>
-              <p className="text-sm text-gray-500 mb-1">
+              <p className="text-sm text-gray-500 mb-6">
                 Откройте нашего бота <a href="https://t.me/nutsfarm_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] font-medium hover:underline">@nutsfarm_bot</a> — код придёт автоматически
               </p>
-              <p className="text-sm text-gray-500 mb-6">Если код не пришёл, отправьте боту команду <span className="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-gray-700 text-xs">/start</span> и попробуйте заново. Если не помогло — напишите в <a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] font-medium hover:underline">поддержку</a></p>
 
               <div className="flex justify-center gap-3 mb-6">
                 <InputOTP maxLength={4} value={tgCode} onChange={setTgCode}>
@@ -195,6 +194,11 @@ const Auth: React.FC = () => {
               <Button type="button" onClick={handleTelegramCode} className="w-full h-11 bg-[#2AABEE] hover:bg-[#229ED9] text-white font-medium" disabled={tgCode.length < 4}>
                 Подтвердить
               </Button>
+
+              <p className="text-center text-xs text-gray-400 mt-4">
+                Код не пришёл? Отправьте боту <span className="font-mono bg-gray-100 px-1 py-0.5 rounded text-gray-500 text-[10px]">/start</span> и попробуйте заново.{' '}
+                Если не помогло — <a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">напишите в поддержку</a>
+              </p>
 
             </>
           )}
