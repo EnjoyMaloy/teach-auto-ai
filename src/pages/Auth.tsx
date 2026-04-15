@@ -228,7 +228,7 @@ const Auth: React.FC = () => {
                 <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Введите код</h2>
               </div>
               <p className="text-sm text-gray-500 mb-6">
-                Мы отправили 6-значный код на <span className="font-medium text-gray-700">{email}</span>
+                Мы отправили 4-значный код на <span className="font-medium text-gray-700">{email}</span>
               </p>
 
               <div className="flex justify-center gap-3 mb-6">
