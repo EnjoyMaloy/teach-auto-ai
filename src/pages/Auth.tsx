@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { lovable } from '@/integrations/lovable';
 import { Button } from '@/components/ui/button';
@@ -36,6 +37,7 @@ const emailSchema = z.string().email('Введите корректный email'
 type AuthStep = 'main' | 'email-code' | 'telegram-username' | 'telegram-code' | 'magic-link-sent';
 
 const Auth: React.FC = () => {
+  const navigate = useNavigate();
   const { signInWithMagicLink, verifyEmailOtp } = useAuth();
   const [step, setStep] = useState<AuthStep>('main');
   const [isLoading, setIsLoading] = useState(false);
@@ -99,7 +101,7 @@ const Auth: React.FC = () => {
   const handleTelegramCode = () => {
     if (tgCode.length < 4) { toast.error('Введите 4-значный код'); return; }
     // TODO: верифицировать код через edge function
-    toast.info('Верификация кода (пока заглушка)');
+    navigate('/waitlist');
   };
 
   const goBack = () => {
