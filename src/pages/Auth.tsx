@@ -163,6 +163,9 @@ const Auth: React.FC = () => {
                   Отправить код
                 </Button>
               </form>
+              <p className="text-center text-xs text-gray-400 mt-4">
+                Если вы ещё не пользовались ботом, сначала <a href="https://t.me/nutsfarm_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">откройте его</a> и нажмите <span className="font-mono bg-gray-100 px-1 py-0.5 rounded text-gray-500 text-[10px]">/start</span>
+              </p>
             </>
           )}
 
