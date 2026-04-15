@@ -217,20 +217,46 @@ const Auth: React.FC = () => {
             </>
           )}
 
-          {/* ====== MAGIC LINK SENT ====== */}
-          {step === 'magic-link-sent' && (
-            <div className="text-center py-6 space-y-3">
-              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto">
-                <Check className="w-6 h-6 text-green-600" />
+          {/* ====== EMAIL CODE ====== */}
+          {step === 'email-code' && (
+            <>
+              <button type="button" onClick={() => { setStep('main'); setEmailCode(''); }} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-6 transition-colors">
+                <ArrowLeft className="w-4 h-4" /> Назад
+              </button>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white"><Mail className="w-5 h-5" /></div>
+                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Введите код</h2>
               </div>
-              <p className="text-gray-900 font-medium">Проверьте вашу почту</p>
-              <p className="text-sm text-gray-500">
-                Мы отправили ссылку для входа на <span className="font-medium text-gray-700">{email}</span>
+              <p className="text-sm text-gray-500 mb-6">
+                Мы отправили 6-значный код на <span className="font-medium text-gray-700">{email}</span>
               </p>
-              <button type="button" onClick={() => { setStep('main'); setEmail(''); }} className="text-sm text-gray-500 hover:text-gray-700 hover:underline mt-2">
+
+              <div className="flex justify-center gap-3 mb-6">
+                <InputOTP maxLength={6} value={emailCode} onChange={setEmailCode}>
+                  <InputOTPGroup className="gap-3">
+                    <InputOTPSlot index={0} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                    <InputOTPSlot index={1} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                    <InputOTPSlot index={2} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                    <InputOTPSlot index={3} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                    <InputOTPSlot index={4} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                    <InputOTPSlot index={5} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                  </InputOTPGroup>
+                </InputOTP>
+              </div>
+
+              <Button type="button" onClick={handleVerifyEmailCode} className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium" disabled={emailCode.length < 6 || isLoading}>
+                {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Проверка...</> : 'Подтвердить'}
+              </Button>
+
+              <p className="text-center text-xs text-gray-400 mt-4">
+                Код не пришёл? Проверьте папку «Спам».{' '}
+                Если не помогло — <a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">напишите в поддержку</a>
+              </p>
+
+              <button type="button" onClick={() => { setStep('main'); setEmailCode(''); }} className="block mx-auto text-sm text-gray-500 hover:text-gray-700 hover:underline mt-2">
                 Отправить на другой email
               </button>
-            </div>
+            </>
           )}
 
         </div>
