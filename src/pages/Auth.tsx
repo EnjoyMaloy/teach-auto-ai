@@ -154,7 +154,6 @@ const Auth: React.FC = () => {
               <p className="text-sm text-gray-500 mb-6">Введите ваш Telegram username, чтобы мы отправили код подтверждения в бот</p>
               <form onSubmit={handleTelegramUsername} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="tg-username" className="text-sm text-gray-700 font-semibold">Username</Label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">@</span>
                     <Input id="tg-username" type="text" placeholder="username" value={tgUsername} onChange={e => setTgUsername(e.target.value.replace(/^@/, ''))} className="h-11 pl-8 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-0 text-gray-900 placeholder:text-gray-400" />
