@@ -25,6 +25,7 @@ const PublicCourse = lazy(() => import("./pages/PublicCourse"));
 const ShortCourse = lazy(() => import("./pages/ShortCourse"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Articles = lazy(() => import("./pages/Articles"));
+const Waitlist = lazy(() => import("./pages/Waitlist"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -95,6 +96,7 @@ const AppRoutes = () => (
     {/* Public routes */}
     <Route path="/course/:courseId" element={<Suspense fallback={<PageLoader />}><PublicCourse /></Suspense>} />
     <Route path="/c/:shortId" element={<Suspense fallback={<PageLoader />}><ShortCourse /></Suspense>} />
+    <Route path="/waitlist" element={<ProtectedRoute><Suspense fallback={<PageLoader />}><Waitlist /></Suspense></ProtectedRoute>} />
     <Route path="*" element={<Suspense fallback={<PageLoader />}><NotFound /></Suspense>} />
   </Routes>
 );
