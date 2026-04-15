@@ -75,7 +75,7 @@ const Auth: React.FC = () => {
     if (result.error) { toast.error('Ошибка входа через Google: ' + result.error.message); setIsGoogleLoading(false); }
   };
 
-  const handleTelegramStart = () => setStep('telegram-username');
+  const handleTelegramStart = () => setStep('telegram-code');
 
   const handleTelegramUsername = (e: React.FormEvent) => {
     e.preventDefault();
