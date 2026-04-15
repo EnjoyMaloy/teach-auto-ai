@@ -139,7 +139,7 @@ const Auth: React.FC = () => {
                 <div className="relative flex justify-center text-sm"><span className="bg-white px-4 text-gray-500">Или</span></div>
               </div>
 
-              <form onSubmit={handleMagicLink} className="space-y-4">
+              <form onSubmit={handleSendEmailCode} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-sm text-gray-700 font-semibold">Email</Label>
                   <Input id="email" type="email" placeholder="Введите ваш email" value={email} onChange={e => setEmail(e.target.value)} className={`h-11 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-0 text-gray-900 placeholder:text-gray-400 ${errors.email ? 'border-red-400' : ''}`} />
