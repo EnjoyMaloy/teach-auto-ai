@@ -176,7 +176,7 @@ const Auth: React.FC = () => {
                 <ArrowLeft className="w-4 h-4" /> Назад
               </button>
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-xl bg-[#2AABEE] flex items-center justify-center text-white"><TelegramIcon /></div>
+                <div className="w-10 h-10 rounded-full bg-[#2AABEE] flex items-center justify-center text-white"><TelegramIcon /></div>
                 <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Введите код</h2>
               </div>
               <p className="text-sm text-gray-500 mb-6">
