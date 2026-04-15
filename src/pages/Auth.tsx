@@ -75,7 +75,7 @@ const Auth: React.FC = () => {
     if (result.error) { toast.error('Ошибка входа через Google: ' + result.error.message); setIsGoogleLoading(false); }
   };
 
-  const handleTelegramStart = () => setStep('telegram-username');
+  const handleTelegramStart = () => setStep('telegram-code');
 
   const handleTelegramUsername = (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,31 +141,6 @@ const Auth: React.FC = () => {
             </>
           )}
 
-          {/* ====== TELEGRAM USERNAME ====== */}
-          {step === 'telegram-username' && (
-            <>
-              <button type="button" onClick={goBack} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-6 transition-colors">
-                <ArrowLeft className="w-4 h-4" /> Назад
-              </button>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-[#2AABEE] flex items-center justify-center text-white"><TelegramIcon /></div>
-                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Вход через Telegram</h2>
-              </div>
-              <p className="text-sm text-gray-500 mb-6">Введите ваш Telegram username, чтобы мы отправили код подтверждения в бот</p>
-              <form onSubmit={handleTelegramUsername} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="tg-username" className="text-sm text-gray-700 font-semibold">Username</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">@</span>
-                    <Input id="tg-username" type="text" placeholder="username" value={tgUsername} onChange={e => setTgUsername(e.target.value.replace(/^@/, ''))} className="h-11 pl-8 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-0 text-gray-900 placeholder:text-gray-400" />
-                  </div>
-                </div>
-                <Button type="submit" className="w-full h-11 bg-[#2AABEE] hover:bg-[#229ED9] text-white font-medium">
-                  Отправить код
-                </Button>
-              </form>
-            </>
-          )}
 
           {/* ====== TELEGRAM CODE ====== */}
           {step === 'telegram-code' && (
