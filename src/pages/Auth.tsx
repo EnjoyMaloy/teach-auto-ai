@@ -131,7 +131,7 @@ const Auth: React.FC = () => {
               <form onSubmit={handleMagicLink} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-sm text-gray-700 font-semibold">Email</Label>
-                  <Input id="email" type="email" placeholder="Введите ваш email" value={email} onChange={e => setEmail(e.target.value)} className={`h-11 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-0 placeholder:text-gray-400 ${errors.email ? 'border-red-400' : ''}`} />
+                  <Input id="email" type="email" placeholder="Введите ваш email" value={email} onChange={e => setEmail(e.target.value)} className={`h-11 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-0 text-gray-900 placeholder:text-gray-400 ${errors.email ? 'border-red-400' : ''}`} />
                   {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
                 </div>
                 <Button type="submit" className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium mt-2" disabled={isLoading}>
@@ -157,7 +157,7 @@ const Auth: React.FC = () => {
                   <Label htmlFor="tg-username" className="text-sm text-gray-700 font-semibold">Username</Label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">@</span>
-                    <Input id="tg-username" type="text" placeholder="username" value={tgUsername} onChange={e => setTgUsername(e.target.value.replace(/^@/, ''))} className="h-11 pl-8 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-0 placeholder:text-gray-400" />
+                    <Input id="tg-username" type="text" placeholder="username" value={tgUsername} onChange={e => setTgUsername(e.target.value.replace(/^@/, ''))} className="h-11 pl-8 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-0 text-gray-900 placeholder:text-gray-400" />
                   </div>
                 </div>
                 <Button type="submit" className="w-full h-11 bg-[#2AABEE] hover:bg-[#229ED9] text-white font-medium">
