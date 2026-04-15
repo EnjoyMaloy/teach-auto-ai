@@ -184,10 +184,10 @@ const Auth: React.FC = () => {
               <div className="flex justify-center mb-6">
                 <InputOTP maxLength={4} value={tgCode} onChange={setTgCode}>
                   <InputOTPGroup>
-                    <InputOTPSlot index={0} className="w-14 h-14 text-2xl" />
-                    <InputOTPSlot index={1} className="w-14 h-14 text-2xl" />
-                    <InputOTPSlot index={2} className="w-14 h-14 text-2xl" />
-                    <InputOTPSlot index={3} className="w-14 h-14 text-2xl" />
+                    <InputOTPSlot index={0} className="w-14 h-14 text-2xl border-gray-300 bg-gray-50" />
+                    <InputOTPSlot index={1} className="w-14 h-14 text-2xl border-gray-300 bg-gray-50" />
+                    <InputOTPSlot index={2} className="w-14 h-14 text-2xl border-gray-300 bg-gray-50" />
+                    <InputOTPSlot index={3} className="w-14 h-14 text-2xl border-gray-300 bg-gray-50" />
                   </InputOTPGroup>
                 </InputOTP>
               </div>
@@ -196,9 +196,6 @@ const Auth: React.FC = () => {
                 Подтвердить
               </Button>
 
-              <p className="text-center text-xs text-gray-400 mt-4">
-                Код действителен 5 минут
-              </p>
             </>
           )}
 
