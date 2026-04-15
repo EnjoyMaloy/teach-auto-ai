@@ -16,6 +16,7 @@ import {
 
 const authIllustration = '/auth-illustration.jpg';
 import Logo from '@/assets/Logo.svg';
+import TelegramIconSvg from '@/assets/telegram-icon.svg';
 
 const GoogleIcon = () => (
   <svg className="w-5 h-5" viewBox="0 0 24 24">
