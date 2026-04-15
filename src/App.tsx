@@ -96,7 +96,7 @@ const AppRoutes = () => (
     {/* Public routes */}
     <Route path="/course/:courseId" element={<Suspense fallback={<PageLoader />}><PublicCourse /></Suspense>} />
     <Route path="/c/:shortId" element={<Suspense fallback={<PageLoader />}><ShortCourse /></Suspense>} />
-    <Route path="/waitlist" element={<ProtectedRoute><Suspense fallback={<PageLoader />}><Waitlist /></Suspense></ProtectedRoute>} />
+    <Route path="/waitlist" element={<Suspense fallback={<PageLoader />}><Waitlist /></Suspense>} />
     <Route path="*" element={<Suspense fallback={<PageLoader />}><NotFound /></Suspense>} />
   </Routes>
 );
