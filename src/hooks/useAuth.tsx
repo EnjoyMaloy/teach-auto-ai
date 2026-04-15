@@ -8,6 +8,7 @@ interface AuthContextType {
   isLoading: boolean;
   signInWithMagicLink: (email: string) => Promise<{ error: Error | null }>;
   signInWithGoogle: () => Promise<{ error: Error | null }>;
+  verifyEmailOtp: (email: string, token: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -65,12 +66,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return { error: error as Error | null };
   };
 
+  const verifyEmailOtp = async (email: string, token: string) => {
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: 'email',
+    });
+    return { error: error as Error | null };
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isLoading, signInWithMagicLink, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, session, isLoading, signInWithMagicLink, signInWithGoogle, verifyEmailOtp, signOut }}>
       {children}
     </AuthContext.Provider>
   );

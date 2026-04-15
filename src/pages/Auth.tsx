@@ -33,10 +33,10 @@ const TelegramIcon = () => (
 
 const emailSchema = z.string().email('Введите корректный email');
 
-type AuthStep = 'main' | 'telegram-username' | 'telegram-code' | 'magic-link-sent';
+type AuthStep = 'main' | 'email-code' | 'telegram-username' | 'telegram-code' | 'magic-link-sent';
 
 const Auth: React.FC = () => {
-  const { signInWithMagicLink } = useAuth();
+  const { signInWithMagicLink, verifyEmailOtp } = useAuth();
   const [step, setStep] = useState<AuthStep>('main');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -44,6 +44,7 @@ const Auth: React.FC = () => {
   // Email state
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState<{ email?: string }>({});
+  const [emailCode, setEmailCode] = useState('');
 
   // Telegram state
   const [tgUsername, setTgUsername] = useState('');
@@ -58,15 +59,25 @@ const Auth: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleMagicLink = async (e: React.FormEvent) => {
+  const handleSendEmailCode = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateEmail()) return;
     setIsLoading(true);
     const { error } = await signInWithMagicLink(email);
     setIsLoading(false);
-    if (error) { toast.error('Ошибка отправки ссылки: ' + error.message); return; }
-    setStep('magic-link-sent');
-    toast.success('Ссылка для входа отправлена!');
+    if (error) { toast.error('Ошибка отправки кода: ' + error.message); return; }
+    setStep('email-code');
+    setEmailCode('');
+    toast.success('Код отправлен на почту!');
+  };
+
+  const handleVerifyEmailCode = async () => {
+    if (emailCode.length < 6) { toast.error('Введите 6-значный код'); return; }
+    setIsLoading(true);
+    const { error } = await verifyEmailOtp(email, emailCode);
+    setIsLoading(false);
+    if (error) { toast.error('Неверный код: ' + error.message); return; }
+    toast.success('Вход выполнен!');
   };
 
   const handleGoogleSignIn = async () => {
@@ -128,7 +139,7 @@ const Auth: React.FC = () => {
                 <div className="relative flex justify-center text-sm"><span className="bg-white px-4 text-gray-500">Или</span></div>
               </div>
 
-              <form onSubmit={handleMagicLink} className="space-y-4">
+              <form onSubmit={handleSendEmailCode} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-sm text-gray-700 font-semibold">Email</Label>
                   <Input id="email" type="email" placeholder="Введите ваш email" value={email} onChange={e => setEmail(e.target.value)} className={`h-11 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-0 text-gray-900 placeholder:text-gray-400 ${errors.email ? 'border-red-400' : ''}`} />
@@ -206,20 +217,46 @@ const Auth: React.FC = () => {
             </>
           )}
 
-          {/* ====== MAGIC LINK SENT ====== */}
-          {step === 'magic-link-sent' && (
-            <div className="text-center py-6 space-y-3">
-              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto">
-                <Check className="w-6 h-6 text-green-600" />
+          {/* ====== EMAIL CODE ====== */}
+          {step === 'email-code' && (
+            <>
+              <button type="button" onClick={() => { setStep('main'); setEmailCode(''); }} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-6 transition-colors">
+                <ArrowLeft className="w-4 h-4" /> Назад
+              </button>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white"><Mail className="w-5 h-5" /></div>
+                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Введите код</h2>
               </div>
-              <p className="text-gray-900 font-medium">Проверьте вашу почту</p>
-              <p className="text-sm text-gray-500">
-                Мы отправили ссылку для входа на <span className="font-medium text-gray-700">{email}</span>
+              <p className="text-sm text-gray-500 mb-6">
+                Мы отправили 6-значный код на <span className="font-medium text-gray-700">{email}</span>
               </p>
-              <button type="button" onClick={() => { setStep('main'); setEmail(''); }} className="text-sm text-gray-500 hover:text-gray-700 hover:underline mt-2">
+
+              <div className="flex justify-center gap-3 mb-6">
+                <InputOTP maxLength={6} value={emailCode} onChange={setEmailCode}>
+                  <InputOTPGroup className="gap-3">
+                    <InputOTPSlot index={0} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                    <InputOTPSlot index={1} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                    <InputOTPSlot index={2} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                    <InputOTPSlot index={3} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                    <InputOTPSlot index={4} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                    <InputOTPSlot index={5} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                  </InputOTPGroup>
+                </InputOTP>
+              </div>
+
+              <Button type="button" onClick={handleVerifyEmailCode} className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium" disabled={emailCode.length < 6 || isLoading}>
+                {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Проверка...</> : 'Подтвердить'}
+              </Button>
+
+              <p className="text-center text-xs text-gray-400 mt-4">
+                Код не пришёл? Проверьте папку «Спам».{' '}
+                Если не помогло — <a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">напишите в поддержку</a>
+              </p>
+
+              <button type="button" onClick={() => { setStep('main'); setEmailCode(''); }} className="block mx-auto text-sm text-gray-500 hover:text-gray-700 hover:underline mt-2">
                 Отправить на другой email
               </button>
-            </div>
+            </>
           )}
 
         </div>
