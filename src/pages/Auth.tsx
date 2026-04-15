@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Loader2, Send, Check, ArrowLeft } from 'lucide-react';
+import { Loader2, Send, Check, ArrowLeft, Mail } from 'lucide-react';
 import { z } from 'zod';
 import {
   InputOTP,
@@ -135,7 +135,7 @@ const Auth: React.FC = () => {
                   {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
                 </div>
                 <Button type="submit" className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium mt-2" disabled={isLoading}>
-                  {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Отправка...</> : <><Send className="w-4 h-4 mr-2" />Получить ссылку для входа</>}
+                  {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Отправка...</> : <><Mail className="w-4 h-4 mr-2" />Получить код для входа</>}
                 </Button>
               </form>
             </>
