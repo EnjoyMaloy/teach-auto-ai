@@ -72,7 +72,7 @@ const Auth: React.FC = () => {
   };
 
   const handleVerifyEmailCode = async () => {
-    if (emailCode.length < 6) { toast.error('Введите 6-значный код'); return; }
+    if (emailCode.length < 4) { toast.error('Введите 4-значный код'); return; }
     setIsLoading(true);
     const { error } = await verifyEmailOtp(email, emailCode);
     setIsLoading(false);
@@ -228,23 +228,21 @@ const Auth: React.FC = () => {
                 <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Введите код</h2>
               </div>
               <p className="text-sm text-gray-500 mb-6">
-                Мы отправили 6-значный код на <span className="font-medium text-gray-700">{email}</span>
+                Мы отправили 4-значный код на <span className="font-medium text-gray-700">{email}</span>
               </p>
 
               <div className="flex justify-center gap-3 mb-6">
-                <InputOTP maxLength={6} value={emailCode} onChange={setEmailCode}>
+                <InputOTP maxLength={4} value={emailCode} onChange={setEmailCode}>
                   <InputOTPGroup className="gap-3">
-                    <InputOTPSlot index={0} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
-                    <InputOTPSlot index={1} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
-                    <InputOTPSlot index={2} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
-                    <InputOTPSlot index={3} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
-                    <InputOTPSlot index={4} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
-                    <InputOTPSlot index={5} className="!w-12 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                    <InputOTPSlot index={0} className="!w-14 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                    <InputOTPSlot index={1} className="!w-14 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                    <InputOTPSlot index={2} className="!w-14 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                    <InputOTPSlot index={3} className="!w-14 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
                   </InputOTPGroup>
                 </InputOTP>
               </div>
 
-              <Button type="button" onClick={handleVerifyEmailCode} className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium" disabled={emailCode.length < 6 || isLoading}>
+              <Button type="button" onClick={handleVerifyEmailCode} className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium" disabled={emailCode.length < 4 || isLoading}>
                 {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Проверка...</> : 'Подтвердить'}
               </Button>
 
