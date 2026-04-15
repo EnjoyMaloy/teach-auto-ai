@@ -33,10 +33,10 @@ const TelegramIcon = () => (
 
 const emailSchema = z.string().email('Введите корректный email');
 
-type AuthStep = 'main' | 'telegram-username' | 'telegram-code' | 'magic-link-sent';
+type AuthStep = 'main' | 'email-code' | 'telegram-username' | 'telegram-code' | 'magic-link-sent';
 
 const Auth: React.FC = () => {
-  const { signInWithMagicLink } = useAuth();
+  const { signInWithMagicLink, verifyEmailOtp } = useAuth();
   const [step, setStep] = useState<AuthStep>('main');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -44,6 +44,7 @@ const Auth: React.FC = () => {
   // Email state
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState<{ email?: string }>({});
+  const [emailCode, setEmailCode] = useState('');
 
   // Telegram state
   const [tgUsername, setTgUsername] = useState('');
@@ -58,15 +59,25 @@ const Auth: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleMagicLink = async (e: React.FormEvent) => {
+  const handleSendEmailCode = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateEmail()) return;
     setIsLoading(true);
     const { error } = await signInWithMagicLink(email);
     setIsLoading(false);
-    if (error) { toast.error('Ошибка отправки ссылки: ' + error.message); return; }
-    setStep('magic-link-sent');
-    toast.success('Ссылка для входа отправлена!');
+    if (error) { toast.error('Ошибка отправки кода: ' + error.message); return; }
+    setStep('email-code');
+    setEmailCode('');
+    toast.success('Код отправлен на почту!');
+  };
+
+  const handleVerifyEmailCode = async () => {
+    if (emailCode.length < 6) { toast.error('Введите 6-значный код'); return; }
+    setIsLoading(true);
+    const { error } = await verifyEmailOtp(email, emailCode);
+    setIsLoading(false);
+    if (error) { toast.error('Неверный код: ' + error.message); return; }
+    toast.success('Вход выполнен!');
   };
 
   const handleGoogleSignIn = async () => {
