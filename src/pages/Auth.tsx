@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { lovable } from '@/integrations/lovable';
 import { Button } from '@/components/ui/button';
@@ -7,8 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Loader2, Send, Check } from 'lucide-react';
+import { Loader2, Send, Check, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from '@/components/ui/input-otp';
+
 const authIllustration = '/auth-illustration.jpg';
 import Logo from '@/assets/Logo.svg';
 
@@ -29,111 +34,178 @@ const TelegramIcon = () => (
 
 const emailSchema = z.string().email('Введите корректный email');
 
+type AuthStep = 'main' | 'telegram-username' | 'telegram-code' | 'magic-link-sent';
+
 const Auth: React.FC = () => {
-  const navigate = useNavigate();
   const { signInWithMagicLink } = useAuth();
+  const [step, setStep] = useState<AuthStep>('main');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [isTelegramLoading, setIsTelegramLoading] = useState(false);
-  const [magicLinkSent, setMagicLinkSent] = useState(false);
+
+  // Email state
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState<{ email?: string }>({});
 
-  const validateForm = (): boolean => {
+  // Telegram state
+  const [tgUsername, setTgUsername] = useState('');
+  const [tgCode, setTgCode] = useState('');
+
+  const validateEmail = (): boolean => {
     const newErrors: { email?: string } = {};
-    try {
-      emailSchema.parse(email);
-    } catch (e) {
-      if (e instanceof z.ZodError) {
-        newErrors.email = e.errors[0]?.message;
-      }
+    try { emailSchema.parse(email); } catch (e) {
+      if (e instanceof z.ZodError) newErrors.email = e.errors[0]?.message;
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (!validateEmail()) return;
     setIsLoading(true);
     const { error } = await signInWithMagicLink(email);
     setIsLoading(false);
-    if (error) {
-      toast.error('Ошибка отправки ссылки: ' + error.message);
-      return;
-    }
-    setMagicLinkSent(true);
-    toast.success('Ссылка для входа отправлена на вашу почту!');
+    if (error) { toast.error('Ошибка отправки ссылки: ' + error.message); return; }
+    setStep('magic-link-sent');
+    toast.success('Ссылка для входа отправлена!');
   };
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
-    const result = await lovable.auth.signInWithOAuth('google', {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error('Ошибка входа через Google: ' + result.error.message);
-      setIsGoogleLoading(false);
-    }
+    const result = await lovable.auth.signInWithOAuth('google', { redirect_uri: window.location.origin });
+    if (result.error) { toast.error('Ошибка входа через Google: ' + result.error.message); setIsGoogleLoading(false); }
   };
 
-  const handleTelegramSignIn = async () => {
-    setIsTelegramLoading(true);
-    // TODO: Implement Telegram Login Widget when bot username is provided
-    toast.info('Вход через Telegram скоро будет доступен');
-    setIsTelegramLoading(false);
+  const handleTelegramStart = () => setStep('telegram-username');
+
+  const handleTelegramUsername = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tgUsername.trim()) { toast.error('Введите username'); return; }
+    // TODO: вызвать edge function для отправки кода в ТГ бот
+    toast.success('Код отправлен в Telegram-бот!');
+    setStep('telegram-code');
+  };
+
+  const handleTelegramCode = () => {
+    if (tgCode.length < 4) { toast.error('Введите 4-значный код'); return; }
+    // TODO: верифицировать код через edge function
+    toast.info('Верификация кода (пока заглушка)');
+  };
+
+  const goBack = () => {
+    setStep('main');
+    setTgUsername('');
+    setTgCode('');
   };
 
   return (
     <main className="min-h-screen flex flex-col lg:flex-row bg-white relative">
-      {/* Logo */}
       <div className="absolute top-4 left-4 sm:top-6 sm:left-8 lg:left-16 xl:left-24 flex items-center gap-3 z-10">
         <img src={Logo} alt="Academy Logo" className="h-6 sm:h-8" />
       </div>
 
-      {/* Left side - Form */}
       <div className="flex-1 flex flex-col justify-center px-4 sm:px-8 lg:px-16 xl:px-24 pt-16 pb-8 lg:py-0">
         <div className="w-full max-w-[400px] mx-auto">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900 mb-6 sm:mb-8">
-            Войдите в аккаунт
-          </h1>
 
-          {/* Google */}
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full h-11 bg-white border-gray-200 hover:bg-gray-50 text-gray-700 hover:text-gray-700 font-semibold"
-            onClick={handleGoogleSignIn}
-            disabled={isGoogleLoading || isLoading}
-          >
-            {isGoogleLoading ? <Loader2 className="w-4 h-4 mr-3 animate-spin" /> : <span className="mr-3"><GoogleIcon /></span>}
-            Войти через Google
-          </Button>
+          {/* ====== MAIN ====== */}
+          {step === 'main' && (
+            <>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900 mb-6 sm:mb-8">
+                Войдите в аккаунт
+              </h1>
 
-          {/* Telegram */}
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full h-11 bg-[#2AABEE] hover:bg-[#229ED9] text-white hover:text-white font-semibold border-[#2AABEE] hover:border-[#229ED9] mt-3"
-            onClick={handleTelegramSignIn}
-            disabled={isTelegramLoading || isLoading}
-          >
-            {isTelegramLoading ? <Loader2 className="w-4 h-4 mr-3 animate-spin" /> : <span className="mr-3"><TelegramIcon /></span>}
-            Войти через Telegram
-          </Button>
+              <Button type="button" variant="outline" className="w-full h-11 bg-white border-gray-200 hover:bg-gray-50 text-gray-700 hover:text-gray-700 font-semibold" onClick={handleGoogleSignIn} disabled={isGoogleLoading || isLoading}>
+                {isGoogleLoading ? <Loader2 className="w-4 h-4 mr-3 animate-spin" /> : <span className="mr-3"><GoogleIcon /></span>}
+                Войти через Google
+              </Button>
 
-          {/* Divider */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <Separator className="w-full bg-gray-200" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-4 text-gray-500">Или</span>
-            </div>
-          </div>
+              <Button type="button" variant="outline" className="w-full h-11 bg-[#2AABEE] hover:bg-[#229ED9] text-white hover:text-white font-semibold border-[#2AABEE] hover:border-[#229ED9] mt-3" onClick={handleTelegramStart} disabled={isLoading}>
+                <span className="mr-3"><TelegramIcon /></span>
+                Войти через Telegram
+              </Button>
 
-          {/* Magic Link Form */}
-          {magicLinkSent ? (
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center"><Separator className="w-full bg-gray-200" /></div>
+                <div className="relative flex justify-center text-sm"><span className="bg-white px-4 text-gray-500">Или</span></div>
+              </div>
+
+              <form onSubmit={handleMagicLink} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm text-gray-700 font-semibold">Email</Label>
+                  <Input id="email" type="email" placeholder="Введите ваш email" value={email} onChange={e => setEmail(e.target.value)} className={`h-11 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-0 placeholder:text-gray-400 ${errors.email ? 'border-red-400' : ''}`} />
+                  {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+                </div>
+                <Button type="submit" className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium mt-2" disabled={isLoading}>
+                  {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Отправка...</> : <><Send className="w-4 h-4 mr-2" />Получить ссылку для входа</>}
+                </Button>
+              </form>
+            </>
+          )}
+
+          {/* ====== TELEGRAM USERNAME ====== */}
+          {step === 'telegram-username' && (
+            <>
+              <button type="button" onClick={goBack} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-6 transition-colors">
+                <ArrowLeft className="w-4 h-4" /> Назад
+              </button>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-full bg-[#2AABEE] flex items-center justify-center text-white"><TelegramIcon /></div>
+                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Вход через Telegram</h2>
+              </div>
+              <p className="text-sm text-gray-500 mb-6">Введите ваш Telegram username, чтобы мы отправили код подтверждения в бот</p>
+              <form onSubmit={handleTelegramUsername} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="tg-username" className="text-sm text-gray-700 font-semibold">Username</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">@</span>
+                    <Input id="tg-username" type="text" placeholder="username" value={tgUsername} onChange={e => setTgUsername(e.target.value.replace(/^@/, ''))} className="h-11 pl-8 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-0 placeholder:text-gray-400" />
+                  </div>
+                </div>
+                <Button type="submit" className="w-full h-11 bg-[#2AABEE] hover:bg-[#229ED9] text-white font-medium">
+                  Отправить код
+                </Button>
+              </form>
+            </>
+          )}
+
+          {/* ====== TELEGRAM CODE ====== */}
+          {step === 'telegram-code' && (
+            <>
+              <button type="button" onClick={() => setStep('telegram-username')} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-6 transition-colors">
+                <ArrowLeft className="w-4 h-4" /> Назад
+              </button>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-full bg-[#2AABEE] flex items-center justify-center text-white"><TelegramIcon /></div>
+                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Введите код</h2>
+              </div>
+              <p className="text-sm text-gray-500 mb-1">
+                Откройте нашего бота <a href="https://t.me/OpenAcademyBot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] font-medium hover:underline">@OpenAcademyBot</a> и отправьте команду <span className="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-gray-700 text-xs">/login</span>
+              </p>
+              <p className="text-sm text-gray-500 mb-6">Бот отправит вам 4-значный код — введите его ниже</p>
+
+              <div className="flex justify-center mb-6">
+                <InputOTP maxLength={4} value={tgCode} onChange={setTgCode}>
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} className="w-14 h-14 text-2xl" />
+                    <InputOTPSlot index={1} className="w-14 h-14 text-2xl" />
+                    <InputOTPSlot index={2} className="w-14 h-14 text-2xl" />
+                    <InputOTPSlot index={3} className="w-14 h-14 text-2xl" />
+                  </InputOTPGroup>
+                </InputOTP>
+              </div>
+
+              <Button type="button" onClick={handleTelegramCode} className="w-full h-11 bg-[#2AABEE] hover:bg-[#229ED9] text-white font-medium" disabled={tgCode.length < 4}>
+                Подтвердить
+              </Button>
+
+              <p className="text-center text-xs text-gray-400 mt-4">
+                Код действителен 5 минут
+              </p>
+            </>
+          )}
+
+          {/* ====== MAGIC LINK SENT ====== */}
+          {step === 'magic-link-sent' && (
             <div className="text-center py-6 space-y-3">
               <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto">
                 <Check className="w-6 h-6 text-green-600" />
@@ -142,62 +214,22 @@ const Auth: React.FC = () => {
               <p className="text-sm text-gray-500">
                 Мы отправили ссылку для входа на <span className="font-medium text-gray-700">{email}</span>
               </p>
-              <button
-                type="button"
-                onClick={() => { setMagicLinkSent(false); setEmail(''); }}
-                className="text-sm text-gray-500 hover:text-gray-700 hover:underline mt-2"
-              >
+              <button type="button" onClick={() => { setStep('main'); setEmail(''); }} className="text-sm text-gray-500 hover:text-gray-700 hover:underline mt-2">
                 Отправить на другой email
               </button>
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm text-gray-700 font-semibold">
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Введите ваш email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  className={`h-11 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-0 placeholder:text-gray-400 ${errors.email ? 'border-red-400' : ''}`}
-                />
-                {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium mt-2"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Отправка...
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4 mr-2" />
-                    Получить ссылку для входа
-                  </>
-                )}
-              </Button>
-            </form>
           )}
+
         </div>
       </div>
 
-      {/* Right side - Illustration */}
+      {/* Right side */}
       <div className="hidden lg:flex lg:flex-1 p-6">
         <div className="relative w-full h-full rounded-3xl overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
           <img src={authIllustration} alt="Creative workspace" className="absolute inset-0 w-full h-full object-cover" fetchPriority="high" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
           <div className="absolute bottom-12 left-12 right-12">
-            <h2 className="text-3xl font-semibold text-white leading-tight">
-              Превращайте идеи<br />в обучающие курсы
-            </h2>
+            <h2 className="text-3xl font-semibold text-white leading-tight">Превращайте идеи<br />в обучающие курсы</h2>
           </div>
         </div>
       </div>
