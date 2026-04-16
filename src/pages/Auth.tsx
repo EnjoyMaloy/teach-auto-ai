@@ -212,7 +212,7 @@ const Auth: React.FC = () => {
               </Button>
 
               <p className="text-center text-xs text-gray-400 mt-4">
-                Код не пришёл? Отправьте боту <span className="font-mono bg-gray-100 px-1 py-0.5 rounded text-gray-500 text-[10px]">/start</span> и попробуйте заново.{' '}
+                Код действует 4 часа. Не пришёл? Отправьте боту <span className="font-mono bg-gray-100 px-1 py-0.5 rounded text-gray-500 text-[10px]">/start</span> и попробуйте заново.{' '}
                 Если не помогло — <a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">напишите в поддержку</a>
               </p>
 
