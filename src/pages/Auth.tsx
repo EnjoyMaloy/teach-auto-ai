@@ -214,32 +214,32 @@ const Auth: React.FC = () => {
           {step === 'main' && (
             <>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900 mb-6 sm:mb-8">
-                Войдите в аккаунт
+                Sign in to your account
               </h1>
 
               <Button type="button" variant="outline" className="w-full h-11 bg-white border-gray-200 hover:bg-gray-50 text-gray-700 hover:text-gray-700 font-semibold" onClick={handleGoogleSignIn} disabled={isGoogleLoading || isLoading}>
                 {isGoogleLoading ? <Loader2 className="w-4 h-4 mr-3 animate-spin" /> : <span className="mr-3"><GoogleIcon /></span>}
-                Войти через Google
+                Sign in with Google
               </Button>
 
               <Button type="button" variant="outline" className="w-full h-11 bg-[#2AABEE] hover:bg-[#229ED9] text-white hover:text-white font-semibold border-[#2AABEE] hover:border-[#229ED9] mt-3" onClick={handleTelegramStart} disabled={isLoading}>
                 <span className="mr-3"><TelegramIcon /></span>
-                Войти через Telegram
+                Sign in with Telegram
               </Button>
 
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center"><Separator className="w-full bg-gray-200" /></div>
-                <div className="relative flex justify-center text-sm"><span className="bg-white px-4 text-gray-500">Или</span></div>
+                <div className="relative flex justify-center text-sm"><span className="bg-white px-4 text-gray-500">Or</span></div>
               </div>
 
               <form onSubmit={handleSendEmailCode} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-sm text-gray-700 font-semibold">Email</Label>
-                  <Input id="email" type="email" placeholder="Введите ваш email" value={email} onChange={e => setEmail(e.target.value)} className={`h-11 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-0 text-gray-900 placeholder:text-gray-400 ${errors.email ? 'border-red-400' : ''}`} />
+                  <Input id="email" type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} className={`h-11 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-0 text-gray-900 placeholder:text-gray-400 ${errors.email ? 'border-red-400' : ''}`} />
                   {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
                 </div>
                 <Button type="submit" className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium mt-2" disabled={isLoading}>
-                  {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Отправка...</> : <><Mail className="w-4 h-4 mr-2" />Получить код для входа</>}
+                  {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Sending...</> : <><Mail className="w-4 h-4 mr-2" />Get sign-in code</>}
                 </Button>
               </form>
             </>
