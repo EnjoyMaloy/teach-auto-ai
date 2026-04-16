@@ -298,7 +298,7 @@ const Auth: React.FC = () => {
                 Зачем вам OA Studio?
               </h2>
               <p className="text-sm text-gray-500 mb-6">
-                Это поможет нам сделать продукт лучше
+                Создавайте курсы раньше всех и формируйте будущее платформы
               </p>
               <div className="space-y-3 mb-6">
                 {SURVEY_OPTIONS.map((option) => (
