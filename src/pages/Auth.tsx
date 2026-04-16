@@ -279,7 +279,7 @@ const Auth: React.FC = () => {
               </p>
               <div className="flex items-center gap-2 text-sm text-gray-400 mb-8">
                 <Users className="w-4 h-4" />
-                <span>В очереди уже <span className="font-medium text-gray-600">{queueCount}</span> человек</span>
+                <span>В очереди <span className="font-medium text-gray-600">{queueCount}</span> человек</span>
               </div>
               <Button onClick={() => setStep('waitlist-survey')} className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium">
                 Записаться в очередь
