@@ -34,7 +34,7 @@ const TelegramIcon = () => (
 
 const emailSchema = z.string().email('Введите корректный email');
 
-type AuthStep = 'main' | 'email-code' | 'telegram-username' | 'telegram-code' | 'magic-link-sent';
+type AuthStep = 'main' | 'email-code' | 'telegram-username' | 'telegram-code' | 'magic-link-sent' | 'waitlist-info' | 'waitlist-survey' | 'waitlist-done';
 
 const Auth: React.FC = () => {
   const navigate = useNavigate();
