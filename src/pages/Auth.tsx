@@ -53,7 +53,7 @@ const WaitlistDoneView: React.FC = () => {
           transform: showExtras ? 'translateY(0)' : 'translateY(40px)',
         }}
       >
-        <img src={WaitlistSuccessIcon} alt="" className="w-36 h-36 mb-4 mx-auto" />
+        <img src={WaitlistSuccessIcon} alt="" className="w-28 h-28 mb-4 mx-auto" />
         <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
           Спасибо, вы в списке ожидания!
         </h2>
