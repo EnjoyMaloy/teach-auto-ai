@@ -55,10 +55,10 @@ const WaitlistDoneView: React.FC = () => {
       >
         <img src={WaitlistSuccessIcon} alt="" className="w-28 h-28 mb-4 mx-auto" />
         <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
-          Спасибо, вы в списке ожидания!
+          Thank you, you're on the waitlist!
         </h2>
         <p className="text-sm text-gray-500 mb-1">
-          Мы выдаём доступ постепенно. В приоритете — активные участники сообщества, авторы и эксперты. Уведомим вас по email или в Telegram.
+          We're granting access gradually. Priority goes to active community members, authors, and experts. We'll notify you via email or Telegram.
         </p>
       </div>
 
@@ -72,7 +72,7 @@ const WaitlistDoneView: React.FC = () => {
         }}
       >
         <div className="w-full h-px bg-gray-200 mb-6" />
-        <p className="text-base font-medium text-gray-700 mb-4">А пока попробуйте наше приложение с курсами</p>
+        <p className="text-base font-medium text-gray-700 mb-4">Meanwhile, try our learning app</p>
         <div className="grid grid-cols-2 gap-3 mb-2">
           <a href="https://learn.open-academy.app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-11 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-medium text-sm transition-all">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
@@ -86,15 +86,15 @@ const WaitlistDoneView: React.FC = () => {
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="flex items-center justify-center gap-2 h-11 rounded-xl bg-gray-100 text-gray-400 font-medium text-sm cursor-default">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
-            App Store <span className="text-xs text-gray-300 ml-1">скоро</span>
+            App Store <span className="text-xs text-gray-300 ml-1">soon</span>
           </div>
           <div className="flex items-center justify-center gap-2 h-11 rounded-xl bg-gray-100 text-gray-400 font-medium text-sm cursor-default">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814 13.793 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893 2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199 2.302 2.302a1 1 0 0 1 0 1.38l-1.996 1.996L15.7 12.882l2-2.374zM5.864 2.658 16.8 8.99l-2.302 2.302L5.864 2.658z"/></svg>
-            Google Play <span className="text-xs text-gray-300 ml-1">скоро</span>
+            Google Play <span className="text-xs text-gray-300 ml-1">soon</span>
           </div>
         </div>
 
-        <p className="text-base font-medium text-gray-700 mb-4">Подпишитесь, чтобы следить за новостями</p>
+        <p className="text-base font-medium text-gray-700 mb-4">Follow us for updates</p>
         <div className="flex flex-wrap items-center gap-3">
           <a href="https://x.com/OpenAcademyAI" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all text-sm font-medium">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
@@ -106,7 +106,7 @@ const WaitlistDoneView: React.FC = () => {
           </a>
           <a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all text-sm font-medium">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
-            Поддержка
+            Support
           </a>
         </div>
       </div>
