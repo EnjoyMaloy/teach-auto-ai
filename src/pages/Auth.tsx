@@ -354,17 +354,17 @@ const Auth: React.FC = () => {
             <>
               <img src={BetaMascot} alt="" className="w-36 h-36 mb-4 mx-auto" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900 mb-3">
-                Идёт закрытое бета-тестирование
+                Closed beta testing in progress
               </h1>
               <p className="text-sm text-gray-500 mb-2">
-                Мы открываем доступ постепенно, чтобы обеспечить лучший опыт для каждого пользователя.
+                We're opening access gradually to ensure the best experience for every user.
               </p>
               <div className="flex items-center gap-2 text-sm text-gray-400 mb-8">
                 <Users className="w-4 h-4" />
-                <span>В очереди <span className="font-medium text-gray-600">{queueCount}</span> человек</span>
+                <span>In queue: <span className="font-medium text-gray-600">{queueCount}</span> people</span>
               </div>
               <Button onClick={() => setStep('waitlist-survey')} className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium">
-                Получить ранний доступ
+                Get early access
               </Button>
             </>
           )}
@@ -374,10 +374,10 @@ const Auth: React.FC = () => {
             <>
               <button onClick={() => setStep('waitlist-info')} className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 transition-colors mb-4">
                 <ArrowLeft className="w-4 h-4" />
-                Назад
+                Back
               </button>
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
-                Как вы планируете использовать OA Studio?
+                How do you plan to use OA Studio?
               </h2>
               <div className="space-y-3 mt-8 mb-6">
                 {SURVEY_OPTIONS.map((option) => (
@@ -396,7 +396,7 @@ const Auth: React.FC = () => {
                 ))}
               </div>
               <Button onClick={() => setStep('waitlist-done')} className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium" disabled={!selectedSurveyOption}>
-                Отправить
+                Submit
               </Button>
             </>
           )}
