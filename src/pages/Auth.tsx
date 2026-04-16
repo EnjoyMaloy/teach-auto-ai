@@ -332,7 +332,7 @@ const Auth: React.FC = () => {
               <p className="text-sm text-gray-500 mb-1">
                 Мы выдаём доступ постепенно. В приоритете — активные участники сообщества, авторы и эксперты. Уведомим вас по email или в Telegram.
               </p>
-              <Separator className="my-6" />
+              <div className="w-full h-px bg-gray-200 my-6" />
               <p className="text-base font-medium text-gray-700 mb-4">Попробуйте наше приложение с курсами</p>
               <div className="grid grid-cols-2 gap-3 mb-2">
                 <a href="https://learn.open-academy.app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-11 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-medium text-sm transition-all">
