@@ -60,6 +60,7 @@ const Auth: React.FC = () => {
     { id: 'create', label: 'Создавать курсы для своей аудитории' },
     { id: 'business', label: 'Обучать сотрудников в компании' },
     { id: 'personal', label: 'Структурировать свои знания' },
+    { id: 'publish', label: 'Публиковать курсы в Open Academy и зарабатывать' },
     { id: 'explore', label: 'Просто хочу посмотреть, что это' },
   ];
 
@@ -297,7 +298,7 @@ const Auth: React.FC = () => {
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
                 Как вы планируете использовать OA Studio?
               </h2>
-              <div className="space-y-3 mb-6">
+              <div className="space-y-3 mt-8 mb-6">
                 {SURVEY_OPTIONS.map((option) => (
                   <button
                     key={option.id}
