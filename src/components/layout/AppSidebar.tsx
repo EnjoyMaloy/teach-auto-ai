@@ -223,7 +223,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
     <Sidebar variant="floating">
       {/* Header — Logo + Collapse */}
       <SidebarHeader className="p-4 flex flex-row items-center justify-between">
-        <AcademyLogo className="h-6" />
+        <AcademyLogo className="h-4" />
         <SidebarTrigger className="size-8 text-muted-foreground hover:text-foreground" />
       </SidebarHeader>
 
