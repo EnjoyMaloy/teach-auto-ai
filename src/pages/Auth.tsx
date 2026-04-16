@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Loader2, Send, Check, ArrowLeft, Mail, Clock, Users } from 'lucide-react';
+import { Loader2, Send, Check, ArrowLeft, Mail, Clock, Users, ExternalLink } from 'lucide-react';
 import { z } from 'zod';
 import {
   InputOTP,
@@ -332,11 +332,15 @@ const Auth: React.FC = () => {
               <p className="text-sm text-gray-500 mb-1">
                 Мы отправим уведомление на ваш email или в Telegram, как только дадим вам доступ.
               </p>
-              <p className="text-xs text-gray-400 mt-2 mb-6">
-                Обычно это занимает несколько дней
-              </p>
-              <Button onClick={() => { window.location.href = 'https://learn.open-academy.app'; }} className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium">
-                Перейти в Академию
+              <div className="flex items-center gap-3 text-sm text-gray-500 mb-8">
+                <span>Следите за нами:</span>
+                <a href="https://x.com/openacademyapp" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">X</a>
+                <span className="text-gray-300">·</span>
+                <a href="https://t.me/openacademyapp" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Telegram</a>
+              </div>
+              <Button onClick={() => { window.location.href = 'https://learn.open-academy.app'; }} className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium flex items-center justify-center gap-2">
+                Открыть Open Academy
+                <ExternalLink className="w-4 h-4" />
               </Button>
             </>
           )}
