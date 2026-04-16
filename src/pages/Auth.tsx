@@ -333,7 +333,7 @@ const Auth: React.FC = () => {
                 Мы выдаём доступ постепенно. В приоритете — активные участники сообщества, авторы и эксперты. Уведомим вас по email или в Telegram.
               </p>
               <div className="w-full h-px bg-gray-200 my-6" />
-              <p className="text-base font-medium text-gray-700 mb-4">Попробуйте наше приложение с курсами</p>
+              <p className="text-base font-medium text-gray-700 mb-4">А пока попробуйте наше приложение с курсами</p>
               <div className="grid grid-cols-2 gap-3 mb-2">
                 <a href="https://learn.open-academy.app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-11 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-medium text-sm transition-all">
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
