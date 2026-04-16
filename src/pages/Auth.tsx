@@ -19,6 +19,7 @@ const authIllustration = '/auth-illustration.jpg';
 import Logo from '@/assets/Logo.svg';
 import TelegramIconSvg from '@/assets/telegram-icon.svg';
 import WaitlistSuccessIcon from '@/assets/waitlist-success.svg';
+import BetaMascot from '@/assets/beta-mascot.svg';
 
 const GoogleIcon = () => (
   <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -273,6 +274,7 @@ const Auth: React.FC = () => {
           {/* ====== WAITLIST INFO ====== */}
           {step === 'waitlist-info' && (
             <>
+              <img src={BetaMascot} alt="" className="w-24 h-24 mb-4" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900 mb-3">
                 Идёт закрытое бета-тестирование
               </h1>
