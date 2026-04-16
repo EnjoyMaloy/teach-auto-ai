@@ -329,11 +329,7 @@ const Auth: React.FC = () => {
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3">
                 Спасибо, вы в очереди!
               </h2>
-              <p className="text-sm text-gray-500 mb-1">
-                Мы отправим уведомление на ваш email или в Telegram, как только дадим вам доступ.
-              </p>
-              <p className="text-base font-medium text-gray-700 mt-6 mb-1">Попробуйте наше приложение с курсами</p>
-              <p className="text-sm text-gray-400 mb-4">Учитесь и вдохновляйтесь, пока ждёте доступ к Студии</p>
+              <p className="text-base font-medium text-gray-700 mt-6 mb-4">Попробуйте наше приложение с курсами</p>
               <div className="grid grid-cols-2 gap-3 mb-2">
                 <a href="https://learn.open-academy.app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-11 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-medium text-sm transition-all">
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
