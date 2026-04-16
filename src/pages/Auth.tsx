@@ -332,10 +332,26 @@ const Auth: React.FC = () => {
               <p className="text-sm text-gray-500 mb-1">
                 Мы отправим уведомление на ваш email или в Telegram, как только дадим вам доступ.
               </p>
-              <Button onClick={() => { window.location.href = 'https://learn.open-academy.app'; }} className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium flex items-center justify-center gap-2 mb-6">
-                Открыть Open Academy
-                <ExternalLink className="w-4 h-4" />
-              </Button>
+              <div className="grid grid-cols-2 gap-3 mb-2">
+                <a href="https://learn.open-academy.app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-11 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-medium text-sm transition-all">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  WEB
+                </a>
+                <a href="https://t.me/OpenAcademyBot/app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-11 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-medium text-sm transition-all">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="m20.665 3.717-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"/></svg>
+                  TMA
+                </a>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="flex items-center justify-center gap-2 h-11 rounded-xl bg-gray-100 text-gray-400 font-medium text-sm cursor-default">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+                  App Store <span className="text-xs text-gray-300 ml-1">скоро</span>
+                </div>
+                <div className="flex items-center justify-center gap-2 h-11 rounded-xl bg-gray-100 text-gray-400 font-medium text-sm cursor-default">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814 13.793 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893 2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199 2.302 2.302a1 1 0 0 1 0 1.38l-1.996 1.996L15.7 12.882l2-2.374zM5.864 2.658 16.8 8.99l-2.302 2.302L5.864 2.658z"/></svg>
+                  Google Play <span className="text-xs text-gray-300 ml-1">скоро</span>
+                </div>
+              </div>
               <p className="text-base font-medium text-gray-700 mb-1">Подпишитесь, чтобы следить за новостями</p>
               <p className="text-sm text-gray-400 mb-4">Мы расскажем, когда откроем доступ</p>
               <div className="flex flex-wrap items-center gap-3">
