@@ -295,7 +295,7 @@ const Auth: React.FC = () => {
                 Назад
               </button>
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
-                Зачем вам OA Studio?
+                Как вы планируете использовать OA Studio?
               </h2>
               <p className="text-sm text-gray-500 mb-6">
                 Создавайте курсы раньше всех и формируйте будущее платформы
