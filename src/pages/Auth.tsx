@@ -137,11 +137,11 @@ const Auth: React.FC = () => {
   const queueCount = useMemo(() => Math.floor(Math.random() * 300) + 140, []);
 
   const SURVEY_OPTIONS = [
-    { id: 'publish', label: 'Публиковать курсы в Open Academy и зарабатывать' },
-    { id: 'create', label: 'Создавать курсы для своей аудитории' },
-    { id: 'business', label: 'Обучать сотрудников в компании' },
-    { id: 'personal', label: 'Структурировать свои знания' },
-    { id: 'explore', label: 'Просто хочу посмотреть, что это' },
+    { id: 'publish', label: 'Publish courses on Open Academy and earn' },
+    { id: 'create', label: 'Create courses for my audience' },
+    { id: 'business', label: 'Train employees in a company' },
+    { id: 'personal', label: 'Structure my knowledge' },
+    { id: 'explore', label: 'Just want to see what it is' },
   ];
 
   const validateEmail = (): boolean => {
@@ -159,39 +159,39 @@ const Auth: React.FC = () => {
     setIsLoading(true);
     const { error } = await signInWithMagicLink(email);
     setIsLoading(false);
-    if (error) { toast.error('Ошибка отправки кода: ' + error.message); return; }
+    if (error) { toast.error('Error sending code: ' + error.message); return; }
     setStep('email-code');
     setEmailCode('');
-    toast.success('Код отправлен на почту!');
+    toast.success('Code sent to your email!');
   };
 
   const handleVerifyEmailCode = async () => {
-    if (emailCode.length < 4) { toast.error('Введите 4-значный код'); return; }
+    if (emailCode.length < 4) { toast.error('Enter the 4-digit code'); return; }
     setIsLoading(true);
     const { error } = await verifyEmailOtp(email, emailCode);
     setIsLoading(false);
-    if (error) { toast.error('Неверный код: ' + error.message); return; }
-    toast.success('Вход выполнен!');
+    if (error) { toast.error('Invalid code: ' + error.message); return; }
+    toast.success('Signed in!');
   };
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
     const result = await lovable.auth.signInWithOAuth('google', { redirect_uri: window.location.origin });
-    if (result.error) { toast.error('Ошибка входа через Google: ' + result.error.message); setIsGoogleLoading(false); }
+    if (result.error) { toast.error('Google sign-in error: ' + result.error.message); setIsGoogleLoading(false); }
   };
 
   const handleTelegramStart = () => setStep('telegram-username');
 
   const handleTelegramUsername = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!tgUsername.trim()) { toast.error('Введите username'); return; }
-    // TODO: вызвать edge function для отправки кода в ТГ бот
-    toast.success('Код отправлен в Telegram-бот!');
+    if (!tgUsername.trim()) { toast.error('Enter your username'); return; }
+    toast.success('Code sent to Telegram bot!');
+    setStep('telegram-code');
     setStep('telegram-code');
   };
 
   const handleTelegramCode = () => {
-    if (tgCode.length < 4) { toast.error('Введите 4-значный код'); return; }
+    if (tgCode.length < 4) { toast.error('Enter the 4-digit code'); return; }
     setStep('waitlist-info');
   };
 
