@@ -249,13 +249,13 @@ const Auth: React.FC = () => {
           {step === 'telegram-username' && (
             <>
               <button type="button" onClick={goBack} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-6 transition-colors">
-                <ArrowLeft className="w-4 h-4" /> Назад
+                <ArrowLeft className="w-4 h-4" /> Back
               </button>
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-full bg-[#2AABEE] flex items-center justify-center text-white"><TelegramIcon /></div>
-                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Вход через Telegram</h2>
+                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Sign in with Telegram</h2>
               </div>
-              <p className="text-sm text-gray-500 mb-6">Введите ваш Telegram username, чтобы мы отправили код подтверждения в бот</p>
+              <p className="text-sm text-gray-500 mb-6">Enter your Telegram username so we can send a verification code to the bot</p>
               <form onSubmit={handleTelegramUsername} className="space-y-4">
                 <div className="space-y-2">
                   <div className="relative">
@@ -264,11 +264,11 @@ const Auth: React.FC = () => {
                   </div>
                 </div>
                 <Button type="submit" className="w-full h-11 bg-[#2AABEE] hover:bg-[#229ED9] text-white font-medium">
-                  Отправить код
+                  Send code
                 </Button>
               </form>
               <p className="text-center text-xs text-gray-400 mt-4">
-                Если вы не использовали наш Telegram бот, сначала <a href="https://t.me/nutsfarm_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">откройте его</a> и нажмите <span className="font-mono bg-gray-100 px-1 py-0.5 rounded text-gray-500 text-[10px]">/start</span>
+                If you haven't used our Telegram bot, first <a href="https://t.me/nutsfarm_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">open it</a> and tap <span className="font-mono bg-gray-100 px-1 py-0.5 rounded text-gray-500 text-[10px]">/start</span>
               </p>
             </>
           )}
@@ -277,14 +277,14 @@ const Auth: React.FC = () => {
           {step === 'telegram-code' && (
             <>
               <button type="button" onClick={() => setStep('telegram-username')} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-6 transition-colors">
-                <ArrowLeft className="w-4 h-4" /> Назад
+                <ArrowLeft className="w-4 h-4" /> Back
               </button>
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-full bg-[#2AABEE] flex items-center justify-center text-white"><TelegramIcon /></div>
-                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Введите код</h2>
+                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Enter code</h2>
               </div>
               <p className="text-sm text-gray-500 mb-6">
-                Откройте бота <a href="https://t.me/nutsfarm_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] font-medium hover:underline">@openacademy</a> — код придёт автоматически
+                Open the bot <a href="https://t.me/nutsfarm_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] font-medium hover:underline">@openacademy</a> — the code will arrive automatically
               </p>
 
               <div className="flex justify-center gap-3 mb-6">
@@ -299,12 +299,12 @@ const Auth: React.FC = () => {
               </div>
 
               <Button type="button" onClick={handleTelegramCode} className="w-full h-11 bg-[#2AABEE] hover:bg-[#229ED9] text-white font-medium" disabled={tgCode.length < 4}>
-                Подтвердить
+                Confirm
               </Button>
 
               <p className="text-center text-xs text-gray-400 mt-4">
-                Код действует 4 часа. Не пришёл? Отправьте боту <span className="font-mono bg-gray-100 px-1 py-0.5 rounded text-gray-500 text-[10px]">/start</span> и попробуйте заново.{' '}
-                Если не помогло — <a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">напишите в поддержку</a>
+                Code is valid for 4 hours. Didn't receive it? Send <span className="font-mono bg-gray-100 px-1 py-0.5 rounded text-gray-500 text-[10px]">/start</span> to the bot and try again.{' '}
+                If that doesn't help — <a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">contact support</a>
               </p>
 
             </>
