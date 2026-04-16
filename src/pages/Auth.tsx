@@ -52,6 +52,17 @@ const Auth: React.FC = () => {
   const [tgUsername, setTgUsername] = useState('');
   const [tgCode, setTgCode] = useState('');
 
+  // Waitlist state
+  const [selectedSurveyOption, setSelectedSurveyOption] = useState<string | null>(null);
+  const queueCount = useMemo(() => Math.floor(Math.random() * 300) + 140, []);
+
+  const SURVEY_OPTIONS = [
+    { id: 'create', label: 'Создавать курсы для своей аудитории' },
+    { id: 'business', label: 'Обучать сотрудников в компании' },
+    { id: 'personal', label: 'Структурировать свои знания' },
+    { id: 'explore', label: 'Просто хочу посмотреть, что это' },
+  ];
+
   const validateEmail = (): boolean => {
     const newErrors: { email?: string } = {};
     try { emailSchema.parse(email); } catch (e) {
