@@ -111,8 +111,7 @@ const Auth: React.FC = () => {
 
   const handleTelegramCode = () => {
     if (tgCode.length < 4) { toast.error('Введите 4-значный код'); return; }
-    // TODO: верифицировать код через edge function
-    navigate('/waitlist');
+    setStep('waitlist-info');
   };
 
   const goBack = () => {
