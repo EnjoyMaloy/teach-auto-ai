@@ -112,7 +112,7 @@ const Auth: React.FC = () => {
 
   return (
     <main className="min-h-screen flex flex-col lg:flex-row bg-white relative">
-      <div className="absolute top-4 left-4 sm:top-6 sm:left-8 lg:left-16 xl:left-24 flex items-center gap-3 z-10">
+      <div className="absolute top-6 left-4 sm:top-8 sm:left-8 lg:left-16 xl:left-24 flex items-center gap-3 z-10">
         <img src={Logo} alt="Academy Logo" className="h-6 sm:h-8" />
       </div>
 
