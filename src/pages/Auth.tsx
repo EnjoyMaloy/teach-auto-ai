@@ -274,7 +274,7 @@ const Auth: React.FC = () => {
           {/* ====== WAITLIST INFO ====== */}
           {step === 'waitlist-info' && (
             <>
-              <img src={BetaMascot} alt="" className="w-24 h-24 mb-4" />
+              <img src={BetaMascot} alt="" className="w-36 h-36 mb-4 mx-auto" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900 mb-3">
                 Идёт закрытое бета-тестирование
               </h1>
