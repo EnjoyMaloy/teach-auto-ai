@@ -416,7 +416,7 @@ const Auth: React.FC = () => {
             <img src={authIllustration} alt="Creative workspace" className="absolute inset-0 w-full h-full object-cover" fetchPriority="high" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
             <div className="absolute bottom-12 left-12 right-12">
-              <h2 className="text-3xl font-semibold text-white leading-tight">Превращай идеи<br />в интерактивные курсы</h2>
+              <h2 className="text-3xl font-semibold text-white leading-tight">Turn ideas<br />into interactive courses</h2>
             </div>
           </div>
         </div>
