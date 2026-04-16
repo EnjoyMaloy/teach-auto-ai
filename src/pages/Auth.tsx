@@ -326,9 +326,12 @@ const Auth: React.FC = () => {
               <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mb-6">
                 <Check className="w-7 h-7 text-green-600" />
               </div>
-              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3">
-                Спасибо, вы в очереди!
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
+                Спасибо, вы в списке ожидания!
               </h2>
+              <p className="text-sm text-gray-500 mb-1">
+                Мы выдаём доступ постепенно. В приоритете — активные участники сообщества, авторы и эксперты. Уведомим вас по email или в Telegram.
+              </p>
               <p className="text-base font-medium text-gray-700 mt-6 mb-4">Попробуйте наше приложение с курсами</p>
               <div className="grid grid-cols-2 gap-3 mb-2">
                 <a href="https://learn.open-academy.app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-11 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-medium text-sm transition-all">
