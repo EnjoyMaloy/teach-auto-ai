@@ -411,7 +411,7 @@ const Auth: React.FC = () => {
 
       {/* Right side */}
       <div className="hidden lg:flex lg:flex-1 p-6">
-        <div className="relative w-full h-full rounded-[26px] p-[2px]" style={{ background: '#A66CFF' }}>
+        <div className="relative w-full h-full rounded-[26px] p-[2px]" style={{ background: 'linear-gradient(to bottom right, #C9A0FF, #A66CFF, #7B3FE4)' }}>
           <div className="relative w-full h-full rounded-3xl overflow-hidden">
             <img src={authIllustration} alt="Creative workspace" className="absolute inset-0 w-full h-full object-cover" fetchPriority="high" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
