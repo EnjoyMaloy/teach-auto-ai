@@ -282,7 +282,7 @@ const Auth: React.FC = () => {
                 <span>В очереди <span className="font-medium text-gray-600">{queueCount}</span> человек</span>
               </div>
               <Button onClick={() => setStep('waitlist-survey')} className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium">
-                Записаться в очередь
+                Получить ранний доступ
               </Button>
             </>
           )}
