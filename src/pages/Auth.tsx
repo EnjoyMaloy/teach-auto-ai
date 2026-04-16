@@ -326,7 +326,7 @@ const Auth: React.FC = () => {
           {/* ====== WAITLIST DONE ====== */}
           {step === 'waitlist-done' && (
             <>
-              <img src={WaitlistSuccessIcon} alt="" className="w-20 h-20 mb-6" />
+              <img src={WaitlistSuccessIcon} alt="" className="w-36 h-36 mb-4 mx-auto" />
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
                 Спасибо, вы в списке ожидания!
               </h2>
