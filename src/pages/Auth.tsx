@@ -57,10 +57,10 @@ const Auth: React.FC = () => {
   const queueCount = useMemo(() => Math.floor(Math.random() * 300) + 140, []);
 
   const SURVEY_OPTIONS = [
+    { id: 'publish', label: 'Публиковать курсы в Open Academy и зарабатывать' },
     { id: 'create', label: 'Создавать курсы для своей аудитории' },
     { id: 'business', label: 'Обучать сотрудников в компании' },
     { id: 'personal', label: 'Структурировать свои знания' },
-    { id: 'publish', label: 'Публиковать курсы в Open Academy и зарабатывать' },
     { id: 'explore', label: 'Просто хочу посмотреть, что это' },
   ];
 
