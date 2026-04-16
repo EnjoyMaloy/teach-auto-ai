@@ -18,6 +18,7 @@ import {
 const authIllustration = '/auth-illustration.jpg';
 import Logo from '@/assets/Logo.svg';
 import TelegramIconSvg from '@/assets/telegram-icon.svg';
+import WaitlistSuccessIcon from '@/assets/waitlist-success.svg';
 
 const GoogleIcon = () => (
   <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -323,9 +324,7 @@ const Auth: React.FC = () => {
           {/* ====== WAITLIST DONE ====== */}
           {step === 'waitlist-done' && (
             <>
-              <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mb-6">
-                <Check className="w-7 h-7 text-green-600" />
-              </div>
+              <img src={WaitlistSuccessIcon} alt="" className="w-14 h-14 mb-6" />
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
                 Спасибо, вы в списке ожидания!
               </h2>
