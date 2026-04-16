@@ -126,11 +126,13 @@ const Waitlist: React.FC = () => {
 
       {/* Right side */}
       <div className="hidden lg:flex lg:flex-1 p-6">
-        <div className="relative w-full h-full rounded-3xl overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
-          <img src={authIllustration} alt="Creative workspace" className="absolute inset-0 w-full h-full object-cover" fetchPriority="high" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-          <div className="absolute bottom-12 left-12 right-12">
-            <h2 className="text-3xl font-semibold text-white leading-tight">Превращайте идеи<br />в обучающие курсы</h2>
+        <div className="relative w-full h-full rounded-[26px] p-[2px] bg-gradient-to-br from-indigo-300/60 via-blue-200/30 to-purple-300/50">
+          <div className="relative w-full h-full rounded-3xl overflow-hidden">
+            <img src={authIllustration} alt="Creative workspace" className="absolute inset-0 w-full h-full object-cover" fetchPriority="high" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+            <div className="absolute bottom-12 left-12 right-12">
+              <h2 className="text-3xl font-semibold text-white leading-tight">Превращайте идеи<br />в обучающие курсы</h2>
+            </div>
           </div>
         </div>
       </div>
