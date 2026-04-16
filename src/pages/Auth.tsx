@@ -271,11 +271,8 @@ const Auth: React.FC = () => {
           {/* ====== WAITLIST INFO ====== */}
           {step === 'waitlist-info' && (
             <>
-              <div className="w-14 h-14 rounded-2xl bg-gray-900 flex items-center justify-center mb-6">
-                <Clock className="w-7 h-7 text-white" />
-              </div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900 mb-3">
-                Студия в закрытом бета
+                Идёт закрытое бета-тестирование
               </h1>
               <p className="text-sm text-gray-500 mb-2">
                 Мы открываем доступ постепенно, чтобы обеспечить лучший опыт для каждого пользователя.
