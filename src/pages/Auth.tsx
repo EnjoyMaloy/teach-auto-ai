@@ -326,7 +326,7 @@ const Auth: React.FC = () => {
           {/* ====== WAITLIST DONE ====== */}
           {step === 'waitlist-done' && (
             <>
-              <div className="animate-fade-in" style={{ animationDelay: '0ms' }}>
+              <div>
                 <img src={WaitlistSuccessIcon} alt="" className="w-36 h-36 mb-4 mx-auto" />
               </div>
               <div className="animate-fade-in" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
