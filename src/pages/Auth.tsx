@@ -407,6 +407,16 @@ const Auth: React.FC = () => {
           )}
 
         </div>
+
+        {/* Language switcher stub */}
+        <div className="absolute bottom-6 left-4 sm:left-8 lg:left-16 xl:left-24">
+          <button className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-600 transition-colors cursor-default" disabled>
+            <Globe className="w-4 h-4" />
+            <span className="font-medium text-gray-500">EN</span>
+            <span className="text-gray-300">|</span>
+            <span className="text-gray-400">RU</span>
+          </button>
+        </div>
       </div>
 
       {/* Right side */}
