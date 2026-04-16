@@ -314,14 +314,14 @@ const Auth: React.FC = () => {
           {step === 'email-code' && (
             <>
               <button type="button" onClick={() => { setStep('main'); setEmailCode(''); }} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-6 transition-colors">
-                <ArrowLeft className="w-4 h-4" /> Назад
+                <ArrowLeft className="w-4 h-4" /> Back
               </button>
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white"><Mail className="w-5 h-5" /></div>
-                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Введите код</h2>
+                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Enter code</h2>
               </div>
               <p className="text-sm text-gray-500 mb-6">
-                Мы отправили 4-значный код на <span className="font-medium text-gray-700">{email}</span>
+                We sent a 4-digit code to <span className="font-medium text-gray-700">{email}</span>
               </p>
 
               <div className="flex justify-center gap-3 mb-6">
@@ -336,16 +336,16 @@ const Auth: React.FC = () => {
               </div>
 
               <Button type="button" onClick={handleVerifyEmailCode} className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium" disabled={emailCode.length < 4 || isLoading}>
-                {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Проверка...</> : 'Подтвердить'}
+                {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Verifying...</> : 'Confirm'}
               </Button>
 
               <p className="text-center text-xs text-gray-400 mt-4">
-                Код не пришёл? Проверьте папку «Спам».{' '}
-                Если не помогло — <a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">напишите в поддержку</a>
+                Didn't receive the code? Check your spam folder.{' '}
+                If that doesn't help — <a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">contact support</a>
               </p>
 
               <button type="button" onClick={() => { setStep('main'); setEmailCode(''); }} className="block mx-auto text-sm text-gray-500 hover:text-gray-700 hover:underline mt-2">
-                Отправить на другой email
+                Send to a different email
               </button>
             </>
           )}
