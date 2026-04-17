@@ -197,6 +197,8 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
     if (fileRef.current) fileRef.current.value = '';
   };
 
+  const titleColorPresets = ['#ffffff', '#000000', '#fef08a', '#fde68a', '#fca5a5', '#86efac', '#93c5fd', '#c4b5fd'];
+
   return (
     <div className="space-y-3">
       <p className="text-sm font-medium text-foreground">Обложка</p>
