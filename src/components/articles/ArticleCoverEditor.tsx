@@ -38,6 +38,8 @@ interface ArticleCoverEditorProps {
   articleId: string;
   title?: string;
   titleEn?: string;
+  titleColor?: string;
+  onTitleColorChange?: (color: string) => void;
   authorName?: string;
   authorAvatar?: string;
   onUpdate: (gradient: string | null, image: string | null) => void;
@@ -137,6 +139,8 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
   articleId,
   title,
   titleEn,
+  titleColor = '#ffffff',
+  onTitleColorChange,
   authorName,
   authorAvatar,
   onUpdate,
@@ -251,8 +255,8 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
               {/* Bottom info */}
               <div className="px-4 pb-5 pt-0 space-y-2.5">
                 <h3
-                  className="text-white font-semibold text-lg leading-tight text-center line-clamp-2"
-                  style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif' }}
+                  className="font-semibold text-lg leading-tight text-center line-clamp-2"
+                  style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif', color: titleColor }}
                 >
                   {cardTitle}
                 </h3>
