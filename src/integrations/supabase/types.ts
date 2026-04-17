@@ -46,6 +46,7 @@ export type Database = {
           created_at: string
           id: string
           title: string
+          title_color: string | null
           title_en: string | null
           translation_stale: boolean
           updated_at: string
@@ -61,6 +62,7 @@ export type Database = {
           created_at?: string
           id?: string
           title?: string
+          title_color?: string | null
           title_en?: string | null
           translation_stale?: boolean
           updated_at?: string
@@ -76,6 +78,7 @@ export type Database = {
           created_at?: string
           id?: string
           title?: string
+          title_color?: string | null
           title_en?: string | null
           translation_stale?: boolean
           updated_at?: string

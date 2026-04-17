@@ -38,6 +38,8 @@ interface ArticleCoverEditorProps {
   articleId: string;
   title?: string;
   titleEn?: string;
+  titleColor?: string;
+  onTitleColorChange?: (color: string) => void;
   authorName?: string;
   authorAvatar?: string;
   onUpdate: (gradient: string | null, image: string | null) => void;
@@ -137,6 +139,8 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
   articleId,
   title,
   titleEn,
+  titleColor = '#ffffff',
+  onTitleColorChange,
   authorName,
   authorAvatar,
   onUpdate,
@@ -192,6 +196,8 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
     toast.success('Обложка загружена');
     if (fileRef.current) fileRef.current.value = '';
   };
+
+  const titleColorPresets = ['#ffffff', '#000000', '#fef08a', '#fde68a', '#fca5a5', '#86efac', '#93c5fd', '#c4b5fd'];
 
   return (
     <div className="space-y-3">
@@ -251,8 +257,8 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
               {/* Bottom info */}
               <div className="px-4 pb-5 pt-0 space-y-2.5">
                 <h3
-                  className="text-white font-semibold text-lg leading-tight text-center line-clamp-2"
-                  style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif' }}
+                  className="font-semibold text-lg leading-tight text-center line-clamp-2"
+                  style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif', color: titleColor }}
                 >
                   {cardTitle}
                 </h3>
@@ -334,6 +340,38 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
           </PopoverContent>
         </Popover>
       </div>
+
+      {/* Title color picker */}
+      {onTitleColorChange && (
+        <div className="space-y-2 pt-2">
+          <p className="text-sm font-medium text-foreground">Цвет заголовка</p>
+          <div className="flex items-center gap-2 flex-wrap">
+            {titleColorPresets.map((c) => (
+              <button
+                key={c}
+                onClick={() => onTitleColorChange(c)}
+                className={cn(
+                  'w-7 h-7 rounded-lg border-2 transition-all hover:scale-110',
+                  titleColor === c ? 'border-primary ring-1 ring-primary' : 'border-border'
+                )}
+                style={{ backgroundColor: c }}
+              />
+            ))}
+            <label
+              className="w-7 h-7 rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-muted-foreground/60 cursor-pointer flex items-center justify-center"
+              style={{ backgroundColor: titleColor }}
+            >
+              <input
+                type="color"
+                value={titleColor}
+                onChange={(e) => onTitleColorChange(e.target.value)}
+                className="sr-only"
+              />
+            </label>
+            <span className="text-xs text-muted-foreground font-mono ml-1">{titleColor}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
