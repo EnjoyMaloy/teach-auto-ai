@@ -268,16 +268,16 @@ const ArticleEditor: React.FC<{
               ARTICLE_GRADIENTS[Math.abs(article.id.charCodeAt(0)) % ARTICLE_GRADIENTS.length];
             return (
               <div
-                className="w-full rounded-2xl overflow-hidden border border-border shadow-md flex items-center gap-4 p-5"
-                style={{ background: gradient }}
+                className="w-full rounded-2xl overflow-hidden border border-border shadow-md flex items-center gap-4 px-8"
+                style={{ background: gradient, aspectRatio: '4 / 1' }}
               >
                 <h3
-                  className="flex-1 text-white font-semibold text-2xl leading-tight line-clamp-3"
+                  className="flex-1 text-white font-semibold text-3xl leading-tight line-clamp-3"
                   style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif' }}
                 >
                   {displayTitle || 'Новая инструкция'}
                 </h3>
-                <div className="w-28 h-28 shrink-0 flex items-center justify-center">
+                <div className="h-[80%] aspect-square shrink-0 flex items-center justify-center">
                   {coverImage && (
                     <img
                       src={coverImage}
