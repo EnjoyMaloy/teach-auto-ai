@@ -261,6 +261,7 @@ const ArticleEditor: React.FC<{
           <h2 className="text-xl font-semibold text-foreground">Настройки инструкции</h2>
 
           {/* Banner preview */}
+          <p className="text-sm font-medium text-foreground">Шапка</p>
           {(() => {
             const gradient =
               coverGradient ||
