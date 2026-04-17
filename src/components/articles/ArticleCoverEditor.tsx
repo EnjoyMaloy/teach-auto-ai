@@ -250,7 +250,10 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
 
               {/* Bottom info */}
               <div className="px-4 pb-5 pt-0 space-y-2.5">
-                <h3 className="text-white font-semibold text-lg leading-tight text-center line-clamp-2">
+                <h3
+                  className="text-white font-semibold text-lg leading-tight text-center line-clamp-2"
+                  style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif' }}
+                >
                   {cardTitle}
                 </h3>
                 <div className="flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3.5 py-2 mx-auto w-fit">
