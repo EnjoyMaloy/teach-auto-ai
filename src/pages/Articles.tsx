@@ -563,7 +563,10 @@ const Articles: React.FC = () => {
 
                 {/* Bottom info */}
                 <div className="px-4 pb-4 pt-0 space-y-2">
-                  <h3 className="text-white font-semibold text-base leading-tight text-center line-clamp-2">
+                  <h3
+                    className="text-white font-semibold text-base leading-tight text-center line-clamp-2"
+                    style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif' }}
+                  >
                     {article.title || 'Новая инструкция'}
                   </h3>
                   <div className="flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 mx-auto w-fit">
