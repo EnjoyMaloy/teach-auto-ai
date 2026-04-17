@@ -206,7 +206,7 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
           <div key={label} className="flex-1">
             <div
               className="w-full rounded-2xl overflow-hidden relative border border-border shadow-md"
-              style={{ background: gradient || ARTICLE_GRADIENTS[0] }}
+              style={{ background: gradient || ARTICLE_GRADIENTS[Math.abs(articleId.charCodeAt(0)) % ARTICLE_GRADIENTS.length] }}
             >
               {/* Top-right icons */}
               <div className="absolute top-3 right-3 z-20 flex gap-2">
