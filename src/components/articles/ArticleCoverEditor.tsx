@@ -197,7 +197,15 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
     if (fileRef.current) fileRef.current.value = '';
   };
 
-  const titleColorPresets = ['#ffffff', '#000000', '#fef08a', '#fde68a', '#fca5a5', '#86efac', '#93c5fd', '#c4b5fd'];
+  const titleColorPresets = [
+    '#ffffff', '#000000', '#1f2937', '#6b7280',
+    '#fef3c7', '#fde68a', '#fcd34d', '#f59e0b',
+    '#fecaca', '#fca5a5', '#f87171', '#ef4444',
+    '#bbf7d0', '#86efac', '#4ade80', '#22c55e',
+    '#bfdbfe', '#93c5fd', '#60a5fa', '#3b82f6',
+    '#e9d5ff', '#c4b5fd', '#a78bfa', '#8b5cf6',
+    '#fbcfe8', '#f9a8d4', '#f472b6', '#ec4899',
+  ];
 
   return (
     <div className="space-y-3">
@@ -345,20 +353,11 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
       {onTitleColorChange && (
         <div className="space-y-2 pt-2">
           <p className="text-sm font-medium text-foreground">Цвет заголовка</p>
-          <div className="flex items-center gap-2 flex-wrap">
-            {titleColorPresets.map((c) => (
-              <button
-                key={c}
-                onClick={() => onTitleColorChange(c)}
-                className={cn(
-                  'w-7 h-7 rounded-lg border-2 transition-all hover:scale-110',
-                  titleColor === c ? 'border-primary ring-1 ring-primary' : 'border-border'
-                )}
-                style={{ backgroundColor: c }}
-              />
-            ))}
+
+          {/* Custom picker row */}
+          <div className="flex items-center gap-2">
             <label
-              className="w-7 h-7 rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-muted-foreground/60 cursor-pointer flex items-center justify-center"
+              className="w-9 h-9 rounded-lg cursor-pointer block shrink-0 border border-border"
               style={{ backgroundColor: titleColor }}
             >
               <input
@@ -368,7 +367,32 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
                 className="sr-only"
               />
             </label>
-            <span className="text-xs text-muted-foreground font-mono ml-1">{titleColor}</span>
+            <input
+              type="text"
+              value={titleColor}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (/^#[0-9a-fA-F]{0,6}$/.test(v)) onTitleColorChange(v);
+              }}
+              className="flex-1 h-9 rounded-lg border border-border bg-background px-3 text-sm font-mono focus:outline-none focus:border-primary"
+              placeholder="#ffffff"
+            />
+          </div>
+
+          {/* Preset palette */}
+          <div className="grid grid-cols-14 gap-1.5" style={{ gridTemplateColumns: 'repeat(14, minmax(0, 1fr))' }}>
+            {titleColorPresets.map((c) => (
+              <button
+                key={c}
+                onClick={() => onTitleColorChange(c)}
+                className={cn(
+                  'aspect-square rounded-md border-2 transition-all hover:scale-110',
+                  titleColor.toLowerCase() === c.toLowerCase() ? 'border-primary ring-1 ring-primary' : 'border-border/40'
+                )}
+                style={{ backgroundColor: c }}
+                title={c}
+              />
+            ))}
           </div>
         </div>
       )}
