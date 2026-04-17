@@ -272,7 +272,7 @@ const ArticleEditor: React.FC<{
                 style={{ background: gradient, aspectRatio: '4 / 1' }}
               >
                 <h3
-                  className="flex-1 text-white font-semibold text-3xl leading-tight line-clamp-3"
+                  className="flex-1 text-white font-bold text-5xl leading-tight line-clamp-3"
                   style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif' }}
                 >
                   {displayTitle || 'Новая инструкция'}
