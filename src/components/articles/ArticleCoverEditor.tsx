@@ -340,6 +340,38 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
           </PopoverContent>
         </Popover>
       </div>
+
+      {/* Title color picker */}
+      {onTitleColorChange && (
+        <div className="space-y-2 pt-2">
+          <p className="text-sm font-medium text-foreground">Цвет заголовка</p>
+          <div className="flex items-center gap-2 flex-wrap">
+            {titleColorPresets.map((c) => (
+              <button
+                key={c}
+                onClick={() => onTitleColorChange(c)}
+                className={cn(
+                  'w-7 h-7 rounded-lg border-2 transition-all hover:scale-110',
+                  titleColor === c ? 'border-primary ring-1 ring-primary' : 'border-border'
+                )}
+                style={{ backgroundColor: c }}
+              />
+            ))}
+            <label
+              className="w-7 h-7 rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-muted-foreground/60 cursor-pointer flex items-center justify-center"
+              style={{ backgroundColor: titleColor }}
+            >
+              <input
+                type="color"
+                value={titleColor}
+                onChange={(e) => onTitleColorChange(e.target.value)}
+                className="sr-only"
+              />
+            </label>
+            <span className="text-xs text-muted-foreground font-mono ml-1">{titleColor}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
