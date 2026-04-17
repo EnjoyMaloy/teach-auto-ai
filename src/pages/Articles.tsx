@@ -21,6 +21,7 @@ interface Article {
   content_en: string | null;
   cover_gradient: string | null;
   cover_image: string | null;
+  title_color: string | null;
   category: string | null;
   translation_stale: boolean;
   access_type: string;
@@ -70,6 +71,7 @@ const ArticleEditor: React.FC<{
   const [lang, setLang] = useState<'ru' | 'en'>('ru');
   const [coverGradient, setCoverGradient] = useState(article.cover_gradient);
   const [coverImage, setCoverImage] = useState(article.cover_image);
+  const [titleColor, setTitleColor] = useState(article.title_color || '#ffffff');
   const [category, setCategory] = useState(article.category || '');
   const [customCategoryInput, setCustomCategoryInput] = useState('');
   const [translationStale, setTranslationStale] = useState(article.translation_stale);
@@ -143,6 +145,7 @@ const ArticleEditor: React.FC<{
         content_en: htmlEn || null,
         cover_gradient: coverGradient,
         cover_image: coverImage,
+        title_color: titleColor,
         category: category || null,
         translation_stale: newStale,
         access_type: accessType,
@@ -272,8 +275,8 @@ const ArticleEditor: React.FC<{
                 style={{ background: gradient, aspectRatio: '4 / 1' }}
               >
                 <h3
-                  className="flex-1 text-white leading-tight line-clamp-3 font-light text-4xl"
-                  style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif' }}
+                  className="flex-1 leading-tight line-clamp-3 font-light text-4xl"
+                  style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif', color: titleColor }}
                 >
                   {displayTitle || 'Новая инструкция'}
                 </h3>
@@ -296,6 +299,8 @@ const ArticleEditor: React.FC<{
             articleId={article.id}
             title={title}
             titleEn={titleEn}
+            titleColor={titleColor}
+            onTitleColorChange={setTitleColor}
             authorName={user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || ''}
             authorAvatar={user?.user_metadata?.avatar_url || user?.user_metadata?.picture || ''}
             onUpdate={(g, img) => {
@@ -594,8 +599,8 @@ const Articles: React.FC = () => {
                 {/* Bottom info */}
                 <div className="px-4 pb-4 pt-0 space-y-2">
                   <h3
-                    className="text-white font-semibold text-base leading-tight text-center line-clamp-2"
-                    style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif' }}
+                    className="font-semibold text-base leading-tight text-center line-clamp-2"
+                    style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif', color: article.title_color || '#ffffff' }}
                   >
                     {article.title || 'Новая инструкция'}
                   </h3>
