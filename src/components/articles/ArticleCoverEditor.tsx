@@ -8,6 +8,12 @@ import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 export const ARTICLE_GRADIENTS = [
+  'linear-gradient(45deg, #A66CFF 0%, #EDE2FF 100%)',
+  'linear-gradient(45deg, #FF8FB1 0%, #FFE5EC 100%)',
+  'linear-gradient(45deg, #6CC4FF 0%, #E2F3FF 100%)',
+  'linear-gradient(45deg, #6CFFB1 0%, #E2FFE9 100%)',
+  'linear-gradient(45deg, #FFB36C 0%, #FFEFE2 100%)',
+  'linear-gradient(45deg, #FFD86C 0%, #FFF8E2 100%)',
   'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
   'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
   'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
