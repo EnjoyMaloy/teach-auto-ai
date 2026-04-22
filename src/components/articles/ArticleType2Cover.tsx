@@ -160,7 +160,7 @@ const ArticleType2Cover: React.FC<ArticleType2CoverProps> = ({
         'w-full rounded-xl overflow-hidden border border-border shadow-md relative flex flex-col items-center justify-center',
         className
       )}
-      style={{ background: gradient, aspectRatio: '1 / 1' }}
+      style={{ background: gradient }}
     >
       {overlay}
       <div className="w-full flex flex-col items-center justify-center px-4 py-5">
