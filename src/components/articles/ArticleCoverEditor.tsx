@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import ArticleType2Cover from './ArticleType2Cover';
 
 export const ARTICLE_GRADIENTS = [
   'linear-gradient(45deg, #A66CFF 0%, #EDE2FF 100%)',
@@ -45,6 +46,7 @@ interface ArticleCoverEditorProps {
   title?: string;
   titleEn?: string;
   titleColor?: string;
+  coverType?: 'type1' | 'type2';
   onTitleColorChange?: (color: string) => void;
   authorName?: string;
   authorAvatar?: string;
