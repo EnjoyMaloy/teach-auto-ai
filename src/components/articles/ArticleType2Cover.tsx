@@ -50,7 +50,8 @@ const getShadowColor = (gradient: string): string => {
 const SHADOW_OFFSET = 0.06; // 6%
 
 interface MediaFrameProps {
-  size: string; // CSS size (width === height)
+  /** CSS size of the square frame (width === height). */
+  size: string;
   image: string | null;
   placeholder?: React.ReactNode;
   onMediaClick?: () => void;
@@ -58,52 +59,36 @@ interface MediaFrameProps {
 }
 
 /**
- * Renders the (frame + shadow) group, vertically/horizontally centered
- * inside its wrapper. The wrapper accounts for the shadow's offset so the
- * GROUP (not just the front frame) is centered.
+ * Renders the (frame + shadow) group. The wrapper is exactly the size of the
+ * front frame; the shadow extends visibly outside via translate. Use the
+ * `className` on the parent to position/center this group as desired.
  */
 const MediaGroup: React.FC<MediaFrameProps> = ({ size, image, placeholder, onMediaClick, shadow }) => {
-  // The group's effective bounding box has extra space on bottom-left equal to
-  // SHADOW_OFFSET * size. Add equivalent transparent padding on top-right so
-  // that centering the wrapper centers the visual group.
-  const padPct = `${SHADOW_OFFSET * 100}%`;
   return (
-    <div
-      className="relative shrink-0"
-      style={{
-        width: size,
-        height: size,
-        // Compensate so the visual group (frame + shadow) is centered inside this box
-        paddingRight: padPct,
-        paddingTop: padPct,
-        boxSizing: 'content-box',
-      }}
-    >
-      <div className="relative" style={{ width: size, height: size }}>
-        {/* Background frame (offset bottom-left, no tilt) */}
-        <div
-          className="absolute rounded-xl"
-          style={{
-            backgroundColor: shadow,
-            inset: 0,
-            transform: `translate(-${SHADOW_OFFSET * 100}%, ${SHADOW_OFFSET * 100}%)`,
-          }}
-        />
-        {/* Foreground frame (tilted 1deg) */}
-        <div
-          onClick={onMediaClick}
-          className={cn(
-            'absolute inset-0 rounded-xl bg-white overflow-hidden flex items-center justify-center',
-            onMediaClick && 'cursor-pointer'
-          )}
-          style={{ transform: 'rotate(1deg)' }}
-        >
-          {image ? (
-            <img src={image} alt="" className="w-full h-full object-cover" />
-          ) : (
-            placeholder
-          )}
-        </div>
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      {/* Background frame (offset bottom-left, no tilt) */}
+      <div
+        className="absolute rounded-xl"
+        style={{
+          backgroundColor: shadow,
+          inset: 0,
+          transform: `translate(-${SHADOW_OFFSET * 100}%, ${SHADOW_OFFSET * 100}%)`,
+        }}
+      />
+      {/* Foreground frame (tilted 1deg) */}
+      <div
+        onClick={onMediaClick}
+        className={cn(
+          'absolute inset-0 rounded-xl bg-white overflow-hidden flex items-center justify-center',
+          onMediaClick && 'cursor-pointer'
+        )}
+        style={{ transform: 'rotate(1deg)' }}
+      >
+        {image ? (
+          <img src={image} alt="" className="w-full h-full object-cover" />
+        ) : (
+          placeholder
+        )}
       </div>
     </div>
   );
@@ -128,8 +113,9 @@ const ArticleType2Cover: React.FC<ArticleType2CoverProps> = ({
   const shadow = getShadowColor(gradient);
 
   if (variant === 'banner') {
-    // Inner banner content height ≈ 100% (4:1 box). Use a sized media group
-    // so we can center the (frame + shadow) bounding box vertically.
+    // Group bbox = front frame + shadow extending 6% bottom-left.
+    // Group sized 1:1 by banner height. Shift up by half the shadow offset
+    // so the visual GROUP (not just the front frame) is vertically centered.
     return (
       <div
         className={cn(
@@ -150,13 +136,18 @@ const ArticleType2Cover: React.FC<ArticleType2CoverProps> = ({
         >
           {title}
         </h3>
-        <MediaGroup
-          size="78%"
-          image={image}
-          placeholder={placeholder}
-          onMediaClick={onMediaClick}
-          shadow={shadow}
-        />
+        <div
+          className="h-[78%] aspect-square shrink-0"
+          style={{ transform: `translateY(-${(SHADOW_OFFSET * 100) / 2}%)` }}
+        >
+          <MediaGroup
+            size="100%"
+            image={image}
+            placeholder={placeholder}
+            onMediaClick={onMediaClick}
+            shadow={shadow}
+          />
+        </div>
       </div>
     );
   }
@@ -171,18 +162,28 @@ const ArticleType2Cover: React.FC<ArticleType2CoverProps> = ({
       style={{ background: gradient }}
     >
       {overlay}
-      {/* Square media region */}
-      <div className="w-full aspect-square flex items-center justify-center p-5">
-        <MediaGroup
-          size="84%"
-          image={image}
-          placeholder={placeholder}
-          onMediaClick={onMediaClick}
-          shadow={shadow}
-        />
+      {/* Square media region — horizontally center the visual GROUP (frame + shadow).
+          The shadow extends 6% to the bottom-left of the front frame, so we
+          shift the wrapper right by half that amount to center the bbox. */}
+      <div className="w-full aspect-square flex items-center justify-center p-5 pb-2">
+        <div
+          className="aspect-square"
+          style={{
+            width: '84%',
+            transform: `translate(${(SHADOW_OFFSET * 100) / 2}%, -${(SHADOW_OFFSET * 100) / 2}%)`,
+          }}
+        >
+          <MediaGroup
+            size="100%"
+            image={image}
+            placeholder={placeholder}
+            onMediaClick={onMediaClick}
+            shadow={shadow}
+          />
+        </div>
       </div>
-      {/* Title below */}
-      <div className="px-4 pb-5 pt-0">
+      {/* Title below — pulled up closer to the media */}
+      <div className="px-4 pb-5 pt-0 -mt-2">
         <h3
           className="leading-[1.15] line-clamp-3 text-center"
           style={{
