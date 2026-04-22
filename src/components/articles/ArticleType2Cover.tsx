@@ -180,18 +180,22 @@ const ArticleType2Cover: React.FC<ArticleType2CoverProps> = ({
             shadow={shadow}
           />
         </div>
-        {/* Title — reserve up to 3 lines so card height stays constant across RU/EN */}
-        <h3
-          className="leading-[1.15] line-clamp-3 text-center min-h-[3.45em] mt-3 w-full"
-          style={{
-            fontFamily: '"Wix Madefor Display", system-ui, sans-serif',
-            fontWeight: 400,
-            color: titleColor,
-            fontSize: 'clamp(14px, 3.4vw, 28px)',
-          }}
-        >
-          {title}
-        </h3>
+        {/* Title — reserve up to 3 lines so card height stays constant across RU/EN.
+            Use flex centering so 1- or 2-line titles sit centered within the reserved block,
+            making the (media + title) group feel vertically balanced. */}
+        <div className="min-h-[3.45em] mt-3 w-full flex items-center justify-center">
+          <h3
+            className="leading-[1.15] line-clamp-3 text-center"
+            style={{
+              fontFamily: '"Wix Madefor Display", system-ui, sans-serif',
+              fontWeight: 400,
+              color: titleColor,
+              fontSize: 'clamp(14px, 3.4vw, 28px)',
+            }}
+          >
+            {title}
+          </h3>
+        </div>
       </div>
     </div>
   );
