@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { Editor } from '@tiptap/react';
 import { cn } from '@/lib/utils';
 import ArticleCoverEditor, { ARTICLE_GRADIENTS } from '@/components/articles/ArticleCoverEditor';
+import ArticleType2Cover from '@/components/articles/ArticleType2Cover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import NotionEditor from '@/components/articles/NotionEditor';
 
@@ -299,12 +300,13 @@ const ArticleEditor: React.FC<{
 
             if (coverType === 'type2') {
               return (
-                <div
-                  className="w-full rounded-2xl overflow-hidden border border-dashed border-border bg-muted/30 flex items-center justify-center text-sm text-muted-foreground"
-                  style={{ aspectRatio: '4 / 1' }}
-                >
-                  Тип 2 — дизайн будет добавлен позже
-                </div>
+                <ArticleType2Cover
+                  variant="banner"
+                  gradient={gradient}
+                  image={coverImage}
+                  title={displayTitle || 'Новая инструкция'}
+                  titleColor={titleColor}
+                />
               );
             }
 
