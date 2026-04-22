@@ -113,8 +113,9 @@ const ArticleType2Cover: React.FC<ArticleType2CoverProps> = ({
   const shadow = getShadowColor(gradient);
 
   if (variant === 'banner') {
-    // Inner banner content height ≈ 100% (4:1 box). Use a sized media group
-    // so we can center the (frame + shadow) bounding box vertically.
+    // Group bbox = front frame + shadow extending 6% bottom-left.
+    // Group sized 1:1 by banner height. Shift up by half the shadow offset
+    // so the visual GROUP (not just the front frame) is vertically centered.
     return (
       <div
         className={cn(
@@ -135,13 +136,18 @@ const ArticleType2Cover: React.FC<ArticleType2CoverProps> = ({
         >
           {title}
         </h3>
-        <MediaGroup
-          size="78%"
-          image={image}
-          placeholder={placeholder}
-          onMediaClick={onMediaClick}
-          shadow={shadow}
-        />
+        <div
+          className="h-[78%] aspect-square shrink-0"
+          style={{ transform: `translateY(-${(SHADOW_OFFSET * 100) / 2}%)` }}
+        >
+          <MediaGroup
+            size="100%"
+            image={image}
+            placeholder={placeholder}
+            onMediaClick={onMediaClick}
+            shadow={shadow}
+          />
+        </div>
       </div>
     );
   }
@@ -156,18 +162,28 @@ const ArticleType2Cover: React.FC<ArticleType2CoverProps> = ({
       style={{ background: gradient }}
     >
       {overlay}
-      {/* Square media region */}
-      <div className="w-full aspect-square flex items-center justify-center p-5">
-        <MediaGroup
-          size="84%"
-          image={image}
-          placeholder={placeholder}
-          onMediaClick={onMediaClick}
-          shadow={shadow}
-        />
+      {/* Square media region — horizontally center the visual GROUP (frame + shadow).
+          The shadow extends 6% to the bottom-left of the front frame, so we
+          shift the wrapper right by half that amount to center the bbox. */}
+      <div className="w-full aspect-square flex items-center justify-center p-5 pb-2">
+        <div
+          className="aspect-square"
+          style={{
+            width: '84%',
+            transform: `translate(${(SHADOW_OFFSET * 100) / 2}%, -${(SHADOW_OFFSET * 100) / 2}%)`,
+          }}
+        >
+          <MediaGroup
+            size="100%"
+            image={image}
+            placeholder={placeholder}
+            onMediaClick={onMediaClick}
+            shadow={shadow}
+          />
+        </div>
       </div>
-      {/* Title below */}
-      <div className="px-4 pb-5 pt-0">
+      {/* Title below — pulled up closer to the media */}
+      <div className="px-4 pb-5 pt-0 -mt-2">
         <h3
           className="leading-[1.15] line-clamp-3 text-center"
           style={{
