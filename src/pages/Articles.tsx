@@ -22,6 +22,7 @@ interface Article {
   cover_gradient: string | null;
   cover_image: string | null;
   title_color: string | null;
+  cover_type: string | null;
   category: string | null;
   translation_stale: boolean;
   access_type: string;
@@ -72,6 +73,7 @@ const ArticleEditor: React.FC<{
   const [coverGradient, setCoverGradient] = useState(article.cover_gradient);
   const [coverImage, setCoverImage] = useState(article.cover_image);
   const [titleColor, setTitleColor] = useState(article.title_color || '#ffffff');
+  const [coverType, setCoverType] = useState<'type1' | 'type2'>((article.cover_type as 'type1' | 'type2') || 'type1');
   const [category, setCategory] = useState(article.category || '');
   const [customCategoryInput, setCustomCategoryInput] = useState('');
   const [translationStale, setTranslationStale] = useState(article.translation_stale);
@@ -146,6 +148,7 @@ const ArticleEditor: React.FC<{
         cover_gradient: coverGradient,
         cover_image: coverImage,
         title_color: titleColor,
+        cover_type: coverType,
         category: category || null,
         translation_stale: newStale,
         access_type: accessType,
