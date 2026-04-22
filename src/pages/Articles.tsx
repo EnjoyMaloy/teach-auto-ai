@@ -22,6 +22,7 @@ interface Article {
   cover_gradient: string | null;
   cover_image: string | null;
   title_color: string | null;
+  cover_type: string | null;
   category: string | null;
   translation_stale: boolean;
   access_type: string;
@@ -72,6 +73,7 @@ const ArticleEditor: React.FC<{
   const [coverGradient, setCoverGradient] = useState(article.cover_gradient);
   const [coverImage, setCoverImage] = useState(article.cover_image);
   const [titleColor, setTitleColor] = useState(article.title_color || '#ffffff');
+  const [coverType, setCoverType] = useState<'type1' | 'type2'>((article.cover_type as 'type1' | 'type2') || 'type1');
   const [category, setCategory] = useState(article.category || '');
   const [customCategoryInput, setCustomCategoryInput] = useState('');
   const [translationStale, setTranslationStale] = useState(article.translation_stale);
@@ -146,6 +148,7 @@ const ArticleEditor: React.FC<{
         cover_gradient: coverGradient,
         cover_image: coverImage,
         title_color: titleColor,
+        cover_type: coverType,
         category: category || null,
         translation_stale: newStale,
         access_type: accessType,
@@ -263,12 +266,48 @@ const ArticleEditor: React.FC<{
         <div className="max-w-3xl mx-auto px-4 py-10 space-y-6">
           <h2 className="text-xl font-semibold text-foreground">Настройки инструкции</h2>
 
+          {/* Cover type switcher */}
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-foreground">Тип обложки</p>
+            <div className="inline-flex bg-muted rounded-lg p-0.5">
+              {([
+                { id: 'type1', name: 'Тип 1' },
+                { id: 'type2', name: 'Тип 2' },
+              ] as const).map((opt) => (
+                <button
+                  key={opt.id}
+                  onClick={() => setCoverType(opt.id)}
+                  className={cn(
+                    'px-4 py-1.5 text-xs font-medium rounded-md transition-colors',
+                    coverType === opt.id
+                      ? 'bg-background text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  {opt.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Banner preview */}
           <p className="text-sm font-medium text-foreground">Шапка</p>
           {(() => {
             const gradient =
               coverGradient ||
               ARTICLE_GRADIENTS[Math.abs(article.id.charCodeAt(0)) % ARTICLE_GRADIENTS.length];
+
+            if (coverType === 'type2') {
+              return (
+                <div
+                  className="w-full rounded-2xl overflow-hidden border border-dashed border-border bg-muted/30 flex items-center justify-center text-sm text-muted-foreground"
+                  style={{ aspectRatio: '4 / 1' }}
+                >
+                  Тип 2 — дизайн будет добавлен позже
+                </div>
+              );
+            }
+
             return (
               <div
                 className="w-full rounded-2xl overflow-hidden border border-border shadow-md flex items-center gap-4 px-8"
