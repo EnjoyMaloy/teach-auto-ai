@@ -341,6 +341,7 @@ const ArticleEditor: React.FC<{
             title={title}
             titleEn={titleEn}
             titleColor={titleColor}
+            coverType={coverType}
             onTitleColorChange={setTitleColor}
             authorName={user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || ''}
             authorAvatar={user?.user_metadata?.avatar_url || user?.user_metadata?.picture || ''}
