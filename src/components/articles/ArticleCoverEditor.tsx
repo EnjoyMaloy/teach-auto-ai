@@ -148,6 +148,7 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
   title,
   titleEn,
   titleColor = '#ffffff',
+  coverType = 'type1',
   onTitleColorChange,
   authorName,
   authorAvatar,
