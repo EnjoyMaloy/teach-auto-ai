@@ -6,8 +6,15 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import ArticleType2Cover from './ArticleType2Cover';
 
 export const ARTICLE_GRADIENTS = [
+  'linear-gradient(45deg, #A66CFF 0%, #EDE2FF 100%)',
+  'linear-gradient(45deg, #FF8FB1 0%, #FFE5EC 100%)',
+  'linear-gradient(45deg, #6CC4FF 0%, #E2F3FF 100%)',
+  'linear-gradient(45deg, #6CFFB1 0%, #E2FFE9 100%)',
+  'linear-gradient(45deg, #FFB36C 0%, #FFEFE2 100%)',
+  'linear-gradient(45deg, #FFD86C 0%, #FFF8E2 100%)',
   'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
   'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
   'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
@@ -39,6 +46,7 @@ interface ArticleCoverEditorProps {
   title?: string;
   titleEn?: string;
   titleColor?: string;
+  coverType?: 'type1' | 'type2';
   onTitleColorChange?: (color: string) => void;
   authorName?: string;
   authorAvatar?: string;
@@ -140,6 +148,7 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
   title,
   titleEn,
   titleColor = '#ffffff',
+  coverType = 'type1',
   onTitleColorChange,
   authorName,
   authorAvatar,
@@ -214,78 +223,110 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
       {/* Two card previews side by side */}
       <div className="flex gap-3">
         {[
-          { label: 'RU', cardTitle: title || 'Заголовок инструкции' },
-          { label: 'EN', cardTitle: titleEn || 'Instruction title' },
-        ].map(({ label, cardTitle }) => (
-          <div key={label} className="flex-1">
-            <div
-              className="w-full rounded-2xl overflow-hidden relative border border-border shadow-md"
-              style={{ background: gradient || ARTICLE_GRADIENTS[Math.abs(articleId.charCodeAt(0)) % ARTICLE_GRADIENTS.length] }}
-            >
-              {/* Top-right icons */}
-              <div className="absolute top-3 right-3 z-20 flex gap-2">
-                <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/40 transition-colors cursor-pointer">
-                  <Unlink className="w-4.5 h-4.5 text-white" />
-                </div>
-                <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/40 transition-colors cursor-pointer">
-                  <Bookmark className="w-4.5 h-4.5 text-white" />
-                </div>
-              </div>
+          { label: 'RU' as const, cardTitle: title || 'Заголовок инструкции' },
+          { label: 'EN' as const, cardTitle: titleEn || 'Instruction title' },
+        ].map(({ label, cardTitle }) => {
+          const bg = gradient || ARTICLE_GRADIENTS[Math.abs(articleId.charCodeAt(0)) % ARTICLE_GRADIENTS.length];
 
-              {/* Image area */}
-              <div className="w-full aspect-square flex items-center justify-center relative p-4">
-                {image && (
-                  <img
-                    src={image}
-                    alt="cover"
-                    className={cn(
-                      "max-h-full max-w-full object-contain relative z-10 drop-shadow-lg",
-                      label === 'RU' && "cursor-pointer hover:opacity-80 transition-opacity"
-                    )}
-                    onClick={label === 'RU' ? () => fileRef.current?.click() : undefined}
-                  />
-                )}
-                {!image && !uploading && label === 'RU' && (
-                  <button
-                    onClick={() => fileRef.current?.click()}
-                    className="flex flex-col items-center gap-1 text-white/60 hover:text-white/90 transition-colors z-10"
-                  >
-                    <ImagePlus className="w-6 h-6" />
-                    <span className="text-[10px]">PNG</span>
-                  </button>
-                )}
-                {!image && !uploading && label === 'EN' && (
-                  <div className="text-white/30 text-[10px]">No image</div>
-                )}
-                {uploading && label === 'RU' && (
-                  <Loader2 className="w-5 h-5 animate-spin text-white/80 z-10" />
-                )}
+          if (coverType === 'type2') {
+            return (
+              <div key={label} className="flex-1">
+                <ArticleType2Cover
+                  variant="square"
+                  gradient={bg}
+                  image={image}
+                  title={cardTitle}
+                  titleColor={titleColor}
+                  onMediaClick={label === 'RU' ? () => fileRef.current?.click() : undefined}
+                  placeholder={
+                    label === 'RU' ? (
+                      <button
+                        onClick={() => fileRef.current?.click()}
+                        className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <ImagePlus className="w-6 h-6" />}
+                        <span className="text-[10px]">PNG</span>
+                      </button>
+                    ) : (
+                      <span className="text-muted-foreground/50 text-[10px]">No image</span>
+                    )
+                  }
+                />
               </div>
+            );
+          }
 
-              {/* Bottom info */}
-              <div className="px-4 pb-5 pt-0 space-y-2.5">
-                <h3
-                  className="font-semibold text-lg leading-tight text-center line-clamp-2"
-                  style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif', color: titleColor }}
-                >
-                  {cardTitle}
-                </h3>
-                <div className="flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3.5 py-2 mx-auto w-fit">
-                  {authorAvatar ? (
-                    <img src={authorAvatar} alt="" className="w-6 h-6 rounded-full object-cover" />
-                  ) : (
-                    <div className="w-6 h-6 rounded-full bg-white/30" />
+          return (
+            <div key={label} className="flex-1">
+              <div
+                className="w-full rounded-2xl overflow-hidden relative border border-border shadow-md"
+                style={{ background: bg }}
+              >
+                {/* Top-right icons */}
+                <div className="absolute top-3 right-3 z-20 flex gap-2">
+                  <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/40 transition-colors cursor-pointer">
+                    <Unlink className="w-4.5 h-4.5 text-white" />
+                  </div>
+                  <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/40 transition-colors cursor-pointer">
+                    <Bookmark className="w-4.5 h-4.5 text-white" />
+                  </div>
+                </div>
+
+                {/* Image area */}
+                <div className="w-full aspect-square flex items-center justify-center relative p-4">
+                  {image && (
+                    <img
+                      src={image}
+                      alt="cover"
+                      className={cn(
+                        "max-h-full max-w-full object-contain relative z-10 drop-shadow-lg",
+                        label === 'RU' && "cursor-pointer hover:opacity-80 transition-opacity"
+                      )}
+                      onClick={label === 'RU' ? () => fileRef.current?.click() : undefined}
+                    />
                   )}
-                  <span className="text-white text-sm font-medium truncate max-w-[90px]">
-                    {authorName || 'Автор'}
-                  </span>
-                  <Eye className="w-3.5 h-3.5 text-white/70" />
-                  <span className="text-white/70 text-sm">1337</span>
+                  {!image && !uploading && label === 'RU' && (
+                    <button
+                      onClick={() => fileRef.current?.click()}
+                      className="flex flex-col items-center gap-1 text-white/60 hover:text-white/90 transition-colors z-10"
+                    >
+                      <ImagePlus className="w-6 h-6" />
+                      <span className="text-[10px]">PNG</span>
+                    </button>
+                  )}
+                  {!image && !uploading && label === 'EN' && (
+                    <div className="text-white/30 text-[10px]">No image</div>
+                  )}
+                  {uploading && label === 'RU' && (
+                    <Loader2 className="w-5 h-5 animate-spin text-white/80 z-10" />
+                  )}
+                </div>
+
+                {/* Bottom info */}
+                <div className="px-4 pb-5 pt-0 space-y-2.5">
+                  <h3
+                    className="font-semibold text-lg leading-tight text-center line-clamp-2"
+                    style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif', color: titleColor }}
+                  >
+                    {cardTitle}
+                  </h3>
+                  <div className="flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3.5 py-2 mx-auto w-fit">
+                    {authorAvatar ? (
+                      <img src={authorAvatar} alt="" className="w-6 h-6 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-6 h-6 rounded-full bg-white/30" />
+                    )}
+                    <span className="text-white text-sm font-medium truncate max-w-[90px]">
+                      {authorName || 'Автор'}
+                    </span>
+                    <Eye className="w-3.5 h-3.5 text-white/70" />
+                    <span className="text-white/70 text-sm">1337</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
 
