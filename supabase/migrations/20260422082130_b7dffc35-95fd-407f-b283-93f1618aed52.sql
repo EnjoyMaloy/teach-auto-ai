@@ -1,0 +1,1 @@
+ALTER TABLE public.articles ADD COLUMN IF NOT EXISTS cover_type TEXT NOT NULL DEFAULT 'type1';
