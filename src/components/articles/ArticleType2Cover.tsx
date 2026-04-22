@@ -152,23 +152,24 @@ const ArticleType2Cover: React.FC<ArticleType2CoverProps> = ({
     );
   }
 
-  // Square (cover preview) — fixed 1:1 outer box; the (media + title) group
-  // is vertically centered as a whole so short titles don't leave a big gap.
+  // Square (cover preview) — square media region on top + reserved title block below.
+  // Both regions have fixed dimensions independent of title length, so RU/EN cards
+  // always render at the same size.
   return (
     <div
       className={cn(
-        'w-full rounded-xl overflow-hidden border border-border shadow-md relative flex flex-col items-center justify-center',
+        'w-full rounded-xl overflow-hidden border border-border shadow-md relative',
         className
       )}
       style={{ background: gradient }}
     >
       {overlay}
-      <div className="w-full flex flex-col items-center justify-center px-4 py-5">
-        {/* Media — horizontally center the visual GROUP (frame + shadow). */}
+      {/* Square media region — horizontally center the visual GROUP (frame + shadow). */}
+      <div className="w-full aspect-square flex items-center justify-center p-5 pb-2">
         <div
           className="aspect-square"
           style={{
-            width: '70%',
+            width: '84%',
             transform: `translate(${(SHADOW_OFFSET * 100) / 2}%, -${(SHADOW_OFFSET * 100) / 2}%)`,
           }}
         >
@@ -180,10 +181,11 @@ const ArticleType2Cover: React.FC<ArticleType2CoverProps> = ({
             shadow={shadow}
           />
         </div>
-        {/* Title — reserve up to 3 lines so card height stays constant across RU/EN.
-            Use flex centering so 1- or 2-line titles sit centered within the reserved block,
-            making the (media + title) group feel vertically balanced. */}
-        <div className="min-h-[3.45em] mt-3 w-full flex items-center justify-center">
+      </div>
+      {/* Title — reserve up to 3 lines so card height stays constant across RU/EN.
+          Title text is vertically centered within the reserved block. */}
+      <div className="px-4 pb-5 pt-0 -mt-2">
+        <div className="min-h-[3.45em] flex items-center justify-center">
           <h3
             className="leading-[1.15] line-clamp-3 text-center"
             style={{
