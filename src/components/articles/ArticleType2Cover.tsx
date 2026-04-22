@@ -182,10 +182,11 @@ const ArticleType2Cover: React.FC<ArticleType2CoverProps> = ({
           />
         </div>
       </div>
-      {/* Title below — pulled up closer to the media */}
+      {/* Title below — pulled up closer to the media. Reserve space for up to
+          3 lines so cards with shorter titles keep the same height as longer ones. */}
       <div className="px-4 pb-5 pt-0 -mt-2">
         <h3
-          className="leading-[1.15] line-clamp-3 text-center"
+          className="leading-[1.15] line-clamp-3 text-center min-h-[3.45em]"
           style={{
             fontFamily: '"Wix Madefor Display", system-ui, sans-serif',
             fontWeight: 400,
