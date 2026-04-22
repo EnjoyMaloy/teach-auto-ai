@@ -182,12 +182,15 @@ const ArticleType2Cover: React.FC<ArticleType2CoverProps> = ({
           />
         </div>
       </div>
-      {/* Title — reserve up to 3 lines so card height stays constant across RU/EN.
-          Title text is vertically centered within the reserved block. */}
+      {/* Title — reserve a fixed 3-line block based on the actual heading font size,
+          so RU/EN cards always keep the same total height. */}
       <div className="px-4 pb-5 pt-0 -mt-2">
-        <div className="min-h-[3.45em] flex items-center justify-center">
+        <div
+          className="w-full flex items-center justify-center"
+          style={{ minHeight: 'clamp(48.3px, 11.73vw, 96.6px)' }}
+        >
           <h3
-            className="leading-[1.15] line-clamp-3 text-center"
+            className="leading-[1.15] line-clamp-3 text-center w-full"
             style={{
               fontFamily: '"Wix Madefor Display", system-ui, sans-serif',
               fontWeight: 400,
