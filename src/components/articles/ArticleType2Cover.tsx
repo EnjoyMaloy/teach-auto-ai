@@ -152,24 +152,23 @@ const ArticleType2Cover: React.FC<ArticleType2CoverProps> = ({
     );
   }
 
-  // Square (cover preview) — match Type 1 layout: square media area on top + text below.
+  // Square (cover preview) — fixed 1:1 outer box; the (media + title) group
+  // is vertically centered as a whole so short titles don't leave a big gap.
   return (
     <div
       className={cn(
-        'w-full rounded-xl overflow-hidden border border-border shadow-md relative',
+        'w-full rounded-xl overflow-hidden border border-border shadow-md relative flex flex-col items-center justify-center',
         className
       )}
-      style={{ background: gradient }}
+      style={{ background: gradient, aspectRatio: '1 / 1' }}
     >
       {overlay}
-      {/* Square media region — horizontally center the visual GROUP (frame + shadow).
-          The shadow extends 6% to the bottom-left of the front frame, so we
-          shift the wrapper right by half that amount to center the bbox. */}
-      <div className="w-full aspect-square flex items-center justify-center p-5 pb-2">
+      <div className="w-full flex flex-col items-center justify-center px-4 py-5">
+        {/* Media — horizontally center the visual GROUP (frame + shadow). */}
         <div
           className="aspect-square"
           style={{
-            width: '84%',
+            width: '70%',
             transform: `translate(${(SHADOW_OFFSET * 100) / 2}%, -${(SHADOW_OFFSET * 100) / 2}%)`,
           }}
         >
@@ -181,12 +180,9 @@ const ArticleType2Cover: React.FC<ArticleType2CoverProps> = ({
             shadow={shadow}
           />
         </div>
-      </div>
-      {/* Title below — pulled up closer to the media. Reserve space for up to
-          3 lines so cards with shorter titles keep the same height as longer ones. */}
-      <div className="px-4 pb-5 pt-0 -mt-2">
+        {/* Title — reserve up to 3 lines so card height stays constant across RU/EN */}
         <h3
-          className="leading-[1.15] line-clamp-3 text-center min-h-[3.45em]"
+          className="leading-[1.15] line-clamp-3 text-center min-h-[3.45em] mt-3 w-full"
           style={{
             fontFamily: '"Wix Madefor Display", system-ui, sans-serif',
             fontWeight: 400,
