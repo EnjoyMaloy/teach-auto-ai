@@ -595,7 +595,7 @@ const Articles: React.FC = () => {
       <div className="flex items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Инструкции</h1>
-          <p className="text-sm text-muted-foreground">Создавайте инструкции, публикуйте их в Open Academy и встраивайте в курсы</p>
+          <p className="text-sm text-muted-foreground">Создавайте инструкции, публикуйте их в Open Academy и встраивайте в свои курсы</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1">
