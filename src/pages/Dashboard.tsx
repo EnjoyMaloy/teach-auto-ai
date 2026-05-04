@@ -184,13 +184,13 @@ const Dashboard: React.FC = () => {
       </div>
 
       {isLoading ? (
-        <div className="grid gap-3 md:gap-5 [grid-template-columns:repeat(auto-fill,minmax(240px,240px))] justify-center">
+        <div className="grid gap-3 md:gap-5 [grid-template-columns:repeat(auto-fill,minmax(240px,240px))] justify-start">
           {[...Array(8)].map((_, i) => (
             <CourseCardSkeleton key={i} />
           ))}
         </div>
       ) : filteredCourses.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 text-center">
+        <div className="flex flex-col items-center justify-start h-64 text-center">
           <div className="text-muted-foreground dark:text-white/20 text-[13px] mb-4">
             {filter === 'all' ? 'У вас пока нет курсов' : 'Ничего не найдено'}
           </div>
@@ -207,7 +207,7 @@ const Dashboard: React.FC = () => {
           )}
         </div>
       ) : (
-        <div className="grid gap-3 md:gap-5 [grid-template-columns:repeat(auto-fill,minmax(240px,240px))] justify-center">
+        <div className="grid gap-3 md:gap-5 [grid-template-columns:repeat(auto-fill,minmax(240px,240px))] justify-start">
           {filteredCourses.map(course => (
             <CourseCardOverlay
               key={course.id}
