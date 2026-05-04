@@ -19,6 +19,7 @@ import CourseCardOverlay from '@/components/catalog/CourseCardOverlay';
 import { useUserCourses, CourseListItem } from '@/hooks/useCachedCourses';
 import { useCachedFavorites } from '@/hooks/useCachedFavorites';
 import { useSidebar } from '@/components/ui/sidebar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type FilterType = 'all' | 'drafts' | 'published';
 
@@ -93,24 +94,16 @@ const Dashboard: React.FC = () => {
           <p className="text-sm text-muted-foreground">Создавайте курсы, публикуйте их в Open Academy и делитесь со студентами</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            {filters.map(f => (
-              <button
-                key={f.id}
-                onClick={() => setFilter(f.id)}
-                className={`
-                  px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap
-                  ${filter === f.id 
-                    ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
-                    : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
-                  }
-                `}
-              >
-                {f.label}
-                <span className="ml-1.5 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
-              </button>
-            ))}
-          </div>
+          <Select value={filter} onValueChange={(v) => setFilter(v as FilterType)}>
+            <SelectTrigger className="h-8 w-auto gap-2 border-border bg-background/40 hover:bg-background/60 px-3 text-[13px] font-medium rounded-md">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="end">
+              {filters.map(f => (
+                <SelectItem key={f.id} value={f.id}>{f.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Button 
             onClick={handleCreate} 
             size="sm"

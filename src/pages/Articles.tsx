@@ -13,6 +13,7 @@ import ArticleCoverEditor, { ARTICLE_GRADIENTS } from '@/components/articles/Art
 import ArticleType2Cover from '@/components/articles/ArticleType2Cover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import NotionEditor from '@/components/articles/NotionEditor';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Article {
   id: string;
@@ -598,33 +599,25 @@ const Articles: React.FC = () => {
           <p className="text-sm text-muted-foreground">Создавайте инструкции, публикуйте их в Open Academy и встраивайте в свои курсы</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            {([
-              { id: 'all', label: 'Все', icon: null },
-              { id: 'private', label: 'Закрытый', icon: Lock },
-              { id: 'link', label: 'По ссылке', icon: Link2 },
-              { id: 'public', label: 'В каталоге', icon: Globe },
-            ] as const).map((f) => {
-              const Icon = f.icon;
-              const count = f.id === 'all' ? articles.length : articles.filter(a => (a.access_type || 'private') === f.id).length;
-              const isActive = accessFilter === f.id;
-              return (
-                <button
-                  key={f.id}
-                  onClick={() => setAccessFilter(f.id)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap ${
-                    isActive
-                      ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white'
-                      : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
-                  }`}
-                >
-                  {Icon && <Icon className="w-3.5 h-3.5" />}
-                  {f.label}
-                  <span className="ml-1 text-muted-foreground dark:text-white/30">{count}</span>
-                </button>
-              );
-            })}
-          </div>
+          <Select value={accessFilter} onValueChange={(v) => setAccessFilter(v as typeof accessFilter)}>
+            <SelectTrigger className="h-8 w-auto gap-2 border-border bg-background/40 hover:bg-background/60 px-3 text-[13px] font-medium rounded-md">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="end">
+              <SelectItem value="all">
+                <span className="inline-flex items-center gap-2">Любой доступ</span>
+              </SelectItem>
+              <SelectItem value="private">
+                <span className="inline-flex items-center gap-2"><Lock className="w-3.5 h-3.5" />Закрытый</span>
+              </SelectItem>
+              <SelectItem value="link">
+                <span className="inline-flex items-center gap-2"><Link2 className="w-3.5 h-3.5" />По ссылке</span>
+              </SelectItem>
+              <SelectItem value="public">
+                <span className="inline-flex items-center gap-2"><Globe className="w-3.5 h-3.5" />В каталоге</span>
+              </SelectItem>
+            </SelectContent>
+          </Select>
           <Button onClick={createArticle} size="sm" className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px]">
             <Plus className="w-3.5 h-3.5 mr-1.5" />
             Создать инструкцию
