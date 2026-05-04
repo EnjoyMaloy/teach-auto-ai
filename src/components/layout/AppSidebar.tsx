@@ -327,7 +327,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
             <SidebarMenu>
               {/* Recent — Collapsible */}
               <Collapsible
-                defaultOpen={recentCourses.some((c) => isEditorRoute(c.id))}
+                defaultOpen
                 className="group/collapsible"
               >
                 <SidebarMenuItem>
