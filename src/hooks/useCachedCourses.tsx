@@ -11,6 +11,7 @@ export interface CourseListItem {
   coverImage?: string;
   authorId: string;
   isPublished: boolean;
+  isLinkAccessible: boolean;
   category?: string;
   lessonsCount: number;
   estimatedMinutes: number;
