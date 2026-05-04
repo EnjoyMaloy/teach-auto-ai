@@ -441,12 +441,10 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
             <DropdownMenuTrigger asChild>
               <Button 
                 variant="ghost" 
-                size="sm" 
-                className="h-9 px-3 text-muted-foreground hover:text-foreground gap-2"
+                size="icon" 
+                className="h-9 w-9 text-muted-foreground hover:text-[hsl(265,60%,75%)] hover:bg-transparent"
               >
-                <Globe className="size-4" />
-                Язык
-                <ChevronDown className="size-3" />
+                <Globe className="size-5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="min-w-[120px]">
