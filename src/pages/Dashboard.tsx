@@ -81,10 +81,10 @@ const Dashboard: React.FC = () => {
         style={{ paddingLeft: '1rem' }}
       >
       {/* Top spacer for mobile header */}
-      <div className="h-16 md:h-14" />
+      <div className="h-16 md:h-20" />
       
       {/* Desktop Top Bar - filters left, create button right */}
-      <div className="hidden md:flex absolute top-4 left-6 right-6 z-20 items-center justify-between gap-2">
+      <div className="hidden md:flex absolute top-6 left-6 right-6 z-20 items-center justify-between gap-2">
         <div className="flex items-center gap-1">
           {filters.map(f => (
             <button
