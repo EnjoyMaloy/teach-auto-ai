@@ -220,7 +220,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   return (
     <Sidebar variant="floating">
       {/* Header — Logo */}
-      <SidebarHeader className="p-4 flex flex-row items-center justify-between">
+      <SidebarHeader className="px-4 pt-7 pb-4 flex flex-row items-center justify-between">
         <AcademyLogo className="h-4" />
       </SidebarHeader>
 
