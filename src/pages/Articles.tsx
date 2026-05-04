@@ -700,7 +700,12 @@ const Articles: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
           {articles
-            .filter(a => (accessFilter === 'all' || (a.access_type || 'private') === accessFilter) && (!search.trim() || (a.title || '').toLowerCase().includes(search.toLowerCase())))
+            .filter(a => {
+              if (accessFilter === 'favorites' && !isFavorite(a.id)) return false;
+              if (accessFilter !== 'all' && accessFilter !== 'favorites' && (a.access_type || 'private') !== accessFilter) return false;
+              if (search.trim() && !(a.title || '').toLowerCase().includes(search.toLowerCase())) return false;
+              return true;
+            })
             .map((article) => {
             const gradient = article.cover_gradient || ARTICLE_GRADIENTS[Math.abs(article.id.charCodeAt(0)) % ARTICLE_GRADIENTS.length];
             return (
