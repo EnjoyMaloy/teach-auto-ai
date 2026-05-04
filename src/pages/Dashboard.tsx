@@ -84,7 +84,7 @@ const Dashboard: React.FC = () => {
       <div className="h-16 md:h-14" />
       
       {/* Desktop Top Bar - filters left, create button right */}
-      <div className="hidden md:flex fixed top-4 left-6 right-6 z-20 items-center justify-between gap-2 pl-12">
+      <div className="hidden md:flex absolute top-4 left-6 right-6 z-20 items-center justify-between gap-2 pl-12">
         <div className="flex items-center gap-1">
           {filters.map(f => (
             <button
