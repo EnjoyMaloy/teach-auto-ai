@@ -716,7 +716,7 @@ const Articles: React.FC = () => {
                 style={{ background: gradient }}
               >
                 {/* Top right controls */}
-                <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+                <div className="absolute top-3 right-3 flex items-center gap-2 z-20">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                       <button className="w-8 h-8 rounded-lg bg-black/30 backdrop-blur-sm hover:bg-black/50 flex items-center justify-center text-white/90 hover:text-white transition-colors opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100">
@@ -767,7 +767,7 @@ const Articles: React.FC = () => {
                 </div>
 
                 {/* Image area */}
-                <div className="w-full flex-1 min-h-0 flex items-center justify-center relative p-4">
+                <div className="w-full flex-1 min-h-0 flex items-center justify-center relative px-4 pb-4 pt-12">
                   {article.cover_image && (
                     <img
                       src={article.cover_image}
