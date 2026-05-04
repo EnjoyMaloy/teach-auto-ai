@@ -18,12 +18,15 @@ import {
 import CourseCardOverlay from '@/components/catalog/CourseCardOverlay';
 import { useUserCourses, CourseListItem } from '@/hooks/useCachedCourses';
 import { useCachedFavorites } from '@/hooks/useCachedFavorites';
+import { useSidebar } from '@/components/ui/sidebar';
 
 type FilterType = 'all' | 'drafts' | 'published';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { courses, isLoading, deleteCourse } = useUserCourses();
+  const { state: sidebarState } = useSidebar();
+  const isSidebarCollapsed = sidebarState === 'collapsed';
   const { isFavorite, toggleFavorite } = useCachedFavorites();
   const [courseToDelete, setCourseToDelete] = useState<CourseListItem | null>(null);
   const [filter, setFilter] = useState<FilterType>('all');
@@ -81,10 +84,10 @@ const Dashboard: React.FC = () => {
         style={{ paddingLeft: '1rem' }}
       >
       {/* Top spacer for mobile header */}
-      <div className="h-16 md:h-20" />
+      <div className="h-16 md:h-28" />
       
       {/* Desktop Top Bar - filters left, create button right */}
-      <div className="hidden md:flex absolute top-6 left-6 right-6 z-20 items-center justify-between gap-2">
+      <div className={`hidden md:flex absolute top-10 right-6 z-20 items-center justify-between gap-2 ${isSidebarCollapsed ? 'left-16' : 'left-6'}`}>
         <div className="flex items-center gap-1">
           {filters.map(f => (
             <button
