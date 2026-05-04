@@ -48,13 +48,13 @@ const LayoutContent: React.FC = () => {
         </div>
       )}
       
-      {/* Desktop sidebar trigger - only when collapsed */}
+      {/* Desktop sidebar trigger - only when collapsed (anchored bottom-left, matches expanded footer) */}
       {!isMobile && isCollapsed && (
         <div 
-          className="fixed top-6 z-20"
-          style={{ left: '1.5rem' }}
+          className="fixed bottom-4 z-20"
+          style={{ left: '1rem' }}
         >
-          <SidebarTrigger className="!h-7 !w-7 shrink-0 rounded-md text-muted-foreground hover:text-foreground" />
+          <SidebarTrigger className="!h-9 !w-9 rounded-md text-muted-foreground hover:bg-transparent hover:text-[hsl(265,60%,75%)] [&_svg]:!size-[1.4375rem]" />
         </div>
       )}
     </>
