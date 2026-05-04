@@ -641,12 +641,17 @@ const Articles: React.FC = () => {
           <div className="flex items-center gap-1 flex-wrap">
             {([
               { id: 'all', label: 'Все', icon: null },
+              { id: 'favorites', label: 'Избранные', icon: Star },
               { id: 'private', label: 'Закрытый', icon: Lock },
               { id: 'link', label: 'По ссылке', icon: Link2 },
               { id: 'public', label: 'В каталоге', icon: Globe },
             ] as const).map((f) => {
               const Icon = f.icon;
-              const count = f.id === 'all' ? articles.length : articles.filter(a => (a.access_type || 'private') === f.id).length;
+              const count = f.id === 'all'
+                ? articles.length
+                : f.id === 'favorites'
+                  ? articles.filter(a => isFavorite(a.id)).length
+                  : articles.filter(a => (a.access_type || 'private') === f.id).length;
               const isActive = accessFilter === f.id;
               return (
                 <button
