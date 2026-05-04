@@ -45,7 +45,6 @@ export type Database = {
           cover_image: string | null
           cover_type: string
           created_at: string
-          en_modified: boolean
           id: string
           title: string
           title_color: string | null
@@ -63,7 +62,6 @@ export type Database = {
           cover_image?: string | null
           cover_type?: string
           created_at?: string
-          en_modified?: boolean
           id?: string
           title?: string
           title_color?: string | null
@@ -81,7 +79,6 @@ export type Database = {
           cover_image?: string | null
           cover_type?: string
           created_at?: string
-          en_modified?: boolean
           id?: string
           title?: string
           title_color?: string | null

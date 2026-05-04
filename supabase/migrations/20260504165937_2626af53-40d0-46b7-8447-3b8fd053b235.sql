@@ -1,1 +1,0 @@
-ALTER TABLE public.articles ADD COLUMN IF NOT EXISTS en_modified boolean NOT NULL DEFAULT false;
