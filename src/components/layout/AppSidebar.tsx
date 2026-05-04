@@ -76,7 +76,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
-  const { theme, setTheme } = useTheme();
+  
   const { language, setLanguage } = useLanguage();
   const [recentCourses, setRecentCourses] = useState<RecentCourse[]>([]);
   const { setOpenMobile, isMobile } = useSidebar();
@@ -197,9 +197,6 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   const isActive = (path: string) => location.pathname === path;
   const isEditorRoute = (courseId: string) => location.pathname === `/editor/${courseId}`;
 
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
 
   const languages = [
     { code: 'ru' as const, label: 'Russian' },
@@ -476,19 +473,6 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Theme Toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className="size-9 text-muted-foreground hover:text-foreground"
-          >
-            {theme === 'dark' ? (
-              <Sun className="size-4" />
-            ) : (
-              <Moon className="size-4" />
-            )}
-          </Button>
         </div>
       </SidebarFooter>
 
