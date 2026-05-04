@@ -517,18 +517,6 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
         {/* Right section */}
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-          {/* Theme toggle */}
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
-          >
-            {theme === 'dark' ? (
-              <Sun className="w-4 h-4" />
-            ) : (
-              <Moon className="w-4 h-4" />
-            )}
-          </button>
 
           <button 
             onClick={onPreview}
