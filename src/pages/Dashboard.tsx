@@ -83,20 +83,38 @@ const Dashboard: React.FC = () => {
       {/* Top spacer for mobile header */}
       <div className="h-16 md:h-14" />
       
-      {/* Desktop Top Bar - aligned with sidebar trigger */}
-      <div className="hidden md:block fixed top-4 right-6 z-20">
+      {/* Desktop Top Bar - filters + create button */}
+      <div className="hidden md:flex fixed top-4 right-6 z-20 items-center gap-2">
+        <div className="flex items-center gap-1">
+          {filters.map(f => (
+            <button
+              key={f.id}
+              onClick={() => setFilter(f.id)}
+              className={`
+                px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap
+                ${filter === f.id 
+                  ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
+                  : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
+                }
+              `}
+            >
+              {f.label}
+              <span className="ml-1.5 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
+            </button>
+          ))}
+        </div>
         <Button 
           onClick={handleCreate} 
           size="sm"
           className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px]"
         >
           <Plus className="w-3.5 h-3.5 mr-1.5" />
-          Новый курс
+          Создать курс
         </Button>
       </div>
 
-      {/* Filters */}
-      <div className="flex items-center gap-1 mb-4 md:mb-6 overflow-x-auto pb-1 scrollbar-hide">
+      {/* Mobile Filters */}
+      <div className="md:hidden flex items-center gap-1 mb-4 overflow-x-auto pb-1 scrollbar-hide">
         {filters.map(f => (
           <button
             key={f.id}
@@ -113,6 +131,7 @@ const Dashboard: React.FC = () => {
             <span className="ml-1.5 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
           </button>
         ))}
+      </div>
       </div>
 
       {isLoading ? (
