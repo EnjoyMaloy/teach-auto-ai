@@ -476,19 +476,6 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Theme Toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className="size-9 text-muted-foreground hover:text-foreground"
-          >
-            {theme === 'dark' ? (
-              <Sun className="size-4" />
-            ) : (
-              <Moon className="size-4" />
-            )}
-          </Button>
         </div>
       </SidebarFooter>
 
