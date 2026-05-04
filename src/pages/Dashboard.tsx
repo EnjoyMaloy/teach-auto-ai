@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Lock, Link2, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -22,7 +22,13 @@ import { useCachedFavorites } from '@/hooks/useCachedFavorites';
 import { useSidebar } from '@/components/ui/sidebar';
 
 
-type FilterType = 'all' | 'drafts' | 'published';
+type FilterType = 'all' | 'private' | 'link' | 'public';
+
+const getAccessType = (c: CourseListItem): 'private' | 'link' | 'public' => {
+  if (c.isPublished) return 'public';
+  if (c.isLinkAccessible) return 'link';
+  return 'private';
+};
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -38,14 +44,14 @@ const Dashboard: React.FC = () => {
     const matchesSearch = !search.trim() || course.title?.toLowerCase().includes(search.toLowerCase());
     if (!matchesSearch) return false;
     if (filter === 'all') return true;
-    if (filter === 'drafts') return !course.isPublished;
-    return course.isPublished;
+    return getAccessType(course) === filter;
   });
 
   const counts = {
     all: courses.length,
-    drafts: courses.filter(c => !c.isPublished).length,
-    published: courses.filter(c => c.isPublished).length,
+    private: courses.filter(c => getAccessType(c) === 'private').length,
+    link: courses.filter(c => getAccessType(c) === 'link').length,
+    public: courses.filter(c => getAccessType(c) === 'public').length,
   };
 
   const handleCreate = () => {
@@ -63,10 +69,11 @@ const Dashboard: React.FC = () => {
     setCourseToDelete(null);
   };
 
-  const filters: { id: FilterType; label: string }[] = [
-    { id: 'all', label: 'Все' },
-    { id: 'drafts', label: 'Черновики' },
-    { id: 'published', label: 'Опубликованные' },
+  const filters: { id: FilterType; label: string; icon: typeof Lock | null }[] = [
+    { id: 'all', label: 'Все', icon: null },
+    { id: 'private', label: 'Закрытый', icon: Lock },
+    { id: 'link', label: 'По ссылке', icon: Link2 },
+    { id: 'public', label: 'В каталоге', icon: Globe },
   ];
 
   return (
@@ -109,20 +116,24 @@ const Dashboard: React.FC = () => {
         </div>
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-1 flex-wrap">
-            {filters.map(f => (
-              <button
-                key={f.id}
-                onClick={() => setFilter(f.id)}
-                className={`px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap ${
-                  filter === f.id 
-                    ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
-                    : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
-                }`}
-              >
-                {f.label}
-                <span className="ml-1.5 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
-              </button>
-            ))}
+            {filters.map(f => {
+              const Icon = f.icon;
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => setFilter(f.id)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap ${
+                    filter === f.id 
+                      ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
+                      : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
+                  }`}
+                >
+                  {Icon && <Icon className="w-3.5 h-3.5" />}
+                  {f.label}
+                  <span className="ml-1 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
+                </button>
+              );
+            })}
           </div>
           <div className="relative w-64 shrink-0">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
@@ -139,20 +150,24 @@ const Dashboard: React.FC = () => {
       {/* Mobile Top Bar */}
       <div className="md:hidden mb-4 space-y-3">
         <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-hide">
-          {filters.map(f => (
-            <button
-              key={f.id}
-              onClick={() => setFilter(f.id)}
-              className={`px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap ${
-                filter === f.id 
-                  ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
-                  : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
-              }`}
-            >
-              {f.label}
-              <span className="ml-1.5 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
-            </button>
-          ))}
+          {filters.map(f => {
+            const Icon = f.icon;
+            return (
+              <button
+                key={f.id}
+                onClick={() => setFilter(f.id)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap ${
+                  filter === f.id 
+                    ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
+                    : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
+                }`}
+              >
+                {Icon && <Icon className="w-3.5 h-3.5" />}
+                {f.label}
+                <span className="ml-1 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
+              </button>
+            );
+          })}
         </div>
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
@@ -174,12 +189,7 @@ const Dashboard: React.FC = () => {
       ) : filteredCourses.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center">
           <div className="text-muted-foreground dark:text-white/20 text-[13px] mb-4">
-            {filter === 'all' 
-              ? 'У вас пока нет курсов' 
-              : filter === 'drafts'
-                ? 'Нет черновиков'
-                : 'Нет опубликованных курсов'
-            }
+            {filter === 'all' ? 'У вас пока нет курсов' : 'Ничего не найдено'}
           </div>
           {filter === 'all' && (
             <Button 
