@@ -589,8 +589,9 @@ const Articles: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="relative z-10 p-4 md:p-6" style={{ paddingLeft: '1rem' }}>
+      <div className="h-16 md:h-[52px]" />
+      <div className="flex items-center justify-between gap-2 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Инструкции</h1>
           <p className="text-sm text-muted-foreground">Создавайте инструкции, публикуйте их в Open Academy и встраивайте в курсы</p>
@@ -617,7 +618,7 @@ const Articles: React.FC = () => {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
           {articles.map((article) => {
             const gradient = article.cover_gradient || ARTICLE_GRADIENTS[Math.abs(article.id.charCodeAt(0)) % ARTICLE_GRADIENTS.length];
             return (
