@@ -516,6 +516,7 @@ const Articles: React.FC = () => {
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [profile, setProfile] = useState<{ name: string | null; avatar_url: string | null } | null>(null);
   const [accessFilter, setAccessFilter] = useState<'all' | 'private' | 'link' | 'public'>('all');
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     if (!user) return;
