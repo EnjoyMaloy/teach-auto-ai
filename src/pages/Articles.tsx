@@ -698,7 +698,7 @@ const Articles: React.FC = () => {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
+        <div className="grid gap-3 md:gap-5 [grid-template-columns:repeat(auto-fill,minmax(240px,240px))] justify-center">
           {articles
             .filter(a => {
               if (accessFilter === 'favorites' && !isFavorite(a.id)) return false;
