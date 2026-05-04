@@ -142,6 +142,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   }, [user, queryClient]);
 
   const [profile, setProfile] = useState<{ name: string | null; avatar_url: string | null }>({ name: null, avatar_url: null });
+  const [langOpen, setLangOpen] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -437,17 +438,23 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
       <SidebarFooter className="p-4">
         <div className="flex items-center justify-between">
           {/* Language Selector */}
-          <DropdownMenu>
+          <DropdownMenu open={langOpen} onOpenChange={setLangOpen}>
             <DropdownMenuTrigger asChild>
               <Button 
                 variant="ghost" 
                 size="icon" 
+                onMouseEnter={() => setLangOpen(true)}
                 className="h-9 w-9 text-muted-foreground hover:text-[hsl(265,60%,75%)] hover:bg-transparent"
               >
-                <Globe className="size-5" />
+                <Globe style={{ width: '1.4375rem', height: '1.4375rem' }} />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="min-w-[120px]">
+            <DropdownMenuContent
+              align="start"
+              className="min-w-[120px]"
+              onMouseEnter={() => setLangOpen(true)}
+              onMouseLeave={() => setLangOpen(false)}
+            >
               {displayLanguages.map((lang) => {
                 const isAvailable = lang.code === 'ru';
                 return (
