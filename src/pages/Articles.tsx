@@ -13,7 +13,7 @@ import ArticleCoverEditor, { ARTICLE_GRADIENTS } from '@/components/articles/Art
 import ArticleType2Cover from '@/components/articles/ArticleType2Cover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import NotionEditor from '@/components/articles/NotionEditor';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 
 interface Article {
   id: string;
