@@ -54,7 +54,7 @@ const LayoutContent: React.FC = () => {
           className="fixed top-6 z-20"
           style={{ left: '1.5rem' }}
         >
-          <SidebarTrigger />
+          <SidebarTrigger className="!h-7 !w-7 shrink-0 rounded-md text-muted-foreground hover:text-foreground" />
         </div>
       )}
     </>
