@@ -719,9 +719,6 @@ const ArticleEditor: React.FC<{
     </div>
   );
 };
-    </div>
-  );
-};
 
 const Articles: React.FC = () => {
   const { user } = useAuth();
