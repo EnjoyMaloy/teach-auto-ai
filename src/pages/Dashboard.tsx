@@ -96,7 +96,7 @@ const Dashboard: React.FC = () => {
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Мои курсы</h1>
-            <p className="text-sm text-muted-foreground">Создавайте курсы, публикуйте их в Open Academy и делитесь со студентами</p>
+            <p className="text-sm text-muted-foreground">Создавайте курсы, публикуйте их в Open Academy или делитесь со аудиторией через свой Telegram Mini App</p>
           </div>
           <Button 
             onClick={handleCreate} 
