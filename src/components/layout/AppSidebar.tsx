@@ -222,7 +222,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
       {/* Header — Logo + Collapse */}
       <SidebarHeader className="p-4 flex flex-row items-center justify-between">
         <AcademyLogo className="h-4" />
-        <SidebarTrigger className="size-8 text-muted-foreground hover:text-foreground" />
+        <SidebarTrigger className="h-8 w-8 rounded-md text-muted-foreground hover:text-foreground" />
       </SidebarHeader>
 
       <SidebarContent>
