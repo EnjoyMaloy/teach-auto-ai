@@ -372,7 +372,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                   onMouseEnter={prefetchWorkshop}
                 >
                   <Folder className="size-4" />
-                  <span>Мои курсы</span>
+                  <span>Все курсы</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
