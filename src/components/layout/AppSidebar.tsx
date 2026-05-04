@@ -142,6 +142,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   }, [user, queryClient]);
 
   const [profile, setProfile] = useState<{ name: string | null; avatar_url: string | null }>({ name: null, avatar_url: null });
+  const [langOpen, setLangOpen] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
