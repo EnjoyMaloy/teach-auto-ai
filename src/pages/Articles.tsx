@@ -682,11 +682,11 @@ const Articles: React.FC = () => {
               <button
                 key={article.id}
                 onClick={() => setEditingArticle(article)}
-                className="group text-left rounded-2xl overflow-hidden border border-border shadow-md transition-transform duration-300 hover:scale-[1.02]"
+                className="group text-left rounded-2xl overflow-hidden border border-border shadow-md transition-transform duration-300 hover:scale-[1.02] aspect-[4/5] flex flex-col"
                 style={{ background: gradient }}
               >
                 {/* Image area */}
-                <div className="w-full aspect-square flex items-center justify-center relative p-4">
+                <div className="w-full flex-1 min-h-0 flex items-center justify-center relative p-4">
                   {article.cover_image && (
                     <img
                       src={article.cover_image}
