@@ -352,7 +352,7 @@ const ArticleEditor: React.FC<{
                 >
                   {displayTitle || 'Новая инструкция'}
                 </h3>
-                <div className="h-[80%] aspect-square shrink-0 flex items-center justify-center">
+                <div className="h-[80%] aspect-square shrink-0 flex items-center justify-start">
                   {coverImage && (
                     <img
                       src={coverImage}
@@ -700,7 +700,7 @@ const Articles: React.FC = () => {
         </div>
       ) : articles.length === 0 ? (
         <div className="text-center py-16 space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-muted mx-auto flex items-center justify-center">
+          <div className="w-16 h-16 rounded-2xl bg-muted mx-auto flex items-center justify-start">
             <FileText className="w-8 h-8 text-muted-foreground" />
           </div>
           <p className="text-muted-foreground">Нет инструкций</p>
@@ -710,7 +710,7 @@ const Articles: React.FC = () => {
           </Button>
         </div>
       ) : (
-        <div className="grid gap-3 md:gap-5 [grid-template-columns:repeat(auto-fill,minmax(240px,240px))] justify-center">
+        <div className="grid gap-3 md:gap-5 [grid-template-columns:repeat(auto-fill,minmax(240px,240px))] justify-start">
           {articles
             .filter(a => {
               if (accessFilter === 'favorites' && !isFavorite(a.id)) return false;
