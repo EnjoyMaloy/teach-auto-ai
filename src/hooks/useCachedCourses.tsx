@@ -55,6 +55,7 @@ const fetchUserCourses = async (userId: string): Promise<CourseListItem[]> => {
     coverImage: c.cover_image || undefined,
     authorId: c.author_id,
     isPublished: c.is_published || false,
+    isLinkAccessible: c.is_link_accessible || false,
     category: c.category || undefined,
     lessonsCount: c.lessons?.length || 0,
     estimatedMinutes: c.estimated_minutes || 0,
