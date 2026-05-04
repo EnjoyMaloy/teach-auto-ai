@@ -998,6 +998,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_favorite_articles: {
+        Row: {
+          article_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          article_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          article_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_favorite_courses: {
         Row: {
           course_id: string
