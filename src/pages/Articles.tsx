@@ -594,35 +594,54 @@ const Articles: React.FC = () => {
   return (
     <div className="relative z-10 p-4 md:p-6" style={{ paddingLeft: '1rem' }}>
       <div className="h-16 md:h-[52px]" />
-      <div className="flex items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Инструкции</h1>
-          <p className="text-sm text-muted-foreground">Создавайте инструкции, публикуйте их в Open Academy и встраивайте в свои курсы</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Select value={accessFilter} onValueChange={(v) => setAccessFilter(v as typeof accessFilter)}>
-            <SelectTrigger className="h-8 w-auto gap-2 border-border bg-background/40 hover:bg-background/60 px-3 text-[13px] font-medium rounded-md">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent align="end">
-              <SelectItem value="all">
-                <span className="inline-flex items-center gap-2">Любой доступ</span>
-              </SelectItem>
-              <SelectItem value="private">
-                <span className="inline-flex items-center gap-2"><Lock className="w-3.5 h-3.5" />Закрытый</span>
-              </SelectItem>
-              <SelectItem value="link">
-                <span className="inline-flex items-center gap-2"><Link2 className="w-3.5 h-3.5" />По ссылке</span>
-              </SelectItem>
-              <SelectItem value="public">
-                <span className="inline-flex items-center gap-2"><Globe className="w-3.5 h-3.5" />В каталоге</span>
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <Button onClick={createArticle} size="sm" className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px]">
+      <div className="mb-6">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Инструкции</h1>
+            <p className="text-sm text-muted-foreground">Создавайте инструкции, публикуйте их в Open Academy и встраивайте в свои курсы</p>
+          </div>
+          <Button onClick={createArticle} size="sm" className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px] shrink-0">
             <Plus className="w-3.5 h-3.5 mr-1.5" />
             Создать инструкцию
           </Button>
+        </div>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-1 flex-wrap">
+            {([
+              { id: 'all', label: 'Все', icon: null },
+              { id: 'private', label: 'Закрытый', icon: Lock },
+              { id: 'link', label: 'По ссылке', icon: Link2 },
+              { id: 'public', label: 'В каталоге', icon: Globe },
+            ] as const).map((f) => {
+              const Icon = f.icon;
+              const count = f.id === 'all' ? articles.length : articles.filter(a => (a.access_type || 'private') === f.id).length;
+              const isActive = accessFilter === f.id;
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => setAccessFilter(f.id)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap ${
+                    isActive
+                      ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white'
+                      : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
+                  }`}
+                >
+                  {Icon && <Icon className="w-3.5 h-3.5" />}
+                  {f.label}
+                  <span className="ml-1 text-muted-foreground dark:text-white/30">{count}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="relative w-full md:w-64 shrink-0">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Поиск по названию"
+              className="h-8 pl-8 text-[13px] bg-background/40 border-border"
+            />
+          </div>
         </div>
       </div>
 
