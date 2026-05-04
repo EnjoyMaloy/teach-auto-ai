@@ -803,6 +803,31 @@ const Articles: React.FC = () => {
           })}
         </div>
       )}
+
+      <AlertDialog open={!!articleToDelete} onOpenChange={() => setArticleToDelete(null)}>
+        <AlertDialogContent className="bg-card dark:bg-[#1a1a1b] border-border dark:border-white/10 max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-[15px] text-foreground dark:text-white">Удалить инструкцию?</AlertDialogTitle>
+            <AlertDialogDescription className="text-[13px] text-muted-foreground dark:text-white/50">
+              «{articleToDelete?.title || 'Без названия'}» будет удалена без возможности восстановления.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2">
+            <AlertDialogCancel className="h-8 px-3 text-[13px] bg-transparent border-border text-muted-foreground hover:text-foreground hover:bg-muted dark:border-white/10 dark:text-white/60 dark:hover:text-white dark:hover:bg-white/5">
+              Отмена
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (articleToDelete) deleteArticle(articleToDelete.id);
+                setArticleToDelete(null);
+              }}
+              className="h-8 px-3 text-[13px] bg-red-500/20 text-red-400 hover:bg-red-500/30 border-0"
+            >
+              Удалить
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
