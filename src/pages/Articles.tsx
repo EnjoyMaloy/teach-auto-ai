@@ -480,11 +480,23 @@ const ArticleEditor: React.FC<{
         /* Editor body */
         <div className="max-w-3xl mx-auto px-4 py-10">
           {/* Title */}
-          <input
+          <textarea
             value={displayTitle}
             onChange={(e) => lang === 'ru' ? setTitle(e.target.value) : setTitleEn(e.target.value)}
             placeholder={lang === 'ru' ? 'Заголовок' : 'Title'}
-            className="w-full text-3xl font-bold bg-transparent border-none outline-none placeholder:text-muted-foreground/50 text-foreground mb-6"
+            rows={1}
+            onInput={(e) => {
+              const el = e.currentTarget;
+              el.style.height = 'auto';
+              el.style.height = el.scrollHeight + 'px';
+            }}
+            ref={(el) => {
+              if (el) {
+                el.style.height = 'auto';
+                el.style.height = el.scrollHeight + 'px';
+              }
+            }}
+            className="w-full text-3xl font-bold bg-transparent border-none outline-none placeholder:text-muted-foreground/50 text-foreground mb-6 resize-none overflow-hidden leading-tight break-words"
           />
 
           {/* Content editor */}
