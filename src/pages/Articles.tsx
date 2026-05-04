@@ -719,7 +719,7 @@ const Articles: React.FC = () => {
                 <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                      <button className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center text-white/80 hover:text-white transition-colors opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100">
+                      <button className="w-8 h-8 rounded-lg bg-black/30 backdrop-blur-sm hover:bg-black/50 flex items-center justify-center text-white/90 hover:text-white transition-colors opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100">
                         <MoreHorizontal className="w-4 h-4" />
                       </button>
                     </DropdownMenuTrigger>
@@ -758,8 +758,8 @@ const Articles: React.FC = () => {
                     className={cn(
                       'w-8 h-8 rounded-lg flex items-center justify-center transition-all',
                       isFavorite(article.id)
-                        ? 'bg-white/30 backdrop-blur-sm text-white'
-                        : 'bg-white/20 backdrop-blur-sm text-white/70 opacity-0 group-hover:opacity-100 hover:text-white hover:bg-white/30'
+                        ? 'bg-black/40 backdrop-blur-sm text-white'
+                        : 'bg-black/30 backdrop-blur-sm text-white/90 opacity-0 group-hover:opacity-100 hover:text-white hover:bg-black/50'
                     )}
                   >
                     <Star className="w-4 h-4" fill={isFavorite(article.id) ? 'currentColor' : 'none'} />
