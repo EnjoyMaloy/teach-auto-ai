@@ -514,6 +514,7 @@ const Articles: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [profile, setProfile] = useState<{ name: string | null; avatar_url: string | null } | null>(null);
+  const [accessFilter, setAccessFilter] = useState<'all' | 'private' | 'link' | 'public'>('all');
 
   useEffect(() => {
     if (!user) return;
@@ -591,15 +592,44 @@ const Articles: React.FC = () => {
   return (
     <div className="relative z-10 p-4 md:p-6" style={{ paddingLeft: '1rem' }}>
       <div className="h-16 md:h-[52px]" />
-      <div className="flex items-center justify-between gap-2 mb-6">
+      <div className="flex items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Инструкции</h1>
           <p className="text-sm text-muted-foreground">Создавайте инструкции, публикуйте их в Open Academy и встраивайте в курсы</p>
         </div>
-        <Button onClick={createArticle} size="sm" className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px]">
-          <Plus className="w-3.5 h-3.5 mr-1.5" />
-          Создать инструкцию
-        </Button>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            {([
+              { id: 'all', label: 'Все', icon: null },
+              { id: 'private', label: 'Закрытый', icon: Lock },
+              { id: 'link', label: 'По ссылке', icon: Link2 },
+              { id: 'public', label: 'В каталоге', icon: Globe },
+            ] as const).map((f) => {
+              const Icon = f.icon;
+              const count = f.id === 'all' ? articles.length : articles.filter(a => (a.access_type || 'private') === f.id).length;
+              const isActive = accessFilter === f.id;
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => setAccessFilter(f.id)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap ${
+                    isActive
+                      ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white'
+                      : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
+                  }`}
+                >
+                  {Icon && <Icon className="w-3.5 h-3.5" />}
+                  {f.label}
+                  <span className="ml-1 text-muted-foreground dark:text-white/30">{count}</span>
+                </button>
+              );
+            })}
+          </div>
+          <Button onClick={createArticle} size="sm" className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px]">
+            <Plus className="w-3.5 h-3.5 mr-1.5" />
+            Создать инструкцию
+          </Button>
+        </div>
       </div>
 
       {loading ? (
@@ -619,7 +649,9 @@ const Articles: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
-          {articles.map((article) => {
+          {articles
+            .filter(a => accessFilter === 'all' || (a.access_type || 'private') === accessFilter)
+            .map((article) => {
             const gradient = article.cover_gradient || ARTICLE_GRADIENTS[Math.abs(article.id.charCodeAt(0)) % ARTICLE_GRADIENTS.length];
             return (
               <button

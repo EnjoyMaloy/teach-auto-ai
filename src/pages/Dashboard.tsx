@@ -86,34 +86,40 @@ const Dashboard: React.FC = () => {
       {/* Top spacer for mobile header */}
       <div className="h-16 md:h-[52px]" />
       
-      {/* Desktop Top Bar - filters left, create button right */}
-      <div className="hidden md:flex relative z-20 items-center justify-between gap-2 mb-6">
-        <div className="flex items-center gap-1">
-          {filters.map(f => (
-            <button
-              key={f.id}
-              onClick={() => setFilter(f.id)}
-              className={`
-                px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap
-                ${filter === f.id 
-                  ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
-                  : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
-                }
-              `}
-            >
-              {f.label}
-              <span className="ml-1.5 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
-            </button>
-          ))}
+      {/* Desktop Top Bar - title left, filters + create button right */}
+      <div className="hidden md:flex relative z-20 items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Мои курсы</h1>
+          <p className="text-sm text-muted-foreground">Создавайте курсы, публикуйте их в Open Academy и делитесь со студентами</p>
         </div>
-        <Button 
-          onClick={handleCreate} 
-          size="sm"
-          className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px]"
-        >
-          <Plus className="w-3.5 h-3.5 mr-1.5" />
-          Создать курс
-        </Button>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            {filters.map(f => (
+              <button
+                key={f.id}
+                onClick={() => setFilter(f.id)}
+                className={`
+                  px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap
+                  ${filter === f.id 
+                    ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
+                    : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
+                  }
+                `}
+              >
+                {f.label}
+                <span className="ml-1.5 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
+              </button>
+            ))}
+          </div>
+          <Button 
+            onClick={handleCreate} 
+            size="sm"
+            className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px]"
+          >
+            <Plus className="w-3.5 h-3.5 mr-1.5" />
+            Создать курс
+          </Button>
+        </div>
       </div>
 
       {/* Mobile Filters */}
