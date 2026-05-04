@@ -412,12 +412,12 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  isActive={isActive('/catalog')}
-                  onClick={() => handleNavigate('/catalog')}
-                  onMouseEnter={prefetchCatalog}
+                  disabled
+                  className="opacity-50 cursor-not-allowed"
                 >
                   <Compass className="size-4" />
                   <span>Исследовать</span>
+                  <span className="ml-auto text-[10px] text-muted-foreground px-1.5 py-0.5 rounded bg-muted">скоро</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
