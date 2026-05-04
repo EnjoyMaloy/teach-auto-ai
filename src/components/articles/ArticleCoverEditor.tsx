@@ -393,10 +393,11 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
         </div>
       </div>
 
-      {/* Title color picker */}
+      {/* Title section */}
       {onTitleColorChange && (
-        <div className="space-y-2 pt-2">
-          <p className="text-sm font-medium text-foreground">Цвет заголовка</p>
+        <div className="space-y-2 pt-4 border-t border-border">
+          <p className="text-sm font-medium text-foreground">Заголовок</p>
+          <p className="text-xs text-muted-foreground">Цвет</p>
 
           {/* Custom picker row */}
           <div className="flex items-center gap-2">
