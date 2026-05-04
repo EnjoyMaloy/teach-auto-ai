@@ -51,8 +51,8 @@ const LayoutContent: React.FC = () => {
       {/* Desktop sidebar trigger - only when collapsed */}
       {!isMobile && isCollapsed && (
         <div 
-          className="fixed top-4 z-20"
-          style={{ left: '1rem' }}
+          className="fixed top-6 z-20"
+          style={{ left: '1.5rem' }}
         >
           <SidebarTrigger />
         </div>
