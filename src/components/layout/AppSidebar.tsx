@@ -453,20 +453,26 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="min-w-[120px]">
-              {displayLanguages.map((lang) => (
-                <DropdownMenuItem
-                  key={lang.code}
-                  onClick={() => {
-                    // Only ru/en are actually supported in i18n
-                    if (lang.code === 'ru' || lang.code === 'en') {
-                      setLanguage(lang.code);
-                    }
-                  }}
-                  className={lang.code !== 'ru' && lang.code !== 'en' ? 'opacity-50' : ''}
-                >
-                  {lang.label}
-                </DropdownMenuItem>
-              ))}
+              {displayLanguages.map((lang) => {
+                const isAvailable = lang.code === 'ru';
+                return (
+                  <DropdownMenuItem
+                    key={lang.code}
+                    disabled={!isAvailable}
+                    onClick={() => {
+                      if (isAvailable) {
+                        setLanguage(lang.code as 'ru' | 'en');
+                      }
+                    }}
+                    className={!isAvailable ? 'opacity-50 cursor-not-allowed' : ''}
+                  >
+                    <span>{lang.label}</span>
+                    {!isAvailable && (
+                      <span className="ml-auto text-[10px] text-muted-foreground px-1.5 py-0.5 rounded bg-muted">soon</span>
+                    )}
+                  </DropdownMenuItem>
+                );
+              })}
             </DropdownMenuContent>
           </DropdownMenu>
 
