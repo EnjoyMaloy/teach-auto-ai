@@ -116,7 +116,7 @@ const ArticleEditor: React.FC<{
   const [keywordInput, setKeywordInput] = useState('');
   const [keywordInputEn, setKeywordInputEn] = useState('');
   const [uploadingOg, setUploadingOg] = useState(false);
-  const [settingsTab, setSettingsTab] = useState<'cover' | 'access' | 'details' | 'seo'>('cover');
+  const [settingsTab, setSettingsTab] = useState<'instruction' | 'cover' | 'access' | 'details' | 'seo'>('instruction');
   const hasEnContent = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
 
   const editorRuRef = useRef<Editor | null>(null);
@@ -214,7 +214,7 @@ const ArticleEditor: React.FC<{
   };
 
 
-  const [showSettings, setShowSettings] = useState(false);
+  const showSettings = settingsTab !== 'instruction';
   const displayTitle = lang === 'ru' ? title : (titleEn || title);
 
   return (
