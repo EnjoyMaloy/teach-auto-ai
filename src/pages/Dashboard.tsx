@@ -89,7 +89,7 @@ const Dashboard: React.FC = () => {
         style={{ paddingLeft: '1rem' }}
       >
       {/* Top spacer for mobile header */}
-      <div className="h-16 md:h-[52px]" />
+      <div className="h-16 md:h-2" />
       
       {/* Desktop Top Bar */}
       <div className="hidden md:block relative z-20 mb-6">
