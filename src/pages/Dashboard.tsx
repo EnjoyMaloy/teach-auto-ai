@@ -22,7 +22,7 @@ import { useCachedFavorites } from '@/hooks/useCachedFavorites';
 import { useSidebar } from '@/components/ui/sidebar';
 
 
-type FilterType = 'all' | 'private' | 'link' | 'public';
+type FilterType = 'all' | 'private' | 'link' | 'public' | 'favorites';
 
 const getAccessType = (c: CourseListItem): 'private' | 'link' | 'public' => {
   if (c.isPublished) return 'public';
@@ -44,6 +44,7 @@ const Dashboard: React.FC = () => {
     const matchesSearch = !search.trim() || course.title?.toLowerCase().includes(search.toLowerCase());
     if (!matchesSearch) return false;
     if (filter === 'all') return true;
+    if (filter === 'favorites') return isFavorite(course.id);
     return getAccessType(course) === filter;
   });
 
@@ -52,6 +53,7 @@ const Dashboard: React.FC = () => {
     private: courses.filter(c => getAccessType(c) === 'private').length,
     link: courses.filter(c => getAccessType(c) === 'link').length,
     public: courses.filter(c => getAccessType(c) === 'public').length,
+    favorites: courses.filter(c => isFavorite(c.id)).length,
   };
 
   const handleCreate = () => {
@@ -71,6 +73,7 @@ const Dashboard: React.FC = () => {
 
   const filters: { id: FilterType; label: string; icon: typeof Lock | null }[] = [
     { id: 'all', label: 'Все', icon: null },
+    { id: 'favorites', label: 'Избранные', icon: Star },
     { id: 'private', label: 'Закрытый', icon: Lock },
     { id: 'link', label: 'По ссылке', icon: Link2 },
     { id: 'public', label: 'В каталоге', icon: Globe },
