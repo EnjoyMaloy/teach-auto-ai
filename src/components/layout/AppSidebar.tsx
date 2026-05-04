@@ -444,7 +444,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                 variant="ghost" 
                 size="icon" 
                 onMouseEnter={() => setLangOpen(true)}
-                className="h-9 w-9 text-muted-foreground hover:text-[hsl(265,60%,75%)] hover:bg-transparent"
+                className="h-9 w-9 text-muted-foreground hover:bg-transparent hover:text-[hsl(265,60%,75%)] data-[state=open]:text-[hsl(265,60%,75%)]"
               >
                 <Globe style={{ width: '1.4375rem', height: '1.4375rem' }} />
               </Button>
