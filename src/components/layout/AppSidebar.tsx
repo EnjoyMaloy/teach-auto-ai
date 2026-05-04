@@ -76,7 +76,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
-  const { theme, setTheme } = useTheme();
+  
   const { language, setLanguage } = useLanguage();
   const [recentCourses, setRecentCourses] = useState<RecentCourse[]>([]);
   const { setOpenMobile, isMobile } = useSidebar();
