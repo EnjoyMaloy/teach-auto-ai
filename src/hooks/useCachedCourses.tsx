@@ -37,6 +37,7 @@ const fetchUserCourses = async (userId: string): Promise<CourseListItem[]> => {
       cover_image,
       author_id,
       is_published,
+      is_link_accessible,
       category,
       estimated_minutes,
       updated_at,
