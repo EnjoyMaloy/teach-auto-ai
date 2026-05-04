@@ -46,6 +46,13 @@ interface Article {
   category: string | null;
   translation_stale: boolean;
   access_type: string;
+  seo_title: string | null;
+  seo_description: string | null;
+  seo_keywords: string[] | null;
+  seo_title_en: string | null;
+  seo_description_en: string | null;
+  seo_keywords_en: string[] | null;
+  og_image: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -98,6 +105,17 @@ const ArticleEditor: React.FC<{
   const [customCategoryInput, setCustomCategoryInput] = useState('');
   const [translationStale, setTranslationStale] = useState(article.translation_stale);
   const [accessType, setAccessType] = useState(article.access_type || 'private');
+  const [seoTitle, setSeoTitle] = useState(article.seo_title || '');
+  const [seoDescription, setSeoDescription] = useState(article.seo_description || '');
+  const [seoKeywords, setSeoKeywords] = useState<string[]>(article.seo_keywords || []);
+  const [seoTitleEn, setSeoTitleEn] = useState(article.seo_title_en || '');
+  const [seoDescriptionEn, setSeoDescriptionEn] = useState(article.seo_description_en || '');
+  const [seoKeywordsEn, setSeoKeywordsEn] = useState<string[]>(article.seo_keywords_en || []);
+  const [ogImage, setOgImage] = useState(article.og_image || '');
+  const [keywordInput, setKeywordInput] = useState('');
+  const [keywordInputEn, setKeywordInputEn] = useState('');
+  const [uploadingOg, setUploadingOg] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<'cover' | 'access' | 'details' | 'seo'>('cover');
   const hasEnContent = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
 
   const editorRuRef = useRef<Editor | null>(null);
@@ -172,6 +190,13 @@ const ArticleEditor: React.FC<{
         category: category || null,
         translation_stale: newStale,
         access_type: accessType,
+        seo_title: seoTitle || null,
+        seo_description: seoDescription || null,
+        seo_keywords: seoKeywords,
+        seo_title_en: seoTitleEn || null,
+        seo_description_en: seoDescriptionEn || null,
+        seo_keywords_en: seoKeywordsEn,
+        og_image: ogImage || null,
       })
       .eq('id', article.id)
       .select()
