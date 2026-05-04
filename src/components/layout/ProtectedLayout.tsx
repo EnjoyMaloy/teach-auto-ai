@@ -54,7 +54,7 @@ const LayoutContent: React.FC = () => {
           className="fixed bottom-4 z-20"
           style={{ left: '1rem' }}
         >
-          <SidebarTrigger className="!h-9 !w-9 rounded-md text-muted-foreground hover:bg-transparent hover:text-[hsl(265,60%,75%)] [&_svg]:!size-[1.4375rem]" />
+          <SidebarTrigger className="!h-9 !w-9 rounded-md border border-border bg-background/60 backdrop-blur-sm shadow-sm text-muted-foreground hover:bg-background/80 hover:text-[hsl(265,60%,75%)] [&_svg]:!size-[1.4375rem]" />
         </div>
       )}
     </>
