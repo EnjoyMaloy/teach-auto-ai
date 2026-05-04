@@ -272,7 +272,7 @@ const ArticleEditor: React.FC<{
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="article-action-hover inline-flex h-8 items-center justify-start gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-semibold text-foreground ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+            className="article-action-hover inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-semibold text-foreground ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
           >
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
             <span className="text-xs">Сохранить</span>
@@ -340,7 +340,7 @@ const ArticleEditor: React.FC<{
                 >
                   {displayTitle || 'Новая инструкция'}
                 </h3>
-                <div className="h-[80%] aspect-square shrink-0 flex items-center justify-start">
+                <div className="h-[80%] aspect-square shrink-0 flex items-center justify-center">
                   {coverImage && (
                     <img
                       src={coverImage}
@@ -428,7 +428,7 @@ const ArticleEditor: React.FC<{
               ) : (
                 <button
                   onClick={() => setCustomCategoryInput(' ')}
-                  className="w-8 h-8 rounded-full bg-muted text-muted-foreground hover:border-border border border-transparent flex items-center justify-start transition-all"
+                  className="w-8 h-8 rounded-full bg-muted text-muted-foreground hover:border-border border border-transparent flex items-center justify-center transition-all"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
@@ -683,12 +683,12 @@ const Articles: React.FC = () => {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-start py-12">
+        <div className="flex items-center justify-center py-12">
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         </div>
       ) : articles.length === 0 ? (
         <div className="text-center py-16 space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-muted mx-auto flex items-center justify-start">
+          <div className="w-16 h-16 rounded-2xl bg-muted mx-auto flex items-center justify-center">
             <FileText className="w-8 h-8 text-muted-foreground" />
           </div>
           <p className="text-muted-foreground">Нет инструкций</p>
@@ -719,7 +719,7 @@ const Articles: React.FC = () => {
                 <div className="absolute top-3 right-3 flex items-center gap-2 z-20">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                      <button className="w-8 h-8 rounded-lg bg-black/30 backdrop-blur-sm hover:bg-black/50 flex items-center justify-start text-white/90 hover:text-white transition-colors opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100">
+                      <button className="w-8 h-8 rounded-lg bg-black/30 backdrop-blur-sm hover:bg-black/50 flex items-center justify-center text-white/90 hover:text-white transition-colors opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100">
                         <MoreHorizontal className="w-4 h-4" />
                       </button>
                     </DropdownMenuTrigger>
@@ -756,7 +756,7 @@ const Articles: React.FC = () => {
                       toggleFavorite(article.id);
                     }}
                     className={cn(
-                      'w-8 h-8 rounded-lg flex items-center justify-start transition-all',
+                      'w-8 h-8 rounded-lg flex items-center justify-center transition-all',
                       isFavorite(article.id)
                         ? 'bg-black/40 backdrop-blur-sm text-white'
                         : 'bg-black/30 backdrop-blur-sm text-white/90 opacity-0 group-hover:opacity-100 hover:text-white hover:bg-black/50'
@@ -767,7 +767,7 @@ const Articles: React.FC = () => {
                 </div>
 
                 {/* Image area */}
-                <div className="w-full flex-1 min-h-0 flex items-center justify-start relative px-4 pb-4 pt-12">
+                <div className="w-full flex-1 min-h-0 flex items-center justify-center relative px-4 pb-4 pt-12">
                   {article.cover_image && (
                     <img
                       src={article.cover_image}
@@ -785,7 +785,7 @@ const Articles: React.FC = () => {
                   >
                     {article.title || 'Новая инструкция'}
                   </h3>
-                  <div className="flex items-center justify-start gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 mx-auto w-fit">
+                  <div className="flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 mx-auto w-fit">
                     {profile?.avatar_url ? (
                       <img src={profile.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />
                     ) : (
