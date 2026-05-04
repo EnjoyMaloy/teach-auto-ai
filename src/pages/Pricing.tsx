@@ -151,9 +151,10 @@ const Pricing = () => {
                 className={cn(
                   "relative overflow-hidden transition-all duration-300",
                   "bg-sidebar/80 backdrop-blur-sm border border-foreground/10 dark:border-sidebar-border",
-                  "hover:bg-sidebar/90 hover:border-foreground/20 dark:hover:border-sidebar-accent",
+                  "hover:bg-sidebar/90",
+                  !plan.recommended && "hover:border-foreground/20 dark:hover:border-sidebar-accent",
                   plan.recommended 
-                    ? "border-[hsl(265_60%_75%)] dark:border-[hsl(265_60%_75%)] shadow-lg shadow-[hsl(265_60%_75%_/_0.2)] lg:scale-105 z-10" 
+                    ? "border-[hsl(265_60%_75%)] dark:border-[hsl(265_60%_75%)] hover:border-[hsl(265_60%_75%)] dark:hover:border-[hsl(265_60%_75%)] shadow-lg shadow-[hsl(265_60%_75%_/_0.2)] lg:scale-105 z-10" 
                     : "",
                   index === 0 && "lg:-mr-2",
                   index === 2 && "lg:-ml-2"
