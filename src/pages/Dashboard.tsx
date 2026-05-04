@@ -22,7 +22,13 @@ import { useCachedFavorites } from '@/hooks/useCachedFavorites';
 import { useSidebar } from '@/components/ui/sidebar';
 
 
-type FilterType = 'all' | 'drafts' | 'published';
+type FilterType = 'all' | 'private' | 'link' | 'public';
+
+const getAccessType = (c: CourseListItem): 'private' | 'link' | 'public' => {
+  if (c.isPublished) return 'public';
+  if (c.isLinkAccessible) return 'link';
+  return 'private';
+};
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -38,14 +44,14 @@ const Dashboard: React.FC = () => {
     const matchesSearch = !search.trim() || course.title?.toLowerCase().includes(search.toLowerCase());
     if (!matchesSearch) return false;
     if (filter === 'all') return true;
-    if (filter === 'drafts') return !course.isPublished;
-    return course.isPublished;
+    return getAccessType(course) === filter;
   });
 
   const counts = {
     all: courses.length,
-    drafts: courses.filter(c => !c.isPublished).length,
-    published: courses.filter(c => c.isPublished).length,
+    private: courses.filter(c => getAccessType(c) === 'private').length,
+    link: courses.filter(c => getAccessType(c) === 'link').length,
+    public: courses.filter(c => getAccessType(c) === 'public').length,
   };
 
   const handleCreate = () => {
@@ -63,10 +69,11 @@ const Dashboard: React.FC = () => {
     setCourseToDelete(null);
   };
 
-  const filters: { id: FilterType; label: string }[] = [
-    { id: 'all', label: 'Все' },
-    { id: 'drafts', label: 'Черновики' },
-    { id: 'published', label: 'Опубликованные' },
+  const filters: { id: FilterType; label: string; icon: typeof Lock | null }[] = [
+    { id: 'all', label: 'Все', icon: null },
+    { id: 'private', label: 'Закрытый', icon: Lock },
+    { id: 'link', label: 'По ссылке', icon: Link2 },
+    { id: 'public', label: 'В каталоге', icon: Globe },
   ];
 
   return (
