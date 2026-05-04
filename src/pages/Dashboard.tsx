@@ -95,7 +95,7 @@ const Dashboard: React.FC = () => {
       <div className="hidden md:block relative z-20 mb-6">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Мои курсы</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-1.5">Мои курсы</h1>
             <p className="text-sm text-muted-foreground">Создавайте курсы, публикуйте их в Open Academy или делитесь с аудиторией через свой Telegram Mini App</p>
           </div>
           <Button 
