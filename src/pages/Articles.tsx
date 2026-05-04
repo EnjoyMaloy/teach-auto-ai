@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, Settings, Languages, AlertTriangle, X, Tag, Eye, Clock, Globe, Link2, Lock, Copy, Check, Search } from 'lucide-react';
+import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, Settings, Languages, AlertTriangle, X, Tag, Eye, Clock, Globe, Link2, Lock, Copy, Check, Search, Star, MoreHorizontal } from 'lucide-react';
 
 import { toast } from 'sonner';
 import { Editor } from '@tiptap/react';
@@ -13,6 +13,24 @@ import ArticleCoverEditor, { ARTICLE_GRADIENTS } from '@/components/articles/Art
 import ArticleType2Cover from '@/components/articles/ArticleType2Cover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import NotionEditor from '@/components/articles/NotionEditor';
+import { useFavoriteArticles } from '@/hooks/useFavoriteArticles';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 
 interface Article {
@@ -527,8 +545,10 @@ const Articles: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [profile, setProfile] = useState<{ name: string | null; avatar_url: string | null } | null>(null);
-  const [accessFilter, setAccessFilter] = useState<'all' | 'private' | 'link' | 'public'>('all');
+  const [accessFilter, setAccessFilter] = useState<'all' | 'private' | 'link' | 'public' | 'favorites'>('all');
   const [search, setSearch] = useState('');
+  const [articleToDelete, setArticleToDelete] = useState<Article | null>(null);
+  const { isFavorite, toggleFavorite } = useFavoriteArticles();
 
   useEffect(() => {
     if (!user) return;
@@ -621,12 +641,17 @@ const Articles: React.FC = () => {
           <div className="flex items-center gap-1 flex-wrap">
             {([
               { id: 'all', label: 'Все', icon: null },
+              { id: 'favorites', label: 'Избранные', icon: Star },
               { id: 'private', label: 'Закрытый', icon: Lock },
               { id: 'link', label: 'По ссылке', icon: Link2 },
               { id: 'public', label: 'В каталоге', icon: Globe },
             ] as const).map((f) => {
               const Icon = f.icon;
-              const count = f.id === 'all' ? articles.length : articles.filter(a => (a.access_type || 'private') === f.id).length;
+              const count = f.id === 'all'
+                ? articles.length
+                : f.id === 'favorites'
+                  ? articles.filter(a => isFavorite(a.id)).length
+                  : articles.filter(a => (a.access_type || 'private') === f.id).length;
               const isActive = accessFilter === f.id;
               return (
                 <button
@@ -675,16 +700,72 @@ const Articles: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5">
           {articles
-            .filter(a => (accessFilter === 'all' || (a.access_type || 'private') === accessFilter) && (!search.trim() || (a.title || '').toLowerCase().includes(search.toLowerCase())))
+            .filter(a => {
+              if (accessFilter === 'favorites' && !isFavorite(a.id)) return false;
+              if (accessFilter !== 'all' && accessFilter !== 'favorites' && (a.access_type || 'private') !== accessFilter) return false;
+              if (search.trim() && !(a.title || '').toLowerCase().includes(search.toLowerCase())) return false;
+              return true;
+            })
             .map((article) => {
             const gradient = article.cover_gradient || ARTICLE_GRADIENTS[Math.abs(article.id.charCodeAt(0)) % ARTICLE_GRADIENTS.length];
             return (
-              <button
+              <div
                 key={article.id}
                 onClick={() => setEditingArticle(article)}
-                className="group text-left rounded-2xl overflow-hidden border border-border shadow-md transition-transform duration-300 hover:scale-[1.02] aspect-[4/5] flex flex-col"
+                className="group relative text-left rounded-2xl overflow-hidden border border-border shadow-md transition-transform duration-300 hover:scale-[1.02] aspect-[4/5] flex flex-col cursor-pointer"
                 style={{ background: gradient }}
               >
+                {/* Top right controls */}
+                <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                      <button className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center text-white/80 hover:text-white transition-colors opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100">
+                        <MoreHorizontal className="w-4 h-4" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="min-w-[140px] bg-card dark:bg-[#1a1a1b] border-border dark:border-white/10 p-1 z-50"
+                    >
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingArticle(article);
+                        }}
+                        className="text-[13px] text-muted-foreground focus:text-foreground focus:bg-muted dark:text-white/70 dark:focus:text-white dark:focus:bg-white/5 rounded px-2 py-1.5"
+                      >
+                        <Settings className="w-3.5 h-3.5 mr-2" />
+                        Открыть
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator className="my-1 bg-border dark:bg-white/5" />
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setArticleToDelete(article);
+                        }}
+                        className="text-[13px] text-red-400 focus:text-red-400 focus:bg-red-500/10 rounded px-2 py-1.5"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 mr-2" />
+                        Удалить
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(article.id);
+                    }}
+                    className={cn(
+                      'w-8 h-8 rounded-lg flex items-center justify-center transition-all',
+                      isFavorite(article.id)
+                        ? 'bg-white/30 backdrop-blur-sm text-white'
+                        : 'bg-white/20 backdrop-blur-sm text-white/70 opacity-0 group-hover:opacity-100 hover:text-white hover:bg-white/30'
+                    )}
+                  >
+                    <Star className="w-4 h-4" fill={isFavorite(article.id) ? 'currentColor' : 'none'} />
+                  </button>
+                </div>
+
                 {/* Image area */}
                 <div className="w-full flex-1 min-h-0 flex items-center justify-center relative p-4">
                   {article.cover_image && (
@@ -717,11 +798,36 @@ const Articles: React.FC = () => {
                     <span className="text-white/70 text-xs">0</span>
                   </div>
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>
       )}
+
+      <AlertDialog open={!!articleToDelete} onOpenChange={() => setArticleToDelete(null)}>
+        <AlertDialogContent className="bg-card dark:bg-[#1a1a1b] border-border dark:border-white/10 max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-[15px] text-foreground dark:text-white">Удалить инструкцию?</AlertDialogTitle>
+            <AlertDialogDescription className="text-[13px] text-muted-foreground dark:text-white/50">
+              «{articleToDelete?.title || 'Без названия'}» будет удалена без возможности восстановления.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2">
+            <AlertDialogCancel className="h-8 px-3 text-[13px] bg-transparent border-border text-muted-foreground hover:text-foreground hover:bg-muted dark:border-white/10 dark:text-white/60 dark:hover:text-white dark:hover:bg-white/5">
+              Отмена
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (articleToDelete) deleteArticle(articleToDelete.id);
+                setArticleToDelete(null);
+              }}
+              className="h-8 px-3 text-[13px] bg-red-500/20 text-red-400 hover:bg-red-500/30 border-0"
+            >
+              Удалить
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
