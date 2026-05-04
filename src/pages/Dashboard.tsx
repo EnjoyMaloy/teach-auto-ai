@@ -87,7 +87,10 @@ const Dashboard: React.FC = () => {
       <div className="h-16 md:h-36" />
       
       {/* Desktop Top Bar - filters left, create button right */}
-      <div className={`hidden md:flex absolute top-16 right-6 z-20 items-center justify-between gap-2 ${isSidebarCollapsed ? 'left-24' : 'left-6'}`}>
+      <div
+        className="hidden md:flex absolute top-16 right-6 z-20 items-center justify-between gap-2"
+        style={{ left: isSidebarCollapsed ? 'calc(var(--sidebar-width) + 1.5rem)' : '1.5rem' }}
+      >
         <div className="flex items-center gap-1">
           {filters.map(f => (
             <button
