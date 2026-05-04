@@ -32,8 +32,11 @@ const Dashboard: React.FC = () => {
   const { isFavorite, toggleFavorite } = useCachedFavorites();
   const [courseToDelete, setCourseToDelete] = useState<CourseListItem | null>(null);
   const [filter, setFilter] = useState<FilterType>('all');
+  const [search, setSearch] = useState('');
 
   const filteredCourses = courses.filter(course => {
+    const matchesSearch = !search.trim() || course.title?.toLowerCase().includes(search.toLowerCase());
+    if (!matchesSearch) return false;
     if (filter === 'all') return true;
     if (filter === 'drafts') return !course.isPublished;
     return course.isPublished;
