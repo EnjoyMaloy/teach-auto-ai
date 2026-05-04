@@ -545,8 +545,10 @@ const Articles: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [profile, setProfile] = useState<{ name: string | null; avatar_url: string | null } | null>(null);
-  const [accessFilter, setAccessFilter] = useState<'all' | 'private' | 'link' | 'public'>('all');
+  const [accessFilter, setAccessFilter] = useState<'all' | 'private' | 'link' | 'public' | 'favorites'>('all');
   const [search, setSearch] = useState('');
+  const [articleToDelete, setArticleToDelete] = useState<Article | null>(null);
+  const { isFavorite, toggleFavorite } = useFavoriteArticles();
 
   useEffect(() => {
     if (!user) return;
