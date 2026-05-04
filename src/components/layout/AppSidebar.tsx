@@ -372,19 +372,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                   onMouseEnter={prefetchWorkshop}
                 >
                   <Folder className="size-4" />
-                  <span>Все курсы</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
-              {/* Favorites */}
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive('/favorites')}
-                  onClick={() => handleNavigate('/favorites')}
-                  onMouseEnter={prefetchFavorites}
-                >
-                  <Star className="size-4" />
-                  <span>Избранное</span>
+                  <span>Мои курсы</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
@@ -396,6 +384,18 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                 >
                   <FileText className="size-4" />
                   <span>Инструкции</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* Favorites — coming soon */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  disabled
+                  className="opacity-50 cursor-not-allowed"
+                >
+                  <Star className="size-4" />
+                  <span>Избранное</span>
+                  <span className="ml-auto text-[10px] text-muted-foreground px-1.5 py-0.5 rounded bg-muted">скоро</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
