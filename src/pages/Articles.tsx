@@ -687,7 +687,7 @@ const Articles: React.FC = () => {
                 {/* Bottom info */}
                 <div className="px-4 pb-4 pt-0 space-y-2">
                   <h3
-                    className="font-semibold text-base leading-tight text-center line-clamp-2 break-words"
+                    className="font-semibold text-base leading-tight text-center line-clamp-2 [overflow-wrap:anywhere] hyphens-auto"
                     style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif', color: article.title_color || '#ffffff' }}
                   >
                     {article.title || 'Новая инструкция'}
