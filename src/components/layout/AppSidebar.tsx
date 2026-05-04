@@ -197,9 +197,6 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   const isActive = (path: string) => location.pathname === path;
   const isEditorRoute = (courseId: string) => location.pathname === `/editor/${courseId}`;
 
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
 
   const languages = [
     { code: 'ru' as const, label: 'Russian' },
