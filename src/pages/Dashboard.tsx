@@ -25,6 +25,8 @@ type FilterType = 'all' | 'drafts' | 'published';
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { courses, isLoading, deleteCourse } = useUserCourses();
+  const { state: sidebarState } = useSidebar();
+  const isSidebarCollapsed = sidebarState === 'collapsed';
   const { isFavorite, toggleFavorite } = useCachedFavorites();
   const [courseToDelete, setCourseToDelete] = useState<CourseListItem | null>(null);
   const [filter, setFilter] = useState<FilterType>('all');
