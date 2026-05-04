@@ -437,39 +437,14 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
       <SidebarFooter className="p-4">
         <div className="flex items-center justify-between">
           {/* Language Selector */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-9 w-9 text-muted-foreground hover:text-[hsl(265,60%,75%)] hover:bg-transparent"
-              >
-                <Globe className="size-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="min-w-[120px]">
-              {displayLanguages.map((lang) => {
-                const isAvailable = lang.code === 'ru';
-                return (
-                  <DropdownMenuItem
-                    key={lang.code}
-                    disabled={!isAvailable}
-                    onClick={() => {
-                      if (isAvailable) {
-                        setLanguage(lang.code as 'ru' | 'en');
-                      }
-                    }}
-                    className={!isAvailable ? 'opacity-50 cursor-not-allowed' : ''}
-                  >
-                    <span>{lang.label}</span>
-                    {!isAvailable && (
-                      <span className="ml-auto text-[10px] text-muted-foreground px-1.5 py-0.5 rounded bg-muted">soon</span>
-                    )}
-                  </DropdownMenuItem>
-                );
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {(() => {
+            const [langOpen, setLangOpen] = [null, null];
+            return null;
+          }) && null}
+          <LanguageMenu
+            displayLanguages={displayLanguages}
+            setLanguage={setLanguage}
+          />
 
         </div>
       </SidebarFooter>
