@@ -477,6 +477,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
+          <SidebarTrigger className="!h-9 !w-9 rounded-md text-muted-foreground hover:bg-transparent hover:text-[hsl(265,60%,75%)] [&_svg]:!size-[1.4375rem]" />
         </div>
       </SidebarFooter>
 
