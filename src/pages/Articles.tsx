@@ -625,7 +625,7 @@ const Articles: React.FC = () => {
               <button
                 key={article.id}
                 onClick={() => setEditingArticle(article)}
-                className="group text-left rounded-2xl overflow-hidden border border-border shadow-md hover:ring-2 hover:ring-primary/50 transition-all"
+                className="group text-left rounded-2xl overflow-hidden border border-border shadow-md transition-transform duration-300 hover:scale-[1.02]"
                 style={{ background: gradient }}
               >
                 {/* Image area */}
