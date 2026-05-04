@@ -301,8 +301,8 @@ const ArticleEditor: React.FC<{
               { id: 'instruction', label: 'Инструкция', icon: FileText },
               { id: 'cover', label: 'Обложка', icon: ImageIcon },
               { id: 'access', label: 'Доступ', icon: ShieldCheck },
-              { id: 'details', label: 'Детали', icon: Layers },
               { id: 'seo', label: 'SEO', icon: Tag },
+              { id: 'details', label: 'Детали', icon: Layers },
             ] as const).map((t) => {
               const Icon = t.icon;
               const active = settingsTab === t.id;
