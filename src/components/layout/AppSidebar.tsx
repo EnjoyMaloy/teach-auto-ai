@@ -171,7 +171,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
         .select('id, title, updated_at')
         .eq('author_id', user.id)
         .order('updated_at', { ascending: false })
-        .limit(5);
+                 .limit(3);
 
       if (!error && data) {
         setRecentCourses(data.map((c) => ({ id: c.id, title: c.title })));
