@@ -338,56 +338,59 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
         onChange={handleUpload}
       />
 
-      {/* Gradient grid */}
-      <div className="grid grid-cols-10 gap-1.5">
-        {ARTICLE_GRADIENTS.map((g, i) => (
-          <button
-            key={`preset-${i}`}
-            onClick={() => onUpdate(g, image)}
-            className={cn(
-              'aspect-square rounded-lg border-2 transition-all hover:scale-110',
-              gradient === g ? 'border-primary ring-1 ring-primary' : 'border-transparent'
-            )}
-            style={{ background: g }}
-          />
-        ))}
-
-        {/* Custom saved gradients */}
-        {customGradients.map((g, i) => (
-          <div key={`custom-${i}`} className="relative group">
+      {/* Gradient section */}
+      <div className="pt-4 border-t border-border space-y-2">
+        <p className="text-sm font-medium text-foreground">Градиент обложки</p>
+        <div className="grid grid-cols-10 gap-1.5">
+          {ARTICLE_GRADIENTS.map((g, i) => (
             <button
+              key={`preset-${i}`}
               onClick={() => onUpdate(g, image)}
               className={cn(
-                'aspect-square rounded-lg border-2 transition-all hover:scale-110 w-full',
+                'aspect-square rounded-lg border-2 transition-all hover:scale-110',
                 gradient === g ? 'border-primary ring-1 ring-primary' : 'border-transparent'
               )}
               style={{ background: g }}
             />
-            <button
-              onClick={() => handleDeleteCustomGradient(g)}
-              className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-white text-black flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
-            >
-              <X className="w-2 h-2" />
-            </button>
-          </div>
-        ))}
+          ))}
 
-        {/* Custom gradient button */}
-        <Popover open={gradientPopoverOpen} onOpenChange={setGradientPopoverOpen}>
-          <PopoverTrigger asChild>
-            <button
-              className="aspect-square rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-muted-foreground/60 transition-all hover:scale-110 flex items-center justify-center"
-            >
-              <Plus className="w-3.5 h-3.5 text-muted-foreground" />
-            </button>
-          </PopoverTrigger>
-          <PopoverContent className="w-72 p-3" align="end">
-            <CustomGradientBuilder
-              onChange={(g) => onUpdate(g, image)}
-              onSave={handleSaveGradient}
-            />
-          </PopoverContent>
-        </Popover>
+          {/* Custom saved gradients */}
+          {customGradients.map((g, i) => (
+            <div key={`custom-${i}`} className="relative group">
+              <button
+                onClick={() => onUpdate(g, image)}
+                className={cn(
+                  'aspect-square rounded-lg border-2 transition-all hover:scale-110 w-full',
+                  gradient === g ? 'border-primary ring-1 ring-primary' : 'border-transparent'
+                )}
+                style={{ background: g }}
+              />
+              <button
+                onClick={() => handleDeleteCustomGradient(g)}
+                className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-white text-black flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+              >
+                <X className="w-2 h-2" />
+              </button>
+            </div>
+          ))}
+
+          {/* Custom gradient button */}
+          <Popover open={gradientPopoverOpen} onOpenChange={setGradientPopoverOpen}>
+            <PopoverTrigger asChild>
+              <button
+                className="aspect-square rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-muted-foreground/60 transition-all hover:scale-110 flex items-center justify-center"
+              >
+                <Plus className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-72 p-3" align="end">
+              <CustomGradientBuilder
+                onChange={(g) => onUpdate(g, image)}
+                onSave={handleSaveGradient}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
 
       {/* Title color picker */}
