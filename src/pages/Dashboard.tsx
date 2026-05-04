@@ -150,20 +150,24 @@ const Dashboard: React.FC = () => {
       {/* Mobile Top Bar */}
       <div className="md:hidden mb-4 space-y-3">
         <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-hide">
-          {filters.map(f => (
-            <button
-              key={f.id}
-              onClick={() => setFilter(f.id)}
-              className={`px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap ${
-                filter === f.id 
-                  ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
-                  : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
-              }`}
-            >
-              {f.label}
-              <span className="ml-1.5 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
-            </button>
-          ))}
+          {filters.map(f => {
+            const Icon = f.icon;
+            return (
+              <button
+                key={f.id}
+                onClick={() => setFilter(f.id)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap ${
+                  filter === f.id 
+                    ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
+                    : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
+                }`}
+              >
+                {Icon && <Icon className="w-3.5 h-3.5" />}
+                {f.label}
+                <span className="ml-1 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
+              </button>
+            );
+          })}
         </div>
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
