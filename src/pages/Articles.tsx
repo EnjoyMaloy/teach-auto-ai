@@ -598,7 +598,7 @@ const Articles: React.FC = () => {
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Инструкции</h1>
-            <p className="text-sm text-muted-foreground">Создавайте инструкции, публикуйте их в Open Academy и встраивайте в свои курсы</p>
+            <p className="text-sm text-muted-foreground">Создавайте инструкции, публикуйте их в Open Academy или встраивайте в свои курсы</p>
           </div>
           <Button onClick={createArticle} size="sm" className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px] shrink-0">
             <Plus className="w-3.5 h-3.5 mr-1.5" />
