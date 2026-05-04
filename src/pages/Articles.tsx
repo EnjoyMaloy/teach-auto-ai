@@ -4,7 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, Settings, Languages, AlertTriangle, X, Tag, Eye, Clock, Globe, Link2, Lock, Copy, Check, Search, Star, MoreHorizontal } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Plus, Trash2, ArrowLeft, FileText, Save, Loader2, Settings, Languages, AlertTriangle, X, Tag, Eye, Clock, Globe, Link2, Lock, Copy, Check, Search, Star, MoreHorizontal, Image as ImageIcon, ShieldCheck, Layers } from 'lucide-react';
 
 import { toast } from 'sonner';
 import { Editor } from '@tiptap/react';
@@ -46,6 +47,13 @@ interface Article {
   category: string | null;
   translation_stale: boolean;
   access_type: string;
+  seo_title: string | null;
+  seo_description: string | null;
+  seo_keywords: string[] | null;
+  seo_title_en: string | null;
+  seo_description_en: string | null;
+  seo_keywords_en: string[] | null;
+  og_image: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -98,6 +106,17 @@ const ArticleEditor: React.FC<{
   const [customCategoryInput, setCustomCategoryInput] = useState('');
   const [translationStale, setTranslationStale] = useState(article.translation_stale);
   const [accessType, setAccessType] = useState(article.access_type || 'private');
+  const [seoTitle, setSeoTitle] = useState(article.seo_title || '');
+  const [seoDescription, setSeoDescription] = useState(article.seo_description || '');
+  const [seoKeywords, setSeoKeywords] = useState<string[]>(article.seo_keywords || []);
+  const [seoTitleEn, setSeoTitleEn] = useState(article.seo_title_en || '');
+  const [seoDescriptionEn, setSeoDescriptionEn] = useState(article.seo_description_en || '');
+  const [seoKeywordsEn, setSeoKeywordsEn] = useState<string[]>(article.seo_keywords_en || []);
+  const [ogImage, setOgImage] = useState(article.og_image || '');
+  const [keywordInput, setKeywordInput] = useState('');
+  const [keywordInputEn, setKeywordInputEn] = useState('');
+  const [uploadingOg, setUploadingOg] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<'cover' | 'access' | 'details' | 'seo'>('cover');
   const hasEnContent = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
 
   const editorRuRef = useRef<Editor | null>(null);
@@ -172,6 +191,13 @@ const ArticleEditor: React.FC<{
         category: category || null,
         translation_stale: newStale,
         access_type: accessType,
+        seo_title: seoTitle || null,
+        seo_description: seoDescription || null,
+        seo_keywords: seoKeywords,
+        seo_title_en: seoTitleEn || null,
+        seo_description_en: seoDescriptionEn || null,
+        seo_keywords_en: seoKeywordsEn,
+        og_image: ogImage || null,
       })
       .eq('id', article.id)
       .select()
@@ -283,215 +309,392 @@ const ArticleEditor: React.FC<{
 
       {/* Settings view (replaces editor) */}
       {showSettings ? (
-        <div className="max-w-3xl mx-auto px-4 py-10 space-y-6">
-          <h2 className="text-xl font-semibold text-foreground">Настройки инструкции</h2>
-
-          {/* Cover type switcher */}
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">Тип обложки</p>
-            <div className="inline-flex bg-muted rounded-lg p-0.5">
+        <div className="max-w-5xl mx-auto px-4 py-10">
+          <h2 className="text-xl font-semibold text-foreground mb-6">Настройки инструкции</h2>
+          <div className="flex gap-8 items-start">
+            {/* Sidebar tabs */}
+            <nav className="w-48 shrink-0 sticky top-24 space-y-1">
               {([
-                { id: 'type1', name: 'Тип 1' },
-                { id: 'type2', name: 'Тип 2' },
-              ] as const).map((opt) => (
-                <button
-                  key={opt.id}
-                  onClick={() => setCoverType(opt.id)}
-                  className={cn(
-                    'px-4 py-1.5 text-xs font-medium rounded-md transition-colors',
-                    coverType === opt.id
-                      ? 'bg-background text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  {opt.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Banner preview */}
-          <p className="text-sm font-medium text-foreground">Шапка</p>
-          {(() => {
-            const gradient =
-              coverGradient ||
-              ARTICLE_GRADIENTS[Math.abs(article.id.charCodeAt(0)) % ARTICLE_GRADIENTS.length];
-
-            if (coverType === 'type2') {
-              return (
-                <ArticleType2Cover
-                  variant="banner"
-                  gradient={gradient}
-                  image={coverImage}
-                  title={displayTitle || 'Новая инструкция'}
-                  titleColor={titleColor}
-                />
-              );
-            }
-
-            return (
-              <div
-                className="w-full rounded-2xl overflow-hidden border border-border shadow-md flex items-center gap-4 px-8"
-                style={{ background: gradient, aspectRatio: '4 / 1' }}
-              >
-                <h3
-                  className="flex-1 leading-tight line-clamp-3 font-light text-4xl"
-                  style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif', color: titleColor }}
-                >
-                  {displayTitle || 'Новая инструкция'}
-                </h3>
-                <div className="h-[80%] aspect-square shrink-0 flex items-center justify-center">
-                  {coverImage && (
-                    <img
-                      src={coverImage}
-                      alt=""
-                      className="max-h-full max-w-full object-contain drop-shadow-lg"
-                    />
-                  )}
-                </div>
-              </div>
-            );
-          })()}
-
-          <ArticleCoverEditor
-            gradient={coverGradient}
-            image={coverImage}
-            articleId={article.id}
-            title={title}
-            titleEn={titleEn}
-            titleColor={titleColor}
-            coverType={coverType}
-            onTitleColorChange={setTitleColor}
-            authorName={user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || ''}
-            authorAvatar={user?.user_metadata?.avatar_url || user?.user_metadata?.picture || ''}
-            onUpdate={(g, img) => {
-              setCoverGradient(g);
-              setCoverImage(img);
-            }}
-          />
-
-          {/* Category selector */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Категория</Label>
-            <div className="flex flex-wrap items-center gap-2">
-              {[
-                { id: 'ai', name: 'ИИ' },
-                { id: 'crypto', name: 'Крипта' },
-              ].map((cat) => {
-                const isSelected = category === cat.id;
+                { id: 'cover', label: 'Обложка', icon: ImageIcon },
+                { id: 'access', label: 'Доступ', icon: ShieldCheck },
+                { id: 'details', label: 'Детали', icon: Layers },
+                { id: 'seo', label: 'SEO', icon: Tag },
+              ] as const).map((t) => {
+                const Icon = t.icon;
+                const active = settingsTab === t.id;
                 return (
                   <button
-                    key={cat.id}
-                    onClick={() => setCategory(isSelected ? '' : cat.id)}
+                    key={t.id}
+                    onClick={() => setSettingsTab(t.id)}
                     className={cn(
-                      'px-4 py-2 rounded-full text-sm font-medium transition-all border',
-                      isSelected
-                        ? 'bg-primary text-primary-foreground border-primary'
-                        : 'bg-muted text-muted-foreground border-transparent hover:border-border'
+                      'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-left',
+                      active
+                        ? 'bg-muted text-foreground'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                     )}
                   >
-                    {cat.name}
+                    <Icon className="w-4 h-4" />
+                    {t.label}
                   </button>
                 );
               })}
-              {category && !['ai', 'crypto'].includes(category) && (
-                <div className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium bg-primary text-primary-foreground border border-primary">
-                  {category}
-                  <button onClick={() => setCategory('')} className="ml-0.5 hover:opacity-70">
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              )}
-              {customCategoryInput !== null && typeof customCategoryInput === 'string' && customCategoryInput !== '' ? (
-                <div className="flex items-center gap-1">
-                  <Input
-                    value={customCategoryInput}
-                    onChange={(e) => setCustomCategoryInput(e.target.value)}
-                    placeholder="Название..."
-                    className="rounded-full text-sm h-auto py-2 px-4 w-28"
-                    autoFocus
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && customCategoryInput.trim()) {
-                        setCategory(customCategoryInput.trim());
-                        setCustomCategoryInput('');
-                      }
-                      if (e.key === 'Escape') setCustomCategoryInput('');
-                    }}
-                    onBlur={() => {
-                      if (customCategoryInput.trim()) {
-                        setCategory(customCategoryInput.trim());
-                      }
-                      setCustomCategoryInput('');
+            </nav>
+
+            {/* Tab content */}
+            <div className="flex-1 min-w-0 space-y-6">
+              {settingsTab === 'cover' && (
+                <>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-foreground">Тип обложки</p>
+                    <div className="inline-flex bg-muted rounded-lg p-0.5">
+                      {([
+                        { id: 'type1', name: 'Тип 1' },
+                        { id: 'type2', name: 'Тип 2' },
+                      ] as const).map((opt) => (
+                        <button
+                          key={opt.id}
+                          onClick={() => setCoverType(opt.id)}
+                          className={cn(
+                            'px-4 py-1.5 text-xs font-medium rounded-md transition-colors',
+                            coverType === opt.id
+                              ? 'bg-background text-foreground shadow-sm'
+                              : 'text-muted-foreground hover:text-foreground'
+                          )}
+                        >
+                          {opt.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <p className="text-sm font-medium text-foreground">Шапка</p>
+                  {(() => {
+                    const gradient =
+                      coverGradient ||
+                      ARTICLE_GRADIENTS[Math.abs(article.id.charCodeAt(0)) % ARTICLE_GRADIENTS.length];
+                    if (coverType === 'type2') {
+                      return (
+                        <ArticleType2Cover
+                          variant="banner"
+                          gradient={gradient}
+                          image={coverImage}
+                          title={displayTitle || 'Новая инструкция'}
+                          titleColor={titleColor}
+                        />
+                      );
+                    }
+                    return (
+                      <div
+                        className="w-full rounded-2xl overflow-hidden border border-border shadow-md flex items-center gap-4 px-8"
+                        style={{ background: gradient, aspectRatio: '4 / 1' }}
+                      >
+                        <h3
+                          className="flex-1 leading-tight line-clamp-3 font-light text-4xl"
+                          style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif', color: titleColor }}
+                        >
+                          {displayTitle || 'Новая инструкция'}
+                        </h3>
+                        <div className="h-[80%] aspect-square shrink-0 flex items-center justify-center">
+                          {coverImage && (
+                            <img src={coverImage} alt="" className="max-h-full max-w-full object-contain drop-shadow-lg" />
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  <ArticleCoverEditor
+                    gradient={coverGradient}
+                    image={coverImage}
+                    articleId={article.id}
+                    title={title}
+                    titleEn={titleEn}
+                    titleColor={titleColor}
+                    coverType={coverType}
+                    onTitleColorChange={setTitleColor}
+                    authorName={user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || ''}
+                    authorAvatar={user?.user_metadata?.avatar_url || user?.user_metadata?.picture || ''}
+                    onUpdate={(g, img) => {
+                      setCoverGradient(g);
+                      setCoverImage(img);
                     }}
                   />
+                </>
+              )}
+
+              {settingsTab === 'access' && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Доступ</Label>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {([
+                      { id: 'private', name: 'Закрытый', icon: Lock },
+                      { id: 'link', name: 'По ссылке', icon: Link2 },
+                      { id: 'public', name: 'В каталоге', icon: Globe },
+                    ] as const).map((opt) => {
+                      const isSelected = accessType === opt.id;
+                      const Icon = opt.icon;
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => setAccessType(opt.id)}
+                          className={cn(
+                            'inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all border',
+                            isSelected
+                              ? 'bg-primary text-primary-foreground border-primary'
+                              : 'bg-muted text-muted-foreground border-transparent hover:border-border'
+                          )}
+                        >
+                          <Icon className="w-3.5 h-3.5" />
+                          {opt.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {accessType === 'link' && (
+                    <LinkCopyRow slug={titleEn ? titleEn.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : article.id} />
+                  )}
                 </div>
-              ) : (
-                <button
-                  onClick={() => setCustomCategoryInput(' ')}
-                  className="w-8 h-8 rounded-full bg-muted text-muted-foreground hover:border-border border border-transparent flex items-center justify-center transition-all"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
+              )}
+
+              {settingsTab === 'details' && (
+                <>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Категория</Label>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {[
+                        { id: 'ai', name: 'ИИ' },
+                        { id: 'crypto', name: 'Крипта' },
+                      ].map((cat) => {
+                        const isSelected = category === cat.id;
+                        return (
+                          <button
+                            key={cat.id}
+                            onClick={() => setCategory(isSelected ? '' : cat.id)}
+                            className={cn(
+                              'px-4 py-2 rounded-full text-sm font-medium transition-all border',
+                              isSelected
+                                ? 'bg-primary text-primary-foreground border-primary'
+                                : 'bg-muted text-muted-foreground border-transparent hover:border-border'
+                            )}
+                          >
+                            {cat.name}
+                          </button>
+                        );
+                      })}
+                      {category && !['ai', 'crypto'].includes(category) && (
+                        <div className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium bg-primary text-primary-foreground border border-primary">
+                          {category}
+                          <button onClick={() => setCategory('')} className="ml-0.5 hover:opacity-70">
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
+                      {customCategoryInput !== null && typeof customCategoryInput === 'string' && customCategoryInput !== '' ? (
+                        <div className="flex items-center gap-1">
+                          <Input
+                            value={customCategoryInput}
+                            onChange={(e) => setCustomCategoryInput(e.target.value)}
+                            placeholder="Название..."
+                            className="rounded-full text-sm h-auto py-2 px-4 w-28"
+                            autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && customCategoryInput.trim()) {
+                                setCategory(customCategoryInput.trim());
+                                setCustomCategoryInput('');
+                              }
+                              if (e.key === 'Escape') setCustomCategoryInput('');
+                            }}
+                            onBlur={() => {
+                              if (customCategoryInput.trim()) {
+                                setCategory(customCategoryInput.trim());
+                              }
+                              setCustomCategoryInput('');
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setCustomCategoryInput(' ')}
+                          className="w-8 h-8 rounded-full bg-muted text-muted-foreground hover:border-border border border-transparent flex items-center justify-center transition-all"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Сведения</Label>
+                    <div className="rounded-xl border border-border bg-muted/50 divide-y divide-border">
+                      <div className="flex items-center justify-between px-4 py-3">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Clock className="w-4 h-4" />
+                          <span>Время чтения</span>
+                        </div>
+                        <span className="text-sm font-medium text-foreground">~{estimateReadingMinutes(editorRuRef.current?.getHTML() || article.content || '')} мин</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-border/50 dark:border-border">
+                    <Button
+                      variant="ghost"
+                      onClick={() => onDelete(article.id)}
+                      className="text-red-400 hover:text-red-500 bg-red-50 hover:bg-red-100 dark:bg-transparent dark:text-destructive dark:hover:bg-destructive/10 gap-2 rounded-xl"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Удалить инструкцию
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {settingsTab === 'seo' && (
+                <>
+                  {/* RU */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">SEO · RU</span>
+                      <div className="flex-1 h-px bg-border" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">SEO Title</Label>
+                      <Input value={seoTitle} onChange={(e) => setSeoTitle(e.target.value)} placeholder="Заголовок для поисковиков" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">SEO Description</Label>
+                      <Textarea value={seoDescription} onChange={(e) => setSeoDescription(e.target.value)} placeholder="Краткое описание (до 160 символов)" rows={3} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Keywords</Label>
+                      <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-border bg-background px-2 py-2 min-h-10">
+                        {seoKeywords.map((kw, i) => (
+                          <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-muted text-xs">
+                            {kw}
+                            <button onClick={() => setSeoKeywords(seoKeywords.filter((_, j) => j !== i))} className="hover:opacity-70">
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+                        <input
+                          value={keywordInput}
+                          onChange={(e) => setKeywordInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if ((e.key === 'Enter' || e.key === ',') && keywordInput.trim()) {
+                              e.preventDefault();
+                              setSeoKeywords([...seoKeywords, keywordInput.trim()]);
+                              setKeywordInput('');
+                            }
+                            if (e.key === 'Backspace' && !keywordInput && seoKeywords.length) {
+                              setSeoKeywords(seoKeywords.slice(0, -1));
+                            }
+                          }}
+                          placeholder="Добавить ключевое слово..."
+                          className="flex-1 min-w-[140px] bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* EN */}
+                  <div className="space-y-4 pt-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">SEO · EN</span>
+                      <div className="flex-1 h-px bg-border" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">SEO Title</Label>
+                      <Input value={seoTitleEn} onChange={(e) => setSeoTitleEn(e.target.value)} placeholder="Search engine title" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">SEO Description</Label>
+                      <Textarea value={seoDescriptionEn} onChange={(e) => setSeoDescriptionEn(e.target.value)} placeholder="Short description (max 160 chars)" rows={3} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Keywords</Label>
+                      <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-border bg-background px-2 py-2 min-h-10">
+                        {seoKeywordsEn.map((kw, i) => (
+                          <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-muted text-xs">
+                            {kw}
+                            <button onClick={() => setSeoKeywordsEn(seoKeywordsEn.filter((_, j) => j !== i))} className="hover:opacity-70">
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+                        <input
+                          value={keywordInputEn}
+                          onChange={(e) => setKeywordInputEn(e.target.value)}
+                          onKeyDown={(e) => {
+                            if ((e.key === 'Enter' || e.key === ',') && keywordInputEn.trim()) {
+                              e.preventDefault();
+                              setSeoKeywordsEn([...seoKeywordsEn, keywordInputEn.trim()]);
+                              setKeywordInputEn('');
+                            }
+                            if (e.key === 'Backspace' && !keywordInputEn && seoKeywordsEn.length) {
+                              setSeoKeywordsEn(seoKeywordsEn.slice(0, -1));
+                            }
+                          }}
+                          placeholder="Add keyword..."
+                          className="flex-1 min-w-[140px] bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* OG image */}
+                  <div className="space-y-2 pt-4">
+                    <Label className="text-sm font-medium">OG image</Label>
+                    {ogImage ? (
+                      <div className="relative rounded-xl overflow-hidden border border-border">
+                        <img src={ogImage} alt="OG" className="w-full aspect-[1200/630] object-cover" />
+                        <button
+                          onClick={() => setOgImage('')}
+                          className="absolute top-3 right-3 px-3 py-1.5 rounded-md bg-black/70 text-white text-xs hover:bg-black/90"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ) : null}
+                    <label className={cn(
+                      "block rounded-xl border-2 border-dashed border-border bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer",
+                      ogImage ? "py-4" : "aspect-[1200/630] flex items-center justify-center"
+                    )}>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          setUploadingOg(true);
+                          const ext = file.name.split('.').pop() || 'png';
+                          const path = `article-covers/${article.id}/og-${Date.now()}.${ext}`;
+                          const { error } = await supabase.storage.from('course-images').upload(path, file, { upsert: true });
+                          if (error) {
+                            toast.error('Ошибка загрузки');
+                          } else {
+                            const { data } = supabase.storage.from('course-images').getPublicUrl(path);
+                            setOgImage(data.publicUrl);
+                          }
+                          setUploadingOg(false);
+                          e.target.value = '';
+                        }}
+                      />
+                      <div className="flex flex-col items-center justify-center text-sm text-muted-foreground gap-1">
+                        {uploadingOg ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <>
+                            <ImageIcon className="w-5 h-5" />
+                            <span>{ogImage ? 'Drop to replace' : 'Загрузите изображение 1200×630'}</span>
+                          </>
+                        )}
+                      </div>
+                    </label>
+                  </div>
+                </>
               )}
             </div>
-          </div>
-
-          {/* Details */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Детали</Label>
-            <div className="rounded-xl border border-border bg-muted/50 divide-y divide-border">
-              <div className="flex items-center justify-between px-4 py-3">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="w-4 h-4" />
-                  <span>Время чтения</span>
-                </div>
-                <span className="text-sm font-medium text-foreground">~{estimateReadingMinutes(editorRuRef.current?.getHTML() || article.content || '')} мин</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Access control */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Доступ</Label>
-            <div className="flex flex-wrap items-center gap-2">
-              {([
-                { id: 'private', name: 'Закрытый', icon: Lock },
-                { id: 'link', name: 'По ссылке', icon: Link2 },
-                { id: 'public', name: 'В каталоге', icon: Globe },
-              ] as const).map((opt) => {
-                const isSelected = accessType === opt.id;
-                const Icon = opt.icon;
-                return (
-                  <button
-                    key={opt.id}
-                    onClick={() => setAccessType(opt.id)}
-                    className={cn(
-                      'inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all border',
-                      isSelected
-                        ? 'bg-primary text-primary-foreground border-primary'
-                        : 'bg-muted text-muted-foreground border-transparent hover:border-border'
-                    )}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    {opt.name}
-                  </button>
-                );
-              })}
-            </div>
-            {accessType === 'link' && (
-              <LinkCopyRow slug={titleEn ? titleEn.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : article.id} />
-            )}
-          </div>
-
-          <div className="pt-4 border-t border-border/50 dark:border-border">
-            <Button
-              variant="ghost"
-              onClick={() => onDelete(article.id)}
-              className="text-red-400 hover:text-red-500 bg-red-50 hover:bg-red-100 dark:bg-transparent dark:text-destructive dark:hover:bg-destructive/10 gap-2 rounded-xl"
-            >
-              <Trash2 className="w-4 h-4" />
-              Удалить инструкцию
-            </Button>
           </div>
         </div>
       ) : (
