@@ -18,6 +18,7 @@ import {
 import CourseCardOverlay from '@/components/catalog/CourseCardOverlay';
 import { useUserCourses, CourseListItem } from '@/hooks/useCachedCourses';
 import { useCachedFavorites } from '@/hooks/useCachedFavorites';
+import { useSidebar } from '@/components/ui/sidebar';
 
 type FilterType = 'all' | 'drafts' | 'published';
 
