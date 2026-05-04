@@ -45,6 +45,7 @@ interface Article {
   cover_type: string | null;
   category: string | null;
   translation_stale: boolean;
+  en_modified?: boolean;
   access_type: string;
   created_at: string;
   updated_at: string;
@@ -97,6 +98,7 @@ const ArticleEditor: React.FC<{
   const [category, setCategory] = useState(article.category || '');
   const [customCategoryInput, setCustomCategoryInput] = useState('');
   const [translationStale, setTranslationStale] = useState(article.translation_stale);
+  const [enModified, setEnModified] = useState(!!article.en_modified);
   const [accessType, setAccessType] = useState(article.access_type || 'private');
   const hasEnContent = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
 
@@ -125,6 +127,9 @@ const ArticleEditor: React.FC<{
       setTitleEn(data.title_en);
       setContentEn(data.content_en);
       setTranslationStale(false);
+      setEnModified(false);
+      // Reset en_modified flag in DB after fresh translation
+      await supabase.from('articles').update({ en_modified: false }).eq('id', article.id);
       editorEnRef.current?.commands.setContent(data.content_en);
       toast.success('Перевод готов');
       setLang('en');
@@ -139,6 +144,7 @@ const ArticleEditor: React.FC<{
         cover_gradient: coverGradient,
         cover_image: coverImage,
         translation_stale: false,
+        en_modified: false,
       });
     } catch (e: any) {
       toast.error(e.message || 'Ошибка перевода');
@@ -156,7 +162,9 @@ const ArticleEditor: React.FC<{
     // Mark translation as stale if RU content changed and EN translation exists
     const hasEn = !!contentEn && contentEn !== '<p></p>' && contentEn !== '';
     const ruChanged = htmlRu !== article.content || title !== article.title;
+    const enChanged = htmlEn !== (article.content_en || '') || titleEn !== (article.title_en || '');
     const newStale = hasEn && ruChanged ? true : translationStale;
+    const newEnModified = hasEn && enChanged ? true : enModified;
     
     const { data, error } = await supabase
       .from('articles')
@@ -171,6 +179,7 @@ const ArticleEditor: React.FC<{
         cover_type: coverType,
         category: category || null,
         translation_stale: newStale,
+        en_modified: newEnModified,
         access_type: accessType,
       })
       .eq('id', article.id)
@@ -182,6 +191,7 @@ const ArticleEditor: React.FC<{
       toast.error('Ошибка сохранения');
     } else {
       setTranslationStale(newStale);
+      setEnModified(newEnModified);
       toast.success('Сохранено');
       onSaved(data as Article);
     }
@@ -227,13 +237,15 @@ const ArticleEditor: React.FC<{
                 </button>
               </div>
 
-              {hasEnContent && translationStale && (
+              {hasEnContent && (translationStale || enModified) && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 cursor-help" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    {lang === 'ru' ? 'RU изменён — обновите перевод' : 'Перевод может быть устаревшим'}
+                    {enModified && !translationStale
+                      ? 'EN версия изменена вручную после перевода'
+                      : lang === 'ru' ? 'RU изменён — обновите перевод' : 'Перевод может быть устаревшим'}
                   </TooltipContent>
                 </Tooltip>
               )}
