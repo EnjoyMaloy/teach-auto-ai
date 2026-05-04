@@ -91,52 +91,78 @@ const Dashboard: React.FC = () => {
       {/* Top spacer for mobile header */}
       <div className="h-16 md:h-[52px]" />
       
-      {/* Desktop Top Bar - title left, filters + create button right */}
-      <div className="hidden md:flex relative z-20 items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Мои курсы</h1>
-          <p className="text-sm text-muted-foreground">Создавайте курсы, публикуйте их в Open Academy и делитесь со студентами</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Select value={filter} onValueChange={(v) => setFilter(v as FilterType)}>
-            <SelectTrigger className="h-8 w-auto gap-2 border-border bg-background/40 hover:bg-background/60 px-3 text-[13px] font-medium rounded-md">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent align="end">
-              {filters.map(f => (
-                <SelectItem key={f.id} value={f.id}>{f.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      {/* Desktop Top Bar */}
+      <div className="hidden md:block relative z-20 mb-6">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Мои курсы</h1>
+            <p className="text-sm text-muted-foreground">Создавайте курсы, публикуйте их в Open Academy и делитесь со студентами</p>
+          </div>
           <Button 
             onClick={handleCreate} 
             size="sm"
-            className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px]"
+            className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px] shrink-0"
           >
             <Plus className="w-3.5 h-3.5 mr-1.5" />
             Создать курс
           </Button>
         </div>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-1 flex-wrap">
+            {filters.map(f => (
+              <button
+                key={f.id}
+                onClick={() => setFilter(f.id)}
+                className={`px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap ${
+                  filter === f.id 
+                    ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
+                    : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
+                }`}
+              >
+                {f.label}
+                <span className="ml-1.5 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
+              </button>
+            ))}
+          </div>
+          <div className="relative w-64 shrink-0">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Поиск по названию"
+              className="h-8 pl-8 text-[13px] bg-background/40 border-border"
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Mobile Filters */}
-      <div className="md:hidden flex items-center gap-1 mb-4 overflow-x-auto pb-1 scrollbar-hide">
-        {filters.map(f => (
-          <button
-            key={f.id}
-            onClick={() => setFilter(f.id)}
-            className={`
-              px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap
-              ${filter === f.id 
-                ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
-                : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
-              }
-            `}
-          >
-            {f.label}
-            <span className="ml-1.5 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
-          </button>
-        ))}
+      {/* Mobile Top Bar */}
+      <div className="md:hidden mb-4 space-y-3">
+        <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-hide">
+          {filters.map(f => (
+            <button
+              key={f.id}
+              onClick={() => setFilter(f.id)}
+              className={`px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap ${
+                filter === f.id 
+                  ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white' 
+                  : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
+              }`}
+            >
+              {f.label}
+              <span className="ml-1.5 text-muted-foreground dark:text-white/30">{counts[f.id]}</span>
+            </button>
+          ))}
+        </div>
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Поиск по названию"
+            className="h-8 pl-8 text-[13px] bg-background/40 border-border"
+          />
+        </div>
       </div>
 
       {isLoading ? (
