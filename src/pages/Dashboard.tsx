@@ -181,12 +181,7 @@ const Dashboard: React.FC = () => {
       ) : filteredCourses.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center">
           <div className="text-muted-foreground dark:text-white/20 text-[13px] mb-4">
-            {filter === 'all' 
-              ? 'У вас пока нет курсов' 
-              : filter === 'drafts'
-                ? 'Нет черновиков'
-                : 'Нет опубликованных курсов'
-            }
+            {filter === 'all' ? 'У вас пока нет курсов' : 'Ничего не найдено'}
           </div>
           {filter === 'all' && (
             <Button 
