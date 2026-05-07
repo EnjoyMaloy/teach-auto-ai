@@ -377,10 +377,10 @@ const ArticleEditor: React.FC<{
                         key={opt.id}
                         onClick={() => setCoverType(opt.id)}
                         className={cn(
-                          'px-4 py-1.5 text-xs font-medium rounded-md transition-colors border',
+                          'px-4 py-1.5 text-xs font-medium rounded-md transition-colors',
                           coverType === opt.id
-                            ? 'bg-sidebar border-sidebar-border text-foreground shadow-sm'
-                            : 'border-transparent text-muted-foreground hover:text-foreground'
+                            ? 'bg-background text-foreground shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
                         )}
                       >
                         {opt.name}
