@@ -235,7 +235,7 @@ const ArticleEditor: React.FC<{
                 onClick={() => setLang('ru')}
                 className={cn(
                   'px-2.5 py-1 text-xs font-medium rounded-md transition-colors',
-                  lang === 'ru' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                  lang === 'ru' ? 'bg-[#0a0a0c] text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
                 )}
               >
                 RU
@@ -244,7 +244,7 @@ const ArticleEditor: React.FC<{
                 onClick={() => setLang('en')}
                 className={cn(
                   'px-2.5 py-1 text-xs font-medium rounded-md transition-colors',
-                  lang === 'en' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                  lang === 'en' ? 'bg-[#0a0a0c] text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
                 )}
               >
                 EN
@@ -283,7 +283,7 @@ const ArticleEditor: React.FC<{
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="article-action-hover inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-background px-3 text-xs font-semibold text-foreground ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+              className="article-action-hover inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-[#0a0a0c] px-3 text-xs font-semibold text-foreground ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
             >
               {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
               <span className="text-xs">Сохранить</span>
@@ -379,7 +379,7 @@ const ArticleEditor: React.FC<{
                         className={cn(
                           'px-4 py-1.5 text-xs font-medium rounded-md transition-colors',
                           coverType === opt.id
-                            ? 'bg-background text-foreground shadow-sm'
+                            ? 'bg-[#0a0a0c] text-foreground shadow-sm'
                             : 'text-muted-foreground hover:text-foreground'
                         )}
                       >
