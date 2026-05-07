@@ -368,7 +368,7 @@ const ArticleEditor: React.FC<{
               <>
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-foreground">Тип обложки</p>
-                  <div className="inline-flex bg-sidebar border border-sidebar-border rounded-lg p-0.5">
+                  <div className="inline-flex bg-muted rounded-lg p-1">
                     {([
                       { id: 'type1', name: 'Тип 1' },
                       { id: 'type2', name: 'Тип 2' },
