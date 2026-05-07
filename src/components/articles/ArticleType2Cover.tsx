@@ -133,7 +133,7 @@ const ArticleType2Cover: React.FC<ArticleType2CoverProps> = ({
           style={{
             fontFamily: '"Wix Madefor Display", system-ui, sans-serif',
             fontWeight: 400,
-            color: titleColor,
+            color: resolvedTitleColor,
             fontSize: 'clamp(20px, 4.2vw, 56px)',
           }}
         >
@@ -197,7 +197,7 @@ const ArticleType2Cover: React.FC<ArticleType2CoverProps> = ({
             style={{
               fontFamily: '"Wix Madefor Display", system-ui, sans-serif',
               fontWeight: 400,
-              color: titleColor,
+              color: resolvedTitleColor,
               fontSize: 'clamp(14px, 3.4vw, 28px)',
             }}
           >
