@@ -1002,7 +1002,7 @@ const Articles: React.FC = () => {
                 if (articleToDelete) deleteArticle(articleToDelete.id);
                 setArticleToDelete(null);
               }}
-              className="h-8 px-3 text-[13px] bg-red-500/20 text-red-400 hover:bg-red-500/30 border-0"
+              className="h-8 px-3 text-[13px] bg-transparent text-red-400 hover:bg-red-500/10 border-0"
             >
               Удалить
             </AlertDialogAction>
