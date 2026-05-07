@@ -379,7 +379,7 @@ const ArticleEditor: React.FC<{
                         className={cn(
                           'px-4 py-1.5 text-xs font-medium rounded-md transition-colors',
                           coverType === opt.id
-                            ? 'bg-background text-foreground shadow-sm'
+                            ? 'bg-[#0a0a0c] text-foreground shadow-sm'
                             : 'text-muted-foreground hover:text-foreground'
                         )}
                       >
