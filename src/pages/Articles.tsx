@@ -838,10 +838,10 @@ const Articles: React.FC = () => {
                 <button
                   key={f.id}
                   onClick={() => setAccessFilter(f.id)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap border ${
                     isActive
-                      ? 'bg-foreground/10 text-foreground dark:bg-white/10 dark:text-white'
-                      : 'text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
+                      ? 'bg-sidebar border-sidebar-border text-foreground dark:text-white'
+                      : 'border-transparent text-muted-foreground hover:text-foreground dark:text-white/40 dark:hover:text-white/60'
                   }`}
                 >
                   {Icon && <Icon className="w-3.5 h-3.5" />}
