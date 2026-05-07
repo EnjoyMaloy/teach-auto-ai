@@ -1,11 +1,13 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { getAutoTitleColor } from '@/lib/gradientTextColor';
 
 interface ArticleType2CoverProps {
   variant: 'banner' | 'square';
   gradient: string;
   image: string | null;
   title: string;
+  /** If omitted, color is auto-computed for contrast against the gradient. */
   titleColor?: string;
   className?: string;
   /** Optional content to show inside the media frame placeholder when no image */
@@ -104,13 +106,14 @@ const ArticleType2Cover: React.FC<ArticleType2CoverProps> = ({
   gradient,
   image,
   title,
-  titleColor = '#1f1f1f',
+  titleColor,
   className,
   placeholder,
   onMediaClick,
   overlay,
 }) => {
   const shadow = getShadowColor(gradient);
+  const resolvedTitleColor = titleColor ?? getAutoTitleColor(gradient);
 
   if (variant === 'banner') {
     // Group bbox = front frame + shadow extending 6% bottom-left.
