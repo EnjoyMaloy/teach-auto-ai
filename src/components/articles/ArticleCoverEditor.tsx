@@ -236,7 +236,6 @@ const ArticleCoverEditor: React.FC<ArticleCoverEditorProps> = ({
                   gradient={bg}
                   image={image}
                   title={cardTitle}
-                  titleColor={titleColor}
                   onMediaClick={label === 'RU' ? () => fileRef.current?.click() : undefined}
                   placeholder={
                     label === 'RU' ? (

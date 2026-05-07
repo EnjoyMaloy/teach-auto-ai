@@ -1,111 +1,40 @@
+## Goal
+Заголовок на карточках типа 2 (градиент) должен сам подбирать контрастный цвет на основе градиента — без ручной настройки.
 
+## Алгоритм (в utils)
+Создать `src/lib/gradientTextColor.ts` с функцией `getAutoTitleColor(gradient: string): string`:
 
-# Раздел «Инструкции» + блок-статья в редакторе
+1. Извлечь два HEX-цвета из строки `linear-gradient(...)` (через regex `#[0-9a-fA-F]{6}`).
+2. Перевести оба в RGB.
+3. Посчитать средний цвет: `avgR/G/B = (c1 + c2) / 2`.
+4. Яркость: `brightness = 0.299*avgR + 0.587*avgG + 0.114*avgB`.
+5. **Сильный контраст** — если `|brightness1 - brightness2| > 110`, вернуть фиксированный:
+   - средний фон тёмный (`< 128`) → `#FFFFFF`
+   - иначе → `#111111`
+6. Иначе сместить средний цвет на ±100 по каждому каналу (clamp 0–255):
+   - тёмный фон → светлее (`+100`)
+   - светлый фон → темнее (`−100`)
+   и вернуть HEX.
+7. Fallback при невалидном/отсутствующем градиенте → `#1f1f1f`.
 
-## Что делаем
+## Применение
+**`src/components/articles/ArticleType2Cover.tsx`**
+- Если `titleColor` не передан явно (или передать новый флаг `autoTitleColor`), вычислять цвет через `getAutoTitleColor(gradient)` и использовать его для `<h3>` в обоих вариантах (`banner`, `square`).
+- Подход: сделать prop `titleColor` опциональным без дефолта; если не задан — вычислять автоматически. Это автоматически покроет все места, где сейчас передаётся `titleColor={titleColor}` — заменим вызовы, чтобы он передавался только если пользователь действительно его кастомизировал (значение в БД отличается от auto).
 
-1. Новая таблица `articles` — хранит статьи пользователя (rich text HTML)
-2. Страница `/articles` — список статей с кнопкой «Создать инструкцию», редактирование через RichTextEditor
-3. Новый тип блока `article` в редакторе курсов — выбираешь статью из списка, она отображается как прокручиваемый контент внутри слайда
-4. Пункт «Инструкции» в сайдбаре (секция «Мои курсы»)
+**Места вызова, которые переключаются на auto:**
+- `src/pages/Articles.tsx` — карточки в списке (line ~891 рендерится напрямую `style={{ background: gradient }}`, нужно проверить — там тоже есть текст заголовка, применить тот же util).
+- Превью в редакторе обложки (`ArticleCoverEditor.tsx`) и превью на странице редактора статьи (`Articles.tsx` ~411): использовать auto-цвет.
 
-## Структура
+## Совместимость с существующим ручным выбором
+Существующий пикер `titleColor` в `ArticleCoverEditor` оставляем, но по умолчанию (если пользователь не менял) показываем auto. Самое простое: убрать `title_color` из основного потока — всегда auto. Пикер цвета в редакторе можно скрыть, либо оставить как опциональный override.
 
-```text
-Сайдбар:
-  Мои курсы
-    ├── Недавние
-    ├── Все курсы
-    ├── Избранное
-    └── Инструкции  ← NEW
+**Рекомендация:** полностью убрать ручной выбор цвета заголовка (пикер и пресеты в `ArticleCoverEditor`), т.к. цель задачи — автоматизация. Поле `title_color` в БД остаётся, но не используется на чтение/запись для типа 2.
 
-Страница /articles:
-  [+ Создать инструкцию]
-  ┌──────────────────┐
-  │ Статья 1         │  → клик → редактор статьи
-  │ Статья 2         │
-  └──────────────────┘
+## Файлы
+- + `src/lib/gradientTextColor.ts` (новый)
+- ~ `src/components/articles/ArticleType2Cover.tsx` — авто-вычисление цвета
+- ~ `src/components/articles/ArticleCoverEditor.tsx` — убрать UI пикера titleColor
+- ~ `src/pages/Articles.tsx` — убрать передачу `titleColor`, применить util в карточке списка (line ~891-897)
 
-Редактор статьи:
-  [Заголовок]
-  [RichTextEditor — полноценный]
-  [Сохранить]
-
-Редактор курса → BlockTypeSelector:
-  Контент: ... + «Статья» (иконка FileText)
-
-Блок article в слайде:
-  Выбор статьи из dropdown → контент рендерится
-  с прокруткой внутри слайда
-```
-
-## Технические изменения
-
-### 1. Миграция БД — таблица `articles`
-
-```sql
-CREATE TABLE public.articles (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL,
-  title TEXT NOT NULL DEFAULT '',
-  content TEXT NOT NULL DEFAULT '',
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-ALTER TABLE public.articles ENABLE ROW LEVEL SECURITY;
-
--- RLS: пользователь видит и управляет только своими
-CREATE POLICY "Users can CRUD own articles"
-  ON public.articles FOR ALL
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-```
-
-Добавить колонку `article_id UUID` в таблицу `slides` и `published_slides` для ссылки на статью.
-
-### 2. Типы — добавить `article` в `SlideType` и `BlockType`
-
-- `src/types/course.ts` — добавить `'article'` в `SlideType`, добавить `articleId?: string` в `Slide`
-- `src/types/blocks.ts` — добавить `'article'` в `BlockType`, конфиг в `BLOCK_CONFIGS`, обновить `createEmptyBlock`
-
-### 3. Страница `src/pages/Articles.tsx`
-
-- Список статей пользователя (fetch из `articles`)
-- Кнопка «Создать инструкцию» — создаёт пустую запись, переходит к редактированию
-- Inline-редактирование: заголовок (input) + RichTextEditor для контента
-- Автосохранение или кнопка «Сохранить»
-- Удаление статьи
-
-### 4. Роутинг — `src/App.tsx`
-
-- Добавить `/articles` в protected routes с layout
-
-### 5. Сайдбар — `AppSidebar.tsx`
-
-- Добавить пункт «Инструкции» (иконка `FileText`) в секцию «Мои курсы» после «Избранное»
-
-### 6. Редактор курса — блок `article`
-
-- `BlockTypeSelector.tsx` — добавить иконку FileText в iconMap, блок появится в секции «Контент»
-- `BlockEditor.tsx` — обработка типа `article`: dropdown для выбора статьи из списка пользователя
-- `SlideRenderer.tsx` — рендеринг блока `article`: загрузка контента статьи по `articleId`, отображение HTML в прокручиваемом контейнере
-
-### 7. Публикация — `usePublishing.tsx`
-
-- При публикации копировать `article_id` в `published_slides`
-
-### Изменяемые/создаваемые файлы
-
-- Миграция БД (новая таблица + колонки)
-- `src/types/course.ts` — SlideType + articleId
-- `src/types/blocks.ts` — BlockType + config
-- `src/pages/Articles.tsx` (новый)
-- `src/App.tsx` — роут
-- `src/components/layout/AppSidebar.tsx` — пункт меню
-- `src/components/editor/blocks/BlockTypeSelector.tsx` — иконка
-- `src/components/editor/blocks/BlockEditor.tsx` — UI выбора статьи
-- `src/components/runtime/SlideRenderer.tsx` — рендеринг article
-- `src/hooks/usePublishing.tsx` — article_id в published_slides
-
+После апрува — реализую.
