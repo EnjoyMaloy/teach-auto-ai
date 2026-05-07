@@ -12,6 +12,7 @@ import { Editor } from '@tiptap/react';
 import { cn } from '@/lib/utils';
 import ArticleCoverEditor, { ARTICLE_GRADIENTS } from '@/components/articles/ArticleCoverEditor';
 import ArticleType2Cover from '@/components/articles/ArticleType2Cover';
+import { getAutoTitleColor } from '@/lib/gradientTextColor';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import NotionEditor from '@/components/articles/NotionEditor';
 import { useFavoriteArticles } from '@/hooks/useFavoriteArticles';
