@@ -1002,7 +1002,8 @@ const Articles: React.FC = () => {
                 if (articleToDelete) deleteArticle(articleToDelete.id);
                 setArticleToDelete(null);
               }}
-              className="h-8 px-3 text-[13px] bg-red-500/20 text-red-400 hover:bg-red-500/30 border-0 shadow-none hover:shadow-none hover:translate-y-0 focus:ring-0 focus-visible:ring-0 focus:ring-offset-0 focus-visible:ring-offset-0"
+              style={{ boxShadow: 'none' }}
+              className="h-8 px-3 text-[13px] bg-red-500/20 text-red-400 hover:bg-red-500/30 border-0 hover:translate-y-0 focus:ring-0 focus-visible:ring-0 focus:ring-offset-0 focus-visible:ring-offset-0 [--shadow-primary:none]"
             >
               Удалить
             </AlertDialogAction>
