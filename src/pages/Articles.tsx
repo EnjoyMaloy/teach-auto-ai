@@ -805,7 +805,7 @@ const Articles: React.FC = () => {
   }
 
   return (
-    <div className="relative z-10 p-4 md:p-6" style={{ paddingLeft: '1rem' }}>
+    <div className="relative z-10 px-4 md:px-10 lg:px-16 xl:px-24 py-4 md:py-6">
       <div className="h-16 md:h-2" />
       <div className="mb-6">
         <div className="flex items-start justify-between gap-4 mb-4">
