@@ -37,14 +37,13 @@ const darken = (hex: string, amount = 0.10): string => {
 };
 
 /**
- * Extract the first hex color from a linear-gradient string and produce a
- * "shadow frame" color one tone darker than the gradient base.
+ * Pick a "shadow frame" color using the same contrast scheme as the title:
+ * average the gradient stops, then shift by ±100 per channel (lighter on dark
+ * backgrounds, darker on light). On strong-contrast gradients fall back to a
+ * fixed black/white frame so it stays readable.
  */
 const getShadowColor = (gradient: string): string => {
-  const hexes = gradient.match(/#[0-9a-fA-F]{6}/g);
-  if (!hexes || hexes.length === 0) return 'rgba(0,0,0,0.10)';
-  // Use the darker (first) color as base; one tone darker
-  return darken(hexes[0], 0.10);
+  return getAutoTitleColor(gradient);
 };
 
 // Shadow frame offset (percent of media frame size) — used to compute
