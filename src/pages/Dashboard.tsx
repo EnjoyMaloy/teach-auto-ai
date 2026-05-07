@@ -101,10 +101,10 @@ const Dashboard: React.FC = () => {
       <div className="h-16 md:h-2" />
       
       {/* Desktop Top Bar */}
-      <div className="hidden md:block relative z-20 mb-6">
-        <div className="flex items-start justify-between gap-4 mb-4">
+      <div className="hidden md:block relative z-20 mb-10">
+        <div className="flex items-start justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-foreground mb-1.5">Мои курсы</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Мои курсы</h1>
             <p className="text-sm text-muted-foreground">Создавайте курсы, публикуйте их в Open Academy или делитесь с аудиторией через свой Telegram Mini App</p>
           </div>
           <Button 
