@@ -401,7 +401,6 @@ const ArticleEditor: React.FC<{
                         gradient={gradient}
                         image={coverImage}
                         title={displayTitle || 'Новая инструкция'}
-                        titleColor={titleColor}
                       />
                     );
                   }
@@ -412,7 +411,7 @@ const ArticleEditor: React.FC<{
                     >
                       <h3
                         className="flex-1 leading-tight line-clamp-3 font-light text-4xl"
-                        style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif', color: titleColor }}
+                        style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif', color: getAutoTitleColor(gradient) }}
                       >
                         {displayTitle || 'Новая инструкция'}
                       </h3>
@@ -431,9 +430,7 @@ const ArticleEditor: React.FC<{
                   articleId={article.id}
                   title={title}
                   titleEn={titleEn}
-                  titleColor={titleColor}
                   coverType={coverType}
-                  onTitleColorChange={setTitleColor}
                   authorName={user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email || ''}
                   authorAvatar={user?.user_metadata?.avatar_url || user?.user_metadata?.picture || ''}
                   onUpdate={(g, img) => {
@@ -962,7 +959,7 @@ const Articles: React.FC = () => {
                 <div className="px-4 pb-4 pt-0 space-y-2">
                   <h3
                     className="font-semibold text-base leading-tight text-center line-clamp-2 [overflow-wrap:anywhere] hyphens-auto"
-                    style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif', color: article.title_color || '#ffffff' }}
+                    style={{ fontFamily: '"Wix Madefor Display", system-ui, sans-serif', color: getAutoTitleColor(gradient) }}
                   >
                     {article.title || 'Новая инструкция'}
                   </h3>
