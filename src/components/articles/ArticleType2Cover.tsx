@@ -37,13 +37,66 @@ const darken = (hex: string, amount = 0.10): string => {
 };
 
 /**
- * Pick a "shadow frame" color using the same contrast scheme as the title:
- * average the gradient stops, then shift by ±100 per channel (lighter on dark
- * backgrounds, darker on light). On strong-contrast gradients fall back to a
- * fixed black/white frame so it stays readable.
+ * Pick a "shadow frame" color from the gradient.
+ * - Dark background  → lighten by 35 % (3.5 tones)
+ * - Light background → darken by 35 % (3.5 tones)
  */
 const getShadowColor = (gradient: string): string => {
-  return getAutoTitleColor(gradient);
+  const hexes = gradient.match(/#[0-9a-fA-F]{6}/g);
+  if (!hexes || hexes.length === 0) return '#1f1f1f';
+
+  const c1 = hexToRgb(hexes[0]);
+  const c2 = hexToRgb(hexes[1] ?? hexes[0]);
+  if (!c1 || !c2) return '#1f1f1f';
+
+  const avgR = (c1.r + c2.r) / 2;
+  const avgG = (c1.g + c2.g) / 2;
+  const avgB = (c1.b + c2.b) / 2;
+
+  const avgBrightness = 0.299 * avgR + 0.587 * avgG + 0.114 * avgB;
+  const isDark = avgBrightness < 128;
+
+  // RGB → HSL
+  const r = avgR / 255, g = avgG / 255, b = avgB / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
+    }
+  }
+
+  // Shift lightness by 35 % (3.5 tones)
+  const TONE_SHIFT = 0.35;
+  l = isDark ? Math.min(1, l + TONE_SHIFT) : Math.max(0, l - TONE_SHIFT);
+
+  // HSL → RGB
+  const hue2rgb = (p: number, q: number, t: number) => {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  };
+
+  let r2: number, g2: number, b2: number;
+  if (s === 0) {
+    r2 = g2 = b2 = l;
+  } else {
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    r2 = hue2rgb(p, q, h + 1 / 3);
+    g2 = hue2rgb(p, q, h);
+    b2 = hue2rgb(p, q, h - 1 / 3);
+  }
+
+  return rgbToHex(r2 * 255, g2 * 255, b2 * 255);
 };
 
 // Shadow frame offset (percent of media frame size) — used to compute
