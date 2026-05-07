@@ -368,7 +368,7 @@ const ArticleEditor: React.FC<{
               <>
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-foreground">Тип обложки</p>
-                  <div className="inline-flex bg-muted rounded-lg p-0.5">
+                  <div className="inline-flex bg-sidebar border border-sidebar-border rounded-lg p-0.5">
                     {([
                       { id: 'type1', name: 'Тип 1' },
                       { id: 'type2', name: 'Тип 2' },
@@ -377,10 +377,10 @@ const ArticleEditor: React.FC<{
                         key={opt.id}
                         onClick={() => setCoverType(opt.id)}
                         className={cn(
-                          'px-4 py-1.5 text-xs font-medium rounded-md transition-colors',
+                          'px-4 py-1.5 text-xs font-medium rounded-md transition-colors border',
                           coverType === opt.id
-                            ? 'bg-background text-foreground shadow-sm'
-                            : 'text-muted-foreground hover:text-foreground'
+                            ? 'bg-sidebar border-sidebar-border text-foreground shadow-sm'
+                            : 'border-transparent text-muted-foreground hover:text-foreground'
                         )}
                       >
                         {opt.name}
