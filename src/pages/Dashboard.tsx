@@ -110,7 +110,8 @@ const Dashboard: React.FC = () => {
           </div>
           <Button 
             onClick={handleCreate} 
-            className="h-11 px-5 rounded-2xl bg-muted hover:bg-muted/80 text-foreground text-sm shrink-0 border-0 shadow-none"
+            style={{ boxShadow: 'none' }}
+            className="h-11 px-5 rounded-2xl bg-white hover:bg-white/90 text-neutral-900 text-sm shrink-0 border-0 hover:translate-y-0"
           >
             <Plus className="w-4 h-4 mr-2" />
             Создать курс
