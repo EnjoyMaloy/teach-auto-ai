@@ -986,10 +986,10 @@ const Articles: React.FC = () => {
       )}
 
       <AlertDialog open={!!articleToDelete} onOpenChange={() => setArticleToDelete(null)}>
-        <AlertDialogContent className="bg-card dark:bg-[#1a1a1b] border-border dark:border-white/10 max-w-sm">
+        <AlertDialogContent className="bg-[#0f0f12] border-white/5 max-w-sm">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-[15px] text-foreground dark:text-white">Удалить инструкцию?</AlertDialogTitle>
-            <AlertDialogDescription className="text-[13px] text-muted-foreground dark:text-white/50">
+            <AlertDialogTitle className="text-lg font-bold text-white">Удалить инструкцию?</AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-white/50">
               «{articleToDelete?.title || 'Без названия'}» будет удалена без возможности восстановления.
             </AlertDialogDescription>
           </AlertDialogHeader>
