@@ -813,8 +813,8 @@ const Articles: React.FC = () => {
             <h1 className="text-2xl font-bold text-foreground mb-1.5">Инструкции</h1>
             <p className="text-sm text-muted-foreground">Создавайте инструкции, публикуйте их в Open Academy или встраивайте в свои курсы</p>
           </div>
-          <Button onClick={createArticle} size="sm" className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px] shrink-0">
-            <Plus className="w-3.5 h-3.5 mr-1.5" />
+          <Button onClick={createArticle} className="h-11 px-5 rounded-2xl bg-muted hover:bg-muted/80 text-foreground text-sm shrink-0 border-0 shadow-none">
+            <Plus className="w-4 h-4 mr-2" />
             Создать инструкцию
           </Button>
         </div>
