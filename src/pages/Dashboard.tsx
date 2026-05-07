@@ -110,10 +110,9 @@ const Dashboard: React.FC = () => {
           </div>
           <Button 
             onClick={handleCreate} 
-            size="sm"
-            className="h-8 px-3 bg-primary hover:bg-primary/90 text-[13px] shrink-0"
+            className="h-11 px-5 rounded-2xl bg-muted hover:bg-muted/80 text-foreground text-sm shrink-0 border-0 shadow-none"
           >
-            <Plus className="w-3.5 h-3.5 mr-1.5" />
+            <Plus className="w-4 h-4 mr-2" />
             Создать курс
           </Button>
         </div>
