@@ -807,10 +807,10 @@ const Articles: React.FC = () => {
   return (
     <div className="relative z-10 px-4 md:px-10 lg:px-16 xl:px-24 py-4 md:py-6">
       <div className="h-16 md:h-2" />
-      <div className="mb-6">
-        <div className="flex items-start justify-between gap-4 mb-4">
+      <div className="mb-10">
+        <div className="flex items-start justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-foreground mb-1.5">Инструкции</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Инструкции</h1>
             <p className="text-sm text-muted-foreground">Создавайте инструкции, публикуйте их в Open Academy или встраивайте в свои курсы</p>
           </div>
           <Button onClick={createArticle} style={{ boxShadow: 'none' }} className="h-11 px-5 rounded-2xl bg-white hover:bg-white/90 text-neutral-900 text-sm shrink-0 border-0 hover:translate-y-0">
