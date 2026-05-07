@@ -230,7 +230,7 @@ const ArticleEditor: React.FC<{
             <div className="flex-1" />
 
             {/* Language toggle (always visible) */}
-            <div className="flex bg-muted rounded-lg p-0.5">
+            <div className="flex bg-sidebar border border-sidebar-border rounded-lg p-0.5">
               <button
                 onClick={() => setLang('ru')}
                 className={cn(
