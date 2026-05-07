@@ -447,7 +447,7 @@ const ArticleEditor: React.FC<{
             {settingsTab === 'access' && (
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Доступ</Label>
-                <div className="inline-flex flex-wrap items-center gap-0.5 bg-sidebar border border-sidebar-border rounded-lg p-0.5">
+                <div className="flex flex-wrap items-center gap-2">
                   {([
                     { id: 'private', name: 'Закрытый', icon: Lock },
                     { id: 'link', name: 'По ссылке', icon: Link2 },
@@ -460,10 +460,10 @@ const ArticleEditor: React.FC<{
                         key={opt.id}
                         onClick={() => setAccessType(opt.id)}
                         className={cn(
-                          'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
+                          'inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all border',
                           isSelected
-                            ? 'bg-background text-foreground shadow-sm'
-                            : 'text-muted-foreground hover:text-foreground'
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-muted text-muted-foreground border-transparent hover:border-border'
                         )}
                       >
                         <Icon className="w-3.5 h-3.5" />
