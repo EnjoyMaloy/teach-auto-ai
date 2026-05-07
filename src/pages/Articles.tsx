@@ -235,7 +235,7 @@ const ArticleEditor: React.FC<{
                 onClick={() => setLang('ru')}
                 className={cn(
                   'px-2.5 py-1 text-xs font-medium rounded-md transition-colors',
-                  lang === 'ru' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                  lang === 'ru' ? 'bg-[#0a0a0c] text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
                 )}
               >
                 RU
