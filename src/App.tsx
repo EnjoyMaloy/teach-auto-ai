@@ -26,6 +26,8 @@ const PublicCourse = lazy(() => import("./pages/PublicCourse"));
 const ShortCourse = lazy(() => import("./pages/ShortCourse"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Articles = lazy(() => import("./pages/Articles"));
+const Teams = lazy(() => import("./pages/Teams"));
+const TeamDetail = lazy(() => import("./pages/TeamDetail"));
 const Waitlist = lazy(() => import("./pages/Waitlist"));
 
 const queryClient = new QueryClient({
