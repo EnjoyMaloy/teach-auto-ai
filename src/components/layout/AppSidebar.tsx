@@ -325,9 +325,49 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
           </SidebarMenu>
         </SidebarGroup>
 
+        {/* Workspace Switcher */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Пространство</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuButton>
+                      <Users className="size-4" />
+                      <span className="truncate">{currentTeam ? currentTeam.name : 'Личное пространство'}</span>
+                      <ChevronsUpDown className="ml-auto size-3.5 opacity-60" />
+                    </SidebarMenuButton>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="min-w-56">
+                    <DropdownMenuItem onClick={() => setCurrentTeamId(null)}>
+                      <Home className="mr-2 size-4" />
+                      <span>Личное пространство</span>
+                      {!currentTeamId && <span className="ml-auto text-[10px] text-primary">●</span>}
+                    </DropdownMenuItem>
+                    {teams.length > 0 && <DropdownMenuSeparator />}
+                    {teams.map((t) => (
+                      <DropdownMenuItem key={t.id} onClick={() => setCurrentTeamId(t.id)}>
+                        <Users className="mr-2 size-4" />
+                        <span className="truncate">{t.name}</span>
+                        {currentTeamId === t.id && <span className="ml-auto text-[10px] text-primary">●</span>}
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleNavigate('/teams')}>
+                      <Settings className="mr-2 size-4" />
+                      <span>Управление командами</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
         {/* My Courses */}
         <SidebarGroup>
-          <SidebarGroupLabel>Мои курсы</SidebarGroupLabel>
+          <SidebarGroupLabel>{currentTeam ? 'Курсы команды' : 'Мои курсы'}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {/* Recent — Collapsible */}
