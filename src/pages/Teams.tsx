@@ -248,7 +248,7 @@ export default function Teams() {
             <button
               key={team.id}
               onClick={() => navigate(`/teams/${team.id}`)}
-              className="text-left p-5 rounded-2xl border border-border bg-card hover:border-primary/50 transition-colors"
+              className="text-left p-5 rounded-2xl border border-sidebar-border bg-sidebar hover:border-primary/50 transition-colors"
             >
               <div className="flex items-start justify-between mb-3">
                 <Avatar className="size-10">
@@ -259,7 +259,7 @@ export default function Teams() {
                 </Avatar>
                 {team.role === 'admin' && (
                   <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wide text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                    <Crown className="size-3" /> Admin
+                    <Shield className="size-3" /> Admin
                   </span>
                 )}
               </div>
