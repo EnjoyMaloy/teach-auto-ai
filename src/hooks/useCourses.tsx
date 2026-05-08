@@ -126,11 +126,16 @@ export const useCourses = () => {
     setIsLoading(true);
     try {
       // Fetch courses
-      const { data: coursesData, error: coursesError } = await supabase
+      let q = supabase
         .from('courses')
         .select('*')
-        .eq('author_id', user.id)
         .order('updated_at', { ascending: false });
+      if (currentTeamId) {
+        q = q.eq('team_id', currentTeamId);
+      } else {
+        q = q.eq('author_id', user.id).is('team_id', null);
+      }
+      const { data: coursesData, error: coursesError } = await q;
 
       if (coursesError) throw coursesError;
       if (!coursesData || coursesData.length === 0) {
