@@ -172,7 +172,7 @@ export default function TeamDetail() {
                 return (
                   <div
                     key={m.id}
-                    className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card"
+                    className="flex items-center gap-3 p-3 rounded-xl border border-sidebar-border bg-sidebar"
                   >
                     <Avatar className="size-9">
                       {m.avatar_url && <AvatarImage src={m.avatar_url} />}
