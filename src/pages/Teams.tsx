@@ -352,8 +352,6 @@ export default function Teams() {
             <Button
               onClick={handleCreate}
               disabled={submitting}
-              style={{ boxShadow: 'none' }}
-              className="bg-primary text-primary-foreground hover:bg-primary hover:text-white hover:translate-y-0"
             >
               {submitting && <Loader2 className="size-4 mr-2 animate-spin" />}
               Создать
