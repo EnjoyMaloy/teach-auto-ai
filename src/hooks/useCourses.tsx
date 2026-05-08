@@ -115,6 +115,7 @@ const dbCourseToCourse = (row: any, lessons: Lesson[]): Course & {
 
 export const useCourses = () => {
   const { user } = useAuth();
+  const { currentTeamId } = useWorkspace();
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
