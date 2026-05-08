@@ -54,6 +54,7 @@ export type Database = {
           seo_keywords_en: string[] | null
           seo_title: string | null
           seo_title_en: string | null
+          team_id: string | null
           title: string
           title_color: string | null
           title_en: string | null
@@ -79,6 +80,7 @@ export type Database = {
           seo_keywords_en?: string[] | null
           seo_title?: string | null
           seo_title_en?: string | null
+          team_id?: string | null
           title?: string
           title_color?: string | null
           title_en?: string | null
@@ -104,6 +106,7 @@ export type Database = {
           seo_keywords_en?: string[] | null
           seo_title?: string | null
           seo_title_en?: string | null
+          team_id?: string | null
           title?: string
           title_color?: string | null
           title_en?: string | null
@@ -111,7 +114,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "articles_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       base_design_systems: {
         Row: {
@@ -337,6 +348,7 @@ export type Database = {
           submitted_for_moderation_at: string | null
           tags: string[] | null
           target_audience: string | null
+          team_id: string | null
           title: string
           updated_at: string
         }
@@ -361,6 +373,7 @@ export type Database = {
           submitted_for_moderation_at?: string | null
           tags?: string[] | null
           target_audience?: string | null
+          team_id?: string | null
           title: string
           updated_at?: string
         }
@@ -385,6 +398,7 @@ export type Database = {
           submitted_for_moderation_at?: string | null
           tags?: string[] | null
           target_audience?: string | null
+          team_id?: string | null
           title?: string
           updated_at?: string
         }
@@ -401,6 +415,13 @@ export type Database = {
             columns: ["base_design_system_id"]
             isOneToOne: false
             referencedRelation: "base_design_systems"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courses_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
             referencedColumns: ["id"]
           },
         ]
@@ -992,6 +1013,68 @@ export type Database = {
           },
         ]
       }
+      team_members: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["team_role"]
+          team_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["team_role"]
+          team_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["team_role"]
+          team_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_design_systems: {
         Row: {
           config: Json
@@ -1157,9 +1240,18 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_team_admin: {
+        Args: { _team_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_team_member: {
+        Args: { _team_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "creator"
+      team_role: "admin" | "member"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1288,6 +1380,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "creator"],
+      team_role: ["admin", "member"],
     },
   },
 } as const

@@ -8,6 +8,7 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { AIGenerationProvider } from "@/hooks/useAIGeneration";
 import { LanguageProvider } from "@/hooks/useLanguage";
+import { WorkspaceProvider } from "@/hooks/useWorkspace";
 import { Loader2 } from "lucide-react";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 
@@ -25,6 +26,8 @@ const PublicCourse = lazy(() => import("./pages/PublicCourse"));
 const ShortCourse = lazy(() => import("./pages/ShortCourse"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Articles = lazy(() => import("./pages/Articles"));
+const Teams = lazy(() => import("./pages/Teams"));
+const TeamDetail = lazy(() => import("./pages/TeamDetail"));
 const Waitlist = lazy(() => import("./pages/Waitlist"));
 
 const queryClient = new QueryClient({
@@ -86,6 +89,8 @@ const AppRoutes = () => (
       <Route path="/favorites" element={<Suspense fallback={<PageLoader />}><Favorites /></Suspense>} />
       <Route path="/pricing" element={<Suspense fallback={<PageLoader />}><Pricing /></Suspense>} />
       <Route path="/articles" element={<Suspense fallback={<PageLoader />}><Articles /></Suspense>} />
+      <Route path="/teams" element={<Suspense fallback={<PageLoader />}><Teams /></Suspense>} />
+      <Route path="/teams/:teamId" element={<Suspense fallback={<PageLoader />}><TeamDetail /></Suspense>} />
     </Route>
     
     {/* Protected routes without sidebar layout */}
@@ -111,7 +116,9 @@ const App = () => (
           <AuthProvider>
             <AIGenerationProvider>
               <LanguageProvider>
-                <AppRoutes />
+                <WorkspaceProvider>
+                  <AppRoutes />
+                </WorkspaceProvider>
               </LanguageProvider>
             </AIGenerationProvider>
           </AuthProvider>

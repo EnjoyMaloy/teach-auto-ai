@@ -25,6 +25,8 @@ import {
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useWorkspace } from '@/hooks/useWorkspace';
+import { Users } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -81,18 +83,21 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   const [recentCourses, setRecentCourses] = useState<RecentCourse[]>([]);
   const { setOpenMobile, isMobile } = useSidebar();
   const queryClient = useQueryClient();
+  const { teams, currentTeamId, currentTeam, setCurrentTeamId } = useWorkspace();
 
   // Prefetch data on hover for instant page switches
   const prefetchWorkshop = useCallback(() => {
     if (!user) return;
     queryClient.prefetchQuery({
-      queryKey: courseKeys.userCourses(user.id),
+      queryKey: courseKeys.userCourses(user.id, currentTeamId),
       queryFn: async () => {
-        const { data } = await supabase
+        let q = supabase
           .from('courses')
-          .select('id, title, description, cover_image, author_id, is_published, category, estimated_minutes, updated_at, lessons(id)')
-          .eq('author_id', user.id)
+          .select('id, title, description, cover_image, author_id, team_id, is_published, category, estimated_minutes, updated_at, lessons(id)')
           .order('updated_at', { ascending: false });
+        if (currentTeamId) q = q.eq('team_id', currentTeamId);
+        else q = q.eq('author_id', user.id).is('team_id', null);
+        const { data } = await q;
         return (data || []).map((c: any) => ({
           id: c.id, title: c.title, description: c.description || '',
           coverImage: c.cover_image || undefined, authorId: c.author_id,
@@ -103,7 +108,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
       },
       staleTime: 1000 * 60 * 2,
     });
-  }, [user, queryClient]);
+  }, [user, queryClient, currentTeamId]);
 
   const prefetchCatalog = useCallback(() => {
     queryClient.prefetchQuery({
@@ -165,21 +170,21 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   useEffect(() => {
     const fetchRecentCourses = async () => {
       if (!user) return;
-
-      const { data, error } = await supabase
+      let q = supabase
         .from('courses')
         .select('id, title, updated_at')
-        .eq('author_id', user.id)
         .order('updated_at', { ascending: false })
-                 .limit(3);
-
+        .limit(3);
+      if (currentTeamId) q = q.eq('team_id', currentTeamId);
+      else q = q.eq('author_id', user.id).is('team_id', null);
+      const { data, error } = await q;
       if (!error && data) {
         setRecentCourses(data.map((c) => ({ id: c.id, title: c.title })));
       }
     };
 
     fetchRecentCourses();
-  }, [user]);
+  }, [user, currentTeamId]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -320,9 +325,49 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
           </SidebarMenu>
         </SidebarGroup>
 
+        {/* Workspace Switcher */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Пространство</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuButton>
+                      <Users className="size-4" />
+                      <span className="truncate">{currentTeam ? currentTeam.name : 'Личное пространство'}</span>
+                      <ChevronsUpDown className="ml-auto size-3.5 opacity-60" />
+                    </SidebarMenuButton>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="min-w-56">
+                    <DropdownMenuItem onClick={() => setCurrentTeamId(null)}>
+                      <Home className="mr-2 size-4" />
+                      <span>Личное пространство</span>
+                      {!currentTeamId && <span className="ml-auto text-[10px] text-primary">●</span>}
+                    </DropdownMenuItem>
+                    {teams.length > 0 && <DropdownMenuSeparator />}
+                    {teams.map((t) => (
+                      <DropdownMenuItem key={t.id} onClick={() => setCurrentTeamId(t.id)}>
+                        <Users className="mr-2 size-4" />
+                        <span className="truncate">{t.name}</span>
+                        {currentTeamId === t.id && <span className="ml-auto text-[10px] text-primary">●</span>}
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleNavigate('/teams')}>
+                      <Settings className="mr-2 size-4" />
+                      <span>Управление командами</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
         {/* My Courses */}
         <SidebarGroup>
-          <SidebarGroupLabel>Мои курсы</SidebarGroupLabel>
+          <SidebarGroupLabel>{currentTeam ? 'Курсы команды' : 'Мои курсы'}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {/* Recent — Collapsible */}
@@ -407,6 +452,15 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
           <SidebarGroupLabel>Ресурсы</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive('/teams')}
+                  onClick={() => handleNavigate('/teams')}
+                >
+                  <Users className="size-4" />
+                  <span>Команды</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   disabled

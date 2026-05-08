@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useWorkspace } from './useWorkspace';
 import { toast } from 'sonner';
 
 // Lightweight course type for lists (no slides data)
@@ -21,14 +22,14 @@ export interface CourseListItem {
 // Query keys
 export const courseKeys = {
   all: ['courses'] as const,
-  userCourses: (userId: string) => [...courseKeys.all, 'user', userId] as const,
+  userCourses: (userId: string, teamId: string | null) => [...courseKeys.all, 'user', userId, teamId ?? 'personal'] as const,
   published: () => [...courseKeys.all, 'published'] as const,
   favorites: (userId: string) => [...courseKeys.all, 'favorites', userId] as const,
 };
 
-// Fetch user's own courses (lightweight - for Dashboard)
-const fetchUserCourses = async (userId: string): Promise<CourseListItem[]> => {
-  const { data, error } = await supabase
+// Fetch courses for current workspace (personal => null team_id, team => team_id)
+const fetchUserCourses = async (userId: string, teamId: string | null): Promise<CourseListItem[]> => {
+  let query = supabase
     .from('courses')
     .select(`
       id,
@@ -36,6 +37,7 @@ const fetchUserCourses = async (userId: string): Promise<CourseListItem[]> => {
       description,
       cover_image,
       author_id,
+      team_id,
       is_published,
       is_link_accessible,
       category,
@@ -43,9 +45,15 @@ const fetchUserCourses = async (userId: string): Promise<CourseListItem[]> => {
       updated_at,
       lessons(id)
     `)
-    .eq('author_id', userId)
     .order('updated_at', { ascending: false });
 
+  if (teamId) {
+    query = query.eq('team_id', teamId);
+  } else {
+    query = query.eq('author_id', userId).is('team_id', null);
+  }
+
+  const { data, error } = await query;
   if (error) throw error;
 
   return (data || []).map(c => ({
@@ -101,24 +109,26 @@ const fetchPublishedCourses = async (): Promise<CourseListItem[]> => {
 // Hook for user's own courses
 export const useUserCourses = () => {
   const { user } = useAuth();
+  const { currentTeamId } = useWorkspace();
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: courseKeys.userCourses(user?.id || ''),
-    queryFn: () => fetchUserCourses(user!.id),
+    queryKey: courseKeys.userCourses(user?.id || '', currentTeamId),
+    queryFn: () => fetchUserCourses(user!.id, currentTeamId),
     enabled: !!user,
-    staleTime: 1000 * 60 * 2, // 2 minutes
-    gcTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 10,
   });
 
   const createMutation = useMutation({
     mutationFn: async (title: string) => {
       if (!user) throw new Error('Not authenticated');
-      
+
       const { data, error } = await supabase
         .from('courses')
         .insert({
           author_id: user.id,
+          team_id: currentTeamId,
           title,
           description: '',
         })
@@ -129,7 +139,7 @@ export const useUserCourses = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: courseKeys.userCourses(user?.id || '') });
+      queryClient.invalidateQueries({ queryKey: courseKeys.userCourses(user?.id || '', currentTeamId) });
     },
     onError: () => {
       toast.error('Ошибка создания курса');
@@ -146,7 +156,7 @@ export const useUserCourses = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: courseKeys.userCourses(user?.id || '') });
+      queryClient.invalidateQueries({ queryKey: courseKeys.userCourses(user?.id || '', currentTeamId) });
     },
     onError: () => {
       toast.error('Ошибка удаления курса');

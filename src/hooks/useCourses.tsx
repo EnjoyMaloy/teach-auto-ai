@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Course, Lesson, Slide, SlideOption, SlideHint, CourseDesignSystem } from '@/types/course';
 import { useAuth } from './useAuth';
+import { useWorkspace } from './useWorkspace';
 import { DesignSystemConfig } from '@/types/designSystem';
 import { toast } from 'sonner';
 
@@ -114,6 +115,7 @@ const dbCourseToCourse = (row: any, lessons: Lesson[]): Course & {
 
 export const useCourses = () => {
   const { user } = useAuth();
+  const { currentTeamId } = useWorkspace();
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -124,11 +126,16 @@ export const useCourses = () => {
     setIsLoading(true);
     try {
       // Fetch courses
-      const { data: coursesData, error: coursesError } = await supabase
+      let q = supabase
         .from('courses')
         .select('*')
-        .eq('author_id', user.id)
         .order('updated_at', { ascending: false });
+      if (currentTeamId) {
+        q = q.eq('team_id', currentTeamId);
+      } else {
+        q = q.eq('author_id', user.id).is('team_id', null);
+      }
+      const { data: coursesData, error: coursesError } = await q;
 
       if (coursesError) throw coursesError;
       if (!coursesData || coursesData.length === 0) {
@@ -237,6 +244,7 @@ export const useCourses = () => {
         .from('courses')
         .insert({
           author_id: user.id,
+          team_id: currentTeamId,
           title,
           description: '',
         })

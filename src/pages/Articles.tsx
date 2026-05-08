@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -720,6 +721,7 @@ const ArticleEditor: React.FC<{
 
 const Articles: React.FC = () => {
   const { user } = useAuth();
+  const { currentTeamId } = useWorkspace();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
@@ -739,17 +741,22 @@ const Articles: React.FC = () => {
   const fetchArticles = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    const { data, error } = await supabase
+    let q = supabase
       .from('articles')
       .select('*')
-      .eq('user_id', user.id)
       .order('updated_at', { ascending: false });
+    if (currentTeamId) {
+      q = q.eq('team_id', currentTeamId);
+    } else {
+      q = q.eq('user_id', user.id).is('team_id', null);
+    }
+    const { data, error } = await q;
 
     if (!error && data) {
       setArticles(data as Article[]);
     }
     setLoading(false);
-  }, [user]);
+  }, [user, currentTeamId]);
 
   useEffect(() => {
     fetchArticles();
@@ -759,7 +766,7 @@ const Articles: React.FC = () => {
     if (!user) return;
     const { data, error } = await supabase
       .from('articles')
-      .insert({ user_id: user.id, title: 'Новая инструкция', title_en: 'New instruction', content: '' })
+      .insert({ user_id: user.id, team_id: currentTeamId, title: 'Новая инструкция', title_en: 'New instruction', content: '' })
       .select()
       .single();
 
