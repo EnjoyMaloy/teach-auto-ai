@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Users, Crown, Camera, Loader2, X } from 'lucide-react';
+import { Plus, Users, Crown, Camera, Loader2, X, Instagram, Send, Youtube, Twitter, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -9,8 +9,8 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useWorkspace } from '@/hooks/useWorkspace';
@@ -22,16 +22,124 @@ import {
   SocialPlatform,
   validateSocialUrl,
 } from '@/lib/socialLinks';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 const SOCIAL_PLATFORMS: SocialPlatform[] = ['instagram', 'telegram', 'youtube', 'x'];
+
+const SOCIAL_ICONS: Record<SocialPlatform, React.ComponentType<{ className?: string }>> = {
+  instagram: Instagram,
+  telegram: Send,
+  youtube: Youtube,
+  x: Twitter,
+};
+
+interface SocialChipProps {
+  platform: SocialPlatform;
+  value: string;
+  onChange: (v: string) => void;
+}
+
+function SocialChip({ platform, value, onChange }: SocialChipProps) {
+  const Icon = SOCIAL_ICONS[platform];
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState(value);
+  const isSet = !!value;
+
+  const handleSave = () => {
+    const trimmed = draft.trim();
+    if (!trimmed) {
+      onChange('');
+      setOpen(false);
+      return;
+    }
+    const v = validateSocialUrl(platform, trimmed);
+    if (v === null) {
+      toast.error(`Неверная ссылка ${SOCIAL_LABELS[platform]}`);
+      return;
+    }
+    onChange(v || '');
+    setOpen(false);
+  };
+
+  return (
+    <Popover
+      open={open}
+      onOpenChange={(o) => {
+        setOpen(o);
+        if (o) setDraft(value);
+      }}
+    >
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          title={SOCIAL_LABELS[platform]}
+          className={cn(
+            'relative size-10 rounded-full flex items-center justify-center transition-colors border',
+            isSet
+              ? 'bg-primary text-primary-foreground border-primary'
+              : 'bg-muted text-muted-foreground border-border hover:text-foreground hover:border-primary/50'
+          )}
+        >
+          <Icon className="size-4" />
+          {!isSet && (
+            <span className="absolute -bottom-0.5 -right-0.5 size-4 rounded-full bg-background border border-border flex items-center justify-center">
+              <Plus className="size-2.5" />
+            </span>
+          )}
+          {isSet && (
+            <span className="absolute -bottom-0.5 -right-0.5 size-4 rounded-full bg-background border border-border flex items-center justify-center text-primary">
+              <Check className="size-2.5" />
+            </span>
+          )}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-72" align="start">
+        <div className="space-y-2">
+          <Label className="text-xs">{SOCIAL_LABELS[platform]}</Label>
+          <Input
+            autoFocus
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder={SOCIAL_PLACEHOLDERS[platform]}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSave();
+              }
+            }}
+          />
+          <div className="flex justify-between gap-2 pt-1">
+            {isSet ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  onChange('');
+                  setOpen(false);
+                }}
+              >
+                <X className="size-3 mr-1" /> Убрать
+              </Button>
+            ) : (
+              <span />
+            )}
+            <Button type="button" size="sm" onClick={handleSave}>
+              Сохранить
+            </Button>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 export default function Teams() {
   const navigate = useNavigate();
   const { teams, isLoading, refresh, setCurrentTeamId } = useWorkspace();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
-  const [desc, setDesc] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [socials, setSocials] = useState<Record<SocialPlatform, string>>({
@@ -46,7 +154,6 @@ export default function Teams() {
 
   const resetForm = () => {
     setName('');
-    setDesc('');
     setAvatarFile(null);
     setAvatarPreview(null);
     setSocials({ instagram: '', telegram: '', youtube: '', x: '' });
@@ -70,37 +177,16 @@ export default function Teams() {
       return;
     }
 
-    // Validate socials
-    const validated: Record<SocialPlatform, string | null> = {
-      instagram: null,
-      telegram: null,
-      youtube: null,
-      x: null,
-    };
-    for (const p of SOCIAL_PLATFORMS) {
-      const raw = socials[p];
-      if (!raw.trim()) continue;
-      const v = validateSocialUrl(p, raw);
-      if (v === null) {
-        toast.error(`Неверная ссылка ${SOCIAL_LABELS[p]}. Используйте домен ${p === 'telegram' ? 't.me' : p === 'x' ? 'x.com / twitter.com' : p + '.com'}`);
-        return;
-      }
-      validated[p] = v || null;
-    }
-
     setSubmitting(true);
     try {
-      // 1. Create the team first (needed for ID-based avatar path)
       const team = await createTeam.mutateAsync({
         name: name.trim(),
-        description: desc.trim(),
-        instagram_url: validated.instagram,
-        telegram_url: validated.telegram,
-        youtube_url: validated.youtube,
-        x_url: validated.x,
+        instagram_url: socials.instagram || null,
+        telegram_url: socials.telegram || null,
+        youtube_url: socials.youtube || null,
+        x_url: socials.x || null,
       });
 
-      // 2. Upload avatar if provided, then patch the team
       if (avatarFile) {
         const ext = avatarFile.name.split('.').pop() || 'png';
         const path = `team-avatars/${team.id}/avatar-${Date.now()}.${ext}`;
@@ -241,34 +327,29 @@ export default function Teams() {
 
             <div className="space-y-2">
               <Label>Название</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Моя команда" maxLength={80} />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Описание</Label>
-              <Textarea
-                value={desc}
-                onChange={(e) => setDesc(e.target.value)}
-                placeholder="О чём ваша команда..."
-                rows={2}
-                maxLength={300}
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Моя команда"
+                maxLength={80}
+                autoFocus
               />
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-                Соцсети (опционально)
+                Соцсети
               </Label>
-              {SOCIAL_PLATFORMS.map((p) => (
-                <div key={p} className="space-y-1">
-                  <Label className="text-xs text-muted-foreground">{SOCIAL_LABELS[p]}</Label>
-                  <Input
+              <div className="flex items-center gap-2">
+                {SOCIAL_PLATFORMS.map((p) => (
+                  <SocialChip
+                    key={p}
+                    platform={p}
                     value={socials[p]}
-                    onChange={(e) => setSocials((s) => ({ ...s, [p]: e.target.value }))}
-                    placeholder={SOCIAL_PLACEHOLDERS[p]}
+                    onChange={(v) => setSocials((s) => ({ ...s, [p]: v }))}
                   />
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
           <DialogFooter>
