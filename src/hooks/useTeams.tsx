@@ -138,14 +138,33 @@ export const useTeamMutations = (teamId: string | null) => {
   return { addMember, removeMember, updateRole, updateTeam, deleteTeam, currentUserId: user?.id };
 };
 
+export interface CreateTeamInput {
+  name: string;
+  description?: string;
+  avatar_url?: string | null;
+  instagram_url?: string | null;
+  telegram_url?: string | null;
+  youtube_url?: string | null;
+  x_url?: string | null;
+}
+
 export const useCreateTeam = () => {
   const { user } = useAuth();
   return useMutation({
-    mutationFn: async ({ name, description }: { name: string; description?: string }) => {
+    mutationFn: async (input: CreateTeamInput) => {
       if (!user) throw new Error('Not authenticated');
       const { data, error } = await supabase
         .from('teams')
-        .insert({ name, description: description || null, created_by: user.id })
+        .insert({
+          name: input.name,
+          description: input.description || null,
+          avatar_url: input.avatar_url || null,
+          instagram_url: input.instagram_url || null,
+          telegram_url: input.telegram_url || null,
+          youtube_url: input.youtube_url || null,
+          x_url: input.x_url || null,
+          created_by: user.id,
+        })
         .select()
         .single();
       if (error) throw error;

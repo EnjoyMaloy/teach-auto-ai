@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Users, Crown } from 'lucide-react';
+import { Plus, Users, Crown, Camera, Loader2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,9 +12,19 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useCreateTeam } from '@/hooks/useTeams';
+import { supabase } from '@/integrations/supabase/client';
+import {
+  SOCIAL_LABELS,
+  SOCIAL_PLACEHOLDERS,
+  SocialPlatform,
+  validateSocialUrl,
+} from '@/lib/socialLinks';
 import { toast } from 'sonner';
+
+const SOCIAL_PLATFORMS: SocialPlatform[] = ['instagram', 'telegram', 'youtube', 'x'];
 
 export default function Teams() {
   const navigate = useNavigate();
@@ -22,23 +32,98 @@ export default function Teams() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [desc, setDesc] = useState('');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [socials, setSocials] = useState<Record<SocialPlatform, string>>({
+    instagram: '',
+    telegram: '',
+    youtube: '',
+    x: '',
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const createTeam = useCreateTeam();
+
+  const resetForm = () => {
+    setName('');
+    setDesc('');
+    setAvatarFile(null);
+    setAvatarPreview(null);
+    setSocials({ instagram: '', telegram: '', youtube: '', x: '' });
+  };
+
+  const handleAvatarPick = (file: File | null) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Выберите изображение');
+      return;
+    }
+    setAvatarFile(file);
+    const reader = new FileReader();
+    reader.onload = (e) => setAvatarPreview(e.target?.result as string);
+    reader.readAsDataURL(file);
+  };
 
   const handleCreate = async () => {
     if (!name.trim()) {
       toast.error('Введите название команды');
       return;
     }
+
+    // Validate socials
+    const validated: Record<SocialPlatform, string | null> = {
+      instagram: null,
+      telegram: null,
+      youtube: null,
+      x: null,
+    };
+    for (const p of SOCIAL_PLATFORMS) {
+      const raw = socials[p];
+      if (!raw.trim()) continue;
+      const v = validateSocialUrl(p, raw);
+      if (v === null) {
+        toast.error(`Неверная ссылка ${SOCIAL_LABELS[p]}. Используйте домен ${p === 'telegram' ? 't.me' : p === 'x' ? 'x.com / twitter.com' : p + '.com'}`);
+        return;
+      }
+      validated[p] = v || null;
+    }
+
+    setSubmitting(true);
     try {
-      const team = await createTeam.mutateAsync({ name: name.trim(), description: desc.trim() });
+      // 1. Create the team first (needed for ID-based avatar path)
+      const team = await createTeam.mutateAsync({
+        name: name.trim(),
+        description: desc.trim(),
+        instagram_url: validated.instagram,
+        telegram_url: validated.telegram,
+        youtube_url: validated.youtube,
+        x_url: validated.x,
+      });
+
+      // 2. Upload avatar if provided, then patch the team
+      if (avatarFile) {
+        const ext = avatarFile.name.split('.').pop() || 'png';
+        const path = `team-avatars/${team.id}/avatar-${Date.now()}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from('course-images')
+          .upload(path, avatarFile, { upsert: true });
+        if (upErr) {
+          toast.error('Команда создана, но не удалось загрузить аватар');
+        } else {
+          const { data } = supabase.storage.from('course-images').getPublicUrl(path);
+          await supabase.from('teams').update({ avatar_url: data.publicUrl }).eq('id', team.id);
+        }
+      }
+
       await refresh();
       setOpen(false);
-      setName('');
-      setDesc('');
+      resetForm();
       setCurrentTeamId(team.id);
       navigate(`/teams/${team.id}`);
     } catch (e: any) {
       toast.error(e.message || 'Ошибка создания');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -80,9 +165,12 @@ export default function Teams() {
               className="text-left p-5 rounded-2xl border border-border bg-card hover:border-primary/50 transition-colors"
             >
               <div className="flex items-start justify-between mb-3">
-                <div className="size-10 rounded-xl bg-primary/15 text-primary flex items-center justify-center font-semibold">
-                  {team.name.slice(0, 2).toUpperCase()}
-                </div>
+                <Avatar className="size-10">
+                  {team.avatar_url && <AvatarImage src={team.avatar_url} />}
+                  <AvatarFallback className="bg-primary/15 text-primary font-semibold rounded-full">
+                    {team.name.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
                 {team.role === 'admin' && (
                   <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wide text-primary bg-primary/10 px-2 py-0.5 rounded-full">
                     <Crown className="size-3" /> Admin
@@ -100,24 +188,95 @@ export default function Teams() {
         </div>
       )}
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+      <Dialog
+        open={open}
+        onOpenChange={(o) => {
+          setOpen(o);
+          if (!o) resetForm();
+        }}
+      >
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Новая команда</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
+          <div className="space-y-5 py-2">
+            {/* Avatar */}
+            <div className="flex flex-col items-center gap-3">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="relative size-24 rounded-full overflow-hidden border-2 border-dashed border-border hover:border-primary transition-colors group"
+              >
+                {avatarPreview ? (
+                  <img src={avatarPreview} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground">
+                    <Camera className="size-6" />
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                  <Camera className="size-5" />
+                </div>
+              </button>
+              {avatarPreview && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAvatarFile(null);
+                    setAvatarPreview(null);
+                  }}
+                  className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+                >
+                  <X className="size-3" /> Убрать
+                </button>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleAvatarPick(e.target.files?.[0] ?? null)}
+              />
+            </div>
+
             <div className="space-y-2">
               <Label>Название</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Моя команда" />
+              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Моя команда" maxLength={80} />
             </div>
+
             <div className="space-y-2">
               <Label>Описание</Label>
-              <Textarea value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="О чём ваша команда..." rows={3} />
+              <Textarea
+                value={desc}
+                onChange={(e) => setDesc(e.target.value)}
+                placeholder="О чём ваша команда..."
+                rows={2}
+                maxLength={300}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+                Соцсети (опционально)
+              </Label>
+              {SOCIAL_PLATFORMS.map((p) => (
+                <div key={p} className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">{SOCIAL_LABELS[p]}</Label>
+                  <Input
+                    value={socials[p]}
+                    onChange={(e) => setSocials((s) => ({ ...s, [p]: e.target.value }))}
+                    placeholder={SOCIAL_PLACEHOLDERS[p]}
+                  />
+                </div>
+              ))}
             </div>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setOpen(false)}>Отмена</Button>
-            <Button onClick={handleCreate} disabled={createTeam.isPending}>
+            <Button variant="ghost" onClick={() => setOpen(false)} disabled={submitting}>
+              Отмена
+            </Button>
+            <Button onClick={handleCreate} disabled={submitting}>
+              {submitting && <Loader2 className="size-4 mr-2 animate-spin" />}
               Создать
             </Button>
           </DialogFooter>
