@@ -214,7 +214,7 @@ export default function Teams() {
   };
 
   return (
-    <div className="container max-w-5xl mx-auto px-6 py-8">
+    <div className="container max-w-6xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-semibold">Команды</h1>
@@ -222,8 +222,12 @@ export default function Teams() {
             Общее пространство для работы над курсами и инструкциями
           </p>
         </div>
-        <Button onClick={() => setOpen(true)}>
-          <Plus className="size-4 mr-2" />
+        <Button
+          onClick={() => setOpen(true)}
+          style={{ boxShadow: 'none' }}
+          className="h-11 px-5 rounded-2xl bg-white hover:bg-white/90 text-neutral-900 text-sm shrink-0 border-0 hover:translate-y-0"
+        >
+          <Plus className="w-4 h-4 mr-2" />
           Создать команду
         </Button>
       </div>
