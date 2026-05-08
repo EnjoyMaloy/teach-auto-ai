@@ -20,6 +20,7 @@ import CourseCardOverlay from '@/components/catalog/CourseCardOverlay';
 import { useUserCourses, CourseListItem } from '@/hooks/useCachedCourses';
 import { useCachedFavorites } from '@/hooks/useCachedFavorites';
 import { useSidebar } from '@/components/ui/sidebar';
+import WorkspaceSwitcher from '@/components/layout/WorkspaceSwitcher';
 
 
 
@@ -106,7 +107,8 @@ const Dashboard: React.FC = () => {
         <div className="flex items-start justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">Мои курсы</h1>
-            <p className="text-sm text-muted-foreground">Создавайте курсы, публикуйте их в Open Academy или делитесь с аудиторией через свой Telegram Mini App</p>
+            <p className="text-sm text-muted-foreground mb-3">Создавайте курсы, публикуйте их в Open Academy или делитесь с аудиторией через свой Telegram Mini App</p>
+            <WorkspaceSwitcher />
           </div>
           <Button 
             onClick={handleCreate} 
