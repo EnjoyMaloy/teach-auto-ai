@@ -236,7 +236,8 @@ export default function TeamDetail() {
             {isAdmin && (
               <Button
                 onClick={handleDelete}
-                className="bg-red-600 text-white hover:bg-red-700"
+                style={{ boxShadow: 'none' }}
+                className="bg-red-600 text-white hover:bg-red-700 border-0 focus-visible:ring-red-600/50 hover:translate-y-0"
               >
                 <Trash2 className="size-4 mr-2" /> Удалить команду
               </Button>
