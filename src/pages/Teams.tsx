@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Users, Crown, Camera, Loader2, X, Instagram, Send, Youtube, Twitter, Check } from 'lucide-react';
+import { Plus, Users, Shield, Camera, Loader2, X, Instagram, Send, Youtube, Twitter, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
