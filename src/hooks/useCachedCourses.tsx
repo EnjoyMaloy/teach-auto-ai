@@ -109,24 +109,26 @@ const fetchPublishedCourses = async (): Promise<CourseListItem[]> => {
 // Hook for user's own courses
 export const useUserCourses = () => {
   const { user } = useAuth();
+  const { currentTeamId } = useWorkspace();
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: courseKeys.userCourses(user?.id || ''),
-    queryFn: () => fetchUserCourses(user!.id),
+    queryKey: courseKeys.userCourses(user?.id || '', currentTeamId),
+    queryFn: () => fetchUserCourses(user!.id, currentTeamId),
     enabled: !!user,
-    staleTime: 1000 * 60 * 2, // 2 minutes
-    gcTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 10,
   });
 
   const createMutation = useMutation({
     mutationFn: async (title: string) => {
       if (!user) throw new Error('Not authenticated');
-      
+
       const { data, error } = await supabase
         .from('courses')
         .insert({
           author_id: user.id,
+          team_id: currentTeamId,
           title,
           description: '',
         })
@@ -137,7 +139,7 @@ export const useUserCourses = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: courseKeys.userCourses(user?.id || '') });
+      queryClient.invalidateQueries({ queryKey: courseKeys.userCourses(user?.id || '', currentTeamId) });
     },
     onError: () => {
       toast.error('Ошибка создания курса');
@@ -154,7 +156,7 @@ export const useUserCourses = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: courseKeys.userCourses(user?.id || '') });
+      queryClient.invalidateQueries({ queryKey: courseKeys.userCourses(user?.id || '', currentTeamId) });
     },
     onError: () => {
       toast.error('Ошибка удаления курса');
