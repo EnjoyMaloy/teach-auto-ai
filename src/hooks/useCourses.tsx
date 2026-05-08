@@ -237,6 +237,7 @@ export const useCourses = () => {
         .from('courses')
         .insert({
           author_id: user.id,
+          team_id: currentTeamId,
           title,
           description: '',
         })
