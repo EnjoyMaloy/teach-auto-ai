@@ -1052,8 +1052,12 @@ export type Database = {
           created_by: string
           description: string | null
           id: string
+          instagram_url: string | null
           name: string
+          telegram_url: string | null
           updated_at: string
+          x_url: string | null
+          youtube_url: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -1061,8 +1065,12 @@ export type Database = {
           created_by: string
           description?: string | null
           id?: string
+          instagram_url?: string | null
           name: string
+          telegram_url?: string | null
           updated_at?: string
+          x_url?: string | null
+          youtube_url?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -1070,8 +1078,12 @@ export type Database = {
           created_by?: string
           description?: string | null
           id?: string
+          instagram_url?: string | null
           name?: string
+          telegram_url?: string | null
           updated_at?: string
+          x_url?: string | null
+          youtube_url?: string | null
         }
         Relationships: []
       }
