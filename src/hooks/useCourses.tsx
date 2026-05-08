@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Course, Lesson, Slide, SlideOption, SlideHint, CourseDesignSystem } from '@/types/course';
 import { useAuth } from './useAuth';
+import { useWorkspace } from './useWorkspace';
 import { DesignSystemConfig } from '@/types/designSystem';
 import { toast } from 'sonner';
 
