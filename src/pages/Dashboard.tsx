@@ -152,7 +152,6 @@ const Dashboard: React.FC = () => {
 
       {/* Mobile Top Bar */}
       <div className="md:hidden mb-4 space-y-3">
-        <WorkspaceSwitcher />
         <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-hide">
           {filters.map(f => {
             const Icon = f.icon;
