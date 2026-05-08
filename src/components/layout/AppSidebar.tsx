@@ -83,18 +83,21 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   const [recentCourses, setRecentCourses] = useState<RecentCourse[]>([]);
   const { setOpenMobile, isMobile } = useSidebar();
   const queryClient = useQueryClient();
+  const { teams, currentTeamId, currentTeam, setCurrentTeamId } = useWorkspace();
 
   // Prefetch data on hover for instant page switches
   const prefetchWorkshop = useCallback(() => {
     if (!user) return;
     queryClient.prefetchQuery({
-      queryKey: courseKeys.userCourses(user.id),
+      queryKey: courseKeys.userCourses(user.id, currentTeamId),
       queryFn: async () => {
-        const { data } = await supabase
+        let q = supabase
           .from('courses')
-          .select('id, title, description, cover_image, author_id, is_published, category, estimated_minutes, updated_at, lessons(id)')
-          .eq('author_id', user.id)
+          .select('id, title, description, cover_image, author_id, team_id, is_published, category, estimated_minutes, updated_at, lessons(id)')
           .order('updated_at', { ascending: false });
+        if (currentTeamId) q = q.eq('team_id', currentTeamId);
+        else q = q.eq('author_id', user.id).is('team_id', null);
+        const { data } = await q;
         return (data || []).map((c: any) => ({
           id: c.id, title: c.title, description: c.description || '',
           coverImage: c.cover_image || undefined, authorId: c.author_id,
@@ -105,7 +108,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
       },
       staleTime: 1000 * 60 * 2,
     });
-  }, [user, queryClient]);
+  }, [user, queryClient, currentTeamId]);
 
   const prefetchCatalog = useCallback(() => {
     queryClient.prefetchQuery({
