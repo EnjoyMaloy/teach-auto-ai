@@ -741,17 +741,22 @@ const Articles: React.FC = () => {
   const fetchArticles = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    const { data, error } = await supabase
+    let q = supabase
       .from('articles')
       .select('*')
-      .eq('user_id', user.id)
       .order('updated_at', { ascending: false });
+    if (currentTeamId) {
+      q = q.eq('team_id', currentTeamId);
+    } else {
+      q = q.eq('user_id', user.id).is('team_id', null);
+    }
+    const { data, error } = await q;
 
     if (!error && data) {
       setArticles(data as Article[]);
     }
     setLoading(false);
-  }, [user]);
+  }, [user, currentTeamId]);
 
   useEffect(() => {
     fetchArticles();
