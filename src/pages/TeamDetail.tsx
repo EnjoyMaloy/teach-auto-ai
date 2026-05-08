@@ -138,9 +138,19 @@ export default function TeamDetail() {
       </div>
 
       <Tabs defaultValue="members">
-        <TabsList>
-          <TabsTrigger value="members">Участники</TabsTrigger>
-          <TabsTrigger value="settings">Настройки</TabsTrigger>
+        <TabsList className="inline-flex bg-muted rounded-lg p-1 h-auto gap-0">
+          {([
+            { id: 'members', name: 'Участники' },
+            { id: 'settings', name: 'Настройки' },
+          ] as const).map((opt) => (
+            <TabsTrigger
+              key={opt.id}
+              value={opt.id}
+              className="px-4 py-1.5 text-xs font-medium rounded-md text-muted-foreground data-[state=active]:bg-[#0a0a0c] data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:text-foreground transition-colors"
+            >
+              {opt.name}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
         <TabsContent value="members" className="mt-6">
