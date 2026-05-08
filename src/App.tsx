@@ -8,6 +8,7 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { AIGenerationProvider } from "@/hooks/useAIGeneration";
 import { LanguageProvider } from "@/hooks/useLanguage";
+import { WorkspaceProvider } from "@/hooks/useWorkspace";
 import { Loader2 } from "lucide-react";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 
