@@ -766,7 +766,7 @@ const Articles: React.FC = () => {
     if (!user) return;
     const { data, error } = await supabase
       .from('articles')
-      .insert({ user_id: user.id, title: 'Новая инструкция', title_en: 'New instruction', content: '' })
+      .insert({ user_id: user.id, team_id: currentTeamId, title: 'Новая инструкция', title_en: 'New instruction', content: '' })
       .select()
       .single();
 
