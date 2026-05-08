@@ -170,21 +170,21 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   useEffect(() => {
     const fetchRecentCourses = async () => {
       if (!user) return;
-
-      const { data, error } = await supabase
+      let q = supabase
         .from('courses')
         .select('id, title, updated_at')
-        .eq('author_id', user.id)
         .order('updated_at', { ascending: false })
-                 .limit(3);
-
+        .limit(3);
+      if (currentTeamId) q = q.eq('team_id', currentTeamId);
+      else q = q.eq('author_id', user.id).is('team_id', null);
+      const { data, error } = await q;
       if (!error && data) {
         setRecentCourses(data.map((c) => ({ id: c.id, title: c.title })));
       }
     };
 
     fetchRecentCourses();
-  }, [user]);
+  }, [user, currentTeamId]);
 
   const handleSignOut = async () => {
     await signOut();
