@@ -100,17 +100,42 @@ export default function TeamDetail() {
         <ArrowLeft className="size-4 mr-2" /> К командам
       </Button>
 
-      <div className="flex items-start justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <div className="size-14 rounded-2xl bg-primary/15 text-primary flex items-center justify-center font-semibold text-xl">
-            {team.name.slice(0, 2).toUpperCase()}
-          </div>
-          <div>
-            <h1 className="text-2xl font-semibold">{team.name}</h1>
+      <div className="flex items-start justify-between mb-8 gap-4">
+        <div className="flex items-center gap-4 min-w-0">
+          <Avatar className="size-14">
+            {team.avatar_url && <AvatarImage src={team.avatar_url} />}
+            <AvatarFallback className="bg-primary/15 text-primary font-semibold text-lg rounded-full">
+              {team.name.slice(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0">
+            <h1 className="text-2xl font-semibold truncate">{team.name}</h1>
             {team.description && <p className="text-sm text-muted-foreground mt-1">{team.description}</p>}
+            {(team.instagram_url || team.telegram_url || team.youtube_url || team.x_url) && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {[
+                  { url: team.instagram_url, label: 'Instagram' },
+                  { url: team.telegram_url, label: 'Telegram' },
+                  { url: team.youtube_url, label: 'YouTube' },
+                  { url: team.x_url, label: 'X' },
+                ]
+                  .filter((s) => s.url)
+                  .map((s) => (
+                    <a
+                      key={s.label}
+                      href={s.url!}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs px-2 py-1 rounded-md bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {s.label}
+                    </a>
+                  ))}
+              </div>
+            )}
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 shrink-0">
           <Button
             variant="secondary"
             onClick={() => {
