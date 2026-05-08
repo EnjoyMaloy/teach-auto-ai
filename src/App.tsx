@@ -89,6 +89,8 @@ const AppRoutes = () => (
       <Route path="/favorites" element={<Suspense fallback={<PageLoader />}><Favorites /></Suspense>} />
       <Route path="/pricing" element={<Suspense fallback={<PageLoader />}><Pricing /></Suspense>} />
       <Route path="/articles" element={<Suspense fallback={<PageLoader />}><Articles /></Suspense>} />
+      <Route path="/teams" element={<Suspense fallback={<PageLoader />}><Teams /></Suspense>} />
+      <Route path="/teams/:teamId" element={<Suspense fallback={<PageLoader />}><TeamDetail /></Suspense>} />
     </Route>
     
     {/* Protected routes without sidebar layout */}
