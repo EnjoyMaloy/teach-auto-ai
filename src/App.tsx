@@ -116,7 +116,9 @@ const App = () => (
           <AuthProvider>
             <AIGenerationProvider>
               <LanguageProvider>
-                <AppRoutes />
+                <WorkspaceProvider>
+                  <AppRoutes />
+                </WorkspaceProvider>
               </LanguageProvider>
             </AIGenerationProvider>
           </AuthProvider>
