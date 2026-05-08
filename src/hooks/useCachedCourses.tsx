@@ -22,14 +22,14 @@ export interface CourseListItem {
 // Query keys
 export const courseKeys = {
   all: ['courses'] as const,
-  userCourses: (userId: string) => [...courseKeys.all, 'user', userId] as const,
+  userCourses: (userId: string, teamId: string | null) => [...courseKeys.all, 'user', userId, teamId ?? 'personal'] as const,
   published: () => [...courseKeys.all, 'published'] as const,
   favorites: (userId: string) => [...courseKeys.all, 'favorites', userId] as const,
 };
 
-// Fetch user's own courses (lightweight - for Dashboard)
-const fetchUserCourses = async (userId: string): Promise<CourseListItem[]> => {
-  const { data, error } = await supabase
+// Fetch courses for current workspace (personal => null team_id, team => team_id)
+const fetchUserCourses = async (userId: string, teamId: string | null): Promise<CourseListItem[]> => {
+  let query = supabase
     .from('courses')
     .select(`
       id,
@@ -37,6 +37,7 @@ const fetchUserCourses = async (userId: string): Promise<CourseListItem[]> => {
       description,
       cover_image,
       author_id,
+      team_id,
       is_published,
       is_link_accessible,
       category,
@@ -44,9 +45,15 @@ const fetchUserCourses = async (userId: string): Promise<CourseListItem[]> => {
       updated_at,
       lessons(id)
     `)
-    .eq('author_id', userId)
     .order('updated_at', { ascending: false });
 
+  if (teamId) {
+    query = query.eq('team_id', teamId);
+  } else {
+    query = query.eq('author_id', userId).is('team_id', null);
+  }
+
+  const { data, error } = await query;
   if (error) throw error;
 
   return (data || []).map(c => ({
