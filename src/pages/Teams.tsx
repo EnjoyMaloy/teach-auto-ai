@@ -214,11 +214,12 @@ export default function Teams() {
   };
 
   return (
-    <div className="container max-w-6xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="relative z-10 px-4 md:px-10 lg:px-16 xl:px-24 py-4 md:py-6">
+      <div className="h-16 md:h-2" />
+      <div className="flex items-start justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-semibold">Команды</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Команды</h1>
+          <p className="text-sm text-muted-foreground">
             Общее пространство для работы над курсами и инструкциями
           </p>
         </div>
