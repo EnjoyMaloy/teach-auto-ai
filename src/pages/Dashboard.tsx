@@ -20,7 +20,7 @@ import CourseCardOverlay from '@/components/catalog/CourseCardOverlay';
 import { useUserCourses, CourseListItem } from '@/hooks/useCachedCourses';
 import { useCachedFavorites } from '@/hooks/useCachedFavorites';
 import { useSidebar } from '@/components/ui/sidebar';
-import WorkspaceSwitcher from '@/components/layout/WorkspaceSwitcher';
+
 
 
 type FilterType = 'all' | 'private' | 'link' | 'public' | 'favorites';
@@ -119,8 +119,6 @@ const Dashboard: React.FC = () => {
         </div>
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 flex-wrap">
-            <WorkspaceSwitcher />
-            <div className="w-px h-5 bg-border mx-1" />
             {filters.map(f => {
               const Icon = f.icon;
               return (
@@ -154,7 +152,6 @@ const Dashboard: React.FC = () => {
 
       {/* Mobile Top Bar */}
       <div className="md:hidden mb-4 space-y-3">
-        <WorkspaceSwitcher />
         <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-hide">
           {filters.map(f => {
             const Icon = f.icon;

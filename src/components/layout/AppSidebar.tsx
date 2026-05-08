@@ -230,7 +230,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Profile with Dropdown */}
+        {/* Profile + Workspace Switcher */}
         <SidebarGroup>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -240,16 +240,27 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                     size="lg"
                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                   >
-                    <Avatar className="size-8 rounded-lg">
-                      {userAvatarUrl && <AvatarImage src={userAvatarUrl} alt={userName} />}
-                      <AvatarFallback className="rounded-lg">
-                        {userName.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
+                    {currentTeam ? (
+                      <Avatar className="size-8 rounded-lg">
+                        {currentTeam.avatar_url && <AvatarImage src={currentTeam.avatar_url} alt={currentTeam.name} />}
+                        <AvatarFallback className="rounded-lg bg-primary/15 text-primary">
+                          {currentTeam.name.slice(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    ) : (
+                      <Avatar className="size-8 rounded-lg">
+                        {userAvatarUrl && <AvatarImage src={userAvatarUrl} alt={userName} />}
+                        <AvatarFallback className="rounded-lg">
+                          {userName.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-medium">{userName}</span>
+                      <span className="truncate font-medium">
+                        {currentTeam ? currentTeam.name : userName}
+                      </span>
                       <span className="truncate text-xs text-muted-foreground">
-                        {userEmail}
+                        {currentTeam ? 'Командное пространство' : userEmail}
                       </span>
                     </div>
                     <ChevronsUpDown className="ml-auto size-4" />
@@ -261,6 +272,37 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
                   side="bottom"
                   sideOffset={4}
                 >
+                  {/* Workspace switcher */}
+                  <div className="px-2 pt-1.5 pb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+                    Пространство
+                  </div>
+                  <DropdownMenuItem onClick={() => setCurrentTeamId(null)}>
+                    <Avatar className="mr-2 size-5 rounded-md">
+                      {userAvatarUrl && <AvatarImage src={userAvatarUrl} alt={userName} />}
+                      <AvatarFallback className="rounded-md text-[9px]">
+                        {userName.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="truncate">{userName}</span>
+                    {!currentTeamId && <span className="ml-auto text-[10px] text-primary">●</span>}
+                  </DropdownMenuItem>
+                  {teams.map((t) => (
+                    <DropdownMenuItem key={t.id} onClick={() => setCurrentTeamId(t.id)}>
+                      <Avatar className="mr-2 size-5 rounded-md">
+                        {t.avatar_url && <AvatarImage src={t.avatar_url} alt={t.name} />}
+                        <AvatarFallback className="rounded-md text-[9px] bg-primary/15 text-primary">
+                          {t.name.slice(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="truncate">{t.name}</span>
+                      {currentTeamId === t.id && <span className="ml-auto text-[10px] text-primary">●</span>}
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuItem onClick={() => handleNavigate('/teams')}>
+                    <Users className="mr-2 size-4" />
+                    <span>Управление командами</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   {/* Plan & Credits Block */}
                   <DropdownMenuItem
                     className="p-0 focus:bg-transparent"
@@ -323,46 +365,6 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
-        </SidebarGroup>
-
-        {/* Workspace Switcher */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Пространство</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton>
-                      <Users className="size-4" />
-                      <span className="truncate">{currentTeam ? currentTeam.name : 'Личное пространство'}</span>
-                      <ChevronsUpDown className="ml-auto size-3.5 opacity-60" />
-                    </SidebarMenuButton>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="min-w-56">
-                    <DropdownMenuItem onClick={() => setCurrentTeamId(null)}>
-                      <Home className="mr-2 size-4" />
-                      <span>Личное пространство</span>
-                      {!currentTeamId && <span className="ml-auto text-[10px] text-primary">●</span>}
-                    </DropdownMenuItem>
-                    {teams.length > 0 && <DropdownMenuSeparator />}
-                    {teams.map((t) => (
-                      <DropdownMenuItem key={t.id} onClick={() => setCurrentTeamId(t.id)}>
-                        <Users className="mr-2 size-4" />
-                        <span className="truncate">{t.name}</span>
-                        {currentTeamId === t.id && <span className="ml-auto text-[10px] text-primary">●</span>}
-                      </DropdownMenuItem>
-                    ))}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => handleNavigate('/teams')}>
-                      <Settings className="mr-2 size-4" />
-                      <span>Управление командами</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
         </SidebarGroup>
 
         {/* My Courses */}
