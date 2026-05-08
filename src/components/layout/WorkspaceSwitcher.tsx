@@ -46,18 +46,31 @@ export default function WorkspaceSwitcher() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="min-w-56">
         <DropdownMenuItem onClick={() => setCurrentTeamId(null)}>
-          <Home className="mr-2 size-4" />
+          <Avatar className="mr-2 size-5">
+            {personalAvatar && <AvatarImage src={personalAvatar} />}
+            <AvatarFallback className="text-[9px] bg-primary/15 text-primary">
+              {(personalName || '??').slice(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
           <span className="truncate">{personalName}</span>
           {!currentTeamId && <Check className="ml-auto size-3.5 text-primary" />}
         </DropdownMenuItem>
         {teams.length > 0 && <DropdownMenuSeparator />}
-        {teams.map((t) => (
-          <DropdownMenuItem key={t.id} onClick={() => setCurrentTeamId(t.id)}>
-            <Users className="mr-2 size-4" />
-            <span className="truncate">{t.name}</span>
-            {currentTeamId === t.id && <Check className="ml-auto size-3.5 text-primary" />}
-          </DropdownMenuItem>
-        ))}
+        {teams.map((t) => {
+          const tInitials = (t.name || '??').slice(0, 2).toUpperCase();
+          return (
+            <DropdownMenuItem key={t.id} onClick={() => setCurrentTeamId(t.id)}>
+              <Avatar className="mr-2 size-5">
+                {t.avatar_url && <AvatarImage src={t.avatar_url} />}
+                <AvatarFallback className="text-[9px] bg-primary/15 text-primary">
+                  {tInitials}
+                </AvatarFallback>
+              </Avatar>
+              <span className="truncate">{t.name}</span>
+              {currentTeamId === t.id && <Check className="ml-auto size-3.5 text-primary" />}
+            </DropdownMenuItem>
+          );
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   );
