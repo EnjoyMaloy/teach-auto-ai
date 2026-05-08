@@ -157,7 +157,12 @@ export default function TeamDetail() {
           <div className="flex items-center justify-between mb-4">
             <div className="text-sm text-muted-foreground">{members.length} участн.</div>
             {isAdmin && (
-              <Button onClick={() => setAddOpen(true)} size="sm">
+              <Button
+                onClick={() => setAddOpen(true)}
+                size="sm"
+                style={{ boxShadow: 'none' }}
+                className="h-9 px-4 rounded-xl bg-white hover:bg-white/90 text-neutral-900 border-0 hover:translate-y-0"
+              >
                 <Plus className="size-4 mr-2" /> Добавить
               </Button>
             )}
