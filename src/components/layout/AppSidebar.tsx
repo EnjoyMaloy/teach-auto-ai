@@ -454,6 +454,15 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
+                  isActive={isActive('/teams')}
+                  onClick={() => handleNavigate('/teams')}
+                >
+                  <Users className="size-4" />
+                  <span>Команды</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
                   disabled
                   className="opacity-50 cursor-not-allowed"
                 >
