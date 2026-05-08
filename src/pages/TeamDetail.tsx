@@ -218,15 +218,20 @@ export default function TeamDetail() {
           )}
         </TabsContent>
 
-        <TabsContent value="settings" className="mt-6 space-y-4">
-          <Button variant="outline" onClick={handleLeave}>
-            <LogOut className="size-4 mr-2" /> Выйти из команды
-          </Button>
-          {isAdmin && (
-            <Button variant="destructive" onClick={handleDelete}>
-              <Trash2 className="size-4 mr-2" /> Удалить команду
+        <TabsContent value="settings" className="mt-6">
+          <div className="flex flex-wrap items-center gap-4">
+            <Button variant="outline" onClick={handleLeave} className="border">
+              <LogOut className="size-4 mr-2" /> Выйти из команды
             </Button>
-          )}
+            {isAdmin && (
+              <Button
+                onClick={handleDelete}
+                className="bg-red-600 text-white hover:bg-red-700"
+              >
+                <Trash2 className="size-4 mr-2" /> Удалить команду
+              </Button>
+            )}
+          </div>
         </TabsContent>
       </Tabs>
 
