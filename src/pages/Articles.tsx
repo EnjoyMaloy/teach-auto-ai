@@ -34,7 +34,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import WorkspaceSwitcher from '@/components/layout/WorkspaceSwitcher';
+
 
 
 interface Article {
