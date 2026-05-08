@@ -135,17 +135,6 @@ export default function TeamDetail() {
             )}
           </div>
         </div>
-        <div className="flex gap-2 shrink-0">
-          <Button
-            variant="secondary"
-            onClick={() => {
-              setCurrentTeamId(team.id);
-              navigate('/workshop');
-            }}
-          >
-            Открыть пространство
-          </Button>
-        </div>
       </div>
 
       <Tabs defaultValue="members">

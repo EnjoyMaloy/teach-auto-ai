@@ -20,6 +20,7 @@ import CourseCardOverlay from '@/components/catalog/CourseCardOverlay';
 import { useUserCourses, CourseListItem } from '@/hooks/useCachedCourses';
 import { useCachedFavorites } from '@/hooks/useCachedFavorites';
 import { useSidebar } from '@/components/ui/sidebar';
+import WorkspaceSwitcher from '@/components/layout/WorkspaceSwitcher';
 
 
 type FilterType = 'all' | 'private' | 'link' | 'public' | 'favorites';
