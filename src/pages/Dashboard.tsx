@@ -118,8 +118,9 @@ const Dashboard: React.FC = () => {
           </Button>
         </div>
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-1 flex-wrap">
-            {filters.map(f => {
+          <div className="flex items-center gap-2 flex-wrap">
+            <WorkspaceSwitcher />
+            <div className="w-px h-5 bg-border mx-1" />
               const Icon = f.icon;
               return (
                 <button
