@@ -121,6 +121,7 @@ const Dashboard: React.FC = () => {
           <div className="flex items-center gap-2 flex-wrap">
             <WorkspaceSwitcher />
             <div className="w-px h-5 bg-border mx-1" />
+            {filters.map(f => {
               const Icon = f.icon;
               return (
                 <button
