@@ -34,7 +34,7 @@ export default function WorkspaceSwitcher() {
           type="button"
           className="inline-flex items-center gap-2 h-8 pl-1 pr-2.5 rounded-md text-[13px] font-medium border border-sidebar-border bg-sidebar text-foreground hover:bg-muted transition-colors max-w-[220px]"
         >
-          <Avatar className="size-6">
+          <Avatar className={currentTeam ? 'size-5' : 'size-6'}>
             {avatarUrl && <AvatarImage src={avatarUrl} />}
             <AvatarFallback className="text-[10px] bg-primary/15 text-primary">
               {initials}
