@@ -720,6 +720,7 @@ const ArticleEditor: React.FC<{
 
 const Articles: React.FC = () => {
   const { user } = useAuth();
+  const { currentTeamId } = useWorkspace();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
