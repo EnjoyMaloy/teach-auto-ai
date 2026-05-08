@@ -7,6 +7,10 @@ export interface Team {
   name: string;
   description: string | null;
   avatar_url: string | null;
+  instagram_url: string | null;
+  telegram_url: string | null;
+  youtube_url: string | null;
+  x_url: string | null;
   role: 'admin' | 'member';
 }
 
@@ -41,7 +45,7 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     const { data, error } = await supabase
       .from('team_members')
-      .select('role, teams!inner(id, name, description, avatar_url)')
+      .select('role, teams!inner(id, name, description, avatar_url, instagram_url, telegram_url, youtube_url, x_url)')
       .eq('user_id', user.id);
 
     if (!error && data) {
@@ -50,6 +54,10 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
         name: row.teams.name,
         description: row.teams.description,
         avatar_url: row.teams.avatar_url,
+        instagram_url: row.teams.instagram_url,
+        telegram_url: row.teams.telegram_url,
+        youtube_url: row.teams.youtube_url,
+        x_url: row.teams.x_url,
         role: row.role,
       }));
       setTeams(list);
