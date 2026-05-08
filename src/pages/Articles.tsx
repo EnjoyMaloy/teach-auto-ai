@@ -16,6 +16,7 @@ import ArticleType2Cover from '@/components/articles/ArticleType2Cover';
 import { getAutoTitleColor } from '@/lib/gradientTextColor';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import NotionEditor from '@/components/articles/NotionEditor';
+import WorkspaceSwitcher from '@/components/layout/WorkspaceSwitcher';
 import { useFavoriteArticles } from '@/hooks/useFavoriteArticles';
 import {
   DropdownMenu,
@@ -817,7 +818,8 @@ const Articles: React.FC = () => {
         <div className="flex items-start justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">Инструкции</h1>
-            <p className="text-sm text-muted-foreground">Создавайте инструкции, публикуйте их в Open Academy или встраивайте в свои курсы</p>
+            <p className="text-sm text-muted-foreground mb-3">Создавайте инструкции, публикуйте их в Open Academy или встраивайте в свои курсы</p>
+            <WorkspaceSwitcher />
           </div>
           <Button onClick={createArticle} style={{ boxShadow: 'none' }} className="h-11 px-5 rounded-2xl bg-white hover:bg-white/90 text-neutral-900 text-sm shrink-0 border-0 hover:translate-y-0">
             <Plus className="w-4 h-4 mr-2" />
