@@ -281,13 +281,13 @@ export default function Teams() {
           if (!o) resetForm();
         }}
       >
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md bg-[#0a0a0d] border-border/60">
           <DialogHeader>
             <DialogTitle>Новая команда</DialogTitle>
           </DialogHeader>
           <div className="space-y-5 py-2">
-            {/* Avatar */}
-            <div className="flex flex-col items-center gap-3">
+            {/* Avatar — click to pick or replace */}
+            <div className="flex flex-col items-center gap-2">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
@@ -304,18 +304,6 @@ export default function Teams() {
                   <Camera className="size-5" />
                 </div>
               </button>
-              {avatarPreview && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAvatarFile(null);
-                    setAvatarPreview(null);
-                  }}
-                  className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
-                >
-                  <X className="size-3" /> Убрать
-                </button>
-              )}
               <input
                 ref={fileInputRef}
                 type="file"
@@ -338,7 +326,7 @@ export default function Teams() {
 
             <div className="space-y-2">
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-                Соцсети
+                Соцсети <span className="normal-case tracking-normal text-muted-foreground/70">— опционально</span>
               </Label>
               <div className="flex items-center gap-2">
                 {SOCIAL_PLATFORMS.map((p) => (
