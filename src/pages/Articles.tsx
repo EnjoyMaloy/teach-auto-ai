@@ -34,6 +34,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import WorkspaceSwitcher from '@/components/layout/WorkspaceSwitcher';
 
 
 interface Article {
@@ -824,7 +825,9 @@ const Articles: React.FC = () => {
           </Button>
         </div>
         <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-1 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap">
+            <WorkspaceSwitcher />
+            <div className="w-px h-5 bg-border mx-1" />
             {([
               { id: 'all', label: 'Все', icon: null },
               { id: 'favorites', label: 'Избранные', icon: Star },
