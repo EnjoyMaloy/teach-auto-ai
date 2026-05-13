@@ -543,7 +543,7 @@ const Auth: React.FC = () => {
       <div className="hidden lg:flex lg:flex-1 p-6">
         <div className="relative w-full h-full rounded-[26px] p-[2px]" style={{ background: 'linear-gradient(to bottom right, rgba(201,160,255,0.25), rgba(166,108,255,0.25), rgba(123,63,228,0.25))' }}>
           <div className="relative w-full h-full rounded-3xl overflow-hidden">
-            <img src={authIllustration} alt="Creative workspace" className="absolute inset-0 w-full h-full object-cover" fetchPriority="high" />
+            <video src="/auth-video.mp4" autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
             <div className="absolute bottom-12 left-12 right-12">
               <h2 className="text-3xl font-semibold text-white leading-tight">{l.bannerLine1}<br />{l.bannerLine2}</h2>
