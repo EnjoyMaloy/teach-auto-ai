@@ -540,8 +540,8 @@ const Auth: React.FC = () => {
       </div>
 
       {/* Right side */}
-      <div className="hidden lg:flex lg:flex-1 p-6">
-        <div className="relative w-full h-full rounded-[26px] p-[2px]" style={{ background: 'linear-gradient(to bottom right, rgba(201,160,255,0.25), rgba(166,108,255,0.25), rgba(123,63,228,0.25))' }}>
+      <div className="hidden lg:flex lg:flex-1 p-6 items-center justify-center">
+        <div className="relative aspect-square max-h-full max-w-full h-auto w-auto rounded-[26px] p-[2px]" style={{ background: 'linear-gradient(to bottom right, rgba(201,160,255,0.25), rgba(166,108,255,0.25), rgba(123,63,228,0.25))', height: 'min(100%, 100vh)', aspectRatio: '1 / 1' }}>
           <div className="relative w-full h-full rounded-3xl overflow-hidden">
             <video src="/auth-video.mp4" autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
