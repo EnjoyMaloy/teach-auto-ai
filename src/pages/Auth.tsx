@@ -540,13 +540,13 @@ const Auth: React.FC = () => {
       </div>
 
       {/* Right side */}
-      <div className="hidden lg:flex lg:flex-1 p-6 items-center justify-center">
-        <div className="relative aspect-square max-w-full max-h-full h-auto w-auto rounded-[26px] p-[2px] flex" style={{ background: 'linear-gradient(to bottom right, rgba(201,160,255,0.25), rgba(166,108,255,0.25), rgba(123,63,228,0.25))', height: 'min(100%, 100vh)' }}>
-          <div className="relative aspect-square h-full rounded-3xl overflow-hidden bg-black">
-            <video src="/auth-video.mp4" autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-contain" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
-            <div className="absolute bottom-10 left-10 right-10">
-              <h2 className="text-2xl font-semibold text-white leading-tight">{l.bannerLine1}<br />{l.bannerLine2}</h2>
+      <div className="hidden lg:flex lg:flex-1 p-6">
+        <div className="relative w-full h-full rounded-[26px] p-[2px]" style={{ background: 'linear-gradient(to bottom right, rgba(201,160,255,0.25), rgba(166,108,255,0.25), rgba(123,63,228,0.25))' }}>
+          <div className="relative w-full h-full rounded-3xl overflow-hidden">
+            <video src="/auth-video.mp4" autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+            <div className="absolute bottom-12 left-12 right-12">
+              <h2 className="text-3xl font-semibold text-white leading-tight">{l.bannerLine1}<br />{l.bannerLine2}</h2>
             </div>
           </div>
         </div>
