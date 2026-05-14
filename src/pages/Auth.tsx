@@ -546,7 +546,7 @@ const Auth: React.FC = () => {
             <video src="/auth-video.mp4" autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
             <div className="absolute bottom-12 left-12 right-12">
-              <h2 className="text-3xl font-semibold text-white leading-tight">{l.bannerLine1}<br />{l.bannerLine2}</h2>
+              <h2 className="text-2xl font-semibold text-white leading-tight">{l.bannerLine1}<br />{l.bannerLine2}</h2>
             </div>
           </div>
         </div>
