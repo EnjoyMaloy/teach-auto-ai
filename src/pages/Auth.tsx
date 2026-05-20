@@ -528,6 +528,7 @@ const Auth: React.FC = () => {
 
               <p className="text-xs text-white/40 mt-6">
                 {l.linkSpamHint}
+                <br />
                 {l.codeHint3}<a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">{l.contactSupport}</a>
               </p>
             </>
