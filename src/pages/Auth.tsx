@@ -498,7 +498,7 @@ const Auth: React.FC = () => {
                 <ArrowLeft className="w-4 h-4" /> {l.back}
               </button>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-white mb-8 leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-6 sm:mb-8">
                 {l.signIn}
               </h1>
 
@@ -507,7 +507,9 @@ const Auth: React.FC = () => {
                 <p className="text-sm text-white/60 leading-relaxed">
                   {l.magicLinkDesc1}
                   <span className="font-semibold text-white">{email}</span>
-                  {l.magicLinkDesc2}
+                  {l.magicLinkDesc2.replace(/^\.\s*/, '.')}
+                  <br />
+                  {l.magicLinkDesc2.startsWith('.') ? l.magicLinkDesc2.slice(1).trim() : l.magicLinkDesc2}
                 </p>
               </div>
 
