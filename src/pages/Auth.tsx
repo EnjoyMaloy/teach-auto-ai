@@ -347,7 +347,7 @@ const Auth: React.FC = () => {
           className="absolute top-8 right-4 sm:top-10 sm:right-8 lg:right-16 xl:right-24 z-10 flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
         >
           <LogOut className="w-4 h-4" />
-          {l.logout ?? (lang === 'ru' ? 'Выйти' : 'Log out')}
+          {lang === 'ru' ? 'Выйти' : 'Log out'}
         </button>
       )}
 
