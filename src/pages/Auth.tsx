@@ -366,7 +366,13 @@ const Auth: React.FC = () => {
                 <Button type="submit" className={`${primaryBtn} mt-2`} disabled={isLoading}>
                   {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{l.sending}</> : l.getCode}
                 </Button>
-                <p className="text-center text-xs text-white/40 mt-3 leading-relaxed">{l.terms}</p>
+                <p className="text-center text-xs text-white/40 mt-3 leading-relaxed">
+                  {l.termsPrefix}
+                  <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-white/70 underline underline-offset-2 hover:text-white transition-colors">{l.termsTos}</a>
+                  {l.termsAnd}
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-white/70 underline underline-offset-2 hover:text-white transition-colors">{l.termsPrivacy}</a>
+                  {l.termsSuffix}
+                </p>
               </form>
             </>
           )}
