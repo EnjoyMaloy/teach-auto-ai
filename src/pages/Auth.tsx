@@ -336,11 +336,20 @@ const Auth: React.FC = () => {
 
   return (
     <main className="min-h-screen flex flex-col lg:flex-row bg-[#0E0E12] relative">
-      <div className="absolute top-8 left-4 sm:top-10 sm:left-8 lg:left-16 xl:left-24 flex items-center gap-3 z-10">
-        <span className="text-white font-semibold text-lg sm:text-xl tracking-tight">OA</span>
-        <img src={Logo} alt="" className="h-5 sm:h-6" />
-        <span className="text-white font-semibold text-lg sm:text-xl tracking-tight">Studio</span>
+      <div className="absolute top-8 left-4 sm:top-10 sm:left-8 lg:left-16 xl:left-24 flex items-center z-10">
+        <img src={Logo} alt="OA Studio" className="h-5 sm:h-6 w-auto" />
       </div>
+
+      {step.startsWith('waitlist') && user && (
+        <button
+          type="button"
+          onClick={async () => { await signOut(); setStep('main'); }}
+          className="absolute top-8 right-4 sm:top-10 sm:right-8 lg:right-16 xl:right-24 z-10 flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+          {l.logout ?? (lang === 'ru' ? 'Выйти' : 'Log out')}
+        </button>
+      )}
 
       <div className="flex-1 flex flex-col justify-center px-4 sm:px-8 lg:px-16 xl:px-24 pt-16 pb-8 lg:py-0 relative">
         <div className="w-full max-w-[400px] mx-auto">
