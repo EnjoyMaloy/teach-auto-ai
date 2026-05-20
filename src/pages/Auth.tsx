@@ -45,7 +45,7 @@ const t = {
     emailLabel: 'Email',
     emailPlaceholder: 'Enter your email',
     emailInvalid: 'Please enter a valid email',
-    getCode: 'Get sign-in code',
+    getCode: 'Get sign-in link',
     sending: 'Sending...',
     back: 'Back',
     tgTitle: 'Sign in with Telegram',
@@ -96,6 +96,7 @@ const t = {
     signedIn: 'Signed in!',
     enter4digit: 'Enter the 4-digit code',
     enterUsername: 'Enter your username',
+    terms: 'By continuing, you agree to the Terms of Service and Privacy Policy.',
   },
   ru: {
     signIn: 'Войдите в аккаунт',
@@ -105,7 +106,7 @@ const t = {
     emailLabel: 'Email',
     emailPlaceholder: 'Введите ваш email',
     emailInvalid: 'Введите корректный email',
-    getCode: 'Получить код для входа',
+    getCode: 'Получить ссылку для входа',
     sending: 'Отправка...',
     back: 'Назад',
     tgTitle: 'Вход через Telegram',
@@ -156,6 +157,7 @@ const t = {
     signedIn: 'Вход выполнен!',
     enter4digit: 'Введите 4-значный код',
     enterUsername: 'Введите username',
+    terms: 'Продолжая, вы соглашаетесь с Условиями использования и Политикой конфиденциальности.',
   },
 };
 
@@ -177,8 +179,8 @@ const WaitlistDoneView: React.FC<{ lang: Lang }> = ({ lang }) => {
         style={{ transform: showExtras ? 'translateY(0)' : 'translateY(40px)' }}
       >
         <img src={WaitlistSuccessIcon} alt="" className="w-28 h-28 mb-4 mx-auto" />
-        <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">{l.thankYou}</h2>
-        <p className="text-sm text-gray-500 mb-1">{l.thankDesc}</p>
+        <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">{l.thankYou}</h2>
+        <p className="text-sm text-white/60 mb-1">{l.thankDesc}</p>
       </div>
 
       <div
@@ -189,40 +191,40 @@ const WaitlistDoneView: React.FC<{ lang: Lang }> = ({ lang }) => {
           marginTop: showExtras ? '24px' : '0px',
         }}
       >
-        <div className="w-full h-px bg-gray-200 mb-6" />
-        <p className="text-base font-medium text-gray-700 mb-4">{l.tryApp}</p>
+        <div className="w-full h-px bg-white/10 mb-6" />
+        <p className="text-base font-medium text-white/80 mb-4">{l.tryApp}</p>
         <div className="grid grid-cols-2 gap-3 mb-2">
-          <a href="https://learn.open-academy.app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-11 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-medium text-sm transition-all">
+          <a href="https://learn.open-academy.app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-11 rounded-xl bg-white hover:bg-white/90 text-[#0a0a0a] font-medium text-sm transition-all">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
             WEB
           </a>
-          <a href="https://t.me/OpenAcademyBot/app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-11 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-medium text-sm transition-all">
+          <a href="https://t.me/OpenAcademyBot/app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-11 rounded-xl bg-white hover:bg-white/90 text-[#0a0a0a] font-medium text-sm transition-all">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="m20.665 3.717-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"/></svg>
             TMA
           </a>
         </div>
         <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="flex items-center justify-center gap-2 h-11 rounded-xl bg-gray-100 text-gray-400 font-medium text-sm cursor-default">
+          <div className="flex items-center justify-center gap-2 h-11 rounded-xl bg-white/5 text-white/30 font-medium text-sm cursor-default">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
-            App Store <span className="text-xs text-gray-300 ml-1">{l.soon}</span>
+            App Store <span className="text-xs text-white/20 ml-1">{l.soon}</span>
           </div>
-          <div className="flex items-center justify-center gap-2 h-11 rounded-xl bg-gray-100 text-gray-400 font-medium text-sm cursor-default">
+          <div className="flex items-center justify-center gap-2 h-11 rounded-xl bg-white/5 text-white/30 font-medium text-sm cursor-default">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814 13.793 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893 2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199 2.302 2.302a1 1 0 0 1 0 1.38l-1.996 1.996L15.7 12.882l2-2.374zM5.864 2.658 16.8 8.99l-2.302 2.302L5.864 2.658z"/></svg>
-            Google Play <span className="text-xs text-gray-300 ml-1">{l.soon}</span>
+            Google Play <span className="text-xs text-white/20 ml-1">{l.soon}</span>
           </div>
         </div>
 
-        <p className="text-base font-medium text-gray-700 mb-4">{l.followUs}</p>
+        <p className="text-base font-medium text-white/80 mb-4">{l.followUs}</p>
         <div className="flex flex-wrap items-center gap-3">
-          <a href="https://x.com/OpenAcademyAI" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all text-sm font-medium">
+          <a href="https://x.com/OpenAcademyAI" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-white/80 hover:border-white/20 hover:bg-white/10 transition-all text-sm font-medium">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             X
           </a>
-          <a href="https://t.me/nutsfarm" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all text-sm font-medium">
+          <a href="https://t.me/nutsfarm" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-white/80 hover:border-white/20 hover:bg-white/10 transition-all text-sm font-medium">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="m20.665 3.717-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"/></svg>
             Telegram
           </a>
-          <a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all text-sm font-medium">
+          <a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-white/80 hover:border-white/20 hover:bg-white/10 transition-all text-sm font-medium">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
             {l.support}
           </a>
@@ -240,20 +242,17 @@ const Auth: React.FC = () => {
   const [step, setStep] = useState<AuthStep>('main');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [lang, setLang] = useState<Lang>('en');
+  const [lang, setLang] = useState<Lang>('ru');
 
   const l = t[lang];
 
-  // Email state
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState<{ email?: string }>({});
   const [emailCode, setEmailCode] = useState('');
 
-  // Telegram state
   const [tgUsername, setTgUsername] = useState('');
   const [tgCode, setTgCode] = useState('');
 
-  // Waitlist state
   const [selectedSurveyOption, setSelectedSurveyOption] = useState<string | null>(null);
   const queueCount = useMemo(() => Math.floor(Math.random() * 300) + 140, []);
 
@@ -313,8 +312,14 @@ const Auth: React.FC = () => {
     setTgCode('');
   };
 
+  // Reusable class fragments for dark theme
+  const inputDark = 'h-11 bg-white/5 border border-white/10 focus:border-white/30 focus:ring-0 text-white placeholder:text-white/40';
+  const otpSlot = '!w-14 !h-14 text-2xl !border !border-white/15 bg-white/5 text-white !rounded-xl';
+  const primaryBtn = 'w-full h-11 bg-white hover:bg-white/90 text-[#0a0a0a] font-medium';
+  const tgBtn = 'w-full h-11 bg-[#2AABEE] hover:bg-[#229ED9] text-white font-medium';
+
   return (
-    <main className="min-h-screen flex flex-col lg:flex-row bg-white relative">
+    <main className="min-h-screen flex flex-col lg:flex-row bg-[#0a0a0a] relative">
       <div className="absolute top-8 left-4 sm:top-10 sm:left-8 lg:left-16 xl:left-24 flex items-center gap-3 z-10">
         <img src={Logo} alt="Academy Logo" className="h-6 sm:h-8" />
       </div>
@@ -325,11 +330,11 @@ const Auth: React.FC = () => {
           {/* ====== MAIN ====== */}
           {step === 'main' && (
             <>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900 mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-6 sm:mb-8">
                 {l.signIn}
               </h1>
 
-              <Button type="button" variant="outline" className="w-full h-11 bg-white border-gray-200 hover:bg-gray-50 text-gray-700 hover:text-gray-700 font-semibold" onClick={handleGoogleSignIn} disabled={isGoogleLoading || isLoading}>
+              <Button type="button" variant="outline" className="w-full h-11 bg-transparent border-white/10 hover:bg-white/5 text-white hover:text-white font-semibold" onClick={handleGoogleSignIn} disabled={isGoogleLoading || isLoading}>
                 {isGoogleLoading ? <Loader2 className="w-4 h-4 mr-3 animate-spin" /> : <span className="mr-3"><GoogleIcon /></span>}
                 {l.google}
               </Button>
@@ -340,19 +345,20 @@ const Auth: React.FC = () => {
               </Button>
 
               <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center"><Separator className="w-full bg-gray-200" /></div>
-                <div className="relative flex justify-center text-sm"><span className="bg-white px-4 text-gray-500">{l.or}</span></div>
+                <div className="absolute inset-0 flex items-center"><Separator className="w-full bg-white/10" /></div>
+                <div className="relative flex justify-center text-sm"><span className="bg-[#0a0a0a] px-4 text-white/50">{l.or}</span></div>
               </div>
 
               <form onSubmit={handleSendEmailCode} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm text-gray-700 font-semibold">{l.emailLabel}</Label>
-                  <Input id="email" type="email" placeholder={l.emailPlaceholder} value={email} onChange={e => setEmail(e.target.value)} className={`h-11 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-0 text-gray-900 placeholder:text-gray-400 ${errors.email ? 'border-red-400' : ''}`} />
-                  {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+                  <Label htmlFor="email" className="text-sm text-white font-semibold">{l.emailLabel}</Label>
+                  <Input id="email" type="email" placeholder={l.emailPlaceholder} value={email} onChange={e => setEmail(e.target.value)} className={`${inputDark} ${errors.email ? 'border-red-400' : ''}`} />
+                  {errors.email && <p className="text-sm text-red-400">{errors.email}</p>}
                 </div>
-                <Button type="submit" className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium mt-2" disabled={isLoading}>
-                  {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{l.sending}</> : <><Mail className="w-4 h-4 mr-2" />{l.getCode}</>}
+                <Button type="submit" className={`${primaryBtn} mt-2`} disabled={isLoading}>
+                  {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{l.sending}</> : l.getCode}
                 </Button>
+                <p className="text-center text-xs text-white/40 mt-3 leading-relaxed">{l.terms}</p>
               </form>
             </>
           )}
@@ -360,27 +366,27 @@ const Auth: React.FC = () => {
           {/* ====== TELEGRAM USERNAME ====== */}
           {step === 'telegram-username' && (
             <>
-              <button type="button" onClick={goBack} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-6 transition-colors">
+              <button type="button" onClick={goBack} className="flex items-center gap-2 text-sm text-white/50 hover:text-white/80 mb-6 transition-colors">
                 <ArrowLeft className="w-4 h-4" /> {l.back}
               </button>
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-full bg-[#2AABEE] flex items-center justify-center text-white"><TelegramIcon /></div>
-                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">{l.tgTitle}</h2>
+                <h2 className="text-xl sm:text-2xl font-semibold text-white">{l.tgTitle}</h2>
               </div>
-              <p className="text-sm text-gray-500 mb-6">{l.tgDesc}</p>
+              <p className="text-sm text-white/60 mb-6">{l.tgDesc}</p>
               <form onSubmit={handleTelegramUsername} className="space-y-4">
                 <div className="space-y-2">
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">@</span>
-                    <Input id="tg-username" type="text" placeholder="username" value={tgUsername} onChange={e => setTgUsername(e.target.value.replace(/^@/, ''))} className="h-11 pl-8 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-0 text-gray-900 placeholder:text-gray-400" />
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-sm">@</span>
+                    <Input id="tg-username" type="text" placeholder="username" value={tgUsername} onChange={e => setTgUsername(e.target.value.replace(/^@/, ''))} className={`${inputDark} pl-8`} />
                   </div>
                 </div>
-                <Button type="submit" className="w-full h-11 bg-[#2AABEE] hover:bg-[#229ED9] text-white font-medium">
+                <Button type="submit" className={tgBtn}>
                   {l.sendCode}
                 </Button>
               </form>
-              <p className="text-center text-xs text-gray-400 mt-4">
-                {l.tgHint1}<a href="https://t.me/nutsfarm_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">{l.tgOpen}</a>{l.tgHint2}<span className="font-mono bg-gray-100 px-1 py-0.5 rounded text-gray-500 text-[10px]">/start</span>
+              <p className="text-center text-xs text-white/40 mt-4">
+                {l.tgHint1}<a href="https://t.me/nutsfarm_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">{l.tgOpen}</a>{l.tgHint2}<span className="font-mono bg-white/10 px-1 py-0.5 rounded text-white/60 text-[10px]">/start</span>
               </p>
             </>
           )}
@@ -388,34 +394,34 @@ const Auth: React.FC = () => {
           {/* ====== TELEGRAM CODE ====== */}
           {step === 'telegram-code' && (
             <>
-              <button type="button" onClick={() => setStep('telegram-username')} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-6 transition-colors">
+              <button type="button" onClick={() => setStep('telegram-username')} className="flex items-center gap-2 text-sm text-white/50 hover:text-white/80 mb-6 transition-colors">
                 <ArrowLeft className="w-4 h-4" /> {l.back}
               </button>
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-full bg-[#2AABEE] flex items-center justify-center text-white"><TelegramIcon /></div>
-                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">{l.enterCode}</h2>
+                <h2 className="text-xl sm:text-2xl font-semibold text-white">{l.enterCode}</h2>
               </div>
-              <p className="text-sm text-gray-500 mb-6">
+              <p className="text-sm text-white/60 mb-6">
                 {l.tgCodeDesc1}<a href="https://t.me/nutsfarm_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] font-medium hover:underline">@openacademy</a>{l.tgCodeDesc2}
               </p>
 
               <div className="flex justify-center gap-3 mb-6">
                 <InputOTP maxLength={4} value={tgCode} onChange={setTgCode}>
                   <InputOTPGroup className="gap-3">
-                    <InputOTPSlot index={0} className="!w-14 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
-                    <InputOTPSlot index={1} className="!w-14 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
-                    <InputOTPSlot index={2} className="!w-14 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
-                    <InputOTPSlot index={3} className="!w-14 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                    <InputOTPSlot index={0} className={otpSlot} />
+                    <InputOTPSlot index={1} className={otpSlot} />
+                    <InputOTPSlot index={2} className={otpSlot} />
+                    <InputOTPSlot index={3} className={otpSlot} />
                   </InputOTPGroup>
                 </InputOTP>
               </div>
 
-              <Button type="button" onClick={handleTelegramCode} className="w-full h-11 bg-[#2AABEE] hover:bg-[#229ED9] text-white font-medium" disabled={tgCode.length < 4}>
+              <Button type="button" onClick={handleTelegramCode} className={tgBtn} disabled={tgCode.length < 4}>
                 {l.confirm}
               </Button>
 
-              <p className="text-center text-xs text-gray-400 mt-4">
-                {l.codeHint1}<span className="font-mono bg-gray-100 px-1 py-0.5 rounded text-gray-500 text-[10px]">/start</span>{l.codeHint2}
+              <p className="text-center text-xs text-white/40 mt-4">
+                {l.codeHint1}<span className="font-mono bg-white/10 px-1 py-0.5 rounded text-white/60 text-[10px]">/start</span>{l.codeHint2}
                 {l.codeHint3}<a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">{l.contactSupport}</a>
               </p>
             </>
@@ -424,38 +430,38 @@ const Auth: React.FC = () => {
           {/* ====== EMAIL CODE ====== */}
           {step === 'email-code' && (
             <>
-              <button type="button" onClick={() => { setStep('main'); setEmailCode(''); }} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-6 transition-colors">
+              <button type="button" onClick={() => { setStep('main'); setEmailCode(''); }} className="flex items-center gap-2 text-sm text-white/50 hover:text-white/80 mb-6 transition-colors">
                 <ArrowLeft className="w-4 h-4" /> {l.back}
               </button>
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white"><Mail className="w-5 h-5" /></div>
-                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">{l.enterCode}</h2>
+                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#0a0a0a]"><Mail className="w-5 h-5" /></div>
+                <h2 className="text-xl sm:text-2xl font-semibold text-white">{l.enterCode}</h2>
               </div>
-              <p className="text-sm text-gray-500 mb-6">
-                {l.emailCodeDesc}<span className="font-medium text-gray-700">{email}</span>
+              <p className="text-sm text-white/60 mb-6">
+                {l.emailCodeDesc}<span className="font-medium text-white/90">{email}</span>
               </p>
 
               <div className="flex justify-center gap-3 mb-6">
                 <InputOTP maxLength={4} value={emailCode} onChange={setEmailCode}>
                   <InputOTPGroup className="gap-3">
-                    <InputOTPSlot index={0} className="!w-14 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
-                    <InputOTPSlot index={1} className="!w-14 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
-                    <InputOTPSlot index={2} className="!w-14 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
-                    <InputOTPSlot index={3} className="!w-14 !h-14 text-2xl !border !border-gray-300 bg-gray-50 text-gray-900 !rounded-xl" />
+                    <InputOTPSlot index={0} className={otpSlot} />
+                    <InputOTPSlot index={1} className={otpSlot} />
+                    <InputOTPSlot index={2} className={otpSlot} />
+                    <InputOTPSlot index={3} className={otpSlot} />
                   </InputOTPGroup>
                 </InputOTP>
               </div>
 
-              <Button type="button" onClick={handleVerifyEmailCode} className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium" disabled={emailCode.length < 4 || isLoading}>
+              <Button type="button" onClick={handleVerifyEmailCode} className={primaryBtn} disabled={emailCode.length < 4 || isLoading}>
                 {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{l.verifying}</> : l.confirm}
               </Button>
 
-              <p className="text-center text-xs text-gray-400 mt-4">
+              <p className="text-center text-xs text-white/40 mt-4">
                 {l.spamHint}
                 {l.codeHint3}<a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">{l.contactSupport}</a>
               </p>
 
-              <button type="button" onClick={() => { setStep('main'); setEmailCode(''); }} className="block mx-auto text-sm text-gray-500 hover:text-gray-700 hover:underline mt-2">
+              <button type="button" onClick={() => { setStep('main'); setEmailCode(''); }} className="block mx-auto text-sm text-white/50 hover:text-white/80 hover:underline mt-2">
                 {l.diffEmail}
               </button>
             </>
@@ -465,15 +471,15 @@ const Auth: React.FC = () => {
           {step === 'waitlist-info' && (
             <>
               <img src={BetaMascot} alt="" className="w-36 h-36 mb-4 mx-auto" />
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900 mb-3">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-3">
                 {l.betaTitle}
               </h1>
-              <p className="text-sm text-gray-500 mb-2">{l.betaDesc}</p>
-              <div className="flex items-center gap-2 text-sm text-gray-400 mb-8">
+              <p className="text-sm text-white/60 mb-2">{l.betaDesc}</p>
+              <div className="flex items-center gap-2 text-sm text-white/50 mb-8">
                 <Users className="w-4 h-4" />
-                <span>{l.inQueue} <span className="font-medium text-gray-600">{queueCount}</span> {l.people}</span>
+                <span>{l.inQueue} <span className="font-medium text-white/80">{queueCount}</span> {l.people}</span>
               </div>
-              <Button onClick={() => setStep('waitlist-survey')} className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium">
+              <Button onClick={() => setStep('waitlist-survey')} className={primaryBtn}>
                 {l.earlyAccess}
               </Button>
             </>
@@ -482,11 +488,11 @@ const Auth: React.FC = () => {
           {/* ====== WAITLIST SURVEY ====== */}
           {step === 'waitlist-survey' && (
             <>
-              <button onClick={() => setStep('waitlist-info')} className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 transition-colors mb-4">
+              <button onClick={() => setStep('waitlist-info')} className="flex items-center gap-1 text-sm text-white/50 hover:text-white/80 transition-colors mb-4">
                 <ArrowLeft className="w-4 h-4" />
                 {l.back}
               </button>
-              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
+              <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">
                 {l.surveyTitle}
               </h2>
               <div className="space-y-3 mt-8 mb-6">
@@ -497,15 +503,15 @@ const Auth: React.FC = () => {
                     onClick={() => setSelectedSurveyOption(id)}
                     className={`w-full text-left px-4 py-3.5 rounded-xl border transition-all text-sm ${
                       selectedSurveyOption === id
-                        ? 'border-gray-900 bg-gray-50 text-gray-900 font-medium'
-                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                        ? 'border-white bg-white/10 text-white font-medium'
+                        : 'border-white/10 bg-white/5 text-white/70 hover:border-white/20 hover:bg-white/10'
                     }`}
                   >
                     {l.surveys[i]}
                   </button>
                 ))}
               </div>
-              <Button onClick={() => setStep('waitlist-done')} className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium" disabled={!selectedSurveyOption}>
+              <Button onClick={() => setStep('waitlist-done')} className={primaryBtn} disabled={!selectedSurveyOption}>
                 {l.submit}
               </Button>
             </>
@@ -521,17 +527,17 @@ const Auth: React.FC = () => {
         {/* Language switcher */}
         <div className="absolute bottom-6 left-4 sm:left-8 lg:left-16 xl:left-24">
           <div className="flex items-center gap-2 text-sm">
-            <Globe className="w-4 h-4 text-gray-400" />
+            <Globe className="w-4 h-4 text-white/40" />
             <button
               onClick={() => setLang('en')}
-              className={`transition-colors ${lang === 'en' ? 'font-medium text-gray-700' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`transition-colors ${lang === 'en' ? 'font-medium text-white' : 'text-white/40 hover:text-white/70'}`}
             >
               EN
             </button>
-            <span className="text-gray-300">|</span>
+            <span className="text-white/20">|</span>
             <button
               onClick={() => setLang('ru')}
-              className={`transition-colors ${lang === 'ru' ? 'font-medium text-gray-700' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`transition-colors ${lang === 'ru' ? 'font-medium text-white' : 'text-white/40 hover:text-white/70'}`}
             >
               RU
             </button>
