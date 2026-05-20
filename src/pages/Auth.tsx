@@ -508,11 +508,10 @@ const Auth: React.FC = () => {
               </button>
 
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-6 sm:mb-8">
-                {l.signIn}
+                {l.checkEmailTitle}
               </h1>
 
               <div className="rounded-2xl border border-white/10 bg-white/5 p-6 mb-5">
-                <h2 className="text-lg font-semibold text-white mb-2">{l.checkEmailTitle}</h2>
                 <p className="text-sm text-white/60 leading-relaxed">
                   {l.magicLinkDesc1}
                   <span className="font-semibold text-white">{email}</span>
@@ -529,7 +528,7 @@ const Auth: React.FC = () => {
               <p className="text-xs text-white/40 mt-6">
                 {l.linkSpamHint}
                 <br />
-                {l.codeHint3}<a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">{l.contactSupport}</a>
+                {l.codeHint3}<a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="text-[#A66CFF] hover:underline">{l.contactSupport}</a>
               </p>
             </>
           )}
