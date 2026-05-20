@@ -96,7 +96,11 @@ const t = {
     signedIn: 'Signed in!',
     enter4digit: 'Enter the 4-digit code',
     enterUsername: 'Enter your username',
-    terms: 'By continuing, you agree to the Terms of Service and Privacy Policy.',
+    termsPrefix: 'By continuing, you agree to the ',
+    termsTos: 'Terms of Service',
+    termsAnd: ' and ',
+    termsPrivacy: 'Privacy Policy',
+    termsSuffix: '.',
   },
   ru: {
     signIn: 'Войдите в аккаунт',
