@@ -202,11 +202,11 @@ const WaitlistDoneView: React.FC<{ lang: Lang }> = ({ lang }) => {
         <div className="w-full h-px bg-white/10 mb-6" />
         <p className="text-base font-medium text-white/80 mb-4">{l.tryApp}</p>
         <div className="grid grid-cols-2 gap-3 mb-2">
-          <a href="https://learn.open-academy.app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-11 rounded-xl bg-white hover:bg-white/90 text-[#0a0a0a] font-medium text-sm transition-all">
+          <a href="https://learn.open-academy.app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-11 rounded-xl bg-white hover:bg-white/90 text-[#0E0E12] font-medium text-sm transition-all">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
             WEB
           </a>
-          <a href="https://t.me/OpenAcademyBot/app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-11 rounded-xl bg-white hover:bg-white/90 text-[#0a0a0a] font-medium text-sm transition-all">
+          <a href="https://t.me/OpenAcademyBot/app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-11 rounded-xl bg-white hover:bg-white/90 text-[#0E0E12] font-medium text-sm transition-all">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="m20.665 3.717-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"/></svg>
             TMA
           </a>
@@ -323,13 +323,15 @@ const Auth: React.FC = () => {
   // Reusable class fragments for dark theme
   const inputDark = 'h-11 bg-white/5 border border-white/10 focus:border-white/30 focus:ring-0 text-white placeholder:text-white/40';
   const otpSlot = '!w-14 !h-14 text-2xl !border !border-white/15 bg-white/5 text-white !rounded-xl';
-  const primaryBtn = 'w-full h-11 bg-white hover:bg-white/90 text-[#0a0a0a] font-medium';
+  const primaryBtn = 'w-full h-11 bg-white hover:bg-white/90 text-[#0E0E12] font-medium';
   const tgBtn = 'w-full h-11 bg-[#2AABEE] hover:bg-[#229ED9] text-white font-medium';
 
   return (
-    <main className="min-h-screen flex flex-col lg:flex-row bg-[#0a0a0a] relative">
+    <main className="min-h-screen flex flex-col lg:flex-row bg-[#0E0E12] relative">
       <div className="absolute top-8 left-4 sm:top-10 sm:left-8 lg:left-16 xl:left-24 flex items-center gap-3 z-10">
-        <img src={Logo} alt="Academy Logo" className="h-6 sm:h-8" />
+        <span className="text-white font-semibold text-lg sm:text-xl tracking-tight">OA</span>
+        <img src={Logo} alt="" className="h-5 sm:h-6" />
+        <span className="text-white font-semibold text-lg sm:text-xl tracking-tight">Studio</span>
       </div>
 
       <div className="flex-1 flex flex-col justify-center px-4 sm:px-8 lg:px-16 xl:px-24 pt-16 pb-8 lg:py-0 relative">
@@ -354,7 +356,7 @@ const Auth: React.FC = () => {
 
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center"><Separator className="w-full bg-white/10" /></div>
-                <div className="relative flex justify-center text-sm"><span className="bg-[#0a0a0a] px-4 text-white/50">{l.or}</span></div>
+                <div className="relative flex justify-center text-sm"><span className="bg-[#0E0E12] px-4 text-white/50">{l.or}</span></div>
               </div>
 
               <form onSubmit={handleSendEmailCode} className="space-y-4">
@@ -448,7 +450,7 @@ const Auth: React.FC = () => {
                 <ArrowLeft className="w-4 h-4" /> {l.back}
               </button>
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#0a0a0a]"><Mail className="w-5 h-5" /></div>
+                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#0E0E12]"><Mail className="w-5 h-5" /></div>
                 <h2 className="text-xl sm:text-2xl font-semibold text-white">{l.enterCode}</h2>
               </div>
               <p className="text-sm text-white/60 mb-6">
