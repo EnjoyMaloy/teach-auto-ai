@@ -288,7 +288,7 @@ const Auth: React.FC = () => {
     const { error } = await signInWithMagicLink(email);
     setIsLoading(false);
     if (error) { toast.error(l.errorSending + error.message); return; }
-    setStep('email-code');
+    setStep('magic-link-sent');
     setEmailCode('');
     toast.success(l.codeSent);
   };
