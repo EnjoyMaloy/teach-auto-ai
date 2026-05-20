@@ -507,9 +507,9 @@ const Auth: React.FC = () => {
                 <p className="text-sm text-white/60 leading-relaxed">
                   {l.magicLinkDesc1}
                   <span className="font-semibold text-white">{email}</span>
-                  {l.magicLinkDesc2.replace(/^\.\s*/, '.')}
+                  {'.'}
                   <br />
-                  {l.magicLinkDesc2.startsWith('.') ? l.magicLinkDesc2.slice(1).trim() : l.magicLinkDesc2}
+                  {l.magicLinkDesc2.replace(/^\.\s*/, '')}
                 </p>
               </div>
 
