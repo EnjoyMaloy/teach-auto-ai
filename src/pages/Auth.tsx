@@ -65,7 +65,11 @@ const t = {
     emailCodeDesc: 'We sent a 4-digit code to ',
     verifying: 'Verifying...',
     spamHint: "Didn't receive the code? Check your spam folder. ",
-    diffEmail: 'Send to a different email',
+    diffEmail: 'Use a different email',
+    checkEmailTitle: 'Check your email',
+    magicLinkDesc1: 'A sign-in link was sent to ',
+    magicLinkDesc2: '. Click it to sign in.',
+    linkSpamHint: "Didn't get the link? Check your spam folder. ",
     betaTitle: 'Closed beta testing in progress',
     betaDesc: "We're opening access gradually to ensure the best experience for every user.",
     inQueue: 'In queue:',
@@ -130,7 +134,11 @@ const t = {
     emailCodeDesc: 'Мы отправили 4-значный код на ',
     verifying: 'Проверка...',
     spamHint: 'Код не пришёл? Проверьте папку «Спам». ',
-    diffEmail: 'Отправить на другой email',
+    diffEmail: 'Использовать другой email',
+    checkEmailTitle: 'Проверьте почту',
+    magicLinkDesc1: 'Ссылка для входа отправлена на ',
+    magicLinkDesc2: '. Перейдите по ней, чтобы войти.',
+    linkSpamHint: 'Ссылка не пришла? Проверьте папку «Спам». ',
     betaTitle: 'Идёт закрытое бета-тестирование',
     betaDesc: 'Мы открываем доступ постепенно, чтобы обеспечить лучший опыт для каждого пользователя.',
     inQueue: 'В очереди:',
@@ -280,7 +288,7 @@ const Auth: React.FC = () => {
     const { error } = await signInWithMagicLink(email);
     setIsLoading(false);
     if (error) { toast.error(l.errorSending + error.message); return; }
-    setStep('email-code');
+    setStep('magic-link-sent');
     setEmailCode('');
     toast.success(l.codeSent);
   };
@@ -480,6 +488,37 @@ const Auth: React.FC = () => {
               <button type="button" onClick={() => { setStep('main'); setEmailCode(''); }} className="block mx-auto text-sm text-white/50 hover:text-white/80 hover:underline mt-2">
                 {l.diffEmail}
               </button>
+            </>
+          )}
+
+          {/* ====== MAGIC LINK SENT ====== */}
+          {step === 'magic-link-sent' && (
+            <>
+              <button type="button" onClick={() => setStep('main')} className="flex items-center gap-2 text-sm text-white/50 hover:text-white/80 mb-6 transition-colors">
+                <ArrowLeft className="w-4 h-4" /> {l.back}
+              </button>
+
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-white mb-8 leading-tight">
+                {l.signIn}
+              </h1>
+
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-6 mb-5">
+                <h2 className="text-lg font-semibold text-white mb-2">{l.checkEmailTitle}</h2>
+                <p className="text-sm text-white/60 leading-relaxed">
+                  {l.magicLinkDesc1}
+                  <span className="font-semibold text-white">{email}</span>
+                  {l.magicLinkDesc2}
+                </p>
+              </div>
+
+              <button type="button" onClick={() => setStep('main')} className="text-sm font-semibold text-white hover:text-white/80 transition-colors">
+                {l.diffEmail}
+              </button>
+
+              <p className="text-xs text-white/40 mt-6">
+                {l.linkSpamHint}
+                {l.codeHint3}<a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">{l.contactSupport}</a>
+              </p>
             </>
           )}
 
