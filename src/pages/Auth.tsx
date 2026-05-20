@@ -491,6 +491,37 @@ const Auth: React.FC = () => {
             </>
           )}
 
+          {/* ====== MAGIC LINK SENT ====== */}
+          {step === 'magic-link-sent' && (
+            <>
+              <button type="button" onClick={() => setStep('main')} className="flex items-center gap-2 text-sm text-white/50 hover:text-white/80 mb-6 transition-colors">
+                <ArrowLeft className="w-4 h-4" /> {l.back}
+              </button>
+
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-white mb-8 leading-tight">
+                {l.signIn}
+              </h1>
+
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-6 mb-5">
+                <h2 className="text-lg font-semibold text-white mb-2">{l.checkEmailTitle}</h2>
+                <p className="text-sm text-white/60 leading-relaxed">
+                  {l.magicLinkDesc1}
+                  <span className="font-semibold text-white">{email}</span>
+                  {l.magicLinkDesc2}
+                </p>
+              </div>
+
+              <button type="button" onClick={() => setStep('main')} className="text-sm font-semibold text-white hover:text-white/80 transition-colors">
+                {l.diffEmail}
+              </button>
+
+              <p className="text-xs text-white/40 mt-6">
+                {l.linkSpamHint}
+                {l.codeHint3}<a href="https://t.me/open_academy_support_bot" target="_blank" rel="noopener noreferrer" className="text-[#2AABEE] hover:underline">{l.contactSupport}</a>
+              </p>
+            </>
+          )}
+
           {/* ====== WAITLIST INFO ====== */}
           {step === 'waitlist-info' && (
             <>
