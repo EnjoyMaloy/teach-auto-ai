@@ -336,8 +336,8 @@ const Auth: React.FC = () => {
 
   return (
     <main className="min-h-screen flex flex-col lg:flex-row bg-[#0E0E12] relative">
-      <div className="absolute top-8 left-4 sm:top-10 sm:left-8 lg:left-16 xl:left-24 flex items-center z-10">
-        <img src={Logo} alt="OA Studio" className="h-5 sm:h-6 w-auto" />
+      <div className="absolute top-8 left-1/2 -translate-x-1/2 sm:left-8 sm:translate-x-0 sm:top-10 lg:left-16 xl:left-24 flex items-center z-10">
+        <img src={Logo} alt="OA Studio" className="h-8 sm:h-6 w-auto" />
       </div>
 
       {step.startsWith('waitlist') && user && (
