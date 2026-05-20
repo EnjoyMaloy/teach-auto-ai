@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/input-otp';
 
 const authIllustration = '/auth-illustration.jpg';
-import Logo from '@/assets/Logo.svg';
+import Logo from '@/assets/logo-diamond.png';
 import TelegramIconSvg from '@/assets/telegram-icon.svg';
 import WaitlistSuccessIcon from '@/assets/waitlist-success.svg';
 import BetaMascot from '@/assets/beta-mascot.png';
