@@ -254,7 +254,7 @@ type AuthStep = 'main' | 'email-code' | 'telegram-username' | 'telegram-code' | 
 
 const Auth: React.FC = () => {
   const navigate = useNavigate();
-  const { signInWithMagicLink, verifyEmailOtp } = useAuth();
+  const { signInWithMagicLink, verifyEmailOtp, signOut, user } = useAuth();
   const [step, setStep] = useState<AuthStep>('main');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
