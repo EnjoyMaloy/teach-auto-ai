@@ -344,10 +344,10 @@ const Auth: React.FC = () => {
         <button
           type="button"
           onClick={async () => { if (user) await signOut(); setStep('main'); }}
-          className="absolute top-8 right-4 sm:top-10 sm:right-8 lg:right-[calc(50%+1.5rem)] xl:right-[calc(50%+1.5rem)] z-10 flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+          className="absolute top-9 right-4 -translate-y-1/2 sm:top-10 sm:translate-y-0 sm:right-8 lg:right-[calc(50%+1.5rem)] xl:right-[calc(50%+1.5rem)] z-10 flex items-center gap-1.5 sm:gap-2 px-2 py-1.5 sm:px-3 sm:py-2 rounded-lg text-xs sm:text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
         >
           <LogOut className="w-4 h-4" />
-          {lang === 'ru' ? 'Выйти' : 'Log out'}
+          <span>{lang === 'ru' ? 'Выйти' : 'Log out'}</span>
         </button>
       )}
 
