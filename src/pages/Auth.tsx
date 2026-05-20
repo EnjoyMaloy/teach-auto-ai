@@ -340,11 +340,11 @@ const Auth: React.FC = () => {
         <img src={Logo} alt="OA Studio" className="h-8 sm:h-6 w-auto" />
       </div>
 
-      {step.startsWith('waitlist') && user && (
+      {step.startsWith('waitlist') && (
         <button
           type="button"
-          onClick={async () => { await signOut(); setStep('main'); }}
-          className="absolute top-8 right-4 sm:top-10 sm:right-8 lg:right-16 xl:right-24 z-10 flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+          onClick={async () => { if (user) await signOut(); setStep('main'); }}
+          className="absolute top-8 right-4 sm:top-10 sm:right-8 lg:right-[calc(50%+1.5rem)] xl:right-[calc(50%+1.5rem)] z-10 flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
         >
           <LogOut className="w-4 h-4" />
           {lang === 'ru' ? 'Выйти' : 'Log out'}
