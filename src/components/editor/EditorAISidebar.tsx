@@ -1035,57 +1035,14 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                 <ImageIcon className="w-3.5 h-3.5" />
                 Иллюстрации
               </div>
-              <div className="flex gap-1.5">
-                <button
-                  onClick={() => { setLocalSkipImages(false); setImageModel('gemini-3-pro'); }}
-                  className={cn(
-                    "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
-                    !localSkipImages && imageModel === 'gemini-3-pro'
-                      ? "bg-primary/10 border-primary/30 text-primary"
-                      : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
-                  )}
-                >
-                  <Star className="w-3.5 h-3.5" />
-                  Детальные
-                </button>
-                <button
-                  onClick={() => { setLocalSkipImages(false); setImageModel('gemini-3.1-flash'); }}
-                  className={cn(
-                    "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
-                    !localSkipImages && imageModel === 'gemini-3.1-flash'
-                      ? "bg-primary/10 border-primary/30 text-primary"
-                      : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
-                  )}
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  NB2
-                </button>
-                <button
-                  onClick={() => { setLocalSkipImages(false); setImageModel('gemini-2.5-flash'); }}
-                  className={cn(
-                    "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
-                    !localSkipImages && imageModel === 'gemini-2.5-flash'
-                      ? "bg-primary/10 border-primary/30 text-primary"
-                      : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
-                  )}
-                >
-                  <Zap className="w-3.5 h-3.5" />
-                  Быстрые
-                </button>
-                <button
-                  onClick={() => setLocalSkipImages(true)}
-                  className={cn(
-                    "flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all border",
-                    localSkipImages
-                      ? "bg-primary/10 border-primary/30 text-primary"
-                      : "bg-muted/30 border-border text-muted-foreground hover:bg-muted/50"
-                  )}
-                >
-                  <ImageOff className="w-3.5 h-3.5" />
-                  Без картинок
-                </button>
-              </div>
+              <ImageModelPicker
+                value={imageModel}
+                onChange={(id) => setImageModel(id)}
+                skipImages={localSkipImages}
+                onSkipImagesChange={setLocalSkipImages}
+              />
             </div>
+
 
             {/* Lesson count - hidden when MD is selected */}
             {sourceType !== 'md' && (
