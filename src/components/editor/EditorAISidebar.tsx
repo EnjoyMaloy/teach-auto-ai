@@ -23,6 +23,7 @@ import { useGenerateCourse } from '@/hooks/useGenerateCourse';
 import { supabase } from '@/integrations/supabase/client';
 import { useBaseDesignSystems } from '@/hooks/useBaseDesignSystems';
 import { useRefineCourse } from '@/hooks/useRefineCourse';
+import { ImageModelPicker } from '@/components/editor/ImageModelPicker';
 import aiMascot from '@/assets/ai-mascot.svg';
 import aiMascotDark from '@/assets/ai-mascot-dark.svg';
 
