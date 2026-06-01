@@ -62,13 +62,11 @@ export const useTeamMutations = (teamId: string | null) => {
     mutationFn: async ({ email, role }: { email: string; role: 'admin' | 'member' }) => {
       if (!teamId) throw new Error('No team');
       const trimmed = email.trim().toLowerCase();
-      const { data: profile, error: pErr } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', trimmed)
-        .maybeSingle();
+      const { data: foundId, error: pErr } = await supabase
+        .rpc('find_user_id_by_email', { _email: trimmed });
       if (pErr) throw pErr;
-      if (!profile) throw new Error('Пользователь с таким email не найден. Он должен сначала зарегистрироваться.');
+      if (!foundId) throw new Error('Пользователь с таким email не найден. Он должен сначала зарегистрироваться.');
+      const profile = { id: foundId as string };
 
       const { error } = await supabase
         .from('team_members')
