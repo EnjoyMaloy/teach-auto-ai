@@ -806,24 +806,34 @@ const Editor: React.FC = () => {
 
         <div className="flex-1 flex overflow-hidden relative bg-secondary dark:bg-black/10">
           {/* Preview area - full width */}
-          <div className={`flex-1 flex items-center justify-center overflow-hidden m-2 rounded-2xl bg-background transition-all duration-300 ${selectedBlock ? 'md:pr-[396px]' : ''}`}>
-            <div 
-              className="h-full w-full py-3"
-            >
-              <MobilePreviewFrame
-                block={selectedBlock}
-                lessonTitle={displayLessonTitle}
-                blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
-                totalBlocks={blocks.length}
-                onContinue={handleContinueToNextBlock}
-                onUpdateBlock={handleUpdateBlock}
-                designSystem={course.designSystem}
-                isMuted={isPreviewMuted}
-                selectedSubBlockId={selectedSubBlockId}
-                onSelectSubBlock={setSelectedSubBlockId}
-              />
+          {selectedBlock ? (
+            <div className={`flex-1 flex items-center justify-center overflow-hidden m-2 rounded-2xl bg-background transition-all duration-300 md:pr-[396px]`}>
+              <div className="h-full w-full py-3">
+                <MobilePreviewFrame
+                  block={selectedBlock}
+                  lessonTitle={displayLessonTitle}
+                  blockIndex={selectedBlockIndex >= 0 ? selectedBlockIndex : 0}
+                  totalBlocks={blocks.length}
+                  onContinue={handleContinueToNextBlock}
+                  onUpdateBlock={handleUpdateBlock}
+                  designSystem={course.designSystem}
+                  isMuted={isPreviewMuted}
+                  selectedSubBlockId={selectedSubBlockId}
+                  onSelectSubBlock={setSelectedSubBlockId}
+                />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="flex-1 flex items-center justify-center overflow-hidden">
+              <div className="text-center px-8 max-w-sm">
+                <p className="text-sm text-muted-foreground">
+                  {course.lessons.length === 0
+                    ? 'Опишите тему курса слева, чтобы сгенерировать его с помощью AI'
+                    : 'Выберите блок на таймлайне снизу или добавьте новый'}
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Right: Block Editor - floating overlay */}
           {selectedBlock && (
