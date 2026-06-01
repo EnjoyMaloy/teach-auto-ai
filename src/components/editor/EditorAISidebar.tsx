@@ -928,7 +928,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       {/* Generation settings panel - above chat when in generate mode */}
       {showGenerationSettings && (
         <ScrollArea className="flex-1 min-h-0">
-        <div className="px-4 pt-2 pb-4">
+        <div className="pl-4 pr-5 pt-2 pb-4">
           <div className="space-y-6 px-1">
             {/* Design System selector */}
             <div className="space-y-2.5">
