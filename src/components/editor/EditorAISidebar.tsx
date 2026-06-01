@@ -948,7 +948,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
                 <Palette className="w-3.5 h-3.5" />
                 Дизайн-система
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 {designSystems.map((ds) => {
                   const dsConfig = ds.config;
                   const isSelected = selectedDesignSystemId === ds.id;
