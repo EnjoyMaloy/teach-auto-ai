@@ -927,8 +927,10 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
 
       {/* Generation settings panel - above chat when in generate mode */}
       {showGenerationSettings && (
-        <ScrollArea className="flex-1 min-h-0 [&>[data-radix-scroll-area-scrollbar]]:hidden">
-        <div className="px-5 pt-2 pb-4">
+        <div
+          className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        >
+        <div className="pl-5 pr-7 pt-2 pb-4">
           <div className="space-y-6 px-1">
             {/* Design System selector */}
             <div className="space-y-2.5">
@@ -1219,7 +1221,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
             </div>
           </div>
         </div>
-        </ScrollArea>
+        </div>
       )}
 
       {/* Empty state - mascot (only when no messages at all) */}
