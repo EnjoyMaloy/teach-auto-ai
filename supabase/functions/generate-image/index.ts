@@ -74,13 +74,28 @@ Deno.serve(async (req) => {
 
     const { prompt, slideContext, colorPalette, imageModel, mascotDescription, referenceImageUrl, styleReferenceUrl } = await req.json();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    
-    if (!GEMINI_API_KEY) {
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+
+    // Resolve model id (supports new IDs + legacy aliases)
+    const modelId = (imageModel as string) || 'nano-banana-pro';
+    const isGpt = modelId.startsWith('gpt-image-2');
+    const gptQuality: 'high' | 'medium' | 'low' =
+      modelId === 'gpt-image-2-high' ? 'high' :
+      modelId === 'gpt-image-2-medium' ? 'medium' : 'low';
+
+    if (isGpt && !LOVABLE_API_KEY) {
+      return new Response(
+        JSON.stringify({ error: "LOVABLE_API_KEY не настроен." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    if (!isGpt && !GEMINI_API_KEY) {
       return new Response(
         JSON.stringify({ error: "GEMINI_API_KEY не настроен." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
 
     // Build color guidance
     let colorGuidance = '';
@@ -156,74 +171,128 @@ Style requirements (STRICTLY FOLLOW):
       });
     }
 
-    const useFlash = imageModel === 'gemini-2.5-flash';
-    const useNB2 = imageModel === 'gemini-3.1-flash';
-    const primaryModel = useFlash ? "gemini-2.5-flash-image" : useNB2 ? "gemini-3.1-flash-image-preview" : "gemini-3-pro-image-preview";
-    const fallbackModel = "gemini-2.5-flash-image";
-    const modelsToTry = useFlash ? [primaryModel] : [primaryModel, fallbackModel];
-    
-    let response: Response | null = null;
-    let lastError = '';
+    // ── Resolve concrete backend model from incoming imageModel id ────────
+    // Legacy ids ('gemini-3-pro', 'gemini-3.1-flash', 'gemini-2.5-flash') and
+    // new ids ('nano-banana-pro', 'nano-banana-2', 'gpt-image-2-*') are all supported.
+    const useFlash = modelId === 'gemini-2.5-flash';
+    const useNB2 = modelId === 'gemini-3.1-flash' || modelId === 'nano-banana-2';
+    const useNBPro = modelId === 'gemini-3-pro' || modelId === 'nano-banana-pro';
 
-    for (const MODEL of modelsToTry) {
-      const MAX_RETRIES = MODEL === primaryModel && !useFlash ? 2 : 3;
-      console.log(`Generating image via ${MODEL}...`);
-      
-      let succeeded = false;
-      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ parts: requestParts }],
-            generationConfig: {
-              responseModalities: ["TEXT", "IMAGE"],
-              ...(MODEL === "gemini-2.5-flash-image" ? {} : { imageConfig: { aspectRatio: "1:1", imageSize: "1K" } }),
-            },
-          }),
-        });
+    let imageBase64 = '';
+    let imageMimeType = '';
 
-        if (response.ok) { succeeded = true; break; }
+    if (isGpt) {
+      // ── OpenAI GPT Image 2 via Lovable AI Gateway ──────────────────────
+      console.log(`Generating image via openai/gpt-image-2 (quality=${gptQuality})...`);
+      const gwResp = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-image-2",
+          prompt: imagePrompt,
+          size: "1024x1024",
+          quality: gptQuality,
+          n: 1,
+        }),
+      });
 
-        const errorText = await response.text();
-        lastError = errorText;
-        console.error(`${MODEL} error (attempt ${attempt + 1}/${MAX_RETRIES}):`, response.status);
-
-        if (response.status === 503 || response.status === 429) {
-          if (attempt < MAX_RETRIES - 1) {
-            const delay = Math.pow(2, attempt) * 2000 + Math.random() * 1000;
-            await new Promise(resolve => setTimeout(resolve, delay));
-            continue;
-          }
-          break;
-        }
-        if (response.status === 403 || response.status === 400) {
+      if (!gwResp.ok) {
+        const errText = await gwResp.text();
+        console.error('GPT Image 2 gateway error:', gwResp.status, errText);
+        if (gwResp.status === 402) {
           return new Response(
-            JSON.stringify({ error: "Ошибка Gemini API. Проверьте ключ и биллинг.", details: errorText }),
-            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            JSON.stringify({ error: "Закончились кредиты Lovable AI. Пополните баланс в Settings → Workspace → Usage." }),
+            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
-        throw new Error(`Gemini API error: ${response.status}`);
+        if (gwResp.status === 429) {
+          return new Response(
+            JSON.stringify({ error: "Превышен лимит запросов. Попробуйте позже." }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        return new Response(
+          JSON.stringify({ error: "Ошибка GPT Image 2.", details: errText }),
+          { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
-      if (succeeded) break;
-      
-      if (MODEL !== modelsToTry[modelsToTry.length - 1]) {
-        console.log(`${MODEL} exhausted retries, falling back to ${fallbackModel}...`);
+
+      const gwData = await gwResp.json();
+      imageBase64 = gwData?.data?.[0]?.b64_json || '';
+      imageMimeType = 'image/png';
+    } else {
+      // ── Gemini (Nano Banana family) — existing logic with fallback ──────
+      const primaryModel = useFlash ? "gemini-2.5-flash-image"
+        : useNB2 ? "gemini-3.1-flash-image-preview"
+        : "gemini-3-pro-image-preview";
+      const fallbackModel = "gemini-2.5-flash-image";
+      const modelsToTry = useFlash ? [primaryModel] : [primaryModel, fallbackModel];
+
+      let response: Response | null = null;
+
+      for (const MODEL of modelsToTry) {
+        const MAX_RETRIES = MODEL === primaryModel && !useFlash ? 2 : 3;
+        console.log(`Generating image via ${MODEL}...`);
+
+        let succeeded = false;
+        for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+          response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: requestParts }],
+              generationConfig: {
+                responseModalities: ["TEXT", "IMAGE"],
+                ...(MODEL === "gemini-2.5-flash-image" ? {} : { imageConfig: { aspectRatio: "1:1", imageSize: "1K" } }),
+              },
+            }),
+          });
+
+          if (response.ok) { succeeded = true; break; }
+
+          const errorText = await response.text();
+          console.error(`${MODEL} error (attempt ${attempt + 1}/${MAX_RETRIES}):`, response.status);
+
+          if (response.status === 503 || response.status === 429) {
+            if (attempt < MAX_RETRIES - 1) {
+              const delay = Math.pow(2, attempt) * 2000 + Math.random() * 1000;
+              await new Promise(resolve => setTimeout(resolve, delay));
+              continue;
+            }
+            break;
+          }
+          if (response.status === 403 || response.status === 400) {
+            return new Response(
+              JSON.stringify({ error: "Ошибка Gemini API. Проверьте ключ и биллинг.", details: errorText }),
+              { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          throw new Error(`Gemini API error: ${response.status}`);
+        }
+        if (succeeded) break;
+
+        if (MODEL !== modelsToTry[modelsToTry.length - 1]) {
+          console.log(`${MODEL} exhausted retries, falling back to ${fallbackModel}...`);
+        }
       }
+
+      if (!response?.ok) {
+        return new Response(
+          JSON.stringify({ error: "Сервис генерации изображений временно перегружен." }),
+          { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const data = await response.json();
+      const parts = data.candidates?.[0]?.content?.parts || [];
+      const imagePart = parts.find((part: any) => part.inlineData?.mimeType?.startsWith('image/'));
+      imageBase64 = imagePart?.inlineData?.data || '';
+      imageMimeType = imagePart?.inlineData?.mimeType || '';
     }
 
-    if (!response?.ok) {
-      return new Response(
-        JSON.stringify({ error: "Сервис генерации изображений временно перегружен." }),
-        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const data = await response.json();
-    const parts = data.candidates?.[0]?.content?.parts || [];
-    const imagePart = parts.find((part: any) => part.inlineData?.mimeType?.startsWith('image/'));
-    let imageBase64 = imagePart?.inlineData?.data || '';
-    let imageMimeType = imagePart?.inlineData?.mimeType || '';
 
     if (!imageBase64) {
       return new Response(
