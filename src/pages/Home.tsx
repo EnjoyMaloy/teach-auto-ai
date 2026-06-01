@@ -5,6 +5,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useAuth } from '@/hooks/useAuth';
 import { useBaseDesignSystems } from '@/hooks/useBaseDesignSystems';
 import { cn } from '@/lib/utils';
+import { ImageModelPicker } from '@/components/editor/ImageModelPicker';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
