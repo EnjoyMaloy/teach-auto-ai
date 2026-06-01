@@ -655,3 +655,15 @@
   border-radius: 0.125rem;
   padding: 0.0625rem 0.125rem;
 }
+/* Diamond generation spin: rotate 180°, pause, rotate again */
+@keyframes diamond-spin-pause {
+  0% { transform: rotate(0deg); }
+  35% { transform: rotate(180deg); }
+  50% { transform: rotate(180deg); }
+  85% { transform: rotate(360deg); }
+  100% { transform: rotate(360deg); }
+}
+.animate-diamond-spin {
+  animation: diamond-spin-pause 2.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  transform-origin: center;
+}
