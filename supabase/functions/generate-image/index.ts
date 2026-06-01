@@ -74,13 +74,28 @@ Deno.serve(async (req) => {
 
     const { prompt, slideContext, colorPalette, imageModel, mascotDescription, referenceImageUrl, styleReferenceUrl } = await req.json();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    
-    if (!GEMINI_API_KEY) {
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+
+    // Resolve model id (supports new IDs + legacy aliases)
+    const modelId = (imageModel as string) || 'nano-banana-pro';
+    const isGpt = modelId.startsWith('gpt-image-2');
+    const gptQuality: 'high' | 'medium' | 'low' =
+      modelId === 'gpt-image-2-high' ? 'high' :
+      modelId === 'gpt-image-2-medium' ? 'medium' : 'low';
+
+    if (isGpt && !LOVABLE_API_KEY) {
+      return new Response(
+        JSON.stringify({ error: "LOVABLE_API_KEY не настроен." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    if (!isGpt && !GEMINI_API_KEY) {
       return new Response(
         JSON.stringify({ error: "GEMINI_API_KEY не настроен." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
 
     // Build color guidance
     let colorGuidance = '';
