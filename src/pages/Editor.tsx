@@ -679,9 +679,20 @@ const Editor: React.FC = () => {
       {/* Academy logo - fixed top-left corner, always visible */}
       <button
         onClick={() => setIsAISidebarOpen(prev => !prev)}
-        className="absolute top-3 left-3 z-50 w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-300 hover:scale-105"
+        className="absolute top-3 left-3 z-50 w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 hover:scale-105"
+        style={{ transition: 'transform 500ms cubic-bezier(0.4, 0, 0.2, 1)' }}
       >
-        <svg width="22" height="22" viewBox="0 0 361 361" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 361 361"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{
+            transform: isAISidebarOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 500ms cubic-bezier(0.4, 0, 0.2, 1)',
+          }}
+        >
           <path d="M180.5 0L0 180.5L180.5 361L361 180.5L180.5 0Z" fill="#A66CFF"/>
         </svg>
       </button>

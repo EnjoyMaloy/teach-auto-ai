@@ -269,20 +269,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
       <header className="h-14 border-b border-border/5 dark:border-transparent bg-secondary dark:bg-black/10 backdrop-blur-sm flex items-center px-2 sm:px-4 gap-1 sm:gap-2 overflow-hidden">
         {/* Left section - Sidebar trigger + Breadcrumbs */}
         <div className={cn("flex items-center gap-2 min-w-0 flex-1 overflow-hidden", !isAISidebarOpen && "ml-11")}>
-          {/* AI Sidebar Toggle */}
-          {onToggleAISidebar && (
-            <button
-              onClick={onToggleAISidebar}
-              className={cn(
-                "p-2 rounded-lg transition-colors",
-                isAISidebarOpen 
-                  ? "bg-muted text-foreground" 
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
-              )}
-            >
-              <PanelLeft className="w-4 h-4" />
-            </button>
-          )}
+          {/* AI Sidebar Toggle moved to diamond logo in Editor.tsx */}
 
           {/* Breadcrumb navigation */}
           <Breadcrumb className="min-w-0 flex-1">
