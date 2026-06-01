@@ -563,45 +563,40 @@ serve(async (req) => {
       systemPrompt = CONTENT_PROMPT;
     }
 
-    // Use user's own Gemini API key (required)
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
-    if (!GEMINI_API_KEY) {
-      console.error("GEMINI_API_KEY not configured");
+    if (!LOVABLE_API_KEY) {
+      console.error("LOVABLE_API_KEY not configured");
       return new Response(
         JSON.stringify({ error: ERROR_MESSAGES.CONFIG_ERROR }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
     
-    // Google Generative Language API model (direct API, not Lovable Gateway)
-    const MODEL = "gemini-2.5-flash";
-    console.log(`Calling Google Gemini (${MODEL}) with role: ${agentRole || 'builder'} for user: ${user.id}`);
+    const MODEL = "google/gemini-3-flash-preview";
+    console.log(`Calling Lovable AI (${MODEL}) with role: ${agentRole || 'builder'} for user: ${user.id}`);
     
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: systemPrompt + "\n\n" + userPrompt }]
-          }
+        model: MODEL,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
         ],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 65536,
-        }
+        temperature: 0.7,
+        max_tokens: 65536,
       }),
     });
     
     if (!response.ok) {
       const status = response.status;
       const errorBody = await response.text().catch(() => "");
-      console.error("Google Gemini API error:", status, errorBody);
-      
+      console.error("Lovable AI error:", status, errorBody);
       
       if (status === 429) {
         return new Response(
@@ -609,7 +604,13 @@ serve(async (req) => {
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (status === 403 || status === 400) {
+      if (status === 402) {
+        return new Response(
+          JSON.stringify({ error: "Закончились кредиты AI. Пополните баланс в настройках Workspace → Usage." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (status === 401 || status === 403) {
         return new Response(
           JSON.stringify({ error: ERROR_MESSAGES.CONFIG_ERROR }),
           { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -623,15 +624,9 @@ serve(async (req) => {
     }
     
     const data = await response.json();
-    // Gemini 3 models may return "thinking" parts before the actual text
-    // Extract text from all parts, skipping empty/thinking ones
-    const parts = data.candidates?.[0]?.content?.parts || [];
-    const content = parts
-      .map((p: any) => p.text || '')
-      .filter((t: string) => t.trim().length > 0)
-      .pop() || ''; // Take the LAST non-empty part (actual response, not thinking)
+    const content = data.choices?.[0]?.message?.content || "";
     
-    console.log("Gemini response received:", content?.substring(0, 200));
+    console.log("Lovable AI response received:", content?.substring(0, 200));
     
     return new Response(
       JSON.stringify({ content, agentRole, model: MODEL }),
