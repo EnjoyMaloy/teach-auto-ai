@@ -574,8 +574,8 @@ serve(async (req) => {
       );
     }
     
-    // Using Gemini 3 Flash Preview model (newest, fast + smart)
-    const MODEL = "gemini-3-flash-preview";
+    // Google Generative Language API model (direct API, not Lovable Gateway)
+    const MODEL = "gemini-2.5-flash";
     console.log(`Calling Google Gemini (${MODEL}) with role: ${agentRole || 'builder'} for user: ${user.id}`);
     
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
@@ -599,7 +599,9 @@ serve(async (req) => {
     
     if (!response.ok) {
       const status = response.status;
-      console.error("Google Gemini API error:", status);
+      const errorBody = await response.text().catch(() => "");
+      console.error("Google Gemini API error:", status, errorBody);
+      
       
       if (status === 429) {
         return new Response(
