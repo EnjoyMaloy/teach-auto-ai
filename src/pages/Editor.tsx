@@ -835,13 +835,63 @@ const Editor: React.FC = () => {
             </div>
           ) : (
             <div className="flex-1 flex items-center justify-center overflow-hidden">
-              <div className="text-center px-8 max-w-sm">
-                <p className="text-sm text-muted-foreground">
-                  {course.lessons.length === 0
-                    ? 'Опишите тему курса слева, чтобы сгенерировать его с помощью AI'
-                    : 'Выберите блок на таймлайне снизу или добавьте новый'}
-                </p>
-              </div>
+              {aiState.status === 'generating' ? (
+                <div className="flex flex-col items-center gap-10 px-8 max-w-md w-full">
+                  <svg
+                    width="140"
+                    height="140"
+                    viewBox="0 0 361 361"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="animate-diamond-spin"
+                    style={{ filter: 'drop-shadow(0 12px 40px rgba(166, 108, 255, 0.45))' }}
+                  >
+                    <path d="M180.5 0L361 180.5L180.5 361L0 180.5L180.5 0Z" fill="#A66CFF" />
+                  </svg>
+                  <div className="w-full flex flex-col gap-2.5">
+                    {aiState.steps.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center animate-pulse">
+                        Запускаю генерацию...
+                      </p>
+                    ) : (
+                      aiState.steps.map((step) => (
+                        <div
+                          key={step.id}
+                          className={`flex items-center gap-3 text-sm transition-all duration-300 ${
+                            step.status === 'active'
+                              ? 'text-foreground font-medium'
+                              : step.status === 'completed'
+                              ? 'text-muted-foreground'
+                              : step.status === 'error'
+                              ? 'text-destructive'
+                              : 'text-muted-foreground/50'
+                          }`}
+                        >
+                          <span
+                            className={`flex-shrink-0 w-1.5 h-1.5 rounded-full transition-all ${
+                              step.status === 'active'
+                                ? 'bg-[#A66CFF] animate-pulse scale-150'
+                                : step.status === 'completed'
+                                ? 'bg-[#A66CFF]/60'
+                                : step.status === 'error'
+                                ? 'bg-destructive'
+                                : 'bg-muted-foreground/30'
+                            }`}
+                          />
+                          <span className="truncate">{step.label}</span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center px-8 max-w-sm">
+                  <p className="text-sm text-muted-foreground">
+                    {course.lessons.length === 0
+                      ? 'Опишите тему курса слева, чтобы сгенерировать его с помощью AI'
+                      : 'Выберите блок на таймлайне снизу или добавьте новый'}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
