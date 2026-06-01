@@ -398,7 +398,17 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
       if (generationMsgIdRef.current) {
         const msgId = generationMsgIdRef.current;
         setMessages(prev => prev.map(m => 
-          m.id === msgId ? { ...m, isGenerating: false } : m
+          m.id === msgId 
+            ? { 
+                ...m, 
+                isGenerating: false,
+                steps: m.steps?.map(s => 
+                  s.status === 'active' || s.status === 'pending'
+                    ? { ...s, status: 'error' as const, message: state.error || 'Ошибка' }
+                    : s
+                ),
+              } 
+            : m
         ));
       }
       setMessages(prev => {
