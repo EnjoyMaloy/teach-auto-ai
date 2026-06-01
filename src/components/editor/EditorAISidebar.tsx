@@ -76,7 +76,7 @@ interface GenerationSettings {
   designSystemId?: string | null;
   lessonCount?: number;
   skipImages?: boolean;
-  imageModel?: 'gemini-3-pro' | 'gemini-3.1-flash' | 'gemini-2.5-flash';
+  imageModel?: string;
   mascotMode?: 'fixed' | 'varied';
 }
 
