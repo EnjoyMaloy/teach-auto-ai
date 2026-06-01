@@ -1221,7 +1221,7 @@ export const EditorAISidebar: React.FC<EditorAISidebarProps> = ({
             </div>
           </div>
         </div>
-        </ScrollArea>
+        </div>
       )}
 
       {/* Empty state - mascot (only when no messages at all) */}
