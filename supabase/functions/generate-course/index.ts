@@ -599,7 +599,9 @@ serve(async (req) => {
     
     if (!response.ok) {
       const status = response.status;
-      console.error("Google Gemini API error:", status);
+      const errorBody = await response.text().catch(() => "");
+      console.error("Google Gemini API error:", status, errorBody);
+      
       
       if (status === 429) {
         return new Response(
