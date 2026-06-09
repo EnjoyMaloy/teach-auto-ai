@@ -175,10 +175,21 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({ videoUrl, onUpdate
     toast.success('Видео удалено');
   };
 
-  if (videoUrl) {
+  const hiddenInput = (
+    <input
+      ref={fileInputRef}
+      type="file"
+      accept="video/mp4,video/webm,video/quicktime,video/x-msvideo"
+      className="hidden"
+      onChange={handleFileSelect}
+    />
+  );
+
+  if (videoUrl && !isUploading) {
     const fileName = videoUrl.split('/').pop()?.split('?')[0] || 'video.mp4';
     return (
       <div className="space-y-3">
+        {hiddenInput}
         <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/40 border border-border">
           <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
             <Video className="w-5 h-5 text-primary" />
@@ -204,13 +215,7 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({ videoUrl, onUpdate
 
   return (
     <div className="space-y-3">
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="video/mp4,video/webm,video/quicktime,video/x-msvideo"
-        className="hidden"
-        onChange={handleFileSelect}
-      />
+      {hiddenInput}
 
       {isUploading ? (
         <div className="border-2 border-dashed border-primary rounded-2xl p-8 text-center bg-primary/5">
