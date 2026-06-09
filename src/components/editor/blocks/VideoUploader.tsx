@@ -98,6 +98,8 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({ videoUrl, onUpdate
       return;
     }
 
+    const oldVideoUrl = videoUrl;
+
     try {
       setIsUploading(true);
       setUploadProgress(10);
@@ -134,6 +136,16 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({ videoUrl, onUpdate
 
       setUploadProgress(100);
       onUpdate(urlData.publicUrl);
+
+      // Delete old video after successful replacement
+      if (oldVideoUrl?.includes('course-videos')) {
+        try {
+          const path = oldVideoUrl.split('course-videos/')[1];
+          if (path) await supabase.storage.from('course-videos').remove([path]);
+        } catch (err) {
+          console.error('Error deleting old video:', err);
+        }
+      }
 
       const orientationText = metadata.orientation === 'vertical' ? '9:16' : '16:9';
       const durationText = metadata.duration < 60
@@ -178,9 +190,14 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({ videoUrl, onUpdate
             <p className="text-xs text-muted-foreground">Видео загружено</p>
           </div>
         </div>
-        <Button variant="destructive" size="sm" onClick={handleRemove} className="w-full rounded-xl">
-          Удалить видео
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="flex-1 rounded-xl">
+            Заменить
+          </Button>
+          <Button variant="destructive" size="sm" onClick={handleRemove} className="flex-1 rounded-xl">
+            Удалить
+          </Button>
+        </div>
       </div>
     );
   }
