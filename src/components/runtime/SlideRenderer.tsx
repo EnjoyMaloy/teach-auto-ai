@@ -9,6 +9,7 @@ import { Slide, CourseDesignSystem } from '@/types/course';
 import { cn } from '@/lib/utils';
 import { Play, Volume2, Check, X } from 'lucide-react';
 import { AudioPlayer } from '@/components/editor/blocks/AudioPlayer';
+import { VideoPlayer } from './VideoPlayer';
 import { DesignBlockEditor } from '@/components/editor/blocks/DesignBlockEditor';
 import { playSound, SoundConfig } from '@/lib/sounds';
 import { DEFAULT_SOUND_SETTINGS, DEFAULT_DESIGN_BLOCK_SETTINGS } from '@/types/designSystem';
@@ -367,29 +368,17 @@ export const SlideRenderer: React.FC<SlideRendererProps> = ({
       }
 
       case 'video': {
-        const getYouTubeId = (url: string) => {
-          if (!url) return null;
-          const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-          const match = url.match(regExp);
-          return match && match[2].length === 11 ? match[2] : null;
-        };
-        
-        const videoId = slide.videoUrl ? getYouTubeId(slide.videoUrl) : null;
-        
         return (
-          <div className="h-full w-full flex items-center justify-center overflow-hidden bg-black">
-            {videoId ? (
-              <iframe
-                src={`https://www.youtube.com/embed/${videoId}`}
-                className="w-full h-full"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
+          <div className="h-full w-full overflow-hidden">
+            {slide.videoUrl ? (
+              <VideoPlayer
+                videoUrl={slide.videoUrl}
+                primaryColor={ds.primaryColor}
+                foregroundColor={ds.foregroundColor}
+                mutedColor={ds.mutedColor}
               />
-            ) : slide.videoUrl ? (
-              <video src={slide.videoUrl} controls className="w-full h-full object-contain" playsInline />
             ) : (
-              <div className="flex flex-col items-center justify-center text-white/60">
+              <div className="h-full w-full flex flex-col items-center justify-center" style={{ color: `hsl(${ds.foregroundColor} / 0.6)` }}>
                 <Play className="w-16 h-16 mb-4" />
                 <p className="text-sm">Видео не загружено</p>
               </div>
