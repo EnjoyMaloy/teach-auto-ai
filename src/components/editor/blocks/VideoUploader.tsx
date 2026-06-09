@@ -190,9 +190,14 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({ videoUrl, onUpdate
             <p className="text-xs text-muted-foreground">Видео загружено</p>
           </div>
         </div>
-        <Button variant="destructive" size="sm" onClick={handleRemove} className="w-full rounded-xl">
-          Удалить видео
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="flex-1 rounded-xl">
+            Заменить
+          </Button>
+          <Button variant="destructive" size="sm" onClick={handleRemove} className="flex-1 rounded-xl">
+            Удалить
+          </Button>
+        </div>
       </div>
     );
   }
