@@ -164,10 +164,19 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({ videoUrl, onUpdate
   };
 
   if (videoUrl) {
+    const fileName = videoUrl.split('/').pop()?.split('?')[0] || 'video.mp4';
     return (
       <div className="space-y-3">
-        <div className="relative rounded-xl overflow-hidden bg-black aspect-video">
-          <video src={videoUrl} controls className="w-full h-full object-contain" />
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/40 border border-border">
+          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <Video className="w-5 h-5 text-primary" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-foreground truncate" title={fileName}>
+              {fileName}
+            </p>
+            <p className="text-xs text-muted-foreground">Видео загружено</p>
+          </div>
         </div>
         <Button variant="destructive" size="sm" onClick={handleRemove} className="w-full rounded-xl">
           Удалить видео
