@@ -198,6 +198,25 @@ const Editor: React.FC = () => {
           }
         }
         
+        // Persist the draft immediately to DB so reloads (e.g. HMR / preview SHA refresh) don't lose it
+        try {
+          const { error: insertError } = await supabase
+            .from('courses')
+            .insert({
+              id: tempId,
+              author_id: user.id,
+              title: tempCourse.title,
+              description: tempCourse.description || '',
+              lessons_display_type: tempCourse.lessonsDisplayType || 'circle_map',
+            });
+          if (!insertError) {
+            setIsNewCourse(false);
+            queryClient.invalidateQueries({ queryKey: ['courses'] });
+          }
+        } catch (e) {
+          console.error('Failed to pre-persist new course:', e);
+        }
+        
         navigate(`/editor/${tempId}`, { replace: true, state: location.state });
       } else if (courseId) {
         const loadedCourse = await fetchCourse(courseId);
