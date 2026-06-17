@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useCreateTeam } from '@/hooks/useTeams';
+import { useMyInvitations, useRespondToInvitation } from '@/hooks/useTeamInvitations';
 import { supabase } from '@/integrations/supabase/client';
 import {
   SOCIAL_LABELS,
