@@ -375,19 +375,32 @@ export default function Teams() {
             </div>
 
 
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">
                 Соцсети <span className="normal-case tracking-normal text-muted-foreground/70">— опционально</span>
               </Label>
-              <div className="flex items-center gap-2">
-                {SOCIAL_PLATFORMS.map((p) => (
-                  <SocialChip
-                    key={p}
-                    platform={p}
-                    value={socials[p]}
-                    onChange={(v) => setSocials((s) => ({ ...s, [p]: v }))}
-                  />
-                ))}
+              <div className="grid gap-2">
+                {SOCIAL_PLATFORMS.map((p) => {
+                  const Icon = SOCIAL_ICONS[p];
+                  return (
+                    <div
+                      key={p}
+                      className="flex items-center gap-3 bg-muted/40 p-1.5 pl-3 rounded-xl border border-border/50 focus-within:border-primary/50 focus-within:bg-muted/60 transition-colors"
+                    >
+                      <div className="flex items-center gap-2 text-muted-foreground shrink-0 w-24">
+                        <Icon className="size-4" />
+                        <span className="text-xs font-medium">{SOCIAL_LABELS[p]}</span>
+                      </div>
+                      <input
+                        type="text"
+                        value={socials[p]}
+                        onChange={(e) => setSocials((s) => ({ ...s, [p]: e.target.value }))}
+                        placeholder={SOCIAL_PLACEHOLDERS[p]}
+                        className="bg-transparent border-0 text-xs focus:outline-none focus:ring-0 w-full p-1 text-foreground placeholder:text-muted-foreground/30"
+                      />
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
