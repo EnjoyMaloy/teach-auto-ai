@@ -116,7 +116,12 @@ export default function TeamDetail() {
           </Avatar>
           <div className="min-w-0">
             <h1 className="text-2xl font-semibold truncate">{team.name}</h1>
-            {team.description && <p className="text-sm text-muted-foreground mt-1">{team.description}</p>}
+            {(team.description_ru || team.description) && (
+              <p className="text-sm text-muted-foreground mt-1">{team.description_ru || team.description}</p>
+            )}
+            {team.description_en && (
+              <p className="text-sm text-muted-foreground/80 mt-1 italic">{team.description_en}</p>
+            )}
             {(team.instagram_url || team.telegram_url || team.youtube_url || team.x_url || team.threads_url) && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {[
