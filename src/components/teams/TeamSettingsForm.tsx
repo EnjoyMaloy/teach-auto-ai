@@ -30,108 +30,7 @@ const SOCIAL_ICONS: Record<SocialPlatform, React.ComponentType<{ className?: str
   threads: ThreadsIcon,
 };
 
-function SocialChip({
-  platform,
-  value,
-  onChange,
-}: {
-  platform: SocialPlatform;
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  const Icon = SOCIAL_ICONS[platform];
-  const [open, setOpen] = useState(false);
-  const [draft, setDraft] = useState(value);
-  const isSet = !!value;
-
-  const handleSave = () => {
-    const trimmed = draft.trim();
-    if (!trimmed) {
-      onChange('');
-      setOpen(false);
-      return;
-    }
-    const v = validateSocialUrl(platform, trimmed);
-    if (v === null) {
-      toast.error(`Неверная ссылка ${SOCIAL_LABELS[platform]}`);
-      return;
-    }
-    onChange(v || '');
-    setOpen(false);
-  };
-
-  return (
-    <Popover
-      open={open}
-      onOpenChange={(o) => {
-        setOpen(o);
-        if (o) setDraft(value);
-      }}
-    >
-      <PopoverTrigger asChild>
-        <button
-          type="button"
-          title={SOCIAL_LABELS[platform]}
-          className={cn(
-            'relative size-10 rounded-full flex items-center justify-center transition-colors border',
-            isSet
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'bg-muted text-muted-foreground border-border hover:text-foreground hover:border-primary/50'
-          )}
-        >
-          <Icon className="size-4" />
-          {!isSet && (
-            <span className="absolute -bottom-0.5 -right-0.5 size-4 rounded-full bg-background border border-border flex items-center justify-center">
-              <Plus className="size-2.5" />
-            </span>
-          )}
-          {isSet && (
-            <span className="absolute -bottom-0.5 -right-0.5 size-4 rounded-full bg-background border border-border flex items-center justify-center text-primary">
-              <Check className="size-2.5" />
-            </span>
-          )}
-        </button>
-      </PopoverTrigger>
-      <PopoverContent className="w-72" align="start">
-        <div className="space-y-2">
-          <Label className="text-xs">{SOCIAL_LABELS[platform]}</Label>
-          <Input
-            autoFocus
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            placeholder={SOCIAL_PLACEHOLDERS[platform]}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleSave();
-              }
-            }}
-          />
-          <div className="flex justify-between gap-2 pt-1">
-            {isSet ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  onChange('');
-                  setOpen(false);
-                }}
-              >
-                <X className="size-3 mr-1" /> Убрать
-              </Button>
-            ) : (
-              <span />
-            )}
-            <Button type="button" size="sm" onClick={handleSave}>
-              Сохранить
-            </Button>
-          </div>
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-}
+// SocialChip removed in favor of direct stacked line inputs (полосками)
 
 interface Props {
   team: Team;
@@ -201,6 +100,23 @@ export default function TeamSettingsForm({ team, canEdit }: Props) {
       toast.error('Введите название команды');
       return;
     }
+
+    // Validate social links on submit
+    const validatedSocials: Record<SocialPlatform, string> = { ...socials };
+    for (const p of SOCIAL_PLATFORMS) {
+      const val = socials[p].trim();
+      if (val) {
+        const validated = validateSocialUrl(p, val);
+        if (validated === null) {
+          toast.error(`Неверная ссылка для ${SOCIAL_LABELS[p]}`);
+          return;
+        }
+        validatedSocials[p] = validated;
+      } else {
+        validatedSocials[p] = '';
+      }
+    }
+
     setSubmitting(true);
     try {
       let avatarUrl: string | undefined;
@@ -223,11 +139,11 @@ export default function TeamSettingsForm({ team, canEdit }: Props) {
         description: descriptionRu.trim() || descriptionEn.trim() || null,
         description_ru: descriptionRu.trim() || null,
         description_en: descriptionEn.trim() || null,
-        instagram_url: socials.instagram || null,
-        telegram_url: socials.telegram || null,
-        youtube_url: socials.youtube || null,
-        x_url: socials.x || null,
-        threads_url: socials.threads || null,
+        instagram_url: validatedSocials.instagram || null,
+        telegram_url: validatedSocials.telegram || null,
+        youtube_url: validatedSocials.youtube || null,
+        x_url: validatedSocials.x || null,
+        threads_url: validatedSocials.threads || null,
         ...(avatarUrl !== undefined ? { avatar_url: avatarUrl } : {}),
       });
       setAvatarFile(null);
@@ -342,19 +258,142 @@ export default function TeamSettingsForm({ team, canEdit }: Props) {
         )}
       </div>
 
+  const handleSocialChange = (platform: SocialPlatform, value: string) => {
+    if (disabled) return;
+    setSocials((s) => ({ ...s, [platform]: value }));
+  };
+
+  return (
+    <div className="space-y-6 max-w-2xl">
+      <div className="flex items-center gap-4">
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => fileInputRef.current?.click()}
+          className={cn(
+            'relative size-20 rounded-full overflow-hidden border-2 border-dashed border-border group',
+            disabled ? 'cursor-not-allowed opacity-70' : 'hover:border-primary transition-colors'
+          )}
+        >
+          {avatarPreview ? (
+            <Avatar className="w-full h-full">
+              <AvatarImage src={avatarPreview} className="object-cover" />
+              <AvatarFallback>{team.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+            </Avatar>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground">
+              <Camera className="size-5" />
+            </div>
+          )}
+          {!disabled && (
+            <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+              <Camera className="size-5" />
+            </div>
+          )}
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => handleAvatarPick(e.target.files?.[0] ?? null)}
+        />
+        <div className="text-xs text-muted-foreground">
+          {disabled ? 'Только админ может менять аватар' : 'Нажмите, чтобы заменить аватар'}
+        </div>
+      </div>
+
       <div className="space-y-2">
+        <Label>Название</Label>
+        <Input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          maxLength={80}
+          disabled={disabled}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label>Описание</Label>
+          <div className="flex bg-muted rounded-lg p-1">
+            <button
+              type="button"
+              onClick={() => setDescLang('ru')}
+              className={cn(
+                'px-2.5 py-1 text-xs font-medium rounded-md transition-colors',
+                descLang === 'ru'
+                  ? 'bg-[#0a0a0c] text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              RU
+            </button>
+            <button
+              type="button"
+              onClick={() => setDescLang('en')}
+              className={cn(
+                'px-2.5 py-1 text-xs font-medium rounded-md transition-colors',
+                descLang === 'en'
+                  ? 'bg-[#0a0a0c] text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              EN
+            </button>
+          </div>
+        </div>
+        {descLang === 'ru' ? (
+          <Textarea
+            value={descriptionRu}
+            onChange={(e) => setDescriptionRu(e.target.value)}
+            rows={3}
+            maxLength={500}
+            placeholder="Команда, которая создаёт курсы..."
+            disabled={disabled}
+          />
+        ) : (
+          <Textarea
+            value={descriptionEn}
+            onChange={(e) => setDescriptionEn(e.target.value)}
+            rows={3}
+            maxLength={500}
+            placeholder="A team that creates courses..."
+            disabled={disabled}
+          />
+        )}
+      </div>
+
+      <div className="space-y-3">
         <Label className="text-xs uppercase tracking-wide text-muted-foreground">
           Соцсети
         </Label>
-        <div className="flex items-center gap-2 flex-wrap">
-          {SOCIAL_PLATFORMS.map((p) => (
-            <SocialChip
-              key={p}
-              platform={p}
-              value={socials[p]}
-              onChange={(v) => !disabled && setSocials((s) => ({ ...s, [p]: v }))}
-            />
-          ))}
+        <div className="grid gap-2">
+          {SOCIAL_PLATFORMS.map((p) => {
+            const Icon = SOCIAL_ICONS[p];
+            return (
+              <div
+                key={p}
+                className={cn(
+                  'flex items-center gap-3 bg-muted/40 p-1.5 pl-3 rounded-xl border border-border/50 focus-within:border-primary/50 focus-within:bg-muted/60 transition-colors',
+                  disabled && 'opacity-70'
+                )}
+              >
+                <div className="flex items-center gap-2 text-muted-foreground shrink-0 w-24">
+                  <Icon className="size-4" />
+                  <span className="text-xs font-medium">{SOCIAL_LABELS[p]}</span>
+                </div>
+                <input
+                  type="text"
+                  value={socials[p]}
+                  disabled={disabled}
+                  onChange={(e) => handleSocialChange(p, e.target.value)}
+                  placeholder={SOCIAL_PLACEHOLDERS[p]}
+                  className="bg-transparent border-0 text-xs focus:outline-none focus:ring-0 w-full p-1 text-foreground placeholder:text-muted-foreground/30"
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
 
