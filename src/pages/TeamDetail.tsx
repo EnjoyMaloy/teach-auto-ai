@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Trash2, Crown, User as UserIcon, LogOut } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Crown, User as UserIcon, LogOut, Mail, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -22,6 +22,10 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useTeamMembers, useTeamMutations } from '@/hooks/useTeams';
+import {
+  useTeamInvitations,
+  useInvitationMutations,
+} from '@/hooks/useTeamInvitations';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
@@ -34,7 +38,9 @@ export default function TeamDetail() {
   const isAdmin = team?.role === 'admin';
 
   const { data: members = [], isLoading } = useTeamMembers(teamId || null);
-  const { addMember, removeMember, updateRole, deleteTeam } = useTeamMutations(teamId || null);
+  const { removeMember, updateRole, deleteTeam } = useTeamMutations(teamId || null);
+  const { data: invitations = [] } = useTeamInvitations(isAdmin ? teamId || null : null);
+  const { invite, cancel } = useInvitationMutations(teamId || null);
 
   const [addOpen, setAddOpen] = useState(false);
   const [email, setEmail] = useState('');
@@ -56,7 +62,7 @@ export default function TeamDetail() {
   const handleAdd = async () => {
     if (!email.trim()) return;
     try {
-      await addMember.mutateAsync({ email, role });
+      await invite.mutateAsync({ email, role });
       setEmail('');
       setRole('member');
       setAddOpen(false);
@@ -164,7 +170,7 @@ export default function TeamDetail() {
                 style={{ boxShadow: 'none' }}
                 className="h-9 px-4 rounded-xl bg-white hover:bg-white/90 text-neutral-900 border-0 hover:translate-y-0"
               >
-                <Plus className="size-4 mr-2" /> Добавить
+                <Plus className="size-4 mr-2" /> Пригласить
               </Button>
             )}
           </div>
@@ -232,6 +238,39 @@ export default function TeamDetail() {
               })}
             </div>
           )}
+
+          {isAdmin && invitations.length > 0 && (
+            <div className="mt-8">
+              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-3">
+                Ожидают принятия ({invitations.length})
+              </div>
+              <div className="space-y-2">
+                {invitations.map((inv) => (
+                  <div
+                    key={inv.id}
+                    className="flex items-center gap-3 p-3 rounded-xl border border-dashed border-sidebar-border bg-sidebar/50"
+                  >
+                    <div className="size-9 rounded-full bg-muted flex items-center justify-center">
+                      <Mail className="size-4 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate">{inv.email}</div>
+                      <div className="text-xs text-muted-foreground">
+                        Приглашение · {inv.role === 'admin' ? 'Admin' : 'Member'}
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => cancel.mutate(inv.id)}
+                    >
+                      <X className="size-4 mr-1" /> Отменить
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="settings" className="mt-6">
@@ -255,7 +294,7 @@ export default function TeamDetail() {
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Добавить участника</DialogTitle>
+            <DialogTitle>Пригласить участника</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
@@ -267,7 +306,7 @@ export default function TeamDetail() {
                 placeholder="user@example.com"
               />
               <p className="text-xs text-muted-foreground">
-                Пользователь должен быть уже зарегистрирован.
+                Пользователь получит приглашение в разделе «Команды» и сможет принять или отклонить его.
               </p>
             </div>
             <div className="space-y-2">
@@ -285,7 +324,7 @@ export default function TeamDetail() {
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setAddOpen(false)}>Отмена</Button>
-            <Button onClick={handleAdd} disabled={addMember.isPending}>Добавить</Button>
+            <Button onClick={handleAdd} disabled={invite.isPending}>Отправить приглашение</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

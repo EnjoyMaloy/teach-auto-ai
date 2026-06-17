@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Users, Shield, Camera, Loader2, X, Instagram, Send, Youtube, Check } from 'lucide-react';
+import { Plus, Users, Shield, Camera, Loader2, X, Instagram, Send, Youtube, Check, Mail } from 'lucide-react';
 import { XIcon, ThreadsIcon } from '@/components/icons/BrandIcons';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useCreateTeam } from '@/hooks/useTeams';
+import { useMyInvitations, useRespondToInvitation } from '@/hooks/useTeamInvitations';
 import { supabase } from '@/integrations/supabase/client';
 import {
   SOCIAL_LABELS,
@@ -140,6 +141,8 @@ function SocialChip({ platform, value, onChange }: SocialChipProps) {
 export default function Teams() {
   const navigate = useNavigate();
   const { teams, isLoading, refresh, setCurrentTeamId } = useWorkspace();
+  const { data: myInvitations = [] } = useMyInvitations();
+  const { accept, decline } = useRespondToInvitation();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -154,6 +157,18 @@ export default function Teams() {
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const createTeam = useCreateTeam();
+
+  const handleAccept = async (invitationId: string) => {
+    try {
+      const teamId = await accept.mutateAsync(invitationId);
+      await refresh();
+      if (teamId) {
+        setCurrentTeamId(teamId);
+        navigate(`/teams/${teamId}`);
+      }
+    } catch {}
+  };
+
 
   const resetForm = () => {
     setName('');
@@ -236,6 +251,58 @@ export default function Teams() {
           Создать команду
         </Button>
       </div>
+
+      {myInvitations.length > 0 && (
+        <div className="mb-8 space-y-3">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <Mail className="size-4 text-primary" />
+            Приглашения в команды
+            <span className="text-xs text-muted-foreground">({myInvitations.length})</span>
+          </div>
+          <div className="space-y-2">
+            {myInvitations.map((inv) => (
+              <div
+                key={inv.id}
+                className="flex items-center gap-3 p-4 rounded-2xl border border-primary/30 bg-primary/5"
+              >
+                <Avatar className="size-10">
+                  {inv.team_avatar_url && <AvatarImage src={inv.team_avatar_url} />}
+                  <AvatarFallback className="bg-primary/15 text-primary font-semibold rounded-full">
+                    {inv.team_name.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium truncate">
+                    Приглашение в «{inv.team_name}»
+                  </div>
+                  <div className="text-xs text-muted-foreground truncate">
+                    От {inv.inviter_name || inv.inviter_email || 'администратора'} ·{' '}
+                    {inv.role === 'admin' ? 'Admin' : 'Member'}
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => decline.mutate(inv.id)}
+                  disabled={decline.isPending || accept.isPending}
+                >
+                  Отклонить
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => handleAccept(inv.id)}
+                  disabled={accept.isPending || decline.isPending}
+                  style={{ boxShadow: 'none' }}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 border-0 hover:translate-y-0"
+                >
+                  <Check className="size-4 mr-1" /> Принять
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
 
       {isLoading ? (
         <div className="text-muted-foreground">Загрузка...</div>
