@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Users, Shield, Camera, Loader2, X, Instagram, Send, Youtube, Check } from 'lucide-react';
+import { Plus, Users, Shield, Camera, Loader2, X, Instagram, Send, Youtube, Check, Mail } from 'lucide-react';
 import { XIcon, ThreadsIcon } from '@/components/icons/BrandIcons';
 import { Button } from '@/components/ui/button';
 import {
