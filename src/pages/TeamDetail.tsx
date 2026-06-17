@@ -38,7 +38,9 @@ export default function TeamDetail() {
   const isAdmin = team?.role === 'admin';
 
   const { data: members = [], isLoading } = useTeamMembers(teamId || null);
-  const { addMember, removeMember, updateRole, deleteTeam } = useTeamMutations(teamId || null);
+  const { removeMember, updateRole, deleteTeam } = useTeamMutations(teamId || null);
+  const { data: invitations = [] } = useTeamInvitations(isAdmin ? teamId || null : null);
+  const { invite, cancel } = useInvitationMutations(teamId || null);
 
   const [addOpen, setAddOpen] = useState(false);
   const [email, setEmail] = useState('');
@@ -60,7 +62,7 @@ export default function TeamDetail() {
   const handleAdd = async () => {
     if (!email.trim()) return;
     try {
-      await addMember.mutateAsync({ email, role });
+      await invite.mutateAsync({ email, role });
       setEmail('');
       setRole('member');
       setAddOpen(false);
