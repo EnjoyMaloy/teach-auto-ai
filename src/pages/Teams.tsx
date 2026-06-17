@@ -148,6 +148,7 @@ export default function Teams() {
   const [name, setName] = useState('');
   const [descriptionRu, setDescriptionRu] = useState('');
   const [descriptionEn, setDescriptionEn] = useState('');
+  const [descLang, setDescLang] = useState<'ru' | 'en'>('ru');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [socials, setSocials] = useState<Record<SocialPlatform, string>>({
