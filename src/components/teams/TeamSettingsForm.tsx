@@ -291,33 +291,54 @@ export default function TeamSettingsForm({ team, canEdit }: Props) {
       </div>
 
       <div className="space-y-2">
-        <Label className="flex items-center justify-between">
-          <span>Описание (RU)</span>
-          <span className="text-xs text-muted-foreground font-normal">опционально</span>
-        </Label>
-        <Textarea
-          value={descriptionRu}
-          onChange={(e) => setDescriptionRu(e.target.value)}
-          rows={3}
-          maxLength={500}
-          placeholder="Команда, которая создаёт курсы..."
-          disabled={disabled}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label className="flex items-center justify-between">
-          <span>Description (EN)</span>
-          <span className="text-xs text-muted-foreground font-normal">optional</span>
-        </Label>
-        <Textarea
-          value={descriptionEn}
-          onChange={(e) => setDescriptionEn(e.target.value)}
-          rows={3}
-          maxLength={500}
-          placeholder="A team that creates courses..."
-          disabled={disabled}
-        />
+        <div className="flex items-center justify-between">
+          <Label>Описание</Label>
+          <div className="flex bg-muted rounded-lg p-1">
+            <button
+              type="button"
+              onClick={() => setDescLang('ru')}
+              className={cn(
+                'px-2.5 py-1 text-xs font-medium rounded-md transition-colors',
+                descLang === 'ru'
+                  ? 'bg-[#0a0a0c] text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              RU
+            </button>
+            <button
+              type="button"
+              onClick={() => setDescLang('en')}
+              className={cn(
+                'px-2.5 py-1 text-xs font-medium rounded-md transition-colors',
+                descLang === 'en'
+                  ? 'bg-[#0a0a0c] text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              EN
+            </button>
+          </div>
+        </div>
+        {descLang === 'ru' ? (
+          <Textarea
+            value={descriptionRu}
+            onChange={(e) => setDescriptionRu(e.target.value)}
+            rows={3}
+            maxLength={500}
+            placeholder="Команда, которая создаёт курсы..."
+            disabled={disabled}
+          />
+        ) : (
+          <Textarea
+            value={descriptionEn}
+            onChange={(e) => setDescriptionEn(e.target.value)}
+            rows={3}
+            maxLength={500}
+            placeholder="A team that creates courses..."
+            disabled={disabled}
+          />
+        )}
       </div>
 
       <div className="space-y-2">
