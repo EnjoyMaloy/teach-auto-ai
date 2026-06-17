@@ -111,7 +111,18 @@ export const useTeamMutations = (teamId: string | null) => {
   });
 
   const updateTeam = useMutation({
-    mutationFn: async (patch: { name?: string; description?: string | null; avatar_url?: string | null }) => {
+    mutationFn: async (patch: {
+      name?: string;
+      description?: string | null;
+      description_ru?: string | null;
+      description_en?: string | null;
+      avatar_url?: string | null;
+      instagram_url?: string | null;
+      telegram_url?: string | null;
+      youtube_url?: string | null;
+      x_url?: string | null;
+      threads_url?: string | null;
+    }) => {
       if (!teamId) throw new Error('No team');
       const { error } = await supabase.from('teams').update(patch).eq('id', teamId);
       if (error) throw error;
