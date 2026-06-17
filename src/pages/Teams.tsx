@@ -102,17 +102,33 @@ export default function Teams() {
       return;
     }
 
+    // Validate social links on submit
+    const validatedSocials: Record<SocialPlatform, string> = { ...socials };
+    for (const p of SOCIAL_PLATFORMS) {
+      const val = socials[p].trim();
+      if (val) {
+        const validated = validateSocialUrl(p, val);
+        if (validated === null) {
+          toast.error(`Неверная ссылка для ${SOCIAL_LABELS[p]}`);
+          return;
+        }
+        validatedSocials[p] = validated;
+      } else {
+        validatedSocials[p] = '';
+      }
+    }
+
     setSubmitting(true);
     try {
       const team = await createTeam.mutateAsync({
         name: name.trim(),
         description_ru: descriptionRu.trim() || null,
         description_en: descriptionEn.trim() || null,
-        instagram_url: socials.instagram || null,
-        telegram_url: socials.telegram || null,
-        youtube_url: socials.youtube || null,
-        x_url: socials.x || null,
-        threads_url: socials.threads || null,
+        instagram_url: validatedSocials.instagram || null,
+        telegram_url: validatedSocials.telegram || null,
+        youtube_url: validatedSocials.youtube || null,
+        x_url: validatedSocials.x || null,
+        threads_url: validatedSocials.threads || null,
       });
 
       if (avatarFile) {
