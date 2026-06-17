@@ -141,6 +141,8 @@ function SocialChip({ platform, value, onChange }: SocialChipProps) {
 export default function Teams() {
   const navigate = useNavigate();
   const { teams, isLoading, refresh, setCurrentTeamId } = useWorkspace();
+  const { data: myInvitations = [] } = useMyInvitations();
+  const { accept, decline } = useRespondToInvitation();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -155,6 +157,18 @@ export default function Teams() {
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const createTeam = useCreateTeam();
+
+  const handleAccept = async (invitationId: string) => {
+    try {
+      const teamId = await accept.mutateAsync(invitationId);
+      await refresh();
+      if (teamId) {
+        setCurrentTeamId(teamId);
+        navigate(`/teams/${teamId}`);
+      }
+    } catch {}
+  };
+
 
   const resetForm = () => {
     setName('');
