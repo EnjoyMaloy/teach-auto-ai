@@ -238,6 +238,39 @@ export default function TeamDetail() {
               })}
             </div>
           )}
+
+          {isAdmin && invitations.length > 0 && (
+            <div className="mt-8">
+              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-3">
+                Ожидают принятия ({invitations.length})
+              </div>
+              <div className="space-y-2">
+                {invitations.map((inv) => (
+                  <div
+                    key={inv.id}
+                    className="flex items-center gap-3 p-3 rounded-xl border border-dashed border-sidebar-border bg-sidebar/50"
+                  >
+                    <div className="size-9 rounded-full bg-muted flex items-center justify-center">
+                      <Mail className="size-4 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate">{inv.email}</div>
+                      <div className="text-xs text-muted-foreground">
+                        Приглашение · {inv.role === 'admin' ? 'Admin' : 'Member'}
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => cancel.mutate(inv.id)}
+                    >
+                      <X className="size-4 mr-1" /> Отменить
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="settings" className="mt-6">
