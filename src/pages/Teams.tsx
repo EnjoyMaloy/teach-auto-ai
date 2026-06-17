@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Users, Shield, Camera, Loader2, X, Instagram, Send, Youtube, Twitter, Check } from 'lucide-react';
+import { Plus, Users, Shield, Camera, Loader2, X, Instagram, Send, Youtube, Check } from 'lucide-react';
+import { XIcon, ThreadsIcon } from '@/components/icons/BrandIcons';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -25,13 +26,14 @@ import {
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
-const SOCIAL_PLATFORMS: SocialPlatform[] = ['instagram', 'telegram', 'youtube', 'x'];
+const SOCIAL_PLATFORMS: SocialPlatform[] = ['instagram', 'telegram', 'youtube', 'x', 'threads'];
 
 const SOCIAL_ICONS: Record<SocialPlatform, React.ComponentType<{ className?: string }>> = {
   instagram: Instagram,
   telegram: Send,
   youtube: Youtube,
-  x: Twitter,
+  x: XIcon,
+  threads: ThreadsIcon,
 };
 
 interface SocialChipProps {
@@ -147,6 +149,7 @@ export default function Teams() {
     telegram: '',
     youtube: '',
     x: '',
+    threads: '',
   });
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -156,7 +159,7 @@ export default function Teams() {
     setName('');
     setAvatarFile(null);
     setAvatarPreview(null);
-    setSocials({ instagram: '', telegram: '', youtube: '', x: '' });
+    setSocials({ instagram: '', telegram: '', youtube: '', x: '', threads: '' });
   };
 
   const handleAvatarPick = (file: File | null) => {
@@ -185,6 +188,7 @@ export default function Teams() {
         telegram_url: socials.telegram || null,
         youtube_url: socials.youtube || null,
         x_url: socials.x || null,
+        threads_url: socials.threads || null,
       });
 
       if (avatarFile) {

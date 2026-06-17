@@ -111,13 +111,14 @@ export default function TeamDetail() {
           <div className="min-w-0">
             <h1 className="text-2xl font-semibold truncate">{team.name}</h1>
             {team.description && <p className="text-sm text-muted-foreground mt-1">{team.description}</p>}
-            {(team.instagram_url || team.telegram_url || team.youtube_url || team.x_url) && (
+            {(team.instagram_url || team.telegram_url || team.youtube_url || team.x_url || team.threads_url) && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {[
                   { url: team.instagram_url, label: 'Instagram' },
                   { url: team.telegram_url, label: 'Telegram' },
                   { url: team.youtube_url, label: 'YouTube' },
                   { url: team.x_url, label: 'X' },
+                  { url: team.threads_url, label: 'Threads' },
                 ]
                   .filter((s) => s.url)
                   .map((s) => (

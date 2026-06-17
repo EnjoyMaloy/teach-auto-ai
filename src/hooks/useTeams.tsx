@@ -144,6 +144,7 @@ export interface CreateTeamInput {
   telegram_url?: string | null;
   youtube_url?: string | null;
   x_url?: string | null;
+  threads_url?: string | null;
 }
 
 export const useCreateTeam = () => {
@@ -161,6 +162,7 @@ export const useCreateTeam = () => {
           telegram_url: input.telegram_url || null,
           youtube_url: input.youtube_url || null,
           x_url: input.x_url || null,
+          threads_url: input.threads_url || null,
           created_by: user.id,
         })
         .select()
