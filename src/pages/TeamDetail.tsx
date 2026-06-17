@@ -170,7 +170,7 @@ export default function TeamDetail() {
                 style={{ boxShadow: 'none' }}
                 className="h-9 px-4 rounded-xl bg-white hover:bg-white/90 text-neutral-900 border-0 hover:translate-y-0"
               >
-                <Plus className="size-4 mr-2" /> Добавить
+                <Plus className="size-4 mr-2" /> Пригласить
               </Button>
             )}
           </div>
