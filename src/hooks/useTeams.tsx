@@ -150,6 +150,8 @@ export const useTeamMutations = (teamId: string | null) => {
 export interface CreateTeamInput {
   name: string;
   description?: string;
+  description_ru?: string | null;
+  description_en?: string | null;
   avatar_url?: string | null;
   instagram_url?: string | null;
   telegram_url?: string | null;
@@ -167,7 +169,9 @@ export const useCreateTeam = () => {
         .from('teams')
         .insert({
           name: input.name,
-          description: input.description || null,
+          description: input.description_ru || input.description || null,
+          description_ru: input.description_ru || null,
+          description_en: input.description_en || null,
           avatar_url: input.avatar_url || null,
           instagram_url: input.instagram_url || null,
           telegram_url: input.telegram_url || null,
