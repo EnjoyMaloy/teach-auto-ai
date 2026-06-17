@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Trash2, Crown, User as UserIcon, LogOut } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Crown, User as UserIcon, LogOut, Mail, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -22,6 +22,10 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useTeamMembers, useTeamMutations } from '@/hooks/useTeams';
+import {
+  useTeamInvitations,
+  useInvitationMutations,
+} from '@/hooks/useTeamInvitations';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
