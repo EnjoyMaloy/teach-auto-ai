@@ -331,38 +331,3 @@ export default function TeamDetail() {
     </div>
   );
 }
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label>Email пользователя</Label>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="user@example.com"
-              />
-              <p className="text-xs text-muted-foreground">
-                Пользователь должен быть уже зарегистрирован.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Label>Роль</Label>
-              <Select value={role} onValueChange={(v: 'admin' | 'member') => setRole(v)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="member">Member — может всё, кроме удаления</SelectItem>
-                  <SelectItem value="admin">Admin — полный доступ</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setAddOpen(false)}>Отмена</Button>
-            <Button onClick={handleAdd} disabled={addMember.isPending}>Добавить</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
