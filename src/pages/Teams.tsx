@@ -203,6 +203,8 @@ export default function Teams() {
     try {
       const team = await createTeam.mutateAsync({
         name: name.trim(),
+        description_ru: descriptionRu.trim() || null,
+        description_en: descriptionEn.trim() || null,
         instagram_url: socials.instagram || null,
         telegram_url: socials.telegram || null,
         youtube_url: socials.youtube || null,
