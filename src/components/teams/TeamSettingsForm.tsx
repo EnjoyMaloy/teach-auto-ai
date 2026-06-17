@@ -145,6 +145,7 @@ export default function TeamSettingsForm({ team, canEdit }: Props) {
   const [name, setName] = useState(team.name);
   const [descriptionRu, setDescriptionRu] = useState(team.description_ru || team.description || '');
   const [descriptionEn, setDescriptionEn] = useState(team.description_en || '');
+  const [descLang, setDescLang] = useState<'ru' | 'en'>('ru');
   const [socials, setSocials] = useState<Record<SocialPlatform, string>>({
     instagram: team.instagram_url || '',
     telegram: team.telegram_url || '',
