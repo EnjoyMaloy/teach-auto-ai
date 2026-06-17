@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { Camera, Loader2, Plus, X, Check, Instagram, Send, Youtube } from 'lucide-react';
+import { Camera, Loader2, Instagram, Send, Youtube } from 'lucide-react';
 import { XIcon, ThreadsIcon } from '@/components/icons/BrandIcons';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useTeamMutations } from '@/hooks/useTeams';
 import { Team } from '@/hooks/useWorkspace';
 import { useWorkspace } from '@/hooks/useWorkspace';
@@ -29,8 +28,6 @@ const SOCIAL_ICONS: Record<SocialPlatform, React.ComponentType<{ className?: str
   x: XIcon,
   threads: ThreadsIcon,
 };
-
-// SocialChip removed in favor of direct stacked line inputs (полосками)
 
 interface Props {
   team: Team;
@@ -155,6 +152,11 @@ export default function TeamSettingsForm({ team, canEdit }: Props) {
     }
   };
 
+  const handleSocialChange = (platform: SocialPlatform, value: string) => {
+    if (disabled) return;
+    setSocials((s) => ({ ...s, [platform]: value }));
+  };
+
   const disabled = !canEdit;
 
   return (
@@ -170,113 +172,7 @@ export default function TeamSettingsForm({ team, canEdit }: Props) {
           )}
         >
           {avatarPreview ? (
-            <Avatar className="w-full h-full">
-              <AvatarImage src={avatarPreview} className="object-cover" />
-              <AvatarFallback>{team.name.slice(0, 2).toUpperCase()}</AvatarFallback>
-            </Avatar>
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground">
-              <Camera className="size-5" />
-            </div>
-          )}
-          {!disabled && (
-            <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-              <Camera className="size-5" />
-            </div>
-          )}
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => handleAvatarPick(e.target.files?.[0] ?? null)}
-        />
-        <div className="text-xs text-muted-foreground">
-          {disabled ? 'Только админ может менять аватар' : 'Нажмите, чтобы заменить аватар'}
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label>Название</Label>
-        <Input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          maxLength={80}
-          disabled={disabled}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label>Описание</Label>
-          <div className="flex bg-muted rounded-lg p-1">
-            <button
-              type="button"
-              onClick={() => setDescLang('ru')}
-              className={cn(
-                'px-2.5 py-1 text-xs font-medium rounded-md transition-colors',
-                descLang === 'ru'
-                  ? 'bg-[#0a0a0c] text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              RU
-            </button>
-            <button
-              type="button"
-              onClick={() => setDescLang('en')}
-              className={cn(
-                'px-2.5 py-1 text-xs font-medium rounded-md transition-colors',
-                descLang === 'en'
-                  ? 'bg-[#0a0a0c] text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              EN
-            </button>
-          </div>
-        </div>
-        {descLang === 'ru' ? (
-          <Textarea
-            value={descriptionRu}
-            onChange={(e) => setDescriptionRu(e.target.value)}
-            rows={3}
-            maxLength={500}
-            placeholder="Команда, которая создаёт курсы..."
-            disabled={disabled}
-          />
-        ) : (
-          <Textarea
-            value={descriptionEn}
-            onChange={(e) => setDescriptionEn(e.target.value)}
-            rows={3}
-            maxLength={500}
-            placeholder="A team that creates courses..."
-            disabled={disabled}
-          />
-        )}
-      </div>
-
-  const handleSocialChange = (platform: SocialPlatform, value: string) => {
-    if (disabled) return;
-    setSocials((s) => ({ ...s, [platform]: value }));
-  };
-
-  return (
-    <div className="space-y-6 max-w-2xl">
-      <div className="flex items-center gap-4">
-        <button
-          type="button"
-          disabled={disabled}
-          onClick={() => fileInputRef.current?.click()}
-          className={cn(
-            'relative size-20 rounded-full overflow-hidden border-2 border-dashed border-border group',
-            disabled ? 'cursor-not-allowed opacity-70' : 'hover:border-primary transition-colors'
-          )}
-        >
-          {avatarPreview ? (
-            <Avatar className="w-full h-full">
+            <Avatar className="size-20">
               <AvatarImage src={avatarPreview} className="object-cover" />
               <AvatarFallback>{team.name.slice(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
