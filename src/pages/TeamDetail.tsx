@@ -278,8 +278,10 @@ export default function TeamDetail() {
           )}
         </TabsContent>
 
-        <TabsContent value="settings" className="mt-6">
-          <div className="flex flex-wrap items-center gap-4">
+        <TabsContent value="settings" className="mt-6 space-y-8">
+          <TeamSettingsForm team={team} canEdit={isAdmin} />
+
+          <div className="border-t border-border pt-6 flex flex-wrap items-center gap-4">
             <Button variant="outline" onClick={handleLeave} className="border">
               <LogOut className="size-4 mr-2" /> Выйти из команды
             </Button>
