@@ -38,106 +38,7 @@ const SOCIAL_ICONS: Record<SocialPlatform, React.ComponentType<{ className?: str
   threads: ThreadsIcon,
 };
 
-interface SocialChipProps {
-  platform: SocialPlatform;
-  value: string;
-  onChange: (v: string) => void;
-}
-
-function SocialChip({ platform, value, onChange }: SocialChipProps) {
-  const Icon = SOCIAL_ICONS[platform];
-  const [open, setOpen] = useState(false);
-  const [draft, setDraft] = useState(value);
-  const isSet = !!value;
-
-  const handleSave = () => {
-    const trimmed = draft.trim();
-    if (!trimmed) {
-      onChange('');
-      setOpen(false);
-      return;
-    }
-    const v = validateSocialUrl(platform, trimmed);
-    if (v === null) {
-      toast.error(`Неверная ссылка ${SOCIAL_LABELS[platform]}`);
-      return;
-    }
-    onChange(v || '');
-    setOpen(false);
-  };
-
-  return (
-    <Popover
-      open={open}
-      onOpenChange={(o) => {
-        setOpen(o);
-        if (o) setDraft(value);
-      }}
-    >
-      <PopoverTrigger asChild>
-        <button
-          type="button"
-          title={SOCIAL_LABELS[platform]}
-          className={cn(
-            'relative size-10 rounded-full flex items-center justify-center transition-colors border',
-            isSet
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'bg-muted text-muted-foreground border-border hover:text-foreground hover:border-primary/50'
-          )}
-        >
-          <Icon className="size-4" />
-          {!isSet && (
-            <span className="absolute -bottom-0.5 -right-0.5 size-4 rounded-full bg-background border border-border flex items-center justify-center">
-              <Plus className="size-2.5" />
-            </span>
-          )}
-          {isSet && (
-            <span className="absolute -bottom-0.5 -right-0.5 size-4 rounded-full bg-background border border-border flex items-center justify-center text-primary">
-              <Check className="size-2.5" />
-            </span>
-          )}
-        </button>
-      </PopoverTrigger>
-      <PopoverContent className="w-72" align="start">
-        <div className="space-y-2">
-          <Label className="text-xs">{SOCIAL_LABELS[platform]}</Label>
-          <Input
-            autoFocus
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            placeholder={SOCIAL_PLACEHOLDERS[platform]}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleSave();
-              }
-            }}
-          />
-          <div className="flex justify-between gap-2 pt-1">
-            {isSet ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  onChange('');
-                  setOpen(false);
-                }}
-              >
-                <X className="size-3 mr-1" /> Убрать
-              </Button>
-            ) : (
-              <span />
-            )}
-            <Button type="button" size="sm" onClick={handleSave}>
-              Сохранить
-            </Button>
-          </div>
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-}
+// SocialChip component removed in favor of direct stacked line inputs (полосками)
 
 export default function Teams() {
   const navigate = useNavigate();
@@ -201,17 +102,33 @@ export default function Teams() {
       return;
     }
 
+    // Validate social links on submit
+    const validatedSocials: Record<SocialPlatform, string> = { ...socials };
+    for (const p of SOCIAL_PLATFORMS) {
+      const val = socials[p].trim();
+      if (val) {
+        const validated = validateSocialUrl(p, val);
+        if (validated === null) {
+          toast.error(`Неверная ссылка для ${SOCIAL_LABELS[p]}`);
+          return;
+        }
+        validatedSocials[p] = validated;
+      } else {
+        validatedSocials[p] = '';
+      }
+    }
+
     setSubmitting(true);
     try {
       const team = await createTeam.mutateAsync({
         name: name.trim(),
         description_ru: descriptionRu.trim() || null,
         description_en: descriptionEn.trim() || null,
-        instagram_url: socials.instagram || null,
-        telegram_url: socials.telegram || null,
-        youtube_url: socials.youtube || null,
-        x_url: socials.x || null,
-        threads_url: socials.threads || null,
+        instagram_url: validatedSocials.instagram || null,
+        telegram_url: validatedSocials.telegram || null,
+        youtube_url: validatedSocials.youtube || null,
+        x_url: validatedSocials.x || null,
+        threads_url: validatedSocials.threads || null,
       });
 
       if (avatarFile) {
@@ -458,19 +375,32 @@ export default function Teams() {
             </div>
 
 
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">
                 Соцсети <span className="normal-case tracking-normal text-muted-foreground/70">— опционально</span>
               </Label>
-              <div className="flex items-center gap-2">
-                {SOCIAL_PLATFORMS.map((p) => (
-                  <SocialChip
-                    key={p}
-                    platform={p}
-                    value={socials[p]}
-                    onChange={(v) => setSocials((s) => ({ ...s, [p]: v }))}
-                  />
-                ))}
+              <div className="grid gap-2">
+                {SOCIAL_PLATFORMS.map((p) => {
+                  const Icon = SOCIAL_ICONS[p];
+                  return (
+                    <div
+                      key={p}
+                      className="flex items-center gap-3 bg-muted/40 p-1.5 pl-3 rounded-xl border border-border/50 focus-within:border-primary/50 focus-within:bg-muted/60 transition-colors"
+                    >
+                      <div className="flex items-center gap-2 text-muted-foreground shrink-0 w-24">
+                        <Icon className="size-4" />
+                        <span className="text-xs font-medium">{SOCIAL_LABELS[p]}</span>
+                      </div>
+                      <input
+                        type="text"
+                        value={socials[p]}
+                        onChange={(e) => setSocials((s) => ({ ...s, [p]: e.target.value }))}
+                        placeholder={SOCIAL_PLACEHOLDERS[p]}
+                        className="bg-transparent border-0 text-xs focus:outline-none focus:ring-0 w-full p-1 text-foreground placeholder:text-muted-foreground/30"
+                      />
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
