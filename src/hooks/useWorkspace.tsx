@@ -6,6 +6,8 @@ export interface Team {
   id: string;
   name: string;
   description: string | null;
+  description_ru: string | null;
+  description_en: string | null;
   avatar_url: string | null;
   instagram_url: string | null;
   telegram_url: string | null;
