@@ -243,7 +243,7 @@ export default function TeamDetail() {
               <Button
                 onClick={handleDelete}
                 style={{ boxShadow: 'none' }}
-                className="bg-red-600 text-white hover:bg-red-700 border-0 focus-visible:ring-red-600/50 hover:translate-y-0"
+                className="bg-red-600 text-white hover:bg-red-700 hover:text-white border-0 focus-visible:ring-red-600/50 hover:translate-y-0"
               >
                 <Trash2 className="size-4 mr-2" /> Удалить команду
               </Button>
