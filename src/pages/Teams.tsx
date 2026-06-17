@@ -174,6 +174,8 @@ export default function Teams() {
 
   const resetForm = () => {
     setName('');
+    setDescriptionRu('');
+    setDescriptionEn('');
     setAvatarFile(null);
     setAvatarPreview(null);
     setSocials({ instagram: '', telegram: '', youtube: '', x: '', threads: '' });
