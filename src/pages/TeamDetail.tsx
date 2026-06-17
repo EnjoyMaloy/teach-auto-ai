@@ -27,6 +27,7 @@ import {
   useInvitationMutations,
 } from '@/hooks/useTeamInvitations';
 import { useAuth } from '@/hooks/useAuth';
+import TeamSettingsForm from '@/components/teams/TeamSettingsForm';
 import { toast } from 'sonner';
 
 export default function TeamDetail() {
