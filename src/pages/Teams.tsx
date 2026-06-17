@@ -408,6 +408,34 @@ export default function Teams() {
             </div>
 
             <div className="space-y-2">
+              <Label className="flex items-center justify-between">
+                <span>Описание (RU)</span>
+                <span className="text-xs text-muted-foreground font-normal">опционально</span>
+              </Label>
+              <Textarea
+                value={descriptionRu}
+                onChange={(e) => setDescriptionRu(e.target.value)}
+                placeholder="Команда, которая создаёт курсы..."
+                rows={2}
+                maxLength={500}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="flex items-center justify-between">
+                <span>Description (EN)</span>
+                <span className="text-xs text-muted-foreground font-normal">optional</span>
+              </Label>
+              <Textarea
+                value={descriptionEn}
+                onChange={(e) => setDescriptionEn(e.target.value)}
+                placeholder="A team that creates courses..."
+                rows={2}
+                maxLength={500}
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">
                 Соцсети <span className="normal-case tracking-normal text-muted-foreground/70">— опционально</span>
               </Label>
