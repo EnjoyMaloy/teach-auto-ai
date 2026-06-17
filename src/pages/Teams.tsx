@@ -13,6 +13,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useCreateTeam } from '@/hooks/useTeams';
@@ -145,6 +146,8 @@ export default function Teams() {
   const { accept, decline } = useRespondToInvitation();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
+  const [descriptionRu, setDescriptionRu] = useState('');
+  const [descriptionEn, setDescriptionEn] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [socials, setSocials] = useState<Record<SocialPlatform, string>>({
@@ -172,6 +175,8 @@ export default function Teams() {
 
   const resetForm = () => {
     setName('');
+    setDescriptionRu('');
+    setDescriptionEn('');
     setAvatarFile(null);
     setAvatarPreview(null);
     setSocials({ instagram: '', telegram: '', youtube: '', x: '', threads: '' });
@@ -199,6 +204,8 @@ export default function Teams() {
     try {
       const team = await createTeam.mutateAsync({
         name: name.trim(),
+        description_ru: descriptionRu.trim() || null,
+        description_en: descriptionEn.trim() || null,
         instagram_url: socials.instagram || null,
         telegram_url: socials.telegram || null,
         youtube_url: socials.youtube || null,
@@ -397,6 +404,34 @@ export default function Teams() {
                 placeholder="Моя команда"
                 maxLength={80}
                 autoFocus
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="flex items-center justify-between">
+                <span>Описание (RU)</span>
+                <span className="text-xs text-muted-foreground font-normal">опционально</span>
+              </Label>
+              <Textarea
+                value={descriptionRu}
+                onChange={(e) => setDescriptionRu(e.target.value)}
+                placeholder="Команда, которая создаёт курсы..."
+                rows={2}
+                maxLength={500}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="flex items-center justify-between">
+                <span>Description (EN)</span>
+                <span className="text-xs text-muted-foreground font-normal">optional</span>
+              </Label>
+              <Textarea
+                value={descriptionEn}
+                onChange={(e) => setDescriptionEn(e.target.value)}
+                placeholder="A team that creates courses..."
+                rows={2}
+                maxLength={500}
               />
             </div>
 

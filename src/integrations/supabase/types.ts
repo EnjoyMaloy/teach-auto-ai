@@ -1095,6 +1095,8 @@ export type Database = {
           created_at: string
           created_by: string
           description: string | null
+          description_en: string | null
+          description_ru: string | null
           id: string
           instagram_url: string | null
           name: string
@@ -1109,6 +1111,8 @@ export type Database = {
           created_at?: string
           created_by: string
           description?: string | null
+          description_en?: string | null
+          description_ru?: string | null
           id?: string
           instagram_url?: string | null
           name: string
@@ -1123,6 +1127,8 @@ export type Database = {
           created_at?: string
           created_by?: string
           description?: string | null
+          description_en?: string | null
+          description_ru?: string | null
           id?: string
           instagram_url?: string | null
           name?: string
