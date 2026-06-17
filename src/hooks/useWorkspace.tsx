@@ -48,7 +48,7 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     const { data, error } = await supabase
       .from('team_members')
-      .select('role, teams!inner(id, name, description, avatar_url, instagram_url, telegram_url, youtube_url, x_url, threads_url)')
+      .select('role, teams!inner(id, name, description, description_ru, description_en, avatar_url, instagram_url, telegram_url, youtube_url, x_url, threads_url)')
       .eq('user_id', user.id);
 
     if (!error && data) {
@@ -56,6 +56,8 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
         id: row.teams.id,
         name: row.teams.name,
         description: row.teams.description,
+        description_ru: row.teams.description_ru,
+        description_en: row.teams.description_en,
         avatar_url: row.teams.avatar_url,
         instagram_url: row.teams.instagram_url,
         telegram_url: row.teams.telegram_url,
