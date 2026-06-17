@@ -1,12 +1,13 @@
 // Social link domain validation for team profiles.
 
-export type SocialPlatform = 'instagram' | 'telegram' | 'youtube' | 'x';
+export type SocialPlatform = 'instagram' | 'telegram' | 'youtube' | 'x' | 'threads';
 
 const DOMAINS: Record<SocialPlatform, string[]> = {
   instagram: ['instagram.com', 'www.instagram.com'],
   telegram: ['t.me', 'telegram.me', 'www.t.me'],
   youtube: ['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be'],
   x: ['x.com', 'www.x.com', 'twitter.com', 'www.twitter.com'],
+  threads: ['threads.net', 'www.threads.net', 'threads.com', 'www.threads.com'],
 };
 
 export const SOCIAL_LABELS: Record<SocialPlatform, string> = {
@@ -14,6 +15,7 @@ export const SOCIAL_LABELS: Record<SocialPlatform, string> = {
   telegram: 'Telegram',
   youtube: 'YouTube',
   x: 'X (Twitter)',
+  threads: 'Threads',
 };
 
 export const SOCIAL_PLACEHOLDERS: Record<SocialPlatform, string> = {
@@ -21,6 +23,7 @@ export const SOCIAL_PLACEHOLDERS: Record<SocialPlatform, string> = {
   telegram: 'https://t.me/username',
   youtube: 'https://youtube.com/@channel',
   x: 'https://x.com/username',
+  threads: 'https://threads.net/@username',
 };
 
 /**
