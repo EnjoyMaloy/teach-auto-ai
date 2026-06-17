@@ -1055,6 +1055,7 @@ export type Database = {
           instagram_url: string | null
           name: string
           telegram_url: string | null
+          threads_url: string | null
           updated_at: string
           x_url: string | null
           youtube_url: string | null
@@ -1068,6 +1069,7 @@ export type Database = {
           instagram_url?: string | null
           name: string
           telegram_url?: string | null
+          threads_url?: string | null
           updated_at?: string
           x_url?: string | null
           youtube_url?: string | null
@@ -1081,6 +1083,7 @@ export type Database = {
           instagram_url?: string | null
           name?: string
           telegram_url?: string | null
+          threads_url?: string | null
           updated_at?: string
           x_url?: string | null
           youtube_url?: string | null
